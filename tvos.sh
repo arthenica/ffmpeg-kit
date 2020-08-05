@@ -1,136 +1,53 @@
 #!/bin/bash
 
-export FFMPEG_KIT_BUILD_TYPE="tvos"
-export BASEDIR="$(pwd)"
-
-source "${BASEDIR}"/scripts/common-${FFMPEG_KIT_BUILD_TYPE}.sh
-
-# ENABLE ARCH
-ENABLED_ARCHITECTURES=(0 0 0 0 0 1 0 0 0 1 0)
-
-# ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-
-# USE 10.2 AS TVOS_MIN_VERSION
-export TVOS_MIN_VERSION=10.2
-
-export APPLE_TVOS_BUILD=1
-
-RECONF_LIBRARIES=()
-REBUILD_LIBRARIES=()
-REDOWNLOAD_LIBRARIES=()
-
-get_ffmpeg_kit_version() {
-  local FFMPEG_KIT_VERSION=$(grep 'const FFMPEG_KIT_VERSION' "${BASEDIR}"/ios/src/FFmpegKit.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
-
-  if [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    echo "${FFMPEG_KIT_VERSION}"
-  else
-    echo "${FFMPEG_KIT_VERSION}.LTS"
-  fi
-}
-
-display_help() {
-  COMMAND=$(echo "$0" | sed -e 's/\.\///g')
-
-  echo -e "\n$COMMAND builds FFmpegKit for tvOS platform. By default two architectures (arm64 and x86-64) are built \
-without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
-Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends, framework bundles and universal fat binaries are created under the prebuilt folder.\n"
-  echo -e "Usage: ./$COMMAND [OPTION]...\n"
-  echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
-
-  display_help_options
-  display_help_licensing
-
-  echo -e "Architectures:"
-
-  echo -e "  --disable-arm64\t\tdo not build arm64 architecture [yes]"
-  echo -e "  --disable-x86-64\t\tdo not build x86-64 architecture [yes]\n"
-
-  echo -e "Libraries:"
-  echo -e "  --full\t\t\tenables all non-GPL external libraries"
-  echo -e "  --enable-tvos-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
-  echo -e "  --enable-tvos-bzip2\t\tbuild with built-in bzip2 support[no]"
-  if [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
-  fi
-  echo -e "  --enable-tvos-zlib\t\tbuild with built-in zlib [no]"
-  echo -e "  --enable-tvos-libiconv\tbuild with built-in libiconv [no]"
-
-  display_help_common_libraries
-  display_help_gpl_libraries
-  display_help_advanced_options
-}
-
-enable_lts_build() {
-  export FFMPEG_KIT_LTS_BUILD="1"
-
-  # XCODE 7.3 HAS TVOS SDK 9.2
-  export TVOS_MIN_VERSION=9.2
-
-  # TVOS SDK 9.2 DOES NOT INCLUDE VIDEOTOOLBOX
-  ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=0
-}
-
-create_static_fat_library() {
-  local FAT_LIBRARY_PATH="${BASEDIR}"/prebuilt/tvos-universal/"$2"-universal
-
-  mkdir -p "${FAT_LIBRARY_PATH}"/lib 1>>"${BASEDIR}"/build.log 2>&1
-
-  LIPO_COMMAND="${LIPO} -create"
-
-  for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"; do
-    LIPO_COMMAND+=" $(find "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH}"-apple-darwin -name $1)"
-  done
-
-  LIPO_COMMAND+=" -output ${FAT_LIBRARY_PATH}/lib/$1"
-
-  RC=$(${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1)
-
-  echo ${RC}
-}
-
-
-get_external_library_version() {
-  local library_version=$(grep Version "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/pkgconfig/"$1".pc 2>>"${BASEDIR}"/build.log | sed 's/Version://g;s/\ //g')
-
-  echo "${library_version}"
-}
-
-# CHECKING IF XCODE IS INSTALLED
-if ! [ -x "$(command -v xcrun)" ]; then
-  echo -e "\n(*) xcrun command not found. Please check your Xcode installation.\n"
+# CHECK IF XCODE IS INSTALLED
+if [ ! -x "$(command -v xcrun)" ]; then
+  echo -e "\n(*) xcrun command not found. Please check your Xcode installation\n"
   exit 1
 fi
 
+# LOAD INITIAL SETTINGS
+export BASEDIR="$(pwd)"
+export FFMPEG_KIT_BUILD_TYPE="tvos"
+source "${BASEDIR}"/scripts/variable.sh
+source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
+
+# SET DEFAULTS SETTINGS
+enable_default_tvos_architectures
+enable_main_build
+
 # SELECT XCODE VERSION USED FOR BUILDING
-XCODE_FOR_FFMPEG_KIT=source ~/.xcode.for.ffmpeg.kit.sh
+XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh)
 if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
   source "${XCODE_FOR_FFMPEG_KIT}" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
+# DETECT TVOS SDK VERSION
 DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version)"
-
 echo -e "INFO: Using SDK ${DETECTED_TVOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ "${DETECTED_TVOS_SDK_VERSION}" != "${TVOS_MIN_VERSION}" ]]; then
-  echo -e "\n(*) LTS packages should be built using SDK ${TVOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_TVOS_SDK_VERSION}\n"
-
-  if [[ -z ${BUILD_FORCE} ]]; then
-    exit 1
-  fi
-fi
-
+# SET DEFAULT BUILD OPTIONS
 GPL_ENABLED="no"
 DISPLAY_HELP=""
-BUILD_LTS=""
 BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_FORCE=""
-BUILD_VERSION=$(git describe --tags 2>>"${BASEDIR}"/build.log)
+BUILD_VERSION=$(git describe --tags --always 2>>"${BASEDIR}"/build.log)
+if [[ -z ${BUILD_VERSION} ]]; then
+  echo -e "\n(*): Can not run git commands in this folder. See build.log.\n"
+  exit 1
+fi
 
+# PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
+for argument in "$@"; do
+  if [[ "$argument" == "-l" ]] || [[ "$argument" == "--lts" ]]; then
+    enable_lts_build
+    BUILD_TYPE_ID+="LTS "
+  fi
+done
+
+# PROCESS BUILD OPTIONS
 while [ ! $# -eq 0 ]; do
   case $1 in
   -h | --help)
@@ -159,9 +76,7 @@ while [ ! $# -eq 0 ]; do
   -s | --speed)
     optimize_for_speed
     ;;
-  -l | --lts)
-    BUILD_LTS="1"
-    ;;
+  -l | --lts) ;;
   -f | --force)
     BUILD_FORCE="1"
     ;;
@@ -203,39 +118,36 @@ while [ ! $# -eq 0 ]; do
   shift
 done
 
-if [[ -z ${BUILD_VERSION} ]]; then
-  echo -e "\nerror: Can not run git commands in this folder. See build.log.\n"
-  exit 1
+# VALIDATE THAT LTS RELEASES ARE BUILT USING THE CORRECT VERSION
+if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ "${DETECTED_TVOS_SDK_VERSION}" != "${TVOS_MIN_VERSION}" ]]; then
+  if [[ -z ${BUILD_FORCE} ]]; then
+    echo -e "\n(*) LTS packages should be built using SDK ${TVOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_TVOS_SDK_VERSION}\n"
+    exit 1
+  fi
 fi
 
-# DETECT BUILD TYPE
-if [[ -n ${BUILD_LTS} ]]; then
-  enable_lts_build
-  BUILD_TYPE_ID+="LTS "
-fi
-
-# HELP DISPLAYED AFTER SETTING LTS FLAG
-if [[ -n ${DISPLAY_HELP} ]]; then
-  display_help
-  exit 0
-fi
-
-# PROCESS FULL FLAG
+# PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..60}; do
+  for library in {0..57}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
-      enable_library "$(get_library_name $library)"
+      enable_library "$(get_library_name $library)" 1
     else
-      if [[ $library -ne $LIBRARY_X264 ]] && [[ $library -ne $LIBRARY_XVIDCORE ]] && [[ $library -ne $LIBRARY_X265 ]] && [[ $library -ne $LIBRARY_LIBVIDSTAB ]] && [[ $library -ne $LIBRARY_RUBBERBAND ]]; then
-        enable_library "$(get_library_name $library)"
+      if [[ $(is_gpl_licensed $library) -eq 1 ]]; then
+        enable_library "$(get_library_name $library)" 1
       fi
     fi
   done
 fi
 
+# IF HELP DISPLAYED EXIT
+if [[ -n ${DISPLAY_HELP} ]]; then
+  display_help
+  exit 0
+fi
+
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}static library for tvOS\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}for tvOS: " 1>>"${BASEDIR}"/build.log 2>&1
-echo -e "$(date)" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "$(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # PRINT BUILD SUMMARY
 print_enabled_architectures
@@ -244,7 +156,7 @@ print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 print_redownload_requested_libraries
 
-# CHECK GPL FLAG AND DOWNLOAD LIBRARIES
+# VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
     library_name=$(get_library_name ${gpl_library})
@@ -253,19 +165,20 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
       echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
       echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" 1>>"${BASEDIR}"/build.log 2>&1
       exit 1
-    else
-      DOWNLOAD_RESULT=$(download_gpl_library_source "${library_name}")
-      if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
-        echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
-        echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" 1>>"${BASEDIR}"/build.log 2>&1
-        exit 1
-      fi
     fi
   fi
 done
 
+echo -n -e "\nDownloading sources: "
+echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+# DOWNLOAD LIBRARY SOURCES
+downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
+
+# THIS WILL SAVE ARCHITECTURES TO BUILD
 TARGET_ARCH_LIST=()
 
+# BUILD ENABLED LIBRARIES ON ENABLED ARCHITECTURES
 for run_arch in {0..10}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
     export ARCH=$(get_arch_name $run_arch)
@@ -275,6 +188,7 @@ for run_arch in {0..10}; do
 
     export LIPO="$(xcrun --sdk "$(get_sdk_name)" -f lipo)"
 
+    # EXECUTE MAIN BUILD SCRIPT
     . "${BASEDIR}"/scripts/main-tvos.sh "${ENABLED_LIBRARIES[@]}"
     case ${ARCH} in
     x86-64)
@@ -287,7 +201,7 @@ for run_arch in {0..10}; do
     TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
     # CLEAR FLAGS
-    for library in {0..60}; do
+    for library in {0..57}; do
       library_name=$(get_library_name ${library})
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"
@@ -297,23 +211,28 @@ done
 
 FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
 
+# BUILD STATIC LIBRARIES
 BUILD_LIBRARY_EXTENSION="a"
 
+# BUILD FFMPEG-KIT
 if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
   echo -e -n "\n\nCreating frameworks and universal libraries under prebuilt: "
 
-  # BUILDING UNIVERSAL LIBRARIES
+  # CREATE FFMPEG
+
+  # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
   rm -rf "${BASEDIR}"/prebuilt/tvos-universal 1>>"${BASEDIR}"/build.log 2>&1
   mkdir -p "${BASEDIR}"/prebuilt/tvos-universal 1>>"${BASEDIR}"/build.log 2>&1
   rm -rf "${BASEDIR}"/prebuilt/tvos-framework 1>>"${BASEDIR}"/build.log 2>&1
   mkdir -p "${BASEDIR}"/prebuilt/tvos-framework 1>>"${BASEDIR}"/build.log 2>&1
 
-  # 1. EXTERNAL LIBRARIES
-  for library in {0..6} {8..37} {39..44}; do
+  # CREATE ENABLED LIBRARY PACKAGES
+  for library in {0..57}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-
       library_name=$(get_library_name ${library})
+
+      # EACH ENABLED LIBRARY HAS TO HAVE A .pc FILE AND A VERSION
       package_config_file_name=$(get_package_config_file_name ${library})
       library_version=$(get_external_library_version "${package_config_file_name}")
       if [[ -z ${library_version} ]]; then
@@ -324,6 +243,7 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
       echo -e "Creating universal library for ${library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
+      # SOME CUSTOM CODE TO HANDLE LIBRARIES THAT PRODUCE MULTIPLE LIBRARY FILES
       if [[ ${LIBRARY_LIBTHEORA} == "$library" ]]; then
 
         LIBRARY_CREATED=$(create_static_fat_library "libtheora.a" "libtheora")
@@ -625,6 +545,8 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
         fi
 
       else
+
+        # LIBRARIES WHICH HAVE ONLY ONE LIBRARY FILE ARE CREATED HERE
         library_name=$(get_library_name $((library)))
         static_archive_name=$(get_static_archive_name $((library)))
         LIBRARY_CREATED=$(create_static_fat_library "$static_archive_name" "$library_name")
@@ -656,11 +578,14 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
     fi
   done
 
-  # 2. FFMPEG
+  # CREATE FFMPEG
+
+  # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
   FFMPEG_UNIVERSAL="${BASEDIR}"/prebuilt/tvos-universal/ffmpeg-universal
   mkdir -p "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
   mkdir -p "${FFMPEG_UNIVERSAL}"/lib 1>>"${BASEDIR}"/build.log 2>&1
 
+  # COPY HEADER FILES
   cp -r "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg/include/* "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
   cp "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg/include/config.h "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -673,8 +598,8 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
     LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
 
+    # EXECUTE CREATE UNIVERSAL LIBRARY COMMAND
     ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
-
     if [ $? -ne 0 ]; then
       echo -e "failed\n"
       exit 1
@@ -683,28 +608,27 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
     FFMPEG_LIB_UPPERCASE=$(echo "${FFMPEG_LIB}" | tr '[a-z]' '[A-Z]')
     FFMPEG_LIB_CAPITALCASE=$(to_capital_case "${FFMPEG_LIB}")
 
+    # EXTRACT FFMPEG VERSION
     FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
     FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
     FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
-
     FFMPEG_LIB_VERSION="${FFMPEG_LIB_MAJOR}.${FFMPEG_LIB_MINOR}.${FFMPEG_LIB_MICRO}"
 
+    # INITIALIZE FRAMEWORK DIRECTORY
     FFMPEG_LIB_FRAMEWORK_PATH=${BASEDIR}/prebuilt/tvos-framework/${FFMPEG_LIB}.framework
-
     rm -rf "${FFMPEG_LIB_FRAMEWORK_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
     mkdir -p "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
 
-    cp -r "${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/*" "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+    # COPY HEADER FILES
+    cp -r "${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+
+    # COPY LIBRARY FILE
     cp "${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
 
-    # COPY THE LICENSES
+    # COPY FRAMEWORK LICENSES
     if [ ${GPL_ENABLED} == "yes" ]; then
-
-      # GPLv3.0
       cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_LIB_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
     else
-
-      # LGPLv3.0
       cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_LIB_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
     fi
 
@@ -713,14 +637,16 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
     echo -e "Created ${FFMPEG_LIB} framework successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
   done
 
-  # COPY THE LICENSES
+  # COPY UNIVERSAL LIBRARY LICENSES
   if [ ${GPL_ENABLED} == "yes" ]; then
     cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   else
     cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   fi
 
-  # 3. FFMPEG KIT
+  # FFMPEG KIT
+
+  # INITIALIZE FRAMEWORK AND UNIVERSAL LIBRARY DIRECTORIES
   FFMPEG_KIT_VERSION=$(get_ffmpeg_kit_version)
   FFMPEG_KIT_UNIVERSAL=${BASEDIR}/prebuilt/tvos-universal/ffmpeg-kit-universal
   FFMPEG_KIT_FRAMEWORK_PATH=${BASEDIR}/prebuilt/tvos-framework/ffmpegkit.framework
@@ -736,15 +662,18 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
   done
   LIPO_COMMAND+=" -output ${FFMPEG_KIT_UNIVERSAL}/lib/libffmpegkit.${BUILD_LIBRARY_EXTENSION}"
 
+  # EXECUTE CREATE UNIVERSAL LIBRARY COMMAND
   ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
-
   if [ $? -ne 0 ]; then
     echo -e "failed\n"
     exit 1
   fi
 
+  # COPY HEADER FILES
   cp -r "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg-kit/include/* "${FFMPEG_KIT_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
   cp -r "${FFMPEG_KIT_UNIVERSAL}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # COPY LIBRARY FILE
   cp "${FFMPEG_KIT_UNIVERSAL}"/lib/libffmpegkit.${BUILD_LIBRARY_EXTENSION} "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
 
   # COPY THE LICENSES
@@ -760,6 +689,5 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
 
   echo -e "Created ffmpeg-kit.framework and universal library successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
-
   echo -e "ok\n"
 fi

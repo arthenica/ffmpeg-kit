@@ -1,0 +1,1673 @@
+#!/bin/bash
+
+source "${BASEDIR}"/scripts/source.sh
+
+get_arch_name() {
+  case $1 in
+  0) echo "arm-v7a" ;; # android
+  1) echo "arm-v7a-neon" ;; # android
+  2) echo "armv7" ;; # ios
+  3) echo "armv7s" ;; # ios
+  4) echo "arm64-v8a" ;; # android
+  5) echo "arm64" ;; # ios, tvos
+  6) echo "arm64e" ;; # ios
+  7) echo "i386" ;; # ios
+  8) echo "x86" ;; # android
+  9) echo "x86-64" ;; # android, ios, macos, tvos
+  10) echo "x86-64-mac-catalyst" ;; # ios
+  esac
+}
+
+from_arch_name() {
+  case $1 in
+  arm-v7a) echo 0 ;; # android
+  arm-v7a-neon) echo 1 ;; # android
+  armv7) echo 2 ;; # ios
+  armv7s) echo 3 ;; # ios
+  arm64-v8a) echo 4 ;; # android
+  arm64) echo 5 ;; # ios, tvos
+  arm64e) echo 6 ;; # ios
+  i386) echo 7 ;; # ios
+  x86) echo 8 ;; # android
+  x86-64) echo 9 ;; # android, ios, macos, tvos
+  x86-64-mac-catalyst) echo 10 ;; # ios
+  esac
+}
+
+get_library_name() {
+  case $1 in
+  0) echo "fontconfig" ;;
+  1) echo "freetype" ;;
+  2) echo "fribidi" ;;
+  3) echo "gmp" ;;
+  4) echo "gnutls" ;;
+  5) echo "lame" ;;
+  6) echo "libass" ;;
+  7) echo "libiconv" ;;
+  8) echo "libtheora" ;;
+  9) echo "libvorbis" ;;
+  10) echo "libvpx" ;;
+  11) echo "libwebp" ;;
+  12) echo "libxml2" ;;
+  13) echo "opencore-amr" ;;
+  14) echo "shine" ;;
+  15) echo "speex" ;;
+  16) echo "wavpack" ;;
+  17) echo "kvazaar" ;;
+  18) echo "x264" ;;
+  19) echo "xvidcore" ;;
+  20) echo "x265" ;;
+  21) echo "libvidstab" ;;
+  22) echo "rubberband" ;;
+  23) echo "libilbc" ;;
+  24) echo "opus" ;;
+  25) echo "snappy" ;;
+  26) echo "soxr" ;;
+  27) echo "libaom" ;;
+  28) echo "chromaprint" ;;
+  29) echo "twolame" ;;
+  30) echo "sdl" ;;
+  31) echo "tesseract" ;;
+  32) echo "openh264" ;;
+  33) echo "vo-amrwbenc" ;;
+  34) echo "giflib" ;;
+  35) echo "jpeg" ;;
+  36) echo "libogg" ;;
+  37) echo "libpng" ;;
+  38) echo "libuuid" ;;
+  39) echo "nettle" ;;
+  40) echo "tiff" ;;
+  41) echo "expat" ;;
+  42) echo "libsndfile" ;;
+  43) echo "leptonica" ;;
+  44) echo "libsamplerate" ;;
+  45) echo "cpu-features" ;;
+  46) echo "android-zlib" ;;
+  47) echo "android-media-codec" ;;
+  48)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-zlib"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-zlib"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-zlib"
+    fi
+    ;;
+  49)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-audiotoolbox"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-audiotoolbox"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-audiotoolbox"
+    fi
+    ;;
+  50)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-bzip2"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-bzip2"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-bzip2"
+    fi
+    ;;
+  51)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-videotoolbox"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-videotoolbox"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-videotoolbox"
+    fi
+    ;;
+  52)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-avfoundation"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-avfoundation"
+    fi
+    ;;
+  53)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-libiconv"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-libiconv"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-libiconv"
+    fi
+    ;;
+  54)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "ios-libuuid"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-libuuid"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "tvos-libuuid"
+    fi
+    ;;
+  55)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-coreimage"
+    fi
+    ;;
+  56)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-opencl"
+    fi
+    ;;
+  57)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "macos-opengl"
+    fi
+    ;;
+  esac
+}
+
+from_library_name() {
+  case $1 in
+  fontconfig) echo 0 ;;
+  freetype) echo 1 ;;
+  fribidi) echo 2 ;;
+  gmp) echo 3 ;;
+  gnutls) echo 4 ;;
+  lame) echo 5 ;;
+  libass) echo 6 ;;
+  libiconv) echo 7 ;;
+  libtheora) echo 8 ;;
+  libvorbis) echo 9 ;;
+  libvpx) echo 10 ;;
+  libwebp) echo 11 ;;
+  libxml2) echo 12 ;;
+  opencore-amr) echo 13 ;;
+  shine) echo 14 ;;
+  speex) echo 15 ;;
+  wavpack) echo 16 ;;
+  kvazaar) echo 17 ;;
+  x264) echo 18 ;;
+  xvidcore) echo 19 ;;
+  x265) echo 20 ;;
+  libvidstab) echo 21 ;;
+  rubberband) echo 22 ;;
+  libilbc) echo 23 ;;
+  opus) echo 24 ;;
+  snappy) echo 25 ;;
+  soxr) echo 26 ;;
+  libaom) echo 27 ;;
+  chromaprint) echo 28 ;;
+  twolame) echo 29 ;;
+  sdl) echo 30 ;;
+  tesseract) echo 31 ;;
+  openh264) echo 32 ;;
+  vo-amrwbenc) echo 33 ;;
+  giflib) echo 34 ;;
+  jpeg) echo 35 ;;
+  libogg) echo 36 ;;
+  libpng) echo 37 ;;
+  libuuid) echo 38 ;;
+  nettle) echo 39 ;;
+  tiff) echo 40 ;;
+  expat) echo 41 ;;
+  libsndfile) echo 42 ;;
+  leptonica) echo 43 ;;
+  libsamplerate) echo 44 ;;
+  cpu-features) echo 45 ;;
+  android-zlib) echo 46 ;;
+  android-media-codec) echo 47 ;;
+  ios-zlib | macos-zlib | tvos-zlib) echo 48 ;;
+  ios-audiotoolbox | macos-audiotoolbox | tvos-audiotoolbox) echo 49 ;;
+  ios-bzip2 | macos-bzip2 | tvos-bzip2) echo 50 ;;
+  ios-videotoolbox | macos-videotoolbox | tvos-videotoolbox) echo 51 ;;
+  ios-avfoundation | macos-avfoundation) echo 52 ;;
+  ios-libiconv | macos-libiconv | tvos-libiconv) echo 53 ;;
+  ios-libuuid | macos-libuuid | tvos-libuuid) echo 54 ;;
+  macos-coreimage) echo 55 ;;
+  macos-opencl) echo 56 ;;
+  macos-opengl) echo 57 ;;
+  esac
+}
+
+#
+# 1. <library name>
+#
+is_library_supported_on_platform() {
+  local library_index=$(from_library_name "$1")
+  case ${library_index} in
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20)
+    echo "0"
+    ;;
+  21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 39 | 40)
+    echo "0"
+    ;;
+  41 | 42 | 43 | 44)
+    echo "0"
+    ;;
+
+  # ANDROID
+  7 | 38 | 45 | 46 | 47)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+
+  # ONLY IOS, MACOS AND TVOS MAIN
+  51)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-videotoolbox" ]]; then
+      echo "0"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] && [[ $1 == "macos-videotoolbox" ]]; then
+      echo "0"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] && [[ $1 == "tvos-videotoolbox" ]] && [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+
+  # ONLY IOS AND MACOS
+  52)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-avfoundation" ]]; then
+      echo "0"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] && [[ $1 == "macos-avfoundation" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+
+  # IOS, MACOS AND TVOS
+  48 | 49 | 50 | 53 | 54)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+
+  # ONLY MACOS
+  55 | 56 | 57)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+  *)
+    echo "1"
+    ;;
+  esac
+}
+
+#
+# 1. <library name>
+#
+is_arch_supported_on_platform() {
+  local arch_index=$(from_arch_name "$1")
+  case ${arch_index} in
+  $ARCH_X86_64)
+    echo 1
+    ;;
+
+    # ANDROID
+  $ARCH_ARM_V7A | $ARCH_ARM_V7A_NEON | $ARCH_ARM64_V8A | $ARCH_X86)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo 1
+    else
+      echo 0
+    fi
+    ;;
+
+    # IOS
+  $ARCH_ARMV7 | $ARCH_ARMV7S | $ARCH_ARM64E | $ARCH_I386 | $ARCH_X86_64_MAC_CATALYST)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo 1
+    else
+      echo 0
+    fi
+    ;;
+
+    # IOS, MACOS OR TVOS
+  $ARCH_ARM64)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo 1
+    else
+      echo 0
+    fi
+    ;;
+  *)
+    echo 0
+    ;;
+  esac
+}
+
+get_package_config_file_name() {
+  case $1 in
+  1) echo "freetype2" ;;
+  5) echo "libmp3lame" ;;
+  8) echo "theora" ;;
+  9) echo "vorbis" ;;
+  10) echo "vpx" ;;
+  12) echo "libxml-2.0" ;;
+  13) echo "opencore-amrnb" ;;
+  21) echo "vidstab" ;;
+  27) echo "aom" ;;
+  28) echo "libchromaprint" ;;
+  30) echo "sdl2" ;;
+  35) echo "libjpeg" ;;
+  36) echo "ogg" ;;
+  40) echo "libtiff-4" ;;
+  42) echo "sndfile" ;;
+  43) echo "lept" ;;
+  44) echo "samplerate" ;;
+  54) echo "uuid" ;;
+  *) echo "$(get_library_name "$1")" ;;
+  esac
+}
+
+get_static_archive_name() {
+  case $1 in
+  5) echo "libmp3lame.a" ;;
+  6) echo "libass.a" ;;
+  10) echo "libvpx.a" ;;
+  12) echo "libxml2.a" ;;
+  21) echo "libvidstab.a" ;;
+  23) echo "libilbc.a" ;;
+  27) echo "libaom.a" ;;
+  29) echo "libtwolame.a" ;;
+  30) echo "libSDL2.a" ;;
+  31) echo "libtesseract.a" ;;
+  34) echo "libgif.a" ;;
+  36) echo "libogg.a" ;;
+  37) echo "libpng.a" ;;
+  42) echo "libsndfile.a" ;;
+  43) echo "liblept.a" ;;
+  44) echo "libsamplerate.a" ;;
+  *) echo lib"$(get_library_name "$1")".a ;;
+  esac
+}
+
+get_build_host() {
+  case ${ARCH} in
+  arm-v7a | arm-v7a-neon)
+    echo "arm-linux-androideabi"
+    ;;
+  armv7 | armv7s | arm64e | i386 | x86-64-mac-catalyst)
+    echo "$(get_target_arch)-ios-darwin"
+    ;;
+  arm64-v8a)
+    echo "aarch64-linux-android"
+    ;;
+  arm64)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "$(get_target_arch)-ios-darwin"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "$(get_target_arch)-tvos-darwin"
+    fi
+    ;;
+  x86)
+    echo "i686-linux-android"
+    ;;
+  x86-64)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo "x86_64-linux-android"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo "$(get_target_arch)-ios-darwin"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+      echo "$(get_target_arch)-macos-darwin"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      echo "$(get_target_arch)-tvos-darwin"
+    fi
+    ;;
+  esac
+}
+
+skip_library() {
+  SKIP_VARIABLE=$(echo "SKIP_$1" | sed "s/\-/\_/g")
+
+  export "${SKIP_VARIABLE}"=1
+}
+
+no_output_redirection() {
+  export NO_OUTPUT_REDIRECTION=1
+}
+
+no_workspace_cleanup_library() {
+  NO_WORKSPACE_CLEANUP_VARIABLE=$(echo "NO_WORKSPACE_CLEANUP_$1" | sed "s/\-/\_/g")
+
+  export "${NO_WORKSPACE_CLEANUP_VARIABLE}"=1
+}
+
+no_link_time_optimization() {
+  export NO_LINK_TIME_OPTIMIZATION=1
+}
+
+enable_debug() {
+  export FFMPEG_KIT_DEBUG="-g"
+
+  BUILD_TYPE_ID+="debug "
+}
+
+optimize_for_speed() {
+  export FFMPEG_KIT_OPTIMIZED_FOR_SPEED="1"
+}
+
+print_unknown_option() {
+  echo -e "\n(*) Unknown option \"$1\".\n\nSee $0 --help for available options."
+  exit 1
+}
+
+print_unknown_library() {
+  echo -e "\n(*) Unknown library \"$1\".\n\nSee $0 --help for available libraries."
+  exit 1
+}
+
+print_unknown_arch() {
+  echo -e "\n(*) Unknown architecture \"$1\".\n\nSee $0 --help for available architectures."
+  exit 1
+}
+
+display_version() {
+  COMMAND=$(echo "$0" | sed -e 's/\.\///g')
+
+  echo -e "\
+$COMMAND v$(get_ffmpeg_kit_version)\n
+Copyright (c) 2018-2020 Taner Sener\n
+License LGPLv3.0: GNU LGPL version 3 or later\n\
+<https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\
+This is free software: you can redistribute it and/or modify it under the terms of the \
+GNU Lesser General Public License as published by the Free Software Foundation, \
+either version 3 of the License, or (at your option) any later version."
+}
+
+display_help_options() {
+  echo -e "Options:"
+  echo -e "  -h, --help\t\t\tdisplay this help and exit"
+  echo -e "  -v, --version\t\t\tdisplay version information and exit"
+  echo -e "  -d, --debug\t\t\tbuild with debug information"
+  echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
+  echo -e "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices"
+  echo -e "  -f, --force\t\t\tignore warnings"
+  if [ -n "$1" ]; then
+    echo -e "$1"
+  fi
+  echo -e ""
+}
+
+display_help_licensing() {
+  echo -e "Licensing options:"
+  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, created libs will be licensed under GPLv3.0 [no]\n"
+}
+
+display_help_common_libraries() {
+  echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
+  echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
+  echo -e "  --enable-freetype\t\tbuild with freetype [no]"
+  echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
+  echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
+  echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
+  echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
+  echo -e "  --enable-lame\t\t\tbuild with lame [no]"
+  echo -e "  --enable-libaom\t\tbuild with libaom [no]"
+  echo -e "  --enable-libass\t\tbuild with libass [no]"
+  echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
+  echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
+  echo -e "  --enable-libtheora\t\tbuild with libtheora [no]"
+  echo -e "  --enable-libvorbis\t\tbuild with libvorbis [no]"
+  echo -e "  --enable-libvpx\t\tbuild with libvpx [no]"
+  echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
+  echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
+  echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+  echo -e "  --enable-openh264\t\tbuild with openh264 [no]"
+  echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+  echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
+  echo -e "  --enable-shine\t\tbuild with shine [no]"
+  echo -e "  --enable-snappy\t\tbuild with snappy [no]"
+  echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
+  echo -e "  --enable-speex\t\tbuild with speex [no]"
+  echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
+  echo -e "  --enable-twolame\t\tbuild with twolame [no]"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
+  echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
+}
+
+display_help_gpl_libraries() {
+  echo -e "GPL libraries:"
+  echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
+  echo -e "  --enable-rubberband\t\tbuild with rubber band [no]"
+  echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+  echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
+  echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
+}
+
+display_help_advanced_options() {
+  echo -e "Advanced options:"
+  echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+  echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even if it is detected as already downloaded [no]"
+  echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even if it is detected as already built [no]\n"
+}
+
+#
+# 1. <library name>
+#
+reconf_library() {
+  local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..45}; do
+    library_name=$(get_library_name ${library})
+    local library_supported_on_platform=$(is_library_supported_on_platform ${library_name})
+
+    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == "$1" ]] && [[ ${library_supported_on_platform} -eq 0 ]]; then
+      export ${RECONF_VARIABLE}=1
+      RECONF_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ ${library_supported} -eq 1 ]]; then
+    echo -e "INFO: --reconf flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
+#
+# 1. <library name>
+#
+rebuild_library() {
+  local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..45}; do
+    library_name=$(get_library_name ${library})
+    local library_supported_on_platform=$(is_library_supported_on_platform ${library_name})
+
+    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == "$1" ]] && [[ ${library_supported_on_platform} -eq 0 ]]; then
+      export ${REBUILD_VARIABLE}=1
+      REBUILD_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ ${library_supported} -eq 1 ]]; then
+    echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
+#
+# 1. <library name>
+#
+redownload_library() {
+  local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..45}; do
+    library_name=$(get_library_name ${library})
+    local library_supported_on_platform=$(is_library_supported_on_platform ${library_name})
+
+    if [[ ${library_name} == "$1" ]] && [[ ${library_supported_on_platform} -eq 0 ]]; then
+      export ${REDOWNLOAD_VARIABLE}=1
+      REDOWNLOAD_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ "ffmpeg" == $1 ]]; then
+    export ${REDOWNLOAD_VARIABLE}=1
+    REDOWNLOAD_LIBRARIES+=($1)
+    library_supported=1
+  fi
+
+  if [[ ${library_supported} -eq 1 ]]; then
+    echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
+#
+# 1. library index
+# 2. ignore unknown libraries
+#
+enable_library() {
+  local library_supported_on_platform=$(is_library_supported_on_platform "$1")
+  if [[ $library_supported_on_platform == 0 ]]; then
+    set_library "$1" 1
+  elif [[ $2 -ne 1 ]]; then
+    print_unknown_library "$1"
+  fi
+}
+
+set_library() {
+  case $1 in
+  android-zlib)
+    ENABLED_LIBRARIES[LIBRARY_ANDROID_ZLIB]=$2
+    ;;
+  android-media-codec)
+    ENABLED_LIBRARIES[LIBRARY_ANDROID_MEDIA_CODEC]=$2
+    ;;
+  ios-zlib | macos-zlib | tvos-zlib)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_ZLIB]=$2
+    ;;
+  ios-audiotoolbox | macos-audiotoolbox | tvos-audiotoolbox)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_AUDIOTOOLBOX]=$2
+    ;;
+  ios-bzip2 | macos-bzip2 | tvos-bzip2)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_BZIP2]=$2
+    ;;
+  ios-videotoolbox | macos-videotoolbox | tvos-videotoolbox)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_VIDEOTOOLBOX]=$2
+    ;;
+  ios-avfoundation | macos-avfoundation)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_AVFOUNDATION]=$2
+    ;;
+  ios-libiconv | macos-libiconv | tvos-libiconv)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_LIBICONV]=$2
+    ;;
+  macos-coreimage)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_COREIMAGE]=$2
+    ;;
+  macos-opencl)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_OPENCL]=$2
+    ;;
+  macos-opengl)
+    ENABLED_LIBRARIES[LIBRARY_OBJC_OPENGL]=$2
+    ;;
+  chromaprint)
+    ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
+    ;;
+  cpu-features)
+    # CPU-FEATURES IS ALWAYS ENABLED
+    ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=1
+    ;;
+  fontconfig)
+    ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      ENABLED_LIBRARIES[LIBRARY_OBJC_LIBUUID]=$2
+    else
+      ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
+    fi
+    ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
+    ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+    set_library "freetype" $2
+    ;;
+  freetype)
+    ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
+    ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+    set_library "libpng" $2
+    ;;
+  fribidi)
+    ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
+    ;;
+  gmp)
+    ENABLED_LIBRARIES[LIBRARY_GMP]=$2
+    ;;
+  gnutls)
+    ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
+    ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+    set_library "nettle" $2
+    set_library "gmp" $2
+    set_library "libiconv" $2
+    ;;
+  kvazaar)
+    ENABLED_LIBRARIES[LIBRARY_KVAZAAR]=$2
+    ;;
+  lame)
+    ENABLED_LIBRARIES[LIBRARY_LAME]=$2
+    set_library "libiconv" $2
+    ;;
+  libaom)
+    ENABLED_LIBRARIES[LIBRARY_LIBAOM]=$2
+    ;;
+  libass)
+    ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+      ENABLED_LIBRARIES[LIBRARY_OBJC_LIBUUID]=$2
+    else
+      ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
+    fi
+    ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
+    set_library "freetype" $2
+    set_library "fribidi" $2
+    set_library "fontconfig" $2
+    set_library "libiconv" $2
+    ;;
+  libiconv)
+    ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+    ;;
+  libilbc)
+    ENABLED_LIBRARIES[LIBRARY_LIBILBC]=$2
+    ;;
+  libpng)
+    ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
+    ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+    ;;
+  libtheora)
+    ENABLED_LIBRARIES[LIBRARY_LIBTHEORA]=$2
+    ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
+    set_library "libvorbis" $2
+    ;;
+  libvidstab)
+    ENABLED_LIBRARIES[LIBRARY_LIBVIDSTAB]=$2
+    ;;
+  libvorbis)
+    ENABLED_LIBRARIES[LIBRARY_LIBVORBIS]=$2
+    ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
+    ;;
+  libvpx)
+    ENABLED_LIBRARIES[LIBRARY_LIBVPX]=$2
+    ;;
+  libwebp)
+    ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
+    ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
+    ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+    set_library "tiff" $2
+    set_library "libpng" $2
+    ;;
+  libxml2)
+    ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
+    set_library "libiconv" $2
+    ;;
+  opencore-amr)
+    ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
+    ;;
+  openh264)
+    ENABLED_LIBRARIES[LIBRARY_OPENH264]=$2
+    ;;
+  opus)
+    ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
+    ;;
+  rubberband)
+    ENABLED_LIBRARIES[LIBRARY_RUBBERBAND]=$2
+    ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+    ENABLED_LIBRARIES[LIBRARY_LIBSAMPLERATE]=$2
+    ;;
+  sdl)
+    ENABLED_LIBRARIES[LIBRARY_SDL]=$2
+    ;;
+  shine)
+    ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
+    ;;
+  snappy)
+    ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
+    ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+    ;;
+  soxr)
+    ENABLED_LIBRARIES[LIBRARY_SOXR]=$2
+    ;;
+  speex)
+    ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
+    ;;
+  tesseract)
+    ENABLED_LIBRARIES[LIBRARY_TESSERACT]=$2
+    ENABLED_LIBRARIES[LIBRARY_LEPTONICA]=$2
+    ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
+    ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
+    ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+    ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+    set_library "tiff" $2
+    set_library "libpng" $2
+    ;;
+  twolame)
+    ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
+    ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+    ;;
+  vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
+    ;;
+  wavpack)
+    ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
+    ;;
+  x264)
+    ENABLED_LIBRARIES[LIBRARY_X264]=$2
+    ;;
+  x265)
+    ENABLED_LIBRARIES[LIBRARY_X265]=$2
+    ;;
+  xvidcore)
+    ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
+    ;;
+  expat | giflib | jpeg | leptonica | libogg | libsamplerate | libsndfile | libuuid | ios-libuuid | tvos-libuuid)
+    # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
+    ;;
+  nettle)
+    ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
+    set_library "gmp" $2
+    ;;
+  tiff)
+    ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+    ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+    ;;
+  *)
+    print_unknown_library $1
+    ;;
+  esac
+}
+
+disable_arch() {
+  local arch_supported_on_platform=$(is_arch_supported_on_platform "$1")
+  if [[ $arch_supported_on_platform == 1 ]]; then
+    set_arch "$1" 0
+  else
+    print_unknown_arch "$1"
+  fi
+}
+
+set_arch() {
+  case $1 in
+  arm-v7a)
+    ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=$2
+    ;;
+  arm-v7a-neon)
+    ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]=$2
+    ;;
+  armv7)
+    ENABLED_ARCHITECTURES[ARCH_ARMV7]=$2
+    ;;
+  armv7s)
+    ENABLED_ARCHITECTURES[ARCH_ARMV7S]=$2
+    ;;
+  arm64-v8a)
+    ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]=$2
+    ;;
+  arm64)
+    ENABLED_ARCHITECTURES[ARCH_ARM64]=$2
+    ;;
+  arm64e)
+    ENABLED_ARCHITECTURES[ARCH_ARM64E]=$2
+    ;;
+  i386)
+    ENABLED_ARCHITECTURES[ARCH_I386]=$2
+    ;;
+  x86)
+    ENABLED_ARCHITECTURES[ARCH_X86]=$2
+    ;;
+  x86-64)
+    ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
+    ;;
+  x86-64-mac-catalyst)
+    ENABLED_ARCHITECTURES[ARCH_X86_64_MAC_CATALYST]=$2
+    ;;
+  *)
+    print_unknown_arch "$1"
+    ;;
+  esac
+}
+
+check_if_dependency_rebuilt() {
+  case $1 in
+  expat)
+    set_dependency_rebuilt_flag "fontconfig"
+    set_dependency_rebuilt_flag "libass"
+    ;;
+  fontconfig)
+    set_dependency_rebuilt_flag "libass"
+    ;;
+  freetype)
+    set_dependency_rebuilt_flag "fontconfig"
+    set_dependency_rebuilt_flag "libass"
+    ;;
+  fribidi)
+    set_dependency_rebuilt_flag "libass"
+    ;;
+  giflib)
+    set_dependency_rebuilt_flag "libwebp"
+    set_dependency_rebuilt_flag "leptonica"
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  gmp)
+    set_dependency_rebuilt_flag "gnutls"
+    set_dependency_rebuilt_flag "nettle"
+    ;;
+  jpeg)
+    set_dependency_rebuilt_flag "tiff"
+    set_dependency_rebuilt_flag "libwebp"
+    set_dependency_rebuilt_flag "leptonica"
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  leptonica)
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  libiconv)
+    set_dependency_rebuilt_flag "fontconfig"
+    set_dependency_rebuilt_flag "gnutls"
+    set_dependency_rebuilt_flag "lame"
+    set_dependency_rebuilt_flag "libass"
+    set_dependency_rebuilt_flag "libxml2"
+    ;;
+  libogg)
+    set_dependency_rebuilt_flag "libvorbis"
+    set_dependency_rebuilt_flag "libtheora"
+    ;;
+  libpng)
+    set_dependency_rebuilt_flag "freetype"
+    set_dependency_rebuilt_flag "libwebp"
+    set_dependency_rebuilt_flag "libass"
+    set_dependency_rebuilt_flag "leptonica"
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  libsamplerate)
+    set_dependency_rebuilt_flag "rubberband"
+    ;;
+  libsndfile)
+    set_dependency_rebuilt_flag "twolame"
+    set_dependency_rebuilt_flag "rubberband"
+    ;;
+  libuuid)
+    set_dependency_rebuilt_flag "fontconfig"
+    set_dependency_rebuilt_flag "libass"
+    ;;
+  libvorbis)
+    set_dependency_rebuilt_flag "libtheora"
+    ;;
+  libwebp)
+    set_dependency_rebuilt_flag "leptonica"
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  nettle)
+    set_dependency_rebuilt_flag "gnutls"
+    ;;
+  tiff)
+    set_dependency_rebuilt_flag "libwebp"
+    set_dependency_rebuilt_flag "leptonica"
+    set_dependency_rebuilt_flag "tesseract"
+    ;;
+  esac
+}
+
+set_dependency_rebuilt_flag() {
+  DEPENDENCY_REBUILT_VARIABLE=$(echo "DEPENDENCY_REBUILT_$1" | sed "s/\-/\_/g")
+  export "${DEPENDENCY_REBUILT_VARIABLE}"=1
+}
+
+print_enabled_architectures() {
+  echo -n "Architectures: "
+
+  let enabled=0
+  for print_arch in {0..10}; do
+    if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
+      if [[ ${enabled} -ge 1 ]]; then
+        echo -n ", "
+      fi
+      echo -n $(get_arch_name $print_arch)
+      enabled=$((${enabled} + 1))
+    fi
+  done
+
+  if [ ${enabled} -gt 0 ]; then
+    echo ""
+  else
+    echo "none"
+  fi
+}
+
+print_enabled_libraries() {
+  echo -n "Libraries: "
+
+  let enabled=0
+
+  for library in {46..53} {55..57} {0..33}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+      if [[ ${enabled} -ge 1 ]]; then
+        echo -n ", "
+      fi
+      echo -n $(get_library_name $library)
+      enabled=$((${enabled} + 1))
+    fi
+  done
+
+  if [ ${enabled} -gt 0 ]; then
+    echo ""
+  else
+    echo "none"
+  fi
+}
+
+print_reconfigure_requested_libraries() {
+  local counter=0
+
+  for RECONF_LIBRARY in "${RECONF_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Reconfigure: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n "${RECONF_LIBRARY}"
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
+print_rebuild_requested_libraries() {
+  local counter=0
+
+  for REBUILD_LIBRARY in "${REBUILD_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Rebuild: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n "${REBUILD_LIBRARY}"
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
+print_redownload_requested_libraries() {
+  local counter=0
+
+  for REDOWNLOAD_LIBRARY in "${REDOWNLOAD_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Redownload: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n "${REDOWNLOAD_LIBRARY}"
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
+build_modulemap() {
+  local FILE_PATH="$1"
+
+  cat >"${FILE_PATH}" <<EOF
+framework module ffmpegkit {
+
+  header "ArchDetect.h"
+  header "AtomicLong.h"
+  header "ExecuteDelegate.h"
+  header "FFmpegExecution.h"
+  header "LogDelegate.h"
+  header "MediaInformation.h"
+  header "MediaInformationParser.h"
+  header "FFmpegKit.h"
+  header "FFmpegKitConfig.h"
+  header "FFprobeKit.h"
+  header "Statistics.h"
+  header "StatisticsDelegate.h"
+  header "StreamInformation.h"
+  header "ffmpegkit_exception.h"
+
+  export *
+}
+EOF
+}
+
+build_info_plist() {
+  local FILE_PATH="$1"
+  local FRAMEWORK_NAME="$2"
+  local FRAMEWORK_ID="$3"
+  local FRAMEWORK_SHORT_VERSION="$4"
+  local FRAMEWORK_VERSION="$5"
+
+  cat >${FILE_PATH} <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>${FRAMEWORK_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${FRAMEWORK_ID}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>${FRAMEWORK_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${FRAMEWORK_SHORT_VERSION}</string>
+	<key>CFBundleVersion</key>
+	<string>${FRAMEWORK_VERSION}</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>MinimumOSVersion</key>
+	<string>$6</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>$7</string>
+	</array>
+	<key>NSPrincipalClass</key>
+	<string></string>
+</dict>
+</plist>
+EOF
+}
+
+# 1 - library name
+# 2 - static library name
+# 3 - library version
+create_static_framework() {
+  local FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/$1.framework
+
+  mkdir -p "${FRAMEWORK_PATH}" 1>>"${BASEDIR}/build.log" 2>&1 || exit 1
+
+  local CAPITAL_CASE_LIBRARY_NAME=$(to_capital_case "$1")
+
+  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_LIBRARY_NAME}" "$3" "$3"
+
+  cp "${BASEDIR}/prebuilt/ios-universal/$1-universal/lib/$2" "${FRAMEWORK_PATH}/$1" 1>>"${BASEDIR}/build.log" 2>&1
+
+  echo "$?"
+}
+
+# 1 - library index
+get_external_library_license_path() {
+  case $1 in
+  1) echo "${BASEDIR}/src/$(get_library_name "$1")/docs/LICENSE.TXT" ;;
+  3) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
+  25) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LGPL" ;;
+  27) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md" ;;
+  29) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.txt" ;;
+  34) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md " ;;
+  37) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
+  38) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYRIGHT" ;;
+  41) echo "${BASEDIR}/src/$(get_library_name "$1")/leptonica-license.txt" ;;
+  4 | 9 | 12 | 18 | 20 | 26 | 31 | 36) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE" ;;
+  *) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING" ;;
+  esac
+}
+
+#
+# 1. <library name>
+#
+autoreconf_library() {
+  echo -e "\nINFO: Running full autoreconf for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # FORCE INSTALL
+  (autoreconf --force --install)
+
+  local EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+
+  echo -e "\nDEBUG: Full autoreconf failed. Running full autoreconf with include for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # FORCE INSTALL WITH m4
+  (autoreconf --force --install -I m4)
+
+  EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+
+  echo -e "\nDEBUG: Full autoreconf with include failed. Running autoreconf without force for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # INSTALL WITHOUT FORCE
+  (autoreconf --install)
+
+  EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+
+  echo -e "\nDEBUG: Autoreconf without force failed. Running autoreconf without force with include for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # INSTALL WITHOUT FORCE WITH m4
+  (autoreconf --install -I m4)
+
+  EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+
+  echo -e "\nDEBUG: Autoreconf without force with include failed. Running default autoreconf for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # INSTALL DEFAULT
+  (autoreconf)
+
+  EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+
+  echo -e "\nDEBUG: Default autoreconf failed. Running default autoreconf with include for $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # INSTALL DEFAULT WITH m4
+  (autoreconf -I m4)
+
+  EXTRACT_RC=$?
+  if [ ${EXTRACT_RC} -eq 0 ]; then
+    return
+  fi
+}
+
+#
+# 1. <repo url>
+# 2. <local folder path>
+# 3. <commit id>
+#
+clone_git_repository_with_commit_id() {
+  local RC
+
+  (mkdir -p $2 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to create local directory $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  echo -e "INFO: Cloning commit id $3 from repository $1 into local directory $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  (git clone $1 $2 --depth 1 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to clone $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  cd $2 1>>"${BASEDIR}"/build.log 2>&1
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to cd into $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  (git fetch --depth 1 origin $3 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to fetch commit id $3 from $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  (git checkout $3 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to checkout commit id $3 from $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  echo ${RC}
+}
+
+#
+# 1. <repo url>
+# 2. <tag name>
+# 3. <local folder path>
+#
+clone_git_repository_with_tag() {
+  local RC
+
+  (mkdir -p $3 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to create local directory $3\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $3 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  echo -e "INFO: Cloning tag $2 from repository $1 into local directory $3\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  (git clone --depth 1 --branch $2 $1 $3 1>>"${BASEDIR}"/build.log 2>&1)
+
+  RC=$?
+
+  if [ ${RC} -ne 0 ]; then
+    echo -e "\nINFO: Failed to clone $1 -> $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf $3 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${RC}
+    return
+  fi
+
+  echo ${RC}
+}
+
+#
+# 1. library index
+#
+is_gpl_licensed() {
+  for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
+    if [[ $gpl_library -eq $1 ]]; then
+      echo 0
+      return
+    fi
+  done
+
+  echo 1
+}
+
+downloaded_enabled_library_sources() {
+
+  # DOWNLOAD FFMPEG SOURCE CODE FIRST
+  DOWNLOAD_RESULT=$(download_library_source "ffmpeg")
+  if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    echo -e "failed\n"
+    exit 1
+  fi
+
+  for library in {1..46}; do
+    if [[ ${!library} -eq 1 ]]; then
+      library_name=$(get_library_name $((library - 1)))
+
+      echo -e "\nDEBUG: Downloading library ${library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+      DOWNLOAD_RESULT=$(download_library_source "${library_name}")
+      if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+        echo -e "failed\n"
+        exit 1
+      fi
+    fi
+  done
+
+  echo -e "ok"
+}
+
+#
+# 1. <url>
+# 2. <local file name>
+# 3. <on error action>
+#
+download() {
+  if [ ! -d "${FFMPEG_KIT_TMPDIR}" ]; then
+    mkdir -p "${FFMPEG_KIT_TMPDIR}"
+  fi
+
+  (curl --fail --location "$1" -o "${FFMPEG_KIT_TMPDIR}"/"$2" 1>>"${BASEDIR}"/build.log 2>&1)
+
+  local RC=$?
+
+  if [ ${RC} -eq 0 ]; then
+    echo -e "\nDEBUG: Downloaded $1 to ${FFMPEG_KIT_TMPDIR}/$2\n" 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    rm -f "${FFMPEG_KIT_TMPDIR}"/"$2" 1>>"${BASEDIR}"/build.log 2>&1
+
+    echo -e -n "\nINFO: Failed to download $1 to ${FFMPEG_KIT_TMPDIR}/$2, rc=${RC}. " 1>>"${BASEDIR}"/build.log 2>&1
+
+    if [ "$3" == "exit" ]; then
+      echo -e "DEBUG: Build will now exit.\n" 1>>"${BASEDIR}"/build.log 2>&1
+      exit 1
+    else
+      echo -e "DEBUG: Build will continue.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    fi
+  fi
+
+  echo ${RC}
+}
+
+#
+# 1. library name
+#
+download_library_source() {
+  local SOURCE_REPO_URL=""
+  local LIB_NAME="$1"
+  local LIB_LOCAL_PATH=${BASEDIR}/src/${LIB_NAME}
+  local SOURCE_ID=""
+  local LIBRARY_RC=""
+  local DOWNLOAD_RC=""
+  local SOURCE_TYPE=""
+
+  echo -e "DEBUG: Downloading library source: $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  SOURCE_REPO_URL=$(get_library_source "${LIB_NAME}" 1)
+  SOURCE_ID=$(get_library_source "${LIB_NAME}" 2)
+  SOURCE_TYPE=$(get_library_source "${LIB_NAME}" 3)
+
+  LIBRARY_RC=$(library_is_downloaded "${LIB_NAME}")
+
+  if [ ${LIBRARY_RC} -eq 0 ]; then
+    echo -e "INFO: $1 already downloaded. Source folder found at ${LIB_LOCAL_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 0
+    return
+  fi
+
+  if [ "${SOURCE_TYPE}" == "TAG" ]; then
+    DOWNLOAD_RC=$(clone_git_repository_with_tag "${SOURCE_REPO_URL}" "${SOURCE_ID}" "${LIB_LOCAL_PATH}")
+  else
+    DOWNLOAD_RC=$(clone_git_repository_with_commit_id "${SOURCE_REPO_URL}" "${LIB_LOCAL_PATH}" "${SOURCE_ID}")
+  fi
+
+  if [ ${DOWNLOAD_RC} -ne 0 ]; then
+    echo -e "INFO: Downloading library $1 failed. Can not get library from ${SOURCE_REPO_URL}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${DOWNLOAD_RC}
+  else
+    echo -e "\nINFO: $1 library downloaded" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
+#//@TODO CHECK IF NECESSARY
+download_gpl_library_source() {
+  local GPL_LIB_URL=""
+  local GPL_LIB_FILE=""
+  local GPL_LIB_ORIG_DIR=""
+  local GPL_LIB_DEST_DIR="$1"
+  local GPL_LIB_SOURCE_PATH="${BASEDIR}/src/${GPL_LIB_DEST_DIR}"
+  local LIBRARY_RC=""
+  local DOWNLOAD_RC=""
+
+  echo -e "\nDEBUG: Downloading GPL library source: $1\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  case $1 in
+  libvidstab)
+    GPL_LIB_URL="https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz"
+    GPL_LIB_FILE="v1.1.0.tar.gz"
+    GPL_LIB_ORIG_DIR="vid.stab-1.1.0"
+    ;;
+  x264)
+    GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/cde9a93319bea766a92e306d69059c76de970190/x264-cde9a93319bea766a92e306d69059c76de970190.tar.bz2"
+    GPL_LIB_FILE="x264-cde9a93319bea766a92e306d69059c76de970190.tar.bz2"
+    GPL_LIB_ORIG_DIR="x264-cde9a93319bea766a92e306d69059c76de970190"
+    ;;
+  x265)
+    GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.4.tar.gz"
+    GPL_LIB_FILE="x265_3.4.tar.gz"
+    GPL_LIB_ORIG_DIR="x265_3.4"
+    ;;
+  xvidcore)
+    GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
+    GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
+    GPL_LIB_ORIG_DIR="xvidcore"
+    ;;
+  rubberband)
+    GPL_LIB_URL="https://breakfastquay.com/files/releases/rubberband-1.8.2.tar.bz2"
+    GPL_LIB_FILE="rubberband-1.8.2.tar.bz2"
+    GPL_LIB_ORIG_DIR="rubberband-1.8.2"
+    ;;
+  esac
+
+  LIBRARY_RC=$(library_is_downloaded "${GPL_LIB_DEST_DIR}")
+
+  if [ ${LIBRARY_RC} -eq 0 ]; then
+    echo -e "INFO: $1 already downloaded. Source folder found at ${GPL_LIB_SOURCE_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 0
+    return
+  fi
+
+  local GPL_LIB_PACKAGE_PATH="${FFMPEG_KIT_TMPDIR}/${GPL_LIB_FILE}"
+
+  echo -e "INFO: $1 source not found. Checking if library package ${GPL_LIB_FILE} is downloaded at ${GPL_LIB_PACKAGE_PATH} \n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  if [ ! -f "${GPL_LIB_PACKAGE_PATH}" ]; then
+    echo -e "DEBUG: $1 library package not found. Downloading from ${GPL_LIB_URL}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    DOWNLOAD_RC=$(download "${GPL_LIB_URL}" "${GPL_LIB_FILE}")
+
+    if [ ${DOWNLOAD_RC} -ne 0 ]; then
+      echo -e "INFO: Downloading GPL library $1 failed. Can not get library package from ${GPL_LIB_URL}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo ${DOWNLOAD_RC}
+      return
+    else
+      echo -e "DEBUG: $1 library package downloaded\n" 1>>"${BASEDIR}"/build.log 2>&1
+    fi
+  else
+    echo -e "DEBUG: $1 library package already downloaded\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+
+  local EXTRACT_COMMAND=""
+
+  if [[ ${GPL_LIB_FILE} == *bz2 ]]; then
+    EXTRACT_COMMAND="tar jxf ${GPL_LIB_PACKAGE_PATH} --directory ${FFMPEG_KIT_TMPDIR}"
+  else
+    EXTRACT_COMMAND="tar zxf ${GPL_LIB_PACKAGE_PATH} --directory ${FFMPEG_KIT_TMPDIR}"
+  fi
+
+  echo -e "DEBUG: Extracting library package ${GPL_LIB_FILE} inside ${FFMPEG_KIT_TMPDIR}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  ${EXTRACT_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
+
+  local EXTRACT_RC=$?
+
+  if [ ${EXTRACT_RC} -ne 0 ]; then
+    echo -e "\nINFO: Downloading GPL library $1 failed. Extract for library package ${GPL_LIB_FILE} completed with rc=${EXTRACT_RC}. Deleting failed files.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -f ${GPL_LIB_PACKAGE_PATH} 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "${FFMPEG_KIT_TMPDIR}"/"${GPL_LIB_ORIG_DIR}" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${EXTRACT_RC}
+    return
+  fi
+
+  echo -e "DEBUG: Extract completed. Copying library source to ${GPL_LIB_SOURCE_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  COPY_COMMAND="cp -r ${FFMPEG_KIT_TMPDIR}/${GPL_LIB_ORIG_DIR} ${GPL_LIB_SOURCE_PATH}"
+
+  ${COPY_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
+
+  local COPY_RC=$?
+
+  if [ ${COPY_RC} -eq 0 ]; then
+    echo -e "INFO: Downloading GPL library source $1 completed successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    echo -e "\nINFO: Downloading GPL library $1 failed. Copying library source to ${GPL_LIB_SOURCE_PATH} completed with rc=${COPY_RC}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "${GPL_LIB_SOURCE_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${COPY_RC}
+    return
+  fi
+}
+
+get_cpu_count() {
+  if [ "$(uname)" == "Darwin" ]; then
+    echo $(sysctl -n hw.physicalcpu)
+  else
+    echo $(nproc)
+  fi
+}
+
+#
+# 1. <lib name>
+#
+library_is_downloaded() {
+  local LOCAL_PATH
+  local LIB_NAME=$1
+  local FILE_COUNT
+  local REDOWNLOAD_VARIABLE
+  REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
+
+  LOCAL_PATH=${BASEDIR}/src/${LIB_NAME}
+
+  echo -e "DEBUG: Checking if ${LIB_NAME} is already downloaded at ${LOCAL_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  if [ ! -d "${LOCAL_PATH}" ]; then
+    echo -e "INFO: ${LOCAL_PATH} directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  FILE_COUNT=$(ls -l "${LOCAL_PATH}" | wc -l)
+
+  if [[ ${FILE_COUNT} -eq 0 ]]; then
+    echo -e "INFO: No files found under ${LOCAL_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  if [[ ${REDOWNLOAD_VARIABLE} -eq 1 ]]; then
+    echo -e "INFO: ${LIB_NAME} library already downloaded but re-download requested\n" 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "${LOCAL_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+  else
+    echo -e "INFO: ${LIB_NAME} library already downloaded\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 0
+  fi
+}
+
+library_is_installed() {
+  local INSTALL_PATH=$1
+  local LIB_NAME=$2
+  local HEADER_COUNT
+  local LIB_COUNT
+
+  echo -e "DEBUG: Checking if ${LIB_NAME} is already built and installed at ${INSTALL_PATH}/${LIB_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  if [ ! -d "${INSTALL_PATH}"/"${LIB_NAME}" ]; then
+    echo -e "INFO: ${INSTALL_PATH}/${LIB_NAME} directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  if [ ! -d "${INSTALL_PATH}"/"${LIB_NAME}"/lib ]; then
+    echo -e "INFO: ${INSTALL_PATH}/${LIB_NAME}/lib directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  if [ ! -d "${INSTALL_PATH}"/"${LIB_NAME}"/include ]; then
+    echo -e "INFO: ${INSTALL_PATH}/${LIB_NAME}/include directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  HEADER_COUNT=$(ls -l "${INSTALL_PATH}"/"${LIB_NAME}"/include | wc -l)
+  LIB_COUNT=$(ls -l ${INSTALL_PATH}/${LIB_NAME}/lib | wc -l)
+
+  if [[ ${HEADER_COUNT} -eq 0 ]]; then
+    echo -e "INFO: No headers found under ${INSTALL_PATH}/${LIB_NAME}/include\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  if [[ ${LIB_COUNT} -eq 0 ]]; then
+    echo -e "INFO: No libraries found under ${INSTALL_PATH}/${LIB_NAME}/lib\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 1
+    return
+  fi
+
+  echo -e "INFO: ${LIB_NAME} library is already built and installed\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo 0
+}
+
+prepare_inline_sed() {
+  if [ "$(uname)" == "Darwin" ]; then
+    export SED_INLINE="sed -i .tmp"
+  else
+    export SED_INLINE="sed -i"
+  fi
+}
+
+to_capital_case() {
+  echo "$(echo ${1:0:1} | tr '[a-z]' '[A-Z]')${1:1}"
+}

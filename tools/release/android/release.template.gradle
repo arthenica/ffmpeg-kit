@@ -1,0 +1,178 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+buildscript {
+    repositories {
+	google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+    }
+}
+
+android {
+    compileSdkVersion Integer.parseInt(releaseTargetSdk)
+    ndkVersion "21.3.6528147"
+
+    defaultConfig {
+        minSdkVersion Integer.parseInt(releaseMinSdk)
+        targetSdkVersion Integer.parseInt(releaseTargetSdk)
+        versionCode Integer.parseInt(releaseVersionCode)
+        versionName releaseVersionName
+        project.archivesBaseName = releaseProject
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["../libs"]
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
+        }
+    }
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = releaseProject
+
+    publishedGroupId = 'com.arthenica'
+    libraryName = releaseProject
+    artifact = releaseProject
+
+    libraryDescription = releaseProjectDescription
+
+    siteUrl = 'https://github.com/tanersener/ffmpeg-kit'
+    issueTrackerUrl = 'https://github.com/tanersener/ffmpeg-kit/issues'
+    gitUrl = 'https://github.com/tanersener/ffmpeg-kit.git'
+
+    libraryVersion = releaseVersionName
+
+    developerId = 'tanersener'
+    developerName = 'Taner Sener'
+    developerEmail = 'tanersener@gmail.com'
+
+    if (Project.hasProperty('releaseGPL')) {
+        licenseName = 'GNU General Public License version 3'
+        licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+        allLicenses = ["GPL-3.0"]
+    } else {
+        licenseName = 'GNU Lesser General Public License, Version 3'
+        licenseUrl = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+        allLicenses = ["LGPL-3.0"]
+    }
+}
+
+group = publishedGroupId
+version = libraryVersion
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId publishedGroupId
+            artifactId artifact
+
+            name libraryName
+            description libraryDescription
+            url siteUrl
+
+            licenses {
+                license {
+                    name licenseName
+                    url licenseUrl
+                }
+            }
+            developers {
+                developer {
+                    id developerId
+                    name developerName
+                    email developerEmail
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = issueTrackerUrl
+        licenses = allLicenses
+        dryRun = true
+        publish = false
+        override = false
+        publicDownloadNumbers = false
+        version {
+            desc = libraryDescription
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    title = 'FFmpegKit'
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+dependencies {
+    testImplementation "androidx.test.ext:junit:1.1.1"
+    testImplementation "org.json:json:20190722"
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}

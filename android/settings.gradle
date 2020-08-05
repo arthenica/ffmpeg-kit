@@ -1,0 +1,4 @@
+include ':app'
+include ':ffmpeg-kit'
+project(':ffmpeg-kit').projectDir = new File('..')
+rootProject.name='FFmpegKit'

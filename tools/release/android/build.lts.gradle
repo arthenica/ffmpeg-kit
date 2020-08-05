@@ -1,0 +1,44 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    ndkVersion "21.3.6528147"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 160440
+        versionName "4.4.LTS"
+        project.archivesBaseName = "ffmpeg-kit"
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["../libs"]
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+task javadoc(type: Javadoc) {
+    title = 'FFmpegKit'
+    destinationDir = file("${projectDir}/../../docs/android/javadoc")
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    source = android.sourceSets.main.java.srcDirs
+}
+
+dependencies {
+    testImplementation "androidx.test.ext:junit:1.1.1"
+    testImplementation "org.json:json:20190722"
+}
