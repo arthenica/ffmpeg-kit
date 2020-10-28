@@ -1,2 +1,5 @@
 cpu-features
 ffmpeg
+fontconfig
+freetype
+libiconv

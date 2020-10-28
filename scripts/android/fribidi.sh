@@ -1,33 +1,13 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo -e "\n(*) ANDROID_NDK_ROOT not defined\n"
-    exit 1
-fi
-
-if [[ -z ${ARCH} ]]; then
-    echo -e "\n(*) ARCH not defined\n"
-    exit 1
-fi
-
-if [[ -z ${API} ]]; then
-    echo -e "\n(*) API not defined\n"
-    exit 1
-fi
-
-if [[ -z ${BASEDIR} ]]; then
-    echo -e "\n(*) BASEDIR not defined\n"
-    exit 1
-fi
-
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
 # PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="fribidi"
 set_toolchain_paths ${LIB_NAME}
 
-# PREPARING FLAGS
+# SET BUILD FLAGS
 BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})

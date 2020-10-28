@@ -1,43 +1,20 @@
 #!/bin/bash
 
-if [[ -z ${ARCH} ]]; then
-    echo -e "\n(*) ARCH not defined\n"
-    exit 1
-fi
-
-if [[ -z ${TARGET_SDK} ]]; then
-    echo -e "\n(*) TARGET_SDK not defined\n"
-    exit 1
-fi
-
-if [[ -z ${SDK_PATH} ]]; then
-    echo -e "\n(*) SDK_PATH not defined\n"
-    exit 1
-fi
-
-if [[ -z ${BASEDIR} ]]; then
-    echo -e "\n(*) BASEDIR not defined\n"
-    exit 1
-fi
-
 # ENABLE COMMON FUNCTIONS
-if [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
-    . ${BASEDIR}/build/tvos-common.sh
-else
-    . ${BASEDIR}/build/ios-common.sh
-fi
+source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
 # PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="openh264"
 set_toolchain_paths ${LIB_NAME}
 
-# PREPARING FLAGS
+# SET BUILD FLAGS
 BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-OS_OPTIONS="OS=ios"
+# SET ARCH OPTIONS
+ARCH_OPTIONS="OS=ios"
 case ${ARCH} in
     armv7 | armv7s)
         CFLAGS+=" -DHAVE_NEON"
@@ -46,7 +23,7 @@ case ${ARCH} in
         CFLAGS+=" -DHAVE_NEON_AARCH64"
     ;;
     x86-64-mac-catalyst)
-        OS_OPTIONS=""
+        ARCH_OPTIONS=""
         CFLAGS+=" -DHAVE_AVX2"
     ;;
     *)
@@ -74,7 +51,7 @@ CFLAGS="$CFLAGS" \
 CXX="${CXX}" \
 CXXFLAGS="${CXXFLAGS}" \
 LDFLAGS="$LDFLAGS" \
-${OS_OPTIONS} \
+${ARCH_OPTIONS} \
 PREFIX="${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME}" \
 SDK_MIN="${IOS_MIN_VERSION}" \
 SDKROOT="${SDK_PATH}" \

@@ -1,49 +1,30 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo -e "\n(*) ANDROID_NDK_ROOT not defined\n"
-    exit 1
-fi
-
-if [[ -z ${ARCH} ]]; then
-    echo -e "\n(*) ARCH not defined\n"
-    exit 1
-fi
-
-if [[ -z ${API} ]]; then
-    echo -e "\n(*) API not defined\n"
-    exit 1
-fi
-
-if [[ -z ${BASEDIR} ]]; then
-    echo -e "\n(*) BASEDIR not defined\n"
-    exit 1
-fi
-
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
 # PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="openh264"
 set_toolchain_paths ${LIB_NAME}
 
-# PREPARING FLAGS
+# SET BUILD FLAGS
 BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
 
+# SET ARCH OPTIONS
 case ${ARCH} in
     arm-v7a-neon)
-        ASM_ARCH=arm
+        ARCH_OPTIONS=arm
         CFLAGS+=" -DHAVE_NEON -DANDROID_NDK"
     ;;
     arm64-v8a)
-        ASM_ARCH=arm64
+        ARCH_OPTIONS=arm64
         CFLAGS+=" -DHAVE_NEON_AARCH64 -DANDROID_NDK"
     ;;
     x86*)
-        ASM_ARCH=x86
+        ARCH_OPTIONS=x86
         CFLAGS+=" -DHAVE_AVX2 -DANDROID_NDK"
     ;;
 esac
@@ -73,7 +54,7 @@ NDKLEVEL="${API}" \
 NDKROOT="${ANDROID_NDK_ROOT}" \
 NDK_TOOLCHAIN_VERSION=clang \
 AR="$AR" \
-ASM_ARCH=${ASM_ARCH} \
+ARCH_OPTIONS=${ARCH_OPTIONS} \
 TARGET="android-${API}" \
 install-static || exit 1
 
