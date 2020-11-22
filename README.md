@@ -21,9 +21,9 @@ FFmpeg kit for applications. Supports Android, iOS, tvOS.
     - Concurrent execution
 
 - Exposes both FFmpeg library and FFmpegKit wrapper library capabilities
-- Includes cross-compile instructions for 47 open-source libraries
+- Includes cross-compile instructions for 48 open-source libraries
     
-    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsamplerate`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `rubberband`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `vo-amrwbenc`, `wavpack`, `x264`, `x265`, `xvidcore`
+    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `harfbuzz`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsamplerate`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `rubberband`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `vo-amrwbenc`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
@@ -141,12 +141,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
         @Override
         public void apply(final long executionId, final int returnCode) {
-            if (rc == RETURN_CODE_SUCCESS) {
+            if (returnCode == RETURN_CODE_SUCCESS) {
                 Log.i(Config.TAG, "Async command execution completed successfully.");
-            } else if (rc == RETURN_CODE_CANCEL) {
+            } else if (returnCode == RETURN_CODE_CANCEL) {
                 Log.i(Config.TAG, "Async command execution cancelled by user.");
             } else {
-                Log.i(Config.TAG, String.format("Async command execution failed with rc=%d.", rc));
+                Log.i(Config.TAG, String.format("Async command execution failed with returnCode=%d.", returnCode));
             }
         }
     });

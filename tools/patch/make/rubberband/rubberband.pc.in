@@ -1,0 +1,11 @@
+prefix=%PREFIX%
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: rubberband
+Version: 1.8.2
+Description:
+Requires: %DEPENDENCIES%
+Libs: -L${libdir} -lrubberband
+Cflags: -I${includedir} 

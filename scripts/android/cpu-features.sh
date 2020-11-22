@@ -1,14 +1,10 @@
 #!/bin/bash
 
-# ENABLE COMMON FUNCTIONS
-. "${BASEDIR}"/scripts/function-android.sh
+$(android_ndk_cmake) -DBUILD_PIC=ON || return 1
 
-LIB_NAME="cpu-features"
-set_toolchain_paths ${LIB_NAME}
+make -C "$(get_cmake_build_directory)" || return 1
 
-cd "${BASEDIR}"/src/${LIB_NAME} || exit 1
+make -C "$(get_cmake_build_directory)" install || return 1
 
-$(android_ndk_cmake) -DBUILD_PIC=ON || exit 1
-make -C "$(get_android_build_dir)" install || exit 1
-
-create_cpufeatures_package_config
+# CREATE PACKAGE CONFIG MANUALLY
+create_cpufeatures_package_config "0.4.1.1" || return 1

@@ -1,0 +1,266 @@
+
+PREFIX		:= @prefix@
+CXX		:= @CXX@
+CC		:= @CC@
+CXXFLAGS	:= -ffast-math -freciprocal-math -O3 -ftree-vectorize -DHAVE_LIBSAMPLERATE -DMALLOC_IS_ALIGNED -DHAVE_VDSP -DPROCESS_SAMPLE_TYPE=float -DUSE_POMMIER_MATHFUN -DNO_THREADING -DNO_THREAD_CHECKS -DNO_TIMING -DNO_TIMING_COMPLETE_NOOP -DNDEBUG -I. -Isrc -Irubberband @CXXFLAGS@ @SRC_CFLAGS@ @SNDFILE_CFLAGS@ $(OPTFLAGS)
+CFLAGS		:= @CFLAGS@ $(OPTFLAGS)
+LDFLAGS		:= @LDFLAGS@ -Wl,-framework,Accelerate $(LDFLAGS)
+
+JNI_CXXFLAGS	:= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+JAVAC		:= $(JAVA_HOME)/bin/javac
+JAR		:= $(JAVA_HOME)/bin/jar
+
+LIBRARY_LIBS		:= @SRC_LIBS@
+PROGRAM_LIBS		:= @SNDFILE_LIBS@ $(LIBRARY_LIBS)
+LADSPA_PLUGIN_LIBS	:= $(LIBRARY_LIBS)
+
+MKDIR			:= mkdir
+AR			:= ar
+
+INSTALL_BINDIR		:= $(PREFIX)/bin
+INSTALL_INCDIR		:= $(PREFIX)/include/rubberband
+INSTALL_LIBDIR		:= $(PREFIX)/lib
+INSTALL_LADSPADIR	:= $(PREFIX)/lib/ladspa
+INSTALL_LRDFDIR		:= $(PREFIX)/share/ladspa/rdf
+INSTALL_PKGDIR		:= $(PREFIX)/lib/pkgconfig
+
+LIBNAME			:= librubberband
+JNINAME			:= librubberband-jni
+JARNAME			:= rubberband.jar
+
+DYNAMIC_EXTENSION	:= .so
+DYNAMIC_FULL_VERSION	:= 2.1.1
+DYNAMIC_ABI_VERSION	:= 2
+DYNAMIC_LDFLAGS		:= -shared -Wl,-Bsymbolic -Wl,-soname=$(LIBNAME)$(DYNAMIC_EXTENSION).$(DYNAMIC_ABI_VERSION)
+LADSPA_LDFLAGS		:= -shared -Wl,-Bsymbolic -Wl,--version-script=ladspa/ladspa-plugin.map
+
+PROGRAM_TARGET 		:= bin/rubberband
+STATIC_TARGET  		:= lib/$(LIBNAME).a
+DYNAMIC_TARGET 		:= lib/$(LIBNAME)$(DYNAMIC_EXTENSION)
+JNI_TARGET		:= lib/$(JNINAME)$(DYNAMIC_EXTENSION)
+JAR_TARGET		:= lib/$(JARNAME)
+LADSPA_TARGET  		:= lib/ladspa-rubberband$(DYNAMIC_EXTENSION)
+
+all:	bin lib $(PROGRAM_TARGET) $(STATIC_TARGET)
+
+static:		$(STATIC_TARGET)
+dynamic:	$(DYNAMIC_TARGET)
+library:	$(STATIC_TARGET)
+jni:		$(JNI_TARGET) $(JAR_TARGET)
+program:	$(PROGRAM_TARGET)
+ladspa:		$(LADSPA_TARGET)
+
+PUBLIC_INCLUDES := \
+	rubberband/rubberband-c.h \
+	rubberband/RubberBandStretcher.h
+
+LIBRARY_INCLUDES := \
+	src/StretcherChannelData.h \
+	src/float_cast/float_cast.h \
+	src/StretcherImpl.h \
+	src/StretchCalculator.h \
+	src/base/Profiler.h \
+	src/base/RingBuffer.h \
+	src/base/Scavenger.h \
+	src/dsp/AudioCurveCalculator.h \
+	src/audiocurves/CompoundAudioCurve.h \
+	src/audiocurves/ConstantAudioCurve.h \
+	src/audiocurves/HighFrequencyAudioCurve.h \
+	src/audiocurves/PercussiveAudioCurve.h \
+	src/audiocurves/SilentAudioCurve.h \
+	src/audiocurves/SpectralDifferenceAudioCurve.h \
+	src/dsp/Resampler.h \
+	src/dsp/FFT.h \
+	src/dsp/MovingMedian.h \
+	src/dsp/SincWindow.h \
+	src/dsp/Window.h \
+	src/system/Allocators.h \
+	src/system/Thread.h \
+	src/system/VectorOps.h \
+	src/system/VectorOpsComplex.h \
+	src/system/sysutils.h
+
+LIBRARY_SOURCES := \
+	src/rubberband-c.cpp \
+	src/RubberBandStretcher.cpp \
+	src/StretcherProcess.cpp \
+	src/StretchCalculator.cpp \
+	src/base/Profiler.cpp \
+	src/dsp/AudioCurveCalculator.cpp \
+	src/audiocurves/CompoundAudioCurve.cpp \
+	src/audiocurves/SpectralDifferenceAudioCurve.cpp \
+	src/audiocurves/HighFrequencyAudioCurve.cpp \
+	src/audiocurves/SilentAudioCurve.cpp \
+	src/audiocurves/ConstantAudioCurve.cpp \
+	src/audiocurves/PercussiveAudioCurve.cpp \
+	src/dsp/Resampler.cpp \
+	src/dsp/FFT.cpp \
+	src/system/Allocators.cpp \
+	src/system/sysutils.cpp \
+	src/system/Thread.cpp \
+	src/system/VectorOpsComplex.cpp \
+	src/StretcherChannelData.cpp \
+	src/StretcherImpl.cpp
+
+JNI_SOURCE := \
+	src/jni/RubberBandStretcherJNI.cpp
+
+JAVA_SOURCE := \
+	com/breakfastquay/rubberband/RubberBandStretcher.java
+
+PROGRAM_SOURCES := \
+	main/main.cpp
+
+LADSPA_HEADERS := \
+	ladspa/RubberBandPitchShifter.h
+
+LADSPA_SOURCES := \
+	ladspa/RubberBandPitchShifter.cpp \
+	ladspa/libmain.cpp
+
+LIBRARY_OBJECTS := $(LIBRARY_SOURCES:.cpp=.o)
+LIBRARY_OBJECTS := $(LIBRARY_OBJECTS:.c=.o)
+JNI_OBJECT	:= $(JNI_SOURCE:.cpp=.o)
+JAVA_OBJECT	:= $(JAVA_SOURCE:.java=.class)
+PROGRAM_OBJECTS := $(PROGRAM_SOURCES:.cpp=.o)
+LADSPA_OBJECTS  := $(LADSPA_SOURCES:.cpp=.o)
+
+$(PROGRAM_TARGET):	$(LIBRARY_OBJECTS) $(PROGRAM_OBJECTS)
+	$(CXX) -o $@ $^ $(PROGRAM_LIBS) $(LDFLAGS)
+
+$(STATIC_TARGET):	$(LIBRARY_OBJECTS)
+	$(AR) rsc $@ $^
+
+$(DYNAMIC_TARGET):	$(LIBRARY_OBJECTS)
+	$(CXX) $(DYNAMIC_LDFLAGS) $^ -o $@ $(LIBRARY_LIBS) $(LDFLAGS)
+
+$(JNI_OBJECT):	$(JNI_SOURCE)
+	$(CXX) -c $(JNI_CXXFLAGS) $(CXXFLAGS) $^ -o $@
+
+$(JNI_TARGET):	$(LIBRARY_OBJECTS) $(JNI_OBJECT)
+	$(CXX) $(DYNAMIC_LDFLAGS) $^ -o $@ $(LIBRARY_LIBS) $(LDFLAGS)
+
+$(JAR_TARGET):	$(JAVA_SOURCE)
+	$(JAVAC) $^
+	$(JAR) cvf $@ $(JAVA_OBJECT)
+
+$(LADSPA_TARGET):	$(LIBRARY_OBJECTS) $(LADSPA_OBJECTS)
+	$(CXX) $(LADSPA_LDFLAGS) -o $@ $^ $(LADSPA_PLUGIN_LIBS) $(LDFLAGS)
+
+bin:
+	$(MKDIR) $@
+lib:
+	$(MKDIR) $@
+
+install:	all
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_BINDIR)
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_INCDIR)
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_LIBDIR)
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_LADSPADIR)
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_LRDFDIR)
+	$(MKDIR) -p $(DESTDIR)$(INSTALL_PKGDIR)
+	cp $(PROGRAM_TARGET) $(DESTDIR)$(INSTALL_BINDIR)
+	cp $(PUBLIC_INCLUDES) $(DESTDIR)$(INSTALL_INCDIR)
+	cp $(STATIC_TARGET) $(DESTDIR)$(INSTALL_LIBDIR)
+	sed "s,%PREFIX%,$(PREFIX)," rubberband.pc.in \
+	  > rubberband.pc
+
+clean:
+	rm -f $(LIBRARY_OBJECTS) $(JNI_OBJECT) $(JAVA_OBJECT) $(PROGRAM_OBJECTS) $(LADSPA_OBJECTS)
+
+distclean:	clean
+	rm -f $(PROGRAM_TARGET) $(STATIC_TARGET) $(DYNAMIC_TARGET) $(JNI_TARGET) $(JAR_TARGET) $(LADSPA_TARGET)
+
+depend:
+	makedepend -Y $(LIBRARY_SOURCES) $(PROGRAM_SOURCES)
+
+
+# DO NOT DELETE
+
+src/rubberband-c.o: rubberband/rubberband-c.h
+src/rubberband-c.o: rubberband/RubberBandStretcher.h
+src/RubberBandStretcher.o: src/StretcherImpl.h
+src/RubberBandStretcher.o: rubberband/RubberBandStretcher.h src/dsp/Window.h
+src/RubberBandStretcher.o: src/dsp/SincWindow.h src/dsp/FFT.h
+src/RubberBandStretcher.o: src/audiocurves/CompoundAudioCurve.h
+src/RubberBandStretcher.o: src/dsp/AudioCurveCalculator.h
+src/RubberBandStretcher.o: src/audiocurves/PercussiveAudioCurve.h
+src/RubberBandStretcher.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/RubberBandStretcher.o: src/dsp/SampleFilter.h src/base/RingBuffer.h
+src/RubberBandStretcher.o: src/base/Scavenger.h src/system/Thread.h
+src/RubberBandStretcher.o: src/system/sysutils.h
+src/StretcherProcess.o: src/StretcherImpl.h rubberband/RubberBandStretcher.h
+src/StretcherProcess.o: src/dsp/Window.h src/dsp/SincWindow.h src/dsp/FFT.h
+src/StretcherProcess.o: src/audiocurves/CompoundAudioCurve.h
+src/StretcherProcess.o: src/dsp/AudioCurveCalculator.h
+src/StretcherProcess.o: src/audiocurves/PercussiveAudioCurve.h
+src/StretcherProcess.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/StretcherProcess.o: src/dsp/SampleFilter.h src/base/RingBuffer.h
+src/StretcherProcess.o: src/base/Scavenger.h src/system/Thread.h
+src/StretcherProcess.o: src/system/sysutils.h src/audiocurves/PercussiveAudioCurve.h
+src/StretcherProcess.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/StretcherProcess.o: src/audiocurves/ConstantAudioCurve.h src/StretchCalculator.h
+src/StretcherProcess.o: src/StretcherChannelData.h src/dsp/Resampler.h
+src/StretcherProcess.o: src/base/Profiler.h src/system/VectorOps.h
+src/StretcherProcess.o: src/system/sysutils.h
+src/StretchCalculator.o: src/StretchCalculator.h src/system/sysutils.h
+src/base/Profiler.o: src/base/Profiler.h src/system/sysutils.h
+src/dsp/AudioCurveCalculator.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/CompoundAudioCurve.o: src/audiocurves/CompoundAudioCurve.h
+src/audiocurves/CompoundAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/CompoundAudioCurve.o: src/audiocurves/PercussiveAudioCurve.h
+src/audiocurves/CompoundAudioCurve.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/audiocurves/CompoundAudioCurve.o: src/dsp/SampleFilter.h src/dsp/MovingMedian.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/audiocurves/SpectralDifferenceAudioCurve.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/dsp/Window.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/system/sysutils.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/system/VectorOps.h
+src/audiocurves/SpectralDifferenceAudioCurve.o: src/system/sysutils.h
+src/audiocurves/HighFrequencyAudioCurve.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/audiocurves/HighFrequencyAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/SilentAudioCurve.o: src/audiocurves/SilentAudioCurve.h
+src/audiocurves/SilentAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/ConstantAudioCurve.o: src/audiocurves/ConstantAudioCurve.h
+src/audiocurves/ConstantAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/PercussiveAudioCurve.o: src/audiocurves/PercussiveAudioCurve.h
+src/audiocurves/PercussiveAudioCurve.o: src/dsp/AudioCurveCalculator.h
+src/audiocurves/PercussiveAudioCurve.o: src/system/VectorOps.h src/system/sysutils.h
+src/dsp/Resampler.o: src/dsp/Resampler.h src/system/sysutils.h
+src/dsp/Resampler.o: src/base/Profiler.h
+src/dsp/FFT.o: src/dsp/FFT.h src/system/sysutils.h src/system/Thread.h
+src/dsp/FFT.o: src/base/Profiler.h src/system/VectorOps.h
+src/dsp/FFT.o: src/system/sysutils.h
+src/system/Allocators.o: src/system/Allocators.h src/system/VectorOps.h
+src/system/Allocators.o: src/system/sysutils.h
+src/system/sysutils.o: src/system/sysutils.h
+src/system/Thread.o: src/system/Thread.h
+src/StretcherChannelData.o: src/StretcherChannelData.h src/StretcherImpl.h
+src/StretcherChannelData.o: rubberband/RubberBandStretcher.h src/dsp/Window.h
+src/StretcherChannelData.o: src/dsp/SincWindow.h src/dsp/FFT.h
+src/StretcherChannelData.o: src/audiocurves/CompoundAudioCurve.h
+src/StretcherChannelData.o: src/dsp/AudioCurveCalculator.h
+src/StretcherChannelData.o: src/audiocurves/PercussiveAudioCurve.h
+src/StretcherChannelData.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/StretcherChannelData.o: src/dsp/SampleFilter.h src/base/RingBuffer.h
+src/StretcherChannelData.o: src/base/Scavenger.h src/system/Thread.h
+src/StretcherChannelData.o: src/system/sysutils.h src/dsp/Resampler.h
+src/StretcherChannelData.o: src/system/Allocators.h src/system/VectorOps.h
+src/StretcherChannelData.o: src/system/sysutils.h
+src/StretcherImpl.o: src/StretcherImpl.h rubberband/RubberBandStretcher.h
+src/StretcherImpl.o: src/dsp/Window.h src/dsp/SincWindow.h src/dsp/FFT.h
+src/StretcherImpl.o: src/audiocurves/CompoundAudioCurve.h
+src/StretcherImpl.o: src/dsp/AudioCurveCalculator.h
+src/StretcherImpl.o: src/audiocurves/PercussiveAudioCurve.h
+src/StretcherImpl.o: src/audiocurves/HighFrequencyAudioCurve.h src/dsp/SampleFilter.h
+src/StretcherImpl.o: src/base/RingBuffer.h src/base/Scavenger.h
+src/StretcherImpl.o: src/system/Thread.h src/system/sysutils.h
+src/StretcherImpl.o: src/audiocurves/PercussiveAudioCurve.h
+src/StretcherImpl.o: src/audiocurves/HighFrequencyAudioCurve.h
+src/StretcherImpl.o: src/audiocurves/SpectralDifferenceAudioCurve.h src/dsp/Window.h
+src/StretcherImpl.o: src/system/VectorOps.h src/system/sysutils.h
+src/StretcherImpl.o: src/audiocurves/SilentAudioCurve.h src/audiocurves/ConstantAudioCurve.h
+src/StretcherImpl.o: src/dsp/Resampler.h src/StretchCalculator.h
+src/StretcherImpl.o: src/StretcherChannelData.h src/base/Profiler.h
+main/main.o: rubberband/RubberBandStretcher.h src/system/sysutils.h
+main/main.o: src/base/Profiler.h

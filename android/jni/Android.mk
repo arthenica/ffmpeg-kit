@@ -11,11 +11,22 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
         MY_ARMV7_NEON := true
     endif
 endif
-ifeq ($(MY_ARMV7_NEON), true)
-    FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/android-$(TARGET_ARCH)-neon/ffmpeg/include
+
+ifeq ($(TARGET_PLATFORM),android-16)
+    ifeq ($(MY_ARMV7_NEON), true)
+        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon-lts
+    else
+        MY_BUILD_DIR := android-$(TARGET_ARCH)-lts
+    endif
 else
-    FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+    ifeq ($(MY_ARMV7_NEON), true)
+        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon
+    else
+        MY_BUILD_DIR := android-$(TARGET_ARCH)
+    endif
 endif
+
+FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/include
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := false

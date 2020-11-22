@@ -1,8 +1,4 @@
-ifeq ($(MY_ARMV7_NEON), true)
-    LOCAL_PATH := $(call my-dir)/../../../prebuilt/android-$(TARGET_ARCH)-neon/cpu-features/lib
-else
-    LOCAL_PATH := $(call my-dir)/../../../prebuilt/android-$(TARGET_ARCH)/cpu-features/lib
-endif
+LOCAL_PATH := $(call my-dir)/../../../prebuilt/$(MY_BUILD_DIR)/cpu-features/lib
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)

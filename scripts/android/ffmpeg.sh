@@ -1,277 +1,291 @@
 #!/bin/bash
 
-# ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
-
-# FIND pkg-config PATH
 HOST_PKG_CONFIG_PATH=$(command -v pkg-config)
 if [ -z "${HOST_PKG_CONFIG_PATH}" ]; then
   echo -e "\n(*) pkg-config command not found\n"
   exit 1
 fi
 
-# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
-LIB_NAME="ffmpeg"
-set_toolchain_paths ${LIB_NAME}
+# ENABLE COMMON FUNCTIONS
+source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-# PREPARE BUILD FLAGS
-BUILD_HOST=$(get_build_host)
-CFLAGS=$(get_cflags ${LIB_NAME})
-CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-LDFLAGS=$(get_ldflags ${LIB_NAME})
+LIB_NAME="ffmpeg"
+
+echo -e "----------------------------------------------------------------" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "\nINFO: Building ${LIB_NAME} with the following environment variables\n" 1>>"${BASEDIR}"/build.log 2>&1
+env 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "----------------------------------------------------------------\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: System information\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: $(uname -a)\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "----------------------------------------------------------------\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+FFMPEG_LIBRARY_PATH="${LIB_INSTALL_BASE}/${LIB_NAME}"
+ANDROID_SYSROOT="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot
+
+# SET PATHS
+set_toolchain_paths "${LIB_NAME}"
+
+# SET BUILD FLAGS
+HOST=$(get_host)
+export CFLAGS=$(get_cflags "${LIB_NAME}")
+export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
+export LDFLAGS=$(get_ldflags "${LIB_NAME}")
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-# PREPARE BUILD OPTIONS
+cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
+# SET BUILD OPTIONS
 TARGET_CPU=""
 TARGET_ARCH=""
-ARCH_OPTIONS=""
+ASM_OPTIONS=""
 case ${ARCH} in
 arm-v7a)
   TARGET_CPU="armv7-a"
   TARGET_ARCH="armv7-a"
-  ARCH_OPTIONS=" --disable-neon --enable-asm --enable-inline-asm"
+  ASM_OPTIONS=" --disable-neon --enable-asm --enable-inline-asm"
   ;;
 arm-v7a-neon)
   TARGET_CPU="armv7-a"
   TARGET_ARCH="armv7-a"
-  ARCH_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm --build-suffix=_neon"
+  ASM_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm --build-suffix=_neon"
   ;;
 arm64-v8a)
   TARGET_CPU="armv8-a"
   TARGET_ARCH="aarch64"
-  ARCH_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm"
+  ASM_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm"
   ;;
 x86)
   TARGET_CPU="i686"
   TARGET_ARCH="i686"
 
   # asm disabled due to this ticket https://trac.ffmpeg.org/ticket/4928
-  ARCH_OPTIONS=" --disable-neon --disable-asm --disable-inline-asm"
+  ASM_OPTIONS=" --disable-neon --disable-asm --disable-inline-asm"
   ;;
 x86-64)
   TARGET_CPU="x86_64"
   TARGET_ARCH="x86_64"
-  ARCH_OPTIONS=" --disable-neon --enable-asm --enable-inline-asm"
+  ASM_OPTIONS=" --disable-neon --enable-asm --enable-inline-asm"
   ;;
 esac
 
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-# PREPARE CONFIGURE OPTIONS
+# SET CONFIGURE OPTIONS
 for library in {1..58}; do
   if [[ ${!library} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
     echo -e "INFO: Enabling library ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    case $ENABLED_LIBRARY in
+    case ${ENABLED_LIBRARY} in
     chromaprint)
-      CFLAGS+=" $(pkg-config --cflags libchromaprint 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libchromaprint 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libchromaprint 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libchromaprint 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-chromaprint"
       ;;
     cpu-features)
-      pkg-config --libs --static cpu-features 1>>"${BASEDIR}"/build.log 2>&1
+      pkg-config --libs --static cpu-features 2>>"${BASEDIR}"/build.log 1>/dev/null
       if [[ $? -eq 1 ]]; then
-        echo -e "\nffmpeg: failed\n"
+        echo -e "ERROR: cpu-features was not found in the pkg-config search path\n" 1>>"${BASEDIR}"/build.log 2>&1
+        echo -e "\nffmpeg: failed\n\nSee build.log for details\n"
         exit 1
       fi
       ;;
     fontconfig)
-      CFLAGS+=" $(pkg-config --cflags fontconfig 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static fontconfig 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags fontconfig 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static fontconfig 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libfontconfig"
       ;;
     freetype)
-      CFLAGS+=" $(pkg-config --cflags freetype2 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static freetype2 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags freetype2 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static freetype2 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libfreetype"
       ;;
     fribidi)
-      CFLAGS+=" $(pkg-config --cflags fribidi 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static fribidi 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags fribidi 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static fribidi 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libfribidi"
       ;;
     gmp)
-      CFLAGS+=" $(pkg-config --cflags gmp 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static gmp 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags gmp 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static gmp 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-gmp"
       ;;
     gnutls)
-      CFLAGS+=" $(pkg-config --cflags gnutls 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static gnutls 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags gnutls 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static gnutls 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-gnutls"
       ;;
     kvazaar)
-      CFLAGS+=" $(pkg-config --cflags kvazaar 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static kvazaar 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags kvazaar 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static kvazaar 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libkvazaar"
       ;;
     lame)
-      CFLAGS+=" $(pkg-config --cflags libmp3lame 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libmp3lame 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libmp3lame 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libmp3lame 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libmp3lame"
       ;;
     libaom)
-      CFLAGS+=" $(pkg-config --cflags aom 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static aom 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags aom 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static aom 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libaom"
       ;;
     libass)
-      CFLAGS+=" $(pkg-config --cflags libass 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libass 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libass 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libass 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libass"
       ;;
     libiconv)
-      CFLAGS+=" $(pkg-config --cflags libiconv 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libiconv 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libiconv 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libiconv 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-iconv"
-      HIGH_PRIORITY_INCLUDES+=" $(pkg-config --cflags libiconv 1>>"${BASEDIR}"/build.log 2>&1)"
+      HIGH_PRIORITY_INCLUDES+=" $(pkg-config --cflags libiconv 2>>"${BASEDIR}"/build.log)"
       ;;
     libilbc)
-      CFLAGS+=" $(pkg-config --cflags libilbc 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libilbc 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libilbc 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libilbc 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libilbc"
       ;;
     libtheora)
-      CFLAGS+=" $(pkg-config --cflags theora 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static theora 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags theora 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static theora 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libtheora"
       ;;
     libvidstab)
-      CFLAGS+=" $(pkg-config --cflags vidstab 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static vidstab 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags vidstab 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static vidstab 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
       ;;
     libvorbis)
-      CFLAGS+=" $(pkg-config --cflags vorbis 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static vorbis 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags vorbis 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static vorbis 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvorbis"
       ;;
     libvpx)
-      CFLAGS+=" $(pkg-config --cflags vpx 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs vpx 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs cpu-features 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags vpx 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs vpx 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs cpu-features 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvpx"
       ;;
     libwebp)
-      CFLAGS+=" $(pkg-config --cflags libwebp 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libwebp 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libwebp 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libwebp 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libwebp"
       ;;
     libxml2)
-      CFLAGS+=" $(pkg-config --cflags libxml-2.0 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libxml-2.0 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libxml-2.0 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libxml-2.0 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libxml2"
       ;;
     opencore-amr)
-      CFLAGS+=" $(pkg-config --cflags opencore-amrnb 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags opencore-amrnb 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
       ;;
     openh264)
-      FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264 1>>"${BASEDIR}"/build.log 2>&1)"
-      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openh264 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags openh264 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static openh264 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopenh264"
       ;;
     opus)
-      CFLAGS+=" $(pkg-config --cflags opus 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static opus 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags opus 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static opus 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopus"
       ;;
     rubberband)
-      CFLAGS+=" $(pkg-config --cflags rubberband 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static rubberband 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags rubberband 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static rubberband 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
       ;;
-    shine)
-      CFLAGS+=" $(pkg-config --cflags shine 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static shine 1>>"${BASEDIR}"/build.log 2>&1)"
-      CONFIGURE_POSTFIX+=" --enable-libshine"
-      ;;
     sdl)
-      CFLAGS+=" $(pkg-config --cflags sdl2 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static sdl2 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags sdl2 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static sdl2 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-sdl2"
       ;;
+    shine)
+      CFLAGS+=" $(pkg-config --cflags shine 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static shine 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libshine"
+      ;;
     snappy)
-      CFLAGS+=" $(pkg-config --cflags snappy 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static snappy 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags snappy 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static snappy 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libsnappy"
       ;;
     soxr)
-      CFLAGS+=" $(pkg-config --cflags soxr 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static soxr 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags soxr 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static soxr 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libsoxr"
       ;;
     speex)
-      CFLAGS+=" $(pkg-config --cflags speex 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static speex 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags speex 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static speex 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libspeex"
       ;;
     tesseract)
-      CFLAGS+=" $(pkg-config --cflags tesseract 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static tesseract 1>>"${BASEDIR}"/build.log 2>&1)"
-      CFLAGS+=" $(pkg-config --cflags giflib 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static giflib 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags tesseract 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static tesseract 2>>"${BASEDIR}"/build.log)"
+      CFLAGS+=" $(pkg-config --cflags giflib 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static giflib 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libtesseract"
       ;;
     twolame)
-      CFLAGS+=" $(pkg-config --cflags twolame 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static twolame 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags twolame 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static twolame 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libtwolame"
       ;;
     vo-amrwbenc)
-      CFLAGS+=" $(pkg-config --cflags vo-amrwbenc 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
       ;;
     wavpack)
-      CFLAGS+=" $(pkg-config --cflags wavpack 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static wavpack 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags wavpack 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static wavpack 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libwavpack"
       ;;
     x264)
-      CFLAGS+=" $(pkg-config --cflags x264 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static x264 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags x264 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static x264 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
       ;;
     x265)
-      CFLAGS+=" $(pkg-config --cflags x265 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static x265 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags x265 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static x265 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
       ;;
     xvidcore)
-      CFLAGS+=" $(pkg-config --cflags xvidcore 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static xvidcore 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags xvidcore 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static xvidcore 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
       ;;
     expat)
-      CFLAGS+=" $(pkg-config --cflags expat 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static expat 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static expat 2>>"${BASEDIR}"/build.log)"
       ;;
     libogg)
-      CFLAGS+=" $(pkg-config --cflags ogg 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static ogg 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags ogg 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static ogg 2>>"${BASEDIR}"/build.log)"
       ;;
     libpng)
-      CFLAGS+=" $(pkg-config --cflags libpng 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static libpng 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags libpng 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libpng 2>>"${BASEDIR}"/build.log)"
       ;;
     libuuid)
-      CFLAGS+=" $(pkg-config --cflags uuid 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static uuid 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags uuid 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static uuid 2>>"${BASEDIR}"/build.log)"
       ;;
     nettle)
-      CFLAGS+=" $(pkg-config --cflags nettle 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static nettle 1>>"${BASEDIR}"/build.log 2>&1)"
-      CFLAGS+=" $(pkg-config --cflags hogweed 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static hogweed 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags nettle 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static nettle 2>>"${BASEDIR}"/build.log)"
+      CFLAGS+=" $(pkg-config --cflags hogweed 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static hogweed 2>>"${BASEDIR}"/build.log)"
       ;;
     android-zlib)
-      CFLAGS+=" $(pkg-config --cflags zlib 1>>"${BASEDIR}"/build.log 2>&1)"
-      LDFLAGS+=" $(pkg-config --libs --static zlib 1>>"${BASEDIR}"/build.log 2>&1)"
+      CFLAGS+=" $(pkg-config --cflags zlib 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static zlib 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-zlib"
       ;;
     android-media-codec)
@@ -292,11 +306,11 @@ for library in {1..58}; do
   fi
 done
 
-LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
+export LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
 # LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
 if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ ${API} -lt 18 ]]; then
-  LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
+  export LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
 fi
 
 # ALWAYS BUILD SHARED LIBRARIES
@@ -324,17 +338,13 @@ fi
 
 echo -n -e "\n${LIB_NAME}: "
 
-cd "${BASEDIR}"/src/${LIB_NAME} || exit 1
-
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
   echo -e "INFO: Cleaning workspace for ${LIB_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
   make distclean 2>/dev/null 1>/dev/null
 fi
 
-# SET BUILD FLAGS
+# UPDATE BUILD FLAGS
 export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
-export CXXFLAGS="${CXXFLAGS}"
-export LDFLAGS="${LDFLAGS}"
 
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>"${BASEDIR}"/build.log 2>&1
@@ -342,23 +352,26 @@ ulimit -n 2048 1>>"${BASEDIR}"/build.log 2>&1
 ########################### CUSTOMIZATIONS #######################
 
 # 1. Use thread local log levels
-${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/"${LIB_NAME}"/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
 ###################################################################
 
 ./configure \
-  --cross-prefix="${BUILD_HOST}-" \
-  --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
-  --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
+  --cross-prefix="${HOST}-" \
+  --sysroot="${ANDROID_SYSROOT}" \
+  --prefix="${FFMPEG_LIBRARY_PATH}" \
   --pkg-config="${HOST_PKG_CONFIG_PATH}" \
   --enable-version3 \
   --arch="${TARGET_ARCH}" \
   --cpu="${TARGET_CPU}" \
   --cc="${CC}" \
   --cxx="${CXX}" \
-  --extra-libs="$(pkg-config --libs --static cpu-features 1>>"${BASEDIR}"/build.log 2>&1)" \
+  --ranlib="${RANLIB}" \
+  --strip="${STRIP}" \
+  --nm="${NM}" \
+  --extra-libs="$(pkg-config --libs --static cpu-features)" \
   --target-os=android \
-  ${ARCH_OPTIONS} \
+  ${ASM_OPTIONS} \
   --enable-cross-compile \
   --enable-pic \
   --enable-jni \
@@ -400,65 +413,68 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR
   --disable-vdpau \
   ${CONFIGURE_POSTFIX} 1>>"${BASEDIR}"/build.log 2>&1
 
-if [ $? -ne 0 ]; then
-  echo "failed"
+if [[ $? -ne 0 ]]; then
+  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
 if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
   make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
 
-  if [ $? -ne 0 ]; then
-    echo "failed"
+  if [[ $? -ne 0 ]]; then
+    echo -e "failed\n\nSee build.log for details\n"
     exit 1
   fi
 else
   echo -e "started\n"
-  make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
+  make -j$(get_cpu_count)
 
-  if [ $? -ne 0 ]; then
-    echo -n -e "\n${LIB_NAME}: failed\n"
+  if [[ $? -ne 0 ]]; then
+    echo -n -e "\n${LIB_NAME}: failed\n\nSee build.log for details\n"
     exit 1
   else
     echo -n -e "\n${LIB_NAME}: "
   fi
 fi
 
-rm -rf "${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}"
+# DELETE THE PREVIOUS BUILD OF THE LIBRARY BEFORE INSTALLING
+if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
+  rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+fi
 make install 1>>"${BASEDIR}"/build.log 2>&1
 
-if [ $? -ne 0 ]; then
-  echo "failed"
+if [[ $? -ne 0 ]]; then
+  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
 # MANUALLY ADD REQUIRED HEADERS
-mkdir -p "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/x86
-mkdir -p "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/arm
-mkdir -p "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/aarch64
-mkdir -p "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavcodec/x86
-mkdir -p "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavcodec/arm
-cp -f "${BASEDIR}"/src/ffmpeg/config.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include
-cp -f "${BASEDIR}"/src/ffmpeg/libavcodec/mathops.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavcodec
-cp -f "${BASEDIR}"/src/ffmpeg/libavcodec/x86/mathops.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavcodec/x86
-cp -f "${BASEDIR}"/src/ffmpeg/libavcodec/arm/mathops.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavcodec/arm
-cp -f "${BASEDIR}"/src/ffmpeg/libavformat/network.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavformat
-cp -f "${BASEDIR}"/src/ffmpeg/libavformat/os_support.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavformat
-cp -f "${BASEDIR}"/src/ffmpeg/libavformat/url.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavformat
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/internal.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/libm.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/reverse.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/thread.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/timer.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/x86/asm.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/x86
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/x86/timer.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/x86
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/arm/timer.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/arm
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/aarch64/timer.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/aarch64
-cp -f "${BASEDIR}"/src/ffmpeg/libavutil/x86/emms.h "${BASEDIR}/prebuilt/android-$(get_target_build)"/ffmpeg/include/libavutil/x86
+mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86 1>>"${BASEDIR}"/build.log 2>&1
+mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavutil/arm 1>>"${BASEDIR}"/build.log 2>&1
+mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavutil/aarch64 1>>"${BASEDIR}"/build.log 2>&1
+mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavcodec/x86 1>>"${BASEDIR}"/build.log 2>&1
+mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavcodec/arm 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/config.h "${FFMPEG_LIBRARY_PATH}"/include/config.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavcodec/mathops.h "${FFMPEG_LIBRARY_PATH}"/include/libavcodec/mathops.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavcodec/x86/mathops.h "${FFMPEG_LIBRARY_PATH}"/include/libavcodec/x86/mathops.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavcodec/arm/mathops.h "${FFMPEG_LIBRARY_PATH}"/include/libavcodec/arm/mathops.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/network.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/network.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/os_support.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/os_support.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/url.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/url.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/internal.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/internal.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/libm.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/libm.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/reverse.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/reverse.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/thread.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/thread.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/timer.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/timer.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/x86/asm.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86/asm.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/x86/timer.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86/timer.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/arm/timer.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/arm/timer.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/aarch64/timer.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/aarch64/timer.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/x86/emms.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86/emms.h 1>>"${BASEDIR}"/build.log 2>&1
 
 if [ $? -eq 0 ]; then
   echo "ok"
 else
-  echo "failed"
+  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi

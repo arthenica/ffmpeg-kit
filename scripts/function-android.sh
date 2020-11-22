@@ -23,15 +23,15 @@ get_ffmpeg_kit_version() {
 display_help() {
   local COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
-  echo -e "\n'$COMMAND' builds FFmpegKit for Android platform. By default five Android ABIs (armeabi-v7a, \
+  echo -e "\n'$COMMAND' builds FFmpegKit for Android platform. By default five Android architectures (armeabi-v7a, \
 armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built without any external libraries enabled. Options can be used to \
-disable ABIs and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) \
-need --enable-gpl flag to be set explicitly. When compilation ends an Android Archive (AAR) file is created under the \
-prebuilt folder.\n"
+disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL \
+license) need --enable-gpl flag to be set explicitly. When compilation ends an Android Archive (AAR) file is created \
+under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "      --api-level=api\t\tset Android api level [${API}]"
+  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level [${API}]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -92,7 +92,7 @@ APP_LDFLAGS := -Wl,--hash-style=both
 EOF
 }
 
-get_clang_target_host() {
+get_clang_host() {
   case ${ARCH} in
   arm-v7a | arm-v7a-neon)
     echo "armv7a-linux-androideabi${API}"
@@ -127,7 +127,7 @@ get_toolchain() {
   echo "${HOST_OS}-${HOST_ARCH}"
 }
 
-get_cmake_target_processor() {
+get_cmake_system_processor() {
   case ${ARCH} in
   arm-v7a | arm-v7a-neon)
     echo "arm"
@@ -144,7 +144,7 @@ get_cmake_target_processor() {
   esac
 }
 
-get_target_build() {
+get_target_cpu() {
   case ${ARCH} in
   arm-v7a)
     echo "arm"
@@ -207,7 +207,7 @@ get_common_cflags() {
     local LTS_BUILD__FLAG="-DFFMPEG_KIT_LTS "
   fi
 
-  echo "-fno-integrated-as -fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+  echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {
@@ -288,6 +288,9 @@ get_app_specific_cflags() {
   kvazaar)
     APP_FLAGS="-std=gnu99 -Wno-unused-function"
     ;;
+  openh264)
+    APP_FLAGS="-std=gnu99 -Wno-unused-function -fstack-protector-all"
+    ;;
   rubberband)
     APP_FLAGS="-std=c99 -Wno-unused-function"
     ;;
@@ -359,7 +362,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-  local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${BUILD_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${BUILD_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
+  local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
 
   case $1 in
   ffmpeg)
@@ -448,7 +451,7 @@ create_chromaprint_package_config() {
   local CHROMAPRINT_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/libchromaprint.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/chromaprint
+prefix="${LIB_INSTALL_BASE}"/chromaprint
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -466,7 +469,7 @@ create_fontconfig_package_config() {
   local FONTCONFIG_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/fontconfig
+prefix="${LIB_INSTALL_BASE}"/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -491,7 +494,7 @@ create_freetype_package_config() {
   local FREETYPE_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/freetype
+prefix="${LIB_INSTALL_BASE}"/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -512,7 +515,7 @@ create_giflib_package_config() {
   local GIFLIB_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/giflib.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/giflib
+prefix="${LIB_INSTALL_BASE}"/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -531,7 +534,7 @@ create_gmp_package_config() {
   local GMP_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/gmp.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/gmp
+prefix="${LIB_INSTALL_BASE}"/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -550,7 +553,7 @@ create_gnutls_package_config() {
   local GNUTLS_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/gnutls
+prefix="${LIB_INSTALL_BASE}"/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -570,7 +573,7 @@ create_libaom_package_config() {
   local AOM_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/aom.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libaom
+prefix="${LIB_INSTALL_BASE}"/libaom
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -589,7 +592,7 @@ create_libiconv_package_config() {
   local LIB_ICONV_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv
+prefix="${LIB_INSTALL_BASE}"/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -608,7 +611,7 @@ create_libmp3lame_package_config() {
   local LAME_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/lame
+prefix="${LIB_INSTALL_BASE}"/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -627,7 +630,7 @@ create_libvorbis_package_config() {
   local LIBVORBIS_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
+prefix="${LIB_INSTALL_BASE}"/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -642,7 +645,7 @@ Cflags: -I\${includedir}
 EOF
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
+prefix="${LIB_INSTALL_BASE}"/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -658,7 +661,7 @@ Cflags: -I\${includedir}
 EOF
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
+prefix="${LIB_INSTALL_BASE}"/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -678,7 +681,7 @@ create_libxml2_package_config() {
   local LIBXML2_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libxml2
+prefix="${LIB_INSTALL_BASE}"/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -698,7 +701,7 @@ create_snappy_package_config() {
   local SNAPPY_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/snappy.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/snappy
+prefix="${LIB_INSTALL_BASE}"/snappy
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -717,7 +720,7 @@ create_soxr_package_config() {
   local SOXR_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/soxr.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/soxr
+prefix="${LIB_INSTALL_BASE}"/soxr
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -736,7 +739,7 @@ create_tesseract_package_config() {
   local TESSERACT_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/tesseract
+prefix="${LIB_INSTALL_BASE}"/tesseract
 exec_prefix=\${prefix}
 bindir=\${exec_prefix}/bin
 datarootdir=\${prefix}/share
@@ -759,7 +762,7 @@ create_uuid_package_config() {
   local UUID_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/uuid.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libuuid
+prefix="${LIB_INSTALL_BASE}"/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -777,7 +780,7 @@ create_x265_package_config() {
   local X265_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/x265.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/x265
+prefix="${LIB_INSTALL_BASE}"/x265
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -797,7 +800,7 @@ create_xvidcore_package_config() {
   local XVIDCORE_VERSION="$1"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/xvidcore.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/xvidcore
+prefix="${LIB_INSTALL_BASE}"/xvidcore
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -816,7 +819,7 @@ create_zlib_system_package_config() {
   ZLIB_VERSION=$(grep '#define ZLIB_VERSION' "${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/zlib.pc" <<EOF
-prefix=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr
+prefix="${ANDROID_SYSROOT}"/usr
 exec_prefix=\${prefix}
 libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
 includedir=\${prefix}/include
@@ -832,8 +835,10 @@ EOF
 }
 
 create_cpufeatures_package_config() {
+  local CPU_FEATURES_VERSION="$1"
+
   cat >"${INSTALL_PKG_CONFIG_DIR}/cpu-features.pc" <<EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/cpu-features
+prefix="${LIB_INSTALL_BASE}"/cpu-features
 exec_prefix=\${prefix}/bin
 libdir=\${prefix}/lib
 includedir=\${prefix}/include/ndk_compat
@@ -841,7 +846,7 @@ includedir=\${prefix}/include/ndk_compat
 Name: cpufeatures
 URL: https://github.com/google/cpu_features
 Description: cpu_features Android compatibility library
-Version: 1.${API}
+Version: ${CPU_FEATURES_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lndk_compat
@@ -849,7 +854,9 @@ Cflags: -I\${includedir}
 EOF
 }
 
-android_ndk_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+# Maps current architecture to one of the ABIs supported in $ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+# and returns it
+get_android_cmake_ndk_abi() {
   case ${ARCH} in
   arm-v7a | arm-v7a-neon)
     echo "armeabi-v7a"
@@ -866,8 +873,22 @@ android_ndk_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/bui
   esac
 }
 
-get_android_build_dir() {
-  echo "${BASEDIR}"/android/build/"${LIB_NAME}"/"$(get_target_build)"
+get_build_directory() {
+  local LTS_POSTFIX=""
+  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
+    LTS_POSTFIX="-lts"
+  fi
+
+  echo "android-$(get_target_cpu)${LTS_POSTFIX}"
+}
+
+get_aar_directory() {
+  local LTS_POSTFIX=""
+  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
+    LTS_POSTFIX="-lts"
+  fi
+
+  echo "android-aar${LTS_POSTFIX}"
 }
 
 android_ndk_cmake() {
@@ -879,28 +900,44 @@ android_ndk_cmake() {
     cmake="missing_cmake"
   fi
 
+  # SET BUILD OPTIONS
+  ASM_OPTIONS=""
+  case ${ARCH} in
+  arm-v7a-neon)
+    ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi)"
+    # @TODO TEST THIS
+    #ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi) -DANDROID_ARM_NEON=TRUE"
+    ;;
+  *)
+    ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi)"
+    ;;
+  esac
+
   echo ${cmake} \
+    -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_ROOT}"/build/cmake/android.toolchain.cmake \
+    -DCMAKE_SYSROOT="${ANDROID_SYSROOT}" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_SYSROOT}" \
+    -DCMAKE_INSTALL_PREFIX="${LIB_INSTALL_PREFIX}" \
     -H"${BASEDIR}"/src/"${LIB_NAME}" \
-    -B"$(get_android_build_dir)" \
-    -DANDROID_ABI="$(android_ndk_abi)" \
-    -DANDROID_PLATFORM=android-"${API}" \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}"/prebuilt/android-"$(get_target_build)"/"${LIB_NAME}"
+    -B"${BUILD_DIR}" \
+    "${ASM_OPTIONS}" \
+    -DANDROID_PLATFORM=android-"${API}"
 }
 
 set_toolchain_paths() {
   export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
 
-  BUILD_HOST=$(get_build_host)
+  HOST=$(get_host)
 
-  export AR=${BUILD_HOST}-ar
-  export CC=$(get_clang_target_host)-clang
-  export CXX=$(get_clang_target_host)-clang++
+  export AR=${HOST}-ar
+  export CC=$(get_clang_host)-clang
+  export CXX=$(get_clang_host)-clang++
 
   if [ "$1" == "x264" ]; then
     export AS=${CC}
   else
-    export AS=${BUILD_HOST}-as
+    export AS=${HOST}-as
   fi
 
   case ${ARCH} in
@@ -909,19 +946,20 @@ set_toolchain_paths() {
     ;;
   esac
 
-  export LD=${BUILD_HOST}-ld
-  export RANLIB=${BUILD_HOST}-ranlib
-  export STRIP=${BUILD_HOST}-strip
+  export LD=${HOST}-ld
+  export RANLIB=${HOST}-ranlib
+  export STRIP=${HOST}-strip
+  export NM=${HOST}-nm
 
-  export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
+  export INSTALL_PKG_CONFIG_DIR="${BASEDIR}"/prebuilt/$(get_build_directory)/pkgconfig
   export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
   if [ ! -d "${INSTALL_PKG_CONFIG_DIR}" ]; then
-    mkdir -p "${INSTALL_PKG_CONFIG_DIR}"
+    mkdir -p "${INSTALL_PKG_CONFIG_DIR}" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 
   if [ ! -f "${ZLIB_PACKAGE_CONFIG_PATH}" ]; then
-    create_zlib_system_package_config
+    create_zlib_system_package_config 1>>"${BASEDIR}"/build.log 2>&1
   fi
 
   prepare_inline_sed
@@ -940,11 +978,11 @@ build_android_lts_support() {
   set_toolchain_paths ${LIB_NAME}
 
   # PREPARE FLAGS
-  BUILD_HOST=$(get_build_host)
-  CFLAGS=$(get_cflags ${LIB_NAME})
+  HOST=$(get_host)
+  CFLAGS=$(get_cflags "${LIB_NAME}")
   LDFLAGS=$(get_ldflags ${LIB_NAME})
 
   # BUILD
-  "$(get_clang_target_host)"-clang ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.c -o "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
-  "${BUILD_HOST}"-ar rcs "${BASEDIR}"/android/app/src/main/cpp/libandroidltssupport.a "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
+  "$(get_clang_host)"-clang ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.c -o "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
+  "${HOST}"-ar rcs "${BASEDIR}"/android/app/src/main/cpp/libandroidltssupport.a "${BASEDIR}"/android/app/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
 }

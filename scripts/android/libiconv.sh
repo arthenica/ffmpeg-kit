@@ -1,40 +1,29 @@
 #!/bin/bash
 
-# ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
+# PULL SUBMODULES
+./gitsub.sh pull || return 1
 
-# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
-LIB_NAME="libiconv"
-set_toolchain_paths ${LIB_NAME}
-
-# SET BUILD FLAGS
-BUILD_HOST=$(get_build_host)
-export CFLAGS=$(get_cflags ${LIB_NAME})
-export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS=$(get_ldflags ${LIB_NAME})
-
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
+# ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURE IF REQUESTED
-if [[ ${RECONF_libiconv} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
+# REGENERATE BUILD FILES IF NECESSARY OR REQUESTED
+if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_libiconv} -eq 1 ]]; then
+  autoreconf_library "${LIB_NAME}"
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
-    --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot \
-    --enable-static \
-    --disable-shared \
-    --disable-fast-install \
-    --disable-rpath \
-    --host=${BUILD_HOST} || exit 1
+  --prefix="${LIB_INSTALL_PREFIX}" \
+  --with-pic \
+  --with-sysroot="${ANDROID_SYSROOT}" \
+  --enable-static \
+  --disable-shared \
+  --disable-fast-install \
+  --disable-rpath \
+  --host="${HOST}" || return 1
 
-make -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || return 1
+
+make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libiconv_package_config "1.16"
-
-make install || exit 1
+create_libiconv_package_config "1.16.2" || return 1

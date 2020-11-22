@@ -30,8 +30,9 @@ echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 # SET DEFAULT BUILD OPTIONS
 GPL_ENABLED="no"
 DISPLAY_HELP=""
-BUILD_FULL=""
 BUILD_TYPE_ID=""
+BUILD_FULL=""
+FFMPEG_KIT_XCF_BUILD=""
 BUILD_FORCE=""
 BUILD_VERSION=$(git describe --tags --always 2>>"${BASEDIR}"/build.log)
 if [[ -z ${BUILD_VERSION} ]]; then
@@ -58,7 +59,7 @@ while [ ! $# -eq 0 ]; do
     exit 0
     ;;
   --skip-*)
-    SKIP_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
+    SKIP_LIBRARY=$(echo "$1" | sed -e 's/^--[A-Za-z]*-//g')
 
     skip_library "${SKIP_LIBRARY}"
     ;;
@@ -77,8 +78,11 @@ while [ ! $# -eq 0 ]; do
     optimize_for_speed
     ;;
   -l | --lts) ;;
+  -x | --xcframework)
+    FFMPEG_KIT_XCF_BUILD="1"
+    ;;
   -f | --force)
-    BUILD_FORCE="1"
+    export BUILD_FORCE="1"
     ;;
   --reconf-*)
     CONF_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
@@ -128,12 +132,12 @@ fi
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..57}; do
+  for library in {0..58}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
-      enable_library "$(get_library_name $library)" 1
+      enable_library "$(get_library_name "$library")" 1
     else
-      if [[ $(is_gpl_licensed $library) -eq 1 ]]; then
-        enable_library "$(get_library_name $library)" 1
+      if [[ $(is_gpl_licensed "$library") -eq 1 ]]; then
+        enable_library "$(get_library_name "$library")" 1
       fi
     fi
   done
@@ -143,6 +147,14 @@ fi
 if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
+fi
+
+# CHECK SOME RULES FOR .xcframework BUNDLES
+
+# 1. DO NOT ALLOW --lts AND --xcframework OPTIONS TOGETHER
+if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]] && [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
+  echo -e "\n(*) LTS packages does not support xcframework bundles.\n"
+  exit 1
 fi
 
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}static library for tvOS\n"
@@ -159,7 +171,7 @@ print_redownload_requested_libraries
 # VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
-    library_name=$(get_library_name ${gpl_library})
+    library_name=$(get_library_name "${gpl_library}")
 
     if [ ${GPL_ENABLED} != "yes" ]; then
       echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
@@ -172,6 +184,9 @@ done
 echo -n -e "\nDownloading sources: "
 echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
+# DOWNLOAD GNU CONFIG
+download_gnu_config
+
 # DOWNLOAD LIBRARY SOURCES
 downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
 
@@ -179,515 +194,51 @@ downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
 TARGET_ARCH_LIST=()
 
 # BUILD ENABLED LIBRARIES ON ENABLED ARCHITECTURES
-for run_arch in {0..10}; do
+for run_arch in {0..12}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    export ARCH=$(get_arch_name $run_arch)
-    export TARGET_SDK=$(get_target_sdk)
+    export ARCH=$(get_arch_name "$run_arch")
+    export FULL_ARCH=$(get_full_arch_name "$run_arch")
     export SDK_PATH=$(get_sdk_path)
     export SDK_NAME=$(get_sdk_name)
 
-    export LIPO="$(xcrun --sdk "$(get_sdk_name)" -f lipo)"
-
     # EXECUTE MAIN BUILD SCRIPT
     . "${BASEDIR}"/scripts/main-tvos.sh "${ENABLED_LIBRARIES[@]}"
-    case ${ARCH} in
-    x86-64)
-      TARGET_ARCH="x86_64"
-      ;;
-    *)
-      TARGET_ARCH="${ARCH}"
-      ;;
-    esac
-    TARGET_ARCH_LIST+=(${TARGET_ARCH})
+
+    TARGET_ARCH_LIST+=("${FULL_ARCH}")
 
     # CLEAR FLAGS
-    for library in {0..57}; do
-      library_name=$(get_library_name ${library})
+    for library in {0..58}; do
+      library_name=$(get_library_name "${library}")
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"
     done
   fi
 done
 
-FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
-
-# BUILD STATIC LIBRARIES
-BUILD_LIBRARY_EXTENSION="a"
-
 # BUILD FFMPEG-KIT
 if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
-  echo -e -n "\n\nCreating frameworks and universal libraries under prebuilt: "
+  # INITIALIZE TARGET FOLDERS
+  initialize_prebuilt_tvos_folders
 
-  # CREATE FFMPEG
+  # PREPARE PLATFORM ARCHITECTURE STRINGS
+  build_apple_architecture_variant_strings
 
-  # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
-  rm -rf "${BASEDIR}"/prebuilt/tvos-universal 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${BASEDIR}"/prebuilt/tvos-universal 1>>"${BASEDIR}"/build.log 2>&1
-  rm -rf "${BASEDIR}"/prebuilt/tvos-framework 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${BASEDIR}"/prebuilt/tvos-framework 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
+    echo -e -n "\n\nCreating universal libraries and xcframeworks under prebuilt: "
 
-  # CREATE ENABLED LIBRARY PACKAGES
-  for library in {0..57}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      library_name=$(get_library_name ${library})
+    create_universal_libraries_for_tvos_xcframeworks
 
-      # EACH ENABLED LIBRARY HAS TO HAVE A .pc FILE AND A VERSION
-      package_config_file_name=$(get_package_config_file_name ${library})
-      library_version=$(get_external_library_version "${package_config_file_name}")
-      if [[ -z ${library_version} ]]; then
-        echo -e "Failed to detect version for ${library_name} from ${package_config_file_name}.pc\n" 1>>"${BASEDIR}"/build.log 2>&1
-        echo -e "failed\n"
-        exit 1
-      fi
+    create_frameworks_for_tvos_xcframeworks
 
-      echo -e "Creating universal library for ${library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-      # SOME CUSTOM CODE TO HANDLE LIBRARIES THAT PRODUCE MULTIPLE LIBRARY FILES
-      if [[ ${LIBRARY_LIBTHEORA} == "$library" ]]; then
-
-        LIBRARY_CREATED=$(create_static_fat_library "libtheora.a" "libtheora")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libtheoraenc.a" "libtheoraenc")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libtheoradec.a" "libtheoradec")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libtheora" "libtheora.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libtheoraenc" "libtheoraenc.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libtheoradec" "libtheoradec.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libtheora-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libtheoraenc-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libtheoradec-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libtheora.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libtheoraenc.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libtheoradec.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      elif [[ ${LIBRARY_LIBVORBIS} == "$library" ]]; then
-
-        LIBRARY_CREATED=$(create_static_fat_library "libvorbisfile.a" "libvorbisfile")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libvorbisenc.a" "libvorbisenc")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libvorbis.a" "libvorbis")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libvorbisfile" "libvorbisfile.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libvorbisenc" "libvorbisenc.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libvorbis" "libvorbis.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libvorbisfile-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libvorbisenc-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libvorbis-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libvorbisfile.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libvorbisenc.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libvorbis.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      elif [[ ${LIBRARY_LIBWEBP} == "$library" ]]; then
-
-        LIBRARY_CREATED=$(create_static_fat_library "libwebpmux.a" "libwebpmux")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libwebpdemux.a" "libwebpdemux")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libwebp.a" "libwebp")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libwebpmux" "libwebpmux.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libwebpdemux" "libwebpdemux.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libwebp" "libwebp.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libwebpmux-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libwebpdemux-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libwebp-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libwebpmux.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libwebpdemux.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libwebp.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      elif
-        [[ ${LIBRARY_OPENCOREAMR} == "$library" ]]
-      then
-
-        LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrnb.a" "libopencore-amrnb")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libopencore-amrnb" "libopencore-amrnb.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libopencore-amrnb-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libopencore-amrnb.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      elif [[ ${LIBRARY_NETTLE} == "$library" ]]; then
-
-        LIBRARY_CREATED=$(create_static_fat_library "libnettle.a" "libnettle")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        LIBRARY_CREATED=$(create_static_fat_library "libhogweed.a" "libhogweed")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libnettle" "libnettle.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libhogweed" "libhogweed.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libnettle-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/libhogweed-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libnettle.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/libhogweed.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      else
-
-        # LIBRARIES WHICH HAVE ONLY ONE LIBRARY FILE ARE CREATED HERE
-        library_name=$(get_library_name $((library)))
-        static_archive_name=$(get_static_archive_name $((library)))
-        LIBRARY_CREATED=$(create_static_fat_library "$static_archive_name" "$library_name")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "$library_name" "$static_archive_name" "$library_version")
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-universal/${library_name}-universal/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) "${BASEDIR}"/prebuilt/tvos-framework/${library_name}.framework/LICENSE 1>>"${BASEDIR}"/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-      fi
-
-    fi
-  done
-
-  # CREATE FFMPEG
-
-  # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
-  FFMPEG_UNIVERSAL="${BASEDIR}"/prebuilt/tvos-universal/ffmpeg-universal
-  mkdir -p "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${FFMPEG_UNIVERSAL}"/lib 1>>"${BASEDIR}"/build.log 2>&1
-
-  # COPY HEADER FILES
-  cp -r "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg/include/* "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  cp "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg/include/config.h "${FFMPEG_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
-
-  for FFMPEG_LIB in ${FFMPEG_LIBS}; do
-    LIPO_COMMAND="${LIPO} -create"
-
-    for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"; do
-      LIPO_COMMAND+=" ${BASEDIR}/prebuilt/tvos-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
-    done
-
-    LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
-
-    # EXECUTE CREATE UNIVERSAL LIBRARY COMMAND
-    ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
-    if [ $? -ne 0 ]; then
-      echo -e "failed\n"
-      exit 1
-    fi
-
-    FFMPEG_LIB_UPPERCASE=$(echo "${FFMPEG_LIB}" | tr '[a-z]' '[A-Z]')
-    FFMPEG_LIB_CAPITALCASE=$(to_capital_case "${FFMPEG_LIB}")
-
-    # EXTRACT FFMPEG VERSION
-    FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
-    FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
-    FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" "${FFMPEG_UNIVERSAL}"/include/${FFMPEG_LIB}/version.h | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
-    FFMPEG_LIB_VERSION="${FFMPEG_LIB_MAJOR}.${FFMPEG_LIB_MINOR}.${FFMPEG_LIB_MICRO}"
-
-    # INITIALIZE FRAMEWORK DIRECTORY
-    FFMPEG_LIB_FRAMEWORK_PATH=${BASEDIR}/prebuilt/tvos-framework/${FFMPEG_LIB}.framework
-    rm -rf "${FFMPEG_LIB_FRAMEWORK_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
-    mkdir -p "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
-
-    # COPY HEADER FILES
-    cp -r "${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
-
-    # COPY LIBRARY FILE
-    cp "${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
-
-    # COPY FRAMEWORK LICENSES
-    if [ ${GPL_ENABLED} == "yes" ]; then
-      cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_LIB_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-    else
-      cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_LIB_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-    fi
-
-    build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${FFMPEG_LIB_CAPITALCASE}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
-
-    echo -e "Created ${FFMPEG_LIB} framework successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
-  done
-
-  # COPY UNIVERSAL LIBRARY LICENSES
-  if [ ${GPL_ENABLED} == "yes" ]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    create_tvos_xcframeworks
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e -n "\n\nCreating universal libraries and frameworks under prebuilt: "
+
+    create_universal_libraries_for_tvos_default_frameworks
+
+    create_tvos_default_frameworks
   fi
 
-  # FFMPEG KIT
-
-  # INITIALIZE FRAMEWORK AND UNIVERSAL LIBRARY DIRECTORIES
-  FFMPEG_KIT_VERSION=$(get_ffmpeg_kit_version)
-  FFMPEG_KIT_UNIVERSAL=${BASEDIR}/prebuilt/tvos-universal/ffmpeg-kit-universal
-  FFMPEG_KIT_FRAMEWORK_PATH=${BASEDIR}/prebuilt/tvos-framework/ffmpegkit.framework
-  mkdir -p "${FFMPEG_KIT_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${FFMPEG_KIT_UNIVERSAL}"/lib 1>>"${BASEDIR}"/build.log 2>&1
-  rm -rf "${FFMPEG_KIT_FRAMEWORK_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${FFMPEG_KIT_FRAMEWORK_PATH}"/Modules 1>>"${BASEDIR}"/build.log 2>&1
-
-  LIPO_COMMAND="${LIPO} -create"
-  for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"; do
-    LIPO_COMMAND+=" ${BASEDIR}/prebuilt/tvos-${TARGET_ARCH}-apple-darwin/ffmpeg-kit/lib/libffmpegkit.${BUILD_LIBRARY_EXTENSION}"
-  done
-  LIPO_COMMAND+=" -output ${FFMPEG_KIT_UNIVERSAL}/lib/libffmpegkit.${BUILD_LIBRARY_EXTENSION}"
-
-  # EXECUTE CREATE UNIVERSAL LIBRARY COMMAND
-  ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
-  if [ $? -ne 0 ]; then
-    echo -e "failed\n"
-    exit 1
-  fi
-
-  # COPY HEADER FILES
-  cp -r "${BASEDIR}"/prebuilt/tvos-"${TARGET_ARCH_LIST[0]}"-apple-darwin/ffmpeg-kit/include/* "${FFMPEG_KIT_UNIVERSAL}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  cp -r "${FFMPEG_KIT_UNIVERSAL}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
-
-  # COPY LIBRARY FILE
-  cp "${FFMPEG_KIT_UNIVERSAL}"/lib/libffmpegkit.${BUILD_LIBRARY_EXTENSION} "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
-
-  # COPY THE LICENSES
-  if [ ${GPL_ENABLED} == "yes" ]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-  else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_FRAMEWORK_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
-  fi
-
-  build_info_plist "${FFMPEG_KIT_FRAMEWORK_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}"
-  build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
-
-  echo -e "Created ffmpeg-kit.framework and universal library successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
   echo -e "ok\n"
 fi

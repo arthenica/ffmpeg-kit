@@ -132,7 +132,7 @@ fi
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..57}; do
+  for library in {0..58}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library "$(get_library_name $library)" 1
     else
@@ -176,6 +176,9 @@ done
 echo -n -e "\nDownloading sources: "
 echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
+# DOWNLOAD GNU CONFIG
+download_gnu_config
+
 # DOWNLOAD LIBRARY SOURCES
 downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
 
@@ -183,7 +186,7 @@ downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
 export ORIGINAL_API=${API}
 
 # BUILD ENABLED LIBRARIES ON ENABLED ARCHITECTURES
-for run_arch in {0..10}; do
+for run_arch in {0..12}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
     if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
 
@@ -201,7 +204,7 @@ for run_arch in {0..10}; do
     . "${BASEDIR}"/scripts/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {0..57}; do
+    for library in {0..58}; do
       library_name=$(get_library_name ${library})
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"
@@ -272,7 +275,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   fi
 
   # COPY ANDROID ARCHIVE TO PREBUILT DIRECTORY
-  FFMPEG_KIT_AAR="${BASEDIR}"/prebuilt/android-aar/ffmpeg-kit
+  FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_target_aar_directory)/ffmpeg-kit"
   rm -rf "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
   mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
   cp "${BASEDIR}"/android/app/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1

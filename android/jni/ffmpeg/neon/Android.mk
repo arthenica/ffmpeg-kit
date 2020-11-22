@@ -1,4 +1,8 @@
-LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon/ffmpeg/lib
+ifeq ($(TARGET_PLATFORM),android-16)
+    LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon-lts/ffmpeg/lib
+else
+    LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon/ffmpeg/lib
+endif
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := true

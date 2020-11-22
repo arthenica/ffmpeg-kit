@@ -1,65 +1,32 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo -e "\n(*) ANDROID_NDK_ROOT not defined\n"
-    exit 1
-fi
+cd "${LIB_NAME}" || return 1
 
-if [[ -z ${ARCH} ]]; then
-    echo -e "\n(*) ARCH not defined\n"
-    exit 1
-fi
-
-if [[ -z ${API} ]]; then
-    echo -e "\n(*) API not defined\n"
-    exit 1
-fi
-
-if [[ -z ${BASEDIR} ]]; then
-    echo -e "\n(*) BASEDIR not defined\n"
-    exit 1
-fi
-
-# ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
-
-# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
-LIB_NAME="lame"
-set_toolchain_paths ${LIB_NAME}
-
-# PREPARING FLAGS
-BUILD_HOST=$(get_build_host)
-export CFLAGS=$(get_cflags ${LIB_NAME})
-export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
-
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
+# ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURE IF REQUESTED
-if [[ ${RECONF_lame} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
+# REGENERATE BUILD FILES IF NECESSARY OR REQUESTED
+if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_lame} -eq 1 ]]; then
+  autoreconf_library "${LIB_NAME}"
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
-    --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv \
-    --enable-static \
-    --disable-shared \
-    --disable-fast-install \
-    --disable-maintainer-mode \
-    --disable-frontend \
-    --disable-efence \
-    --disable-gtktest \
-    --host=${BUILD_HOST} || exit 1
+  --prefix="${LIB_INSTALL_PREFIX}" \
+  --with-pic \
+  --with-sysroot="${ANDROID_SYSROOT}" \
+  --with-libiconv-prefix="${LIB_INSTALL_BASE}"/libiconv \
+  --enable-static \
+  --disable-shared \
+  --disable-fast-install \
+  --disable-maintainer-mode \
+  --disable-frontend \
+  --disable-efence \
+  --disable-gtktest \
+  --host="${HOST}" || return 1
 
-make -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || return 1
+
+make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libmp3lame_package_config "3.100"
-
-make install || exit 1
+create_libmp3lame_package_config "3.100" || return 1
