@@ -417,13 +417,13 @@ initialize_prebuilt_tvos_folders() {
 
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    if [[ $(is_apple_architecture_variant_supported 6) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 6)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 6)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_APPLETVOS}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_APPLETVOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_APPLETVOS}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
-    if [[ $(is_apple_architecture_variant_supported 7) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 7)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 7)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_APPLETVSIMULATOR}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_APPLETVSIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_APPLETVSIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
 
     echo -e "DEBUG: Initializing xcframework directory at ${BASEDIR}/prebuilt/$(get_xcframework_directory)\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -432,14 +432,14 @@ initialize_prebuilt_tvos_folders() {
     mkdir -p "${BASEDIR}/prebuilt/$(get_xcframework_directory)" 1>>"${BASEDIR}"/build.log 2>&1
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 5)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")" 1>>"${BASEDIR}"/build.log 2>&1
 
-    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_TVOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 5)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_TVOS}")" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -447,19 +447,19 @@ initialize_prebuilt_tvos_folders() {
 # DEPENDS TARGET_ARCH_LIST VARIABLE
 #
 create_universal_libraries_for_tvos_default_frameworks() {
-  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory 1)"
+  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")"
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 5
+      create_universal_library "${library}" "${ARCH_VAR_TVOS}"
     fi
   done
 
-  create_ffmpeg_universal_library 5
+  create_ffmpeg_universal_library "${ARCH_VAR_TVOS}"
 
-  create_ffmpeg_kit_universal_library 5
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_TVOS}"
 
   echo -e "INFO: Universal libraries for default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -469,13 +469,13 @@ create_tvos_default_frameworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 5
+      create_framework "${library}" "${ARCH_VAR_TVOS}"
     fi
   done
 
-  create_ffmpeg_framework 5
+  create_ffmpeg_framework "${ARCH_VAR_TVOS}"
 
-  create_ffmpeg_kit_framework 5
+  create_ffmpeg_kit_framework "${ARCH_VAR_TVOS}"
 
   echo -e "INFO: Default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -485,16 +485,16 @@ create_universal_libraries_for_tvos_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 6
-      create_universal_library "${library}" 7
+      create_universal_library "${library}" "${ARCH_VAR_APPLETVOS}"
+      create_universal_library "${library}" "${ARCH_VAR_APPLETVSIMULATOR}"
     fi
   done
 
-  create_ffmpeg_universal_library 6
-  create_ffmpeg_universal_library 7
+  create_ffmpeg_universal_library "${ARCH_VAR_APPLETVOS}"
+  create_ffmpeg_universal_library "${ARCH_VAR_APPLETVSIMULATOR}"
 
-  create_ffmpeg_kit_universal_library 6
-  create_ffmpeg_kit_universal_library 7
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_APPLETVOS}"
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_APPLETVSIMULATOR}"
 
   echo -e "INFO: Universal libraries for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -504,22 +504,22 @@ create_frameworks_for_tvos_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 6
-      create_framework "${library}" 7
+      create_framework "${library}" "${ARCH_VAR_APPLETVOS}"
+      create_framework "${library}" "${ARCH_VAR_APPLETVSIMULATOR}"
     fi
   done
 
-  create_ffmpeg_framework 6
-  create_ffmpeg_framework 7
+  create_ffmpeg_framework "${ARCH_VAR_APPLETVOS}"
+  create_ffmpeg_framework "${ARCH_VAR_APPLETVSIMULATOR}"
 
-  create_ffmpeg_kit_framework 6
-  create_ffmpeg_kit_framework 7
+  create_ffmpeg_kit_framework "${ARCH_VAR_APPLETVOS}"
+  create_ffmpeg_kit_framework "${ARCH_VAR_APPLETVSIMULATOR}"
 
   echo -e "INFO: Frameworks for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 create_tvos_xcframeworks() {
-  export ARCHITECTURE_VARIANT_ARRAY=(6 7)
+  export ARCHITECTURE_VARIANT_ARRAY=("${ARCH_VAR_APPLETVOS}" "${ARCH_VAR_APPLETVSIMULATOR}")
   echo -e "INFO: Building xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   for library in {0..46}; do

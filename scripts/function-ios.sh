@@ -460,17 +460,17 @@ initialize_prebuilt_ios_folders() {
 
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    if [[ $(is_apple_architecture_variant_supported 2) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 2)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 2)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONEOS}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONEOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONEOS}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
-    if [[ $(is_apple_architecture_variant_supported 3) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 3)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 3)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONESIMULATOR}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONESIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONESIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
-    if [[ $(is_apple_architecture_variant_supported 4) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 4)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 4)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MAC_CATALYST}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MAC_CATALYST}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MAC_CATALYST}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
 
     echo -e "DEBUG: Initializing xcframework directory at ${BASEDIR}/prebuilt/$(get_xcframework_directory)\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -479,14 +479,14 @@ initialize_prebuilt_ios_folders() {
     mkdir -p "${BASEDIR}/prebuilt/$(get_xcframework_directory)" 1>>"${BASEDIR}"/build.log 2>&1
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 1)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")" 1>>"${BASEDIR}"/build.log 2>&1
 
-    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 1)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -500,13 +500,13 @@ create_universal_libraries_for_ios_default_frameworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 1
+      create_universal_library "${library}" "${ARCH_VAR_IOS}"
     fi
   done
 
-  create_ffmpeg_universal_library 1
+  create_ffmpeg_universal_library "${ARCH_VAR_IOS}"
 
-  create_ffmpeg_kit_universal_library 1
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_IOS}"
 
   echo -e "INFO: Universal libraries for default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -516,13 +516,13 @@ create_ios_default_frameworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 1
+      create_framework "${library}" "${ARCH_VAR_IOS}"
     fi
   done
 
-  create_ffmpeg_framework 1
+  create_ffmpeg_framework "${ARCH_VAR_IOS}"
 
-  create_ffmpeg_kit_framework 1
+  create_ffmpeg_kit_framework "${ARCH_VAR_IOS}"
 
   echo -e "INFO: Default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -532,19 +532,19 @@ create_universal_libraries_for_ios_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 2
-      create_universal_library "${library}" 3
-      create_universal_library "${library}" 4
+      create_universal_library "${library}" "${ARCH_VAR_IPHONEOS}"
+      create_universal_library "${library}" "${ARCH_VAR_IPHONESIMULATOR}"
+      create_universal_library "${library}" "${ARCH_VAR_MAC_CATALYST}"
     fi
   done
 
-  create_ffmpeg_universal_library 2
-  create_ffmpeg_universal_library 3
-  create_ffmpeg_universal_library 4
+  create_ffmpeg_universal_library "${ARCH_VAR_IPHONEOS}"
+  create_ffmpeg_universal_library "${ARCH_VAR_IPHONESIMULATOR}"
+  create_ffmpeg_universal_library "${ARCH_VAR_MAC_CATALYST}"
 
-  create_ffmpeg_kit_universal_library 2
-  create_ffmpeg_kit_universal_library 3
-  create_ffmpeg_kit_universal_library 4
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_IPHONEOS}"
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_IPHONESIMULATOR}"
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_MAC_CATALYST}"
 
   echo -e "INFO: Universal libraries for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -554,25 +554,25 @@ create_frameworks_for_ios_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 2
-      create_framework "${library}" 3
-      create_framework "${library}" 4
+      create_framework "${library}" "${ARCH_VAR_IPHONEOS}"
+      create_framework "${library}" "${ARCH_VAR_IPHONESIMULATOR}"
+      create_framework "${library}" "${ARCH_VAR_MAC_CATALYST}"
     fi
   done
 
-  create_ffmpeg_framework 2
-  create_ffmpeg_framework 3
-  create_ffmpeg_framework 4
+  create_ffmpeg_framework "${ARCH_VAR_IPHONEOS}"
+  create_ffmpeg_framework "${ARCH_VAR_IPHONESIMULATOR}"
+  create_ffmpeg_framework "${ARCH_VAR_MAC_CATALYST}"
 
-  create_ffmpeg_kit_framework 2
-  create_ffmpeg_kit_framework 3
-  create_ffmpeg_kit_framework 4
+  create_ffmpeg_kit_framework "${ARCH_VAR_IPHONEOS}"
+  create_ffmpeg_kit_framework "${ARCH_VAR_IPHONESIMULATOR}"
+  create_ffmpeg_kit_framework "${ARCH_VAR_MAC_CATALYST}"
 
   echo -e "INFO: Frameworks for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 create_ios_xcframeworks() {
-  export ARCHITECTURE_VARIANT_ARRAY=(2 3 4)
+  export ARCHITECTURE_VARIANT_ARRAY=("${ARCH_VAR_IPHONEOS}" "${ARCH_VAR_IPHONESIMULATOR}" "${ARCH_VAR_MAC_CATALYST}")
   echo -e "INFO: Building xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   for library in {0..46}; do

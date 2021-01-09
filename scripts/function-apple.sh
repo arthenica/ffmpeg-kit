@@ -122,14 +122,14 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
 }
 
 build_apple_architecture_variant_strings() {
-  export ALL_IOS_ARCHITECTURES="$(get_apple_architectures_for_variant 1)"
-  export IPHONEOS_ARCHITECTURES="$(get_apple_architectures_for_variant 2)"
-  export IPHONE_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant 3)"
-  export MAC_CATALYST_ARCHITECTURES="$(get_apple_architectures_for_variant 4)"
-  export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant 5)"
-  export APPLETVOS_ARCHITECTURES="$(get_apple_architectures_for_variant 6)"
-  export APPLETV_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant 7)"
-  export MACOSX_ARCHITECTURES="$(get_apple_architectures_for_variant 8)"
+  export ALL_IOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IOS}")"
+  export IPHONEOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IPHONEOS}")"
+  export IPHONE_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IPHONESIMULATOR}")"
+  export MAC_CATALYST_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MAC_CATALYST}")"
+  export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant ARCH_VAR_TVOS)"
+  export APPLETVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVOS}")"
+  export APPLETV_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVSIMULATOR}")"
+  export MACOSX_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MACOS}")"
 }
 
 #
@@ -774,28 +774,28 @@ get_framework_directory() {
   fi
 
   case $FRAMEWORK_TYPE in
-  1)
+  "${ARCH_VAR_IOS}")
     echo "bundle-apple-framework-ios${LTS_POSTFIX}"
     ;;
-  2)
+  "${ARCH_VAR_IPHONEOS}")
     echo "bundle-apple-framework-iphoneos${LTS_POSTFIX}"
     ;;
-  3)
+  "${ARCH_VAR_IPHONESIMULATOR}")
     echo "bundle-apple-framework-iphonesimulator${LTS_POSTFIX}"
     ;;
-  4)
+  "${ARCH_VAR_MAC_CATALYST}")
     echo "bundle-apple-framework-mac-catalyst${LTS_POSTFIX}"
     ;;
-  5)
+  ARCH_VAR_TVOS)
     echo "bundle-apple-framework-tvos${LTS_POSTFIX}"
     ;;
-  6)
+  "${ARCH_VAR_APPLETVOS}")
     echo "bundle-apple-framework-appletvos${LTS_POSTFIX}"
     ;;
-  7)
+  "${ARCH_VAR_APPLETVSIMULATOR}")
     echo "bundle-apple-framework-appletvsimulator${LTS_POSTFIX}"
     ;;
-  8)
+  "${ARCH_VAR_MACOS}")
     echo "bundle-apple-framework-macos${LTS_POSTFIX}"
     ;;
   esac
@@ -810,6 +810,15 @@ get_xcframework_directory() {
   echo "bundle-apple-xcframework-${FFMPEG_KIT_BUILD_TYPE}${LTS_POSTFIX}"
 }
 
+get_umbrella_xcframework_directory() {
+  local LTS_POSTFIX=""
+  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
+    LTS_POSTFIX="-lts"
+  fi
+
+  echo "bundle-apple-xcframework${LTS_POSTFIX}"
+}
+
 #
 # 1. architecture variant
 #
@@ -821,28 +830,28 @@ get_universal_library_directory() {
   fi
 
   case ${ARCHITECTURE_VARIANT} in
-  1)
+  "${ARCH_VAR_IOS}")
     echo "bundle-apple-universal-ios${LTS_POSTFIX}"
     ;;
-  2)
+  "${ARCH_VAR_IPHONEOS}")
     echo "bundle-apple-universal-iphoneos${LTS_POSTFIX}"
     ;;
-  3)
+  "${ARCH_VAR_IPHONESIMULATOR}")
     echo "bundle-apple-universal-iphonesimulator${LTS_POSTFIX}"
     ;;
-  4)
+  "${ARCH_VAR_MAC_CATALYST}")
     echo "bundle-apple-universal-mac-catalyst${LTS_POSTFIX}"
     ;;
-  5)
+  "${ARCH_VAR_APPLETVOS}")
     echo "bundle-apple-universal-tvos${LTS_POSTFIX}"
     ;;
-  6)
+  "${ARCH_VAR_APPLETVOS}")
     echo "bundle-apple-universal-appletvos${LTS_POSTFIX}"
     ;;
-  7)
+  "${ARCH_VAR_APPLETVSIMULATOR}")
     echo "bundle-apple-universal-appletvsimulator${LTS_POSTFIX}"
     ;;
-  8)
+  "${ARCH_VAR_MACOS}")
     echo "bundle-apple-universal-macos${LTS_POSTFIX}"
     ;;
   esac
@@ -859,29 +868,29 @@ get_apple_architecture_variant() {
   fi
 
   case ${ARCHITECTURE_VARIANT} in
-  2)
+  "${ARCH_VAR_IOS}")
+    echo "ios${LTS_POSTFIX}"
+    ;;
+  "${ARCH_VAR_IPHONEOS}")
     echo "iphoneos${LTS_POSTFIX}"
     ;;
-  3)
+  "${ARCH_VAR_IPHONESIMULATOR}")
     echo "iphonesimulator${LTS_POSTFIX}"
     ;;
-  4)
+  "${ARCH_VAR_MAC_CATALYST}")
     echo "mac-catalyst${LTS_POSTFIX}"
     ;;
-  5)
+  ARCH_VAR_TVOS)
     echo "tvos${LTS_POSTFIX}"
     ;;
-  6)
+  "${ARCH_VAR_APPLETVOS}")
     echo "appletvos${LTS_POSTFIX}"
     ;;
-  7)
+  "${ARCH_VAR_APPLETVSIMULATOR}")
     echo "appletvsimulator${LTS_POSTFIX}"
     ;;
-  8)
-    echo "macosx${LTS_POSTFIX}"
-    ;;
-  *)
-    echo "ios${LTS_POSTFIX}"
+  "${ARCH_VAR_MACOS}")
+    echo "macos${LTS_POSTFIX}"
     ;;
   esac
 }
@@ -895,43 +904,43 @@ get_apple_architectures_for_variant() {
   local ARCHITECTURES=""
 
   case ${ARCHITECTURE_VARIANT} in
-  2)
-    for index in 2 3 5 6; do
+  "${ARCH_VAR_IOS}")
+    for index in ${ARCH_ARMV7} ${ARCH_ARMV7S} ${ARCH_ARM64} ${ARCH_ARM64E} ${ARCH_I386} ${ARCH_X86_64} ${ARCH_X86_64_MAC_CATALYST} ${ARCH_ARM64_MAC_CATALYST} ${ARCH_ARM64_SIMULATOR}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  3)
-    for index in 7 9 12; do
+  "${ARCH_VAR_IPHONEOS}")
+    for index in ${ARCH_ARMV7} ${ARCH_ARMV7S} ${ARCH_ARM64} ${ARCH_ARM64E}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  4)
-    for index in 10 11; do
+  "${ARCH_VAR_IPHONESIMULATOR}")
+    for index in ${ARCH_I386} ${ARCH_X86_64} ${ARCH_ARM64_SIMULATOR}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  5)
-    for index in 5 9; do
+  "${ARCH_VAR_MAC_CATALYST}")
+    for index in ${ARCH_X86_64_MAC_CATALYST} ${ARCH_ARM64_MAC_CATALYST}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  6)
-    for index in 5; do
+  ARCH_VAR_TVOS)
+    for index in ${ARCH_ARM64} ${ARCH_X86_64}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  7)
-    for index in 9; do
+  "${ARCH_VAR_APPLETVOS}")
+    for index in ${ARCH_ARM64}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  8)
-    for index in 5 9; do
+  "${ARCH_VAR_APPLETVSIMULATOR}")
+    for index in ${ARCH_X86_64}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  *)
-    for index in 2 3 5 6 7 9 10 11 12; do
+  "${ARCH_VAR_MACOS}")
+    for index in ${ARCH_ARM64} ${ARCH_X86_64}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;

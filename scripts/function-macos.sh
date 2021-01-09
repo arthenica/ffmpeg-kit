@@ -372,9 +372,9 @@ initialize_prebuilt_macos_folders() {
 
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    if [[ $(is_apple_architecture_variant_supported 8) -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 8)" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 8)" 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MACOS}") -eq 1 ]]; then
+      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
     fi
 
     echo -e "DEBUG: Initializing xcframework directory at ${BASEDIR}/prebuilt/$(get_xcframework_directory)\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -383,14 +383,14 @@ initialize_prebuilt_macos_folders() {
     mkdir -p "${BASEDIR}/prebuilt/$(get_xcframework_directory)" 1>>"${BASEDIR}"/build.log 2>&1
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory 8)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
 
-    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory 1)\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory 8)" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -404,13 +404,13 @@ create_universal_libraries_for_macos_default_frameworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 8
+      create_universal_library "${library}" "${ARCH_VAR_MACOS}"
     fi
   done
 
-  create_ffmpeg_universal_library 8
+  create_ffmpeg_universal_library "${ARCH_VAR_MACOS}"
 
-  create_ffmpeg_kit_universal_library 8
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_MACOS}"
 
   echo -e "INFO: Universal libraries for default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -420,13 +420,13 @@ create_macos_default_frameworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 8
+      create_framework "${library}" "${ARCH_VAR_MACOS}"
     fi
   done
 
-  create_ffmpeg_framework 8
+  create_ffmpeg_framework "${ARCH_VAR_MACOS}"
 
-  create_ffmpeg_kit_framework 8
+  create_ffmpeg_kit_framework "${ARCH_VAR_MACOS}"
 
   echo -e "INFO: Default frameworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -436,13 +436,13 @@ create_universal_libraries_for_macos_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" 8
+      create_universal_library "${library}" "${ARCH_VAR_MACOS}"
     fi
   done
 
-  create_ffmpeg_universal_library 8
+  create_ffmpeg_universal_library "${ARCH_VAR_MACOS}"
 
-  create_ffmpeg_kit_universal_library 8
+  create_ffmpeg_kit_universal_library "${ARCH_VAR_MACOS}"
 
   echo -e "INFO: Universal libraries for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -452,19 +452,19 @@ create_frameworks_for_macos_xcframeworks() {
 
   for library in {0..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" 8
+      create_framework "${library}" "${ARCH_VAR_MACOS}"
     fi
   done
 
-  create_ffmpeg_framework 8
+  create_ffmpeg_framework "${ARCH_VAR_MACOS}"
 
-  create_ffmpeg_kit_framework 8
+  create_ffmpeg_kit_framework "${ARCH_VAR_MACOS}"
 
   echo -e "INFO: Frameworks for xcframeworks built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 create_macos_xcframeworks() {
-  export ARCHITECTURE_VARIANT_ARRAY=(8)
+  export ARCHITECTURE_VARIANT_ARRAY=("${ARCH_VAR_MACOS}")
   echo -e "INFO: Building xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   for library in {0..46}; do

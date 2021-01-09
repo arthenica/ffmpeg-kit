@@ -291,7 +291,7 @@ is_library_supported_on_platform() {
 
   # IOS, MACOS AND TVOS
   49 | 50 | 51 | 54 | 55)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "0"
     else
       echo "1"
@@ -342,7 +342,7 @@ is_arch_supported_on_platform() {
 
     # IOS, MACOS OR TVOS
   $ARCH_ARM64)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo 1
     else
       echo 0
@@ -505,12 +505,17 @@ print_unknown_arch() {
   exit 1
 }
 
+print_unknown_arch_variant() {
+  echo -e "\n(*) Unknown architecture variant \"$1\".\n\nSee $0 --help for available architecture variants.\n"
+  exit 1
+}
+
 display_version() {
   COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
   echo -e "\
-$COMMAND v$(get_ffmpeg_kit_version)\n
-Copyright (c) 2018-2021 Taner Sener\n
+$COMMAND v$(get_ffmpeg_kit_version)
+Copyright (c) 2018-2021 Taner Sener\n\
 License LGPLv3.0: GNU LGPL version 3 or later\n\
 <https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\
 This is free software: you can redistribute it and/or modify it under the terms of the \
@@ -536,7 +541,7 @@ display_help_options() {
 
 display_help_licensing() {
   echo -e "Licensing options:"
-  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, created libs will be licensed under GPLv3.0 [no]\n"
+  echo -e "  --enable-gpl\t\t\tallow building GPL libraries, created libs will be licensed under the GPLv3.0 [no]\n"
 }
 
 display_help_common_libraries() {
@@ -552,7 +557,7 @@ display_help_common_libraries() {
   echo -e "  --enable-libass\t\tbuild with libass [no]"
 
   case ${FFMPEG_KIT_BUILD_TYPE} in
-  ios | tvos | macos)
+  android)
     echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
     ;;
   esac
@@ -909,21 +914,21 @@ set_library() {
 set_virtual_library() {
   case $1 in
   libiconv)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "apple" ]]; then
       ENABLED_LIBRARIES[LIBRARY_APPLE_LIBICONV]=$2
     else
       ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
     fi
     ;;
   libuuid)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "apple" ]]; then
       ENABLED_LIBRARIES[LIBRARY_APPLE_LIBUUID]=$2
     else
       ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
     fi
     ;;
   zlib)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "apple" ]]; then
       ENABLED_LIBRARIES[LIBRARY_APPLE_ZLIB]=$2
     else
       ENABLED_LIBRARIES[LIBRARY_ANDROID_ZLIB]=$2
@@ -1095,7 +1100,28 @@ print_enabled_architectures() {
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
       fi
-      echo -n $(get_arch_name $print_arch)
+      echo -n "$(get_arch_name "${print_arch}")"
+      enabled=$((${enabled} + 1))
+    fi
+  done
+
+  if [ ${enabled} -gt 0 ]; then
+    echo ""
+  else
+    echo "none"
+  fi
+}
+
+print_enabled_architecture_variants() {
+  echo -n "Architecture variants: "
+
+  let enabled=0
+  for print_arch_var in {1..8}; do
+    if [[ ${ENABLED_ARCHITECTURE_VARIANTS[$print_arch_var]} -eq 1 ]]; then
+      if [[ ${enabled} -ge 1 ]]; then
+        echo -n ", "
+      fi
+      echo -n "$(get_apple_architecture_variant "${print_arch_var}")"
       enabled=$((${enabled} + 1))
     fi
   done
@@ -1118,7 +1144,7 @@ print_enabled_libraries() {
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
       fi
-      echo -n $(get_library_name $library)
+      echo -n "$(get_library_name "${library}")"
       enabled=$((${enabled} + 1))
     fi
   done
@@ -1128,6 +1154,33 @@ print_enabled_libraries() {
   else
     echo "none"
   fi
+}
+
+print_enabled_xcframeworks() {
+  echo -n "xcframeworks: "
+
+  let enabled=0
+
+  # SUPPLEMENTARY LIBRARIES NOT PRINTED
+  for library in {0..46}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+      if [[ ${enabled} -ge 1 ]]; then
+        echo -n ", "
+      fi
+      echo -n "$(get_library_name "${library}")"
+      enabled=$((${enabled} + 1))
+    fi
+  done
+
+  if [[ ${enabled} -ge 1 ]]; then
+    echo -n ", "
+  fi
+
+  for FFMPEG_LIB in "${FFMPEG_LIBS[@]}"; do
+    echo -n "${FFMPEG_LIB}, "
+  done
+
+  echo "ffmpeg-kit"
 }
 
 print_reconfigure_requested_libraries() {

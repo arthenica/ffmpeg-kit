@@ -6,6 +6,11 @@ if [ ! -x "$(command -v xcrun)" ]; then
   exit 1
 fi
 
+if [ ! -x "$(command -v xcodebuild)" ]; then
+  echo -e "\n(*) xcodebuild command not found. Please check your Xcode installation\n"
+  exit 1
+fi
+
 # LOAD INITIAL SETTINGS
 export BASEDIR="$(pwd)"
 export FFMPEG_KIT_BUILD_TYPE="ios"
