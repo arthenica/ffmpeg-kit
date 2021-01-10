@@ -18,7 +18,7 @@ get_library_source() {
     ;;
   cpu-features)
     SOURCE_REPO_URL="https://github.com/tanersener/cpu_features"
-    SOURCE_ID="v0.4.1.1"
+    SOURCE_ID="v0.6.0"
     SOURCE_TYPE="TAG"
     ;;
   expat)
@@ -33,7 +33,7 @@ get_library_source() {
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
-    SOURCE_ID="2.13.92"
+    SOURCE_ID="2.13.93"
     SOURCE_TYPE="TAG"
     ;;
   freetype)
@@ -63,12 +63,12 @@ get_library_source() {
     ;;
   harfbuzz)
     SOURCE_REPO_URL="https://github.com/tanersener/harfbuzz"
-    SOURCE_ID="2.7.2"
+    SOURCE_ID="2.7.4"
     SOURCE_TYPE="TAG"
     ;;
   jpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/libjpeg-turbo"
-    SOURCE_ID="2.0.5"
+    SOURCE_ID="2.0.6"
     SOURCE_TYPE="TAG"
     ;;
   kvazaar)
@@ -88,7 +88,7 @@ get_library_source() {
     ;;
   libaom)
     SOURCE_REPO_URL="https://github.com/tanersener/libaom"
-    SOURCE_ID="v2.0.0"
+    SOURCE_ID="v2.0.1"
     SOURCE_TYPE="TAG"
     ;;
   libass)
@@ -163,7 +163,7 @@ get_library_source() {
     ;;
   nettle)
     SOURCE_REPO_URL="https://github.com/tanersener/nettle"
-    SOURCE_ID="nettle_3.6_release_20200429"
+    SOURCE_ID="nettle_3.7_release_20210104"
     SOURCE_TYPE="TAG"
     ;;
   opencore-amr)
