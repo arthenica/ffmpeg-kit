@@ -394,7 +394,6 @@ set_toolchain_paths() {
   export CC="clang"
   export OBJC="$(xcrun --sdk "$(get_sdk_name)" -f clang)"
   export CXX="clang++"
-  export LIBTOOL="$(xcrun --sdk "$(get_sdk_name)" -f libtool)"
 
   LOCAL_ASMFLAGS="$(get_asmflags $1)"
   case ${ARCH} in
