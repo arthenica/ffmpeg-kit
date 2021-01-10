@@ -24,6 +24,9 @@
  */
 
 /*
+ * CHANGES 01.2021
+ * - NDK r22 incompatibility issues regarding INT64_MAX fixed
+ *
  * CHANGES 06.2020
  * - ignoring signals implemented
  * - cancel_operation() method signature updated with id
@@ -1318,115 +1321,115 @@ static void do_video_out(OutputFile *of,
     if (!check_recording_time(ost))
         return;
 
-        if (enc->flags & (AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME) &&
-            ost->top_field_first >= 0)
-            in_picture->top_field_first = !!ost->top_field_first;
+    if (enc->flags & (AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME) &&
+        ost->top_field_first >= 0)
+        in_picture->top_field_first = !!ost->top_field_first;
 
-        if (in_picture->interlaced_frame) {
-            if (enc->codec->id == AV_CODEC_ID_MJPEG)
-                mux_par->field_order = in_picture->top_field_first ? AV_FIELD_TT:AV_FIELD_BB;
-            else
-                mux_par->field_order = in_picture->top_field_first ? AV_FIELD_TB:AV_FIELD_BT;
-        } else
-            mux_par->field_order = AV_FIELD_PROGRESSIVE;
+    if (in_picture->interlaced_frame) {
+        if (enc->codec->id == AV_CODEC_ID_MJPEG)
+            mux_par->field_order = in_picture->top_field_first ? AV_FIELD_TT:AV_FIELD_BB;
+        else
+            mux_par->field_order = in_picture->top_field_first ? AV_FIELD_TB:AV_FIELD_BT;
+    } else
+        mux_par->field_order = AV_FIELD_PROGRESSIVE;
 
-        in_picture->quality = enc->global_quality;
-        in_picture->pict_type = 0;
+    in_picture->quality = enc->global_quality;
+    in_picture->pict_type = 0;
 
-        if (ost->forced_kf_ref_pts == AV_NOPTS_VALUE &&
-            in_picture->pts != AV_NOPTS_VALUE)
-            ost->forced_kf_ref_pts = in_picture->pts;
+    if (ost->forced_kf_ref_pts == AV_NOPTS_VALUE &&
+        in_picture->pts != AV_NOPTS_VALUE)
+        ost->forced_kf_ref_pts = in_picture->pts;
 
-        pts_time = in_picture->pts != AV_NOPTS_VALUE ?
-            (in_picture->pts - ost->forced_kf_ref_pts) * av_q2d(enc->time_base) : NAN;
-        if (ost->forced_kf_index < ost->forced_kf_count &&
-            in_picture->pts >= ost->forced_kf_pts[ost->forced_kf_index]) {
-            ost->forced_kf_index++;
+    pts_time = in_picture->pts != AV_NOPTS_VALUE ?
+        (in_picture->pts - ost->forced_kf_ref_pts) * av_q2d(enc->time_base) : NAN;
+    if (ost->forced_kf_index < ost->forced_kf_count &&
+        in_picture->pts >= ost->forced_kf_pts[ost->forced_kf_index]) {
+        ost->forced_kf_index++;
+        forced_keyframe = 1;
+    } else if (ost->forced_keyframes_pexpr) {
+        double res;
+        ost->forced_keyframes_expr_const_values[FKF_T] = pts_time;
+        res = av_expr_eval(ost->forced_keyframes_pexpr,
+                           ost->forced_keyframes_expr_const_values, NULL);
+        ff_dlog(NULL, "force_key_frame: n:%f n_forced:%f prev_forced_n:%f t:%f prev_forced_t:%f -> res:%f\n",
+                ost->forced_keyframes_expr_const_values[FKF_N],
+                ost->forced_keyframes_expr_const_values[FKF_N_FORCED],
+                ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_N],
+                ost->forced_keyframes_expr_const_values[FKF_T],
+                ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_T],
+                res);
+        if (res) {
             forced_keyframe = 1;
-        } else if (ost->forced_keyframes_pexpr) {
-            double res;
-            ost->forced_keyframes_expr_const_values[FKF_T] = pts_time;
-            res = av_expr_eval(ost->forced_keyframes_pexpr,
-                               ost->forced_keyframes_expr_const_values, NULL);
-            ff_dlog(NULL, "force_key_frame: n:%f n_forced:%f prev_forced_n:%f t:%f prev_forced_t:%f -> res:%f\n",
-                    ost->forced_keyframes_expr_const_values[FKF_N],
-                    ost->forced_keyframes_expr_const_values[FKF_N_FORCED],
-                    ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_N],
-                    ost->forced_keyframes_expr_const_values[FKF_T],
-                    ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_T],
-                    res);
-            if (res) {
-                forced_keyframe = 1;
-                ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_N] =
-                    ost->forced_keyframes_expr_const_values[FKF_N];
-                ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_T] =
-                    ost->forced_keyframes_expr_const_values[FKF_T];
-                ost->forced_keyframes_expr_const_values[FKF_N_FORCED] += 1;
-            }
-
-            ost->forced_keyframes_expr_const_values[FKF_N] += 1;
-        } else if (   ost->forced_keyframes
-                   && !strncmp(ost->forced_keyframes, "source", 6)
-                   && in_picture->key_frame==1) {
-            forced_keyframe = 1;
+            ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_N] =
+                ost->forced_keyframes_expr_const_values[FKF_N];
+            ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_T] =
+                ost->forced_keyframes_expr_const_values[FKF_T];
+            ost->forced_keyframes_expr_const_values[FKF_N_FORCED] += 1;
         }
 
-        if (forced_keyframe) {
-            in_picture->pict_type = AV_PICTURE_TYPE_I;
-            av_log(NULL, AV_LOG_DEBUG, "Forced keyframe at time %f\n", pts_time);
-        }
+        ost->forced_keyframes_expr_const_values[FKF_N] += 1;
+    } else if (   ost->forced_keyframes
+               && !strncmp(ost->forced_keyframes, "source", 6)
+               && in_picture->key_frame==1) {
+        forced_keyframe = 1;
+    }
 
-        update_benchmark(NULL);
-        if (debug_ts) {
-            av_log(NULL, AV_LOG_INFO, "encoder <- type:video "
-                   "frame_pts:%s frame_pts_time:%s time_base:%d/%d\n",
-                   av_ts2str(in_picture->pts), av_ts2timestr(in_picture->pts, &enc->time_base),
-                   enc->time_base.num, enc->time_base.den);
-        }
+    if (forced_keyframe) {
+        in_picture->pict_type = AV_PICTURE_TYPE_I;
+        av_log(NULL, AV_LOG_DEBUG, "Forced keyframe at time %f\n", pts_time);
+    }
 
-        ost->frames_encoded++;
+    update_benchmark(NULL);
+    if (debug_ts) {
+        av_log(NULL, AV_LOG_INFO, "encoder <- type:video "
+               "frame_pts:%s frame_pts_time:%s time_base:%d/%d\n",
+               av_ts2str(in_picture->pts), av_ts2timestr(in_picture->pts, &enc->time_base),
+               enc->time_base.num, enc->time_base.den);
+    }
 
-        ret = avcodec_send_frame(enc, in_picture);
+    ost->frames_encoded++;
+
+    ret = avcodec_send_frame(enc, in_picture);
+    if (ret < 0)
+        goto error;
+    // Make sure Closed Captions will not be duplicated
+    av_frame_remove_side_data(in_picture, AV_FRAME_DATA_A53_CC);
+
+    while (1) {
+        ret = avcodec_receive_packet(enc, &pkt);
+        update_benchmark("encode_video %d.%d", ost->file_index, ost->index);
+        if (ret == AVERROR(EAGAIN))
+            break;
         if (ret < 0)
             goto error;
-        // Make sure Closed Captions will not be duplicated
-        av_frame_remove_side_data(in_picture, AV_FRAME_DATA_A53_CC);
 
-        while (1) {
-            ret = avcodec_receive_packet(enc, &pkt);
-            update_benchmark("encode_video %d.%d", ost->file_index, ost->index);
-            if (ret == AVERROR(EAGAIN))
-                break;
-            if (ret < 0)
-                goto error;
-
-            if (debug_ts) {
-                av_log(NULL, AV_LOG_INFO, "encoder -> type:video "
-                       "pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s\n",
-                       av_ts2str(pkt.pts), av_ts2timestr(pkt.pts, &enc->time_base),
-                       av_ts2str(pkt.dts), av_ts2timestr(pkt.dts, &enc->time_base));
-            }
-
-            if (pkt.pts == AV_NOPTS_VALUE && !(enc->codec->capabilities & AV_CODEC_CAP_DELAY))
-                pkt.pts = ost->sync_opts;
-
-            av_packet_rescale_ts(&pkt, enc->time_base, ost->mux_timebase);
-
-            if (debug_ts) {
-                av_log(NULL, AV_LOG_INFO, "encoder -> type:video "
-                    "pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s\n",
-                    av_ts2str(pkt.pts), av_ts2timestr(pkt.pts, &ost->mux_timebase),
-                    av_ts2str(pkt.dts), av_ts2timestr(pkt.dts, &ost->mux_timebase));
-            }
-
-            frame_size = pkt.size;
-            output_packet(of, &pkt, ost, 0);
-
-            /* if two pass, output log */
-            if (ost->logfile && enc->stats_out) {
-                fprintf(ost->logfile, "%s", enc->stats_out);
-            }
+        if (debug_ts) {
+            av_log(NULL, AV_LOG_INFO, "encoder -> type:video "
+                   "pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s\n",
+                   av_ts2str(pkt.pts), av_ts2timestr(pkt.pts, &enc->time_base),
+                   av_ts2str(pkt.dts), av_ts2timestr(pkt.dts, &enc->time_base));
         }
+
+        if (pkt.pts == AV_NOPTS_VALUE && !(enc->codec->capabilities & AV_CODEC_CAP_DELAY))
+            pkt.pts = ost->sync_opts;
+
+        av_packet_rescale_ts(&pkt, enc->time_base, ost->mux_timebase);
+
+        if (debug_ts) {
+            av_log(NULL, AV_LOG_INFO, "encoder -> type:video "
+                "pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s\n",
+                av_ts2str(pkt.pts), av_ts2timestr(pkt.pts, &ost->mux_timebase),
+                av_ts2str(pkt.dts), av_ts2timestr(pkt.dts, &ost->mux_timebase));
+        }
+
+        frame_size = pkt.size;
+        output_packet(of, &pkt, ost, 0);
+
+        /* if two pass, output log */
+        if (ost->logfile && enc->stats_out) {
+            fprintf(ost->logfile, "%s", enc->stats_out);
+        }
+    }
     ost->sync_opts++;
     /*
      * For video, number of frames in == number of packets out.
@@ -3779,7 +3782,7 @@ static int init_output_stream(OutputStream *ost, char *error, int error_len)
     // parse user provided disposition, and update stream values
     if (ost->disposition) {
         static const AVOption opts[] = {
-            { "disposition"         , NULL, 0, AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT64_MIN, INT64_MAX, .unit = "flags" },
+            { "disposition"         , NULL, 0, AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT64_MIN, (double)INT64_MAX, .unit = "flags" },
             { "default"             , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DEFAULT           },    .unit = "flags" },
             { "dub"                 , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DUB               },    .unit = "flags" },
             { "original"            , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_ORIGINAL          },    .unit = "flags" },

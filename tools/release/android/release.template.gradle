@@ -166,7 +166,7 @@ artifacts {
 }
 
 dependencies {
-    testImplementation "androidx.test.ext:junit:1.1.1"
+    testImplementation "androidx.test.ext:junit:1.1.2"
     testImplementation "org.json:json:20190722"
 }
 

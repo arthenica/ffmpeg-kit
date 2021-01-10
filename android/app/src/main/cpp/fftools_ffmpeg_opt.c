@@ -19,6 +19,9 @@
  */
 
 /*
+ * CHANGES 01.2021
+ * - NDK r22 incompatibility issues regarding INT64_MAX fixed
+ *
  * CHANGES 01.2020
  * - ffprobe support changes
  *
@@ -222,7 +225,7 @@ AVDictionary *strip_specifiers(AVDictionary *dict)
 int opt_abort_on(void *optctx, const char *opt, const char *arg)
 {
     const AVOption opts[] = {
-        { "abort_on"        , NULL, 0, AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT64_MIN, INT64_MAX, .unit = "flags" },
+        { "abort_on"        , NULL, 0, AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT64_MIN, (double)INT64_MAX, .unit = "flags" },
         { "empty_output"    , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = ABORT_ON_FLAG_EMPTY_OUTPUT     },    .unit = "flags" },
         { NULL },
     };
