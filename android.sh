@@ -257,15 +257,20 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   cd "${BASEDIR}"/android 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   # BUILD NATIVE LIBRARY
-  "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1
-  if [ $? -eq 0 ]; then
-    echo "ok"
+  if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
+    "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1
+
+    if [ $? -eq 0 ]; then
+      echo "ok"
+    else
+      echo "failed"
+      exit 1
+    fi
   else
-    echo "failed"
-    exit 1
+    echo "skipped"
   fi
 
-  echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
+  echo -e -n "\n\nCreating Android archive under prebuilt: "
 
   # BUILD ANDROID ARCHIVE
   ./gradlew app:clean app:assembleRelease app:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
@@ -275,7 +280,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   fi
 
   # COPY ANDROID ARCHIVE TO PREBUILT DIRECTORY
-  FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_target_aar_directory)/ffmpeg-kit"
+  FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_aar_directory)/ffmpeg-kit"
   rm -rf "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
   mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
   cp "${BASEDIR}"/android/app/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1

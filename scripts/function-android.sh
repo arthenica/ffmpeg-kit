@@ -888,7 +888,7 @@ get_aar_directory() {
     LTS_POSTFIX="-lts"
   fi
 
-  echo "android-aar${LTS_POSTFIX}"
+  echo "bundle-android-aar${LTS_POSTFIX}"
 }
 
 android_ndk_cmake() {
