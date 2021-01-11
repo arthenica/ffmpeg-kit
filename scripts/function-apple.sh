@@ -126,7 +126,7 @@ build_apple_architecture_variant_strings() {
   export IPHONEOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IPHONEOS}")"
   export IPHONE_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IPHONESIMULATOR}")"
   export MAC_CATALYST_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MAC_CATALYST}")"
-  export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant ARCH_VAR_TVOS)"
+  export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_TVOS}")"
   export APPLETVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVOS}")"
   export APPLETV_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVSIMULATOR}")"
   export MACOSX_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MACOS}")"
@@ -786,7 +786,7 @@ get_framework_directory() {
   "${ARCH_VAR_MAC_CATALYST}")
     echo "bundle-apple-framework-mac-catalyst${LTS_POSTFIX}"
     ;;
-  ARCH_VAR_TVOS)
+  "${ARCH_VAR_TVOS}")
     echo "bundle-apple-framework-tvos${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVOS}")
@@ -842,7 +842,7 @@ get_universal_library_directory() {
   "${ARCH_VAR_MAC_CATALYST}")
     echo "bundle-apple-universal-mac-catalyst${LTS_POSTFIX}"
     ;;
-  "${ARCH_VAR_APPLETVOS}")
+  "${ARCH_VAR_TVOS}")
     echo "bundle-apple-universal-tvos${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVOS}")
@@ -880,7 +880,7 @@ get_apple_architecture_variant() {
   "${ARCH_VAR_MAC_CATALYST}")
     echo "mac-catalyst${LTS_POSTFIX}"
     ;;
-  ARCH_VAR_TVOS)
+  "${ARCH_VAR_TVOS}")
     echo "tvos${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVOS}")
@@ -924,7 +924,7 @@ get_apple_architectures_for_variant() {
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
-  ARCH_VAR_TVOS)
+  "${ARCH_VAR_TVOS}")
     for index in ${ARCH_ARM64} ${ARCH_X86_64}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
