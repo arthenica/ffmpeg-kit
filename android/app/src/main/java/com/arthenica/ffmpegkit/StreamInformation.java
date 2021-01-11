@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -26,6 +26,7 @@ import org.json.JSONObject;
  */
 public class StreamInformation {
 
+    /* COMMON KEYS */
     private static final String KEY_INDEX = "index";
     private static final String KEY_TYPE = "codec_type";
     private static final String KEY_CODEC = "codec_name";

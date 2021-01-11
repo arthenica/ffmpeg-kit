@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,11 +20,10 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Statistics for running executions.
+ * <p>Statistics entry for an FFmpeg execute session.
  */
 public class Statistics {
-
-    private long executionId;
+    private long sessionId;
     private int videoFrameNumber;
     private float videoFps;
     private float videoQuality;
@@ -34,7 +33,7 @@ public class Statistics {
     private double speed;
 
     public Statistics() {
-        executionId = 0;
+        sessionId = 0;
         videoFrameNumber = 0;
         videoFps = 0;
         videoQuality = 0;
@@ -44,8 +43,8 @@ public class Statistics {
         speed = 0;
     }
 
-    public Statistics(long executionId, int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
-        this.executionId = executionId;
+    public Statistics(final long sessionId, final int videoFrameNumber, final float videoFps, final float videoQuality, final long size, final int time, final double bitrate, final double speed) {
+        this.sessionId = sessionId;
         this.videoFrameNumber = videoFrameNumber;
         this.videoFps = videoFps;
         this.videoQuality = videoQuality;
@@ -55,44 +54,12 @@ public class Statistics {
         this.speed = speed;
     }
 
-    public void update(final Statistics newStatistics) {
-        if (newStatistics != null) {
-            this.executionId = newStatistics.getExecutionId();
-            if (newStatistics.getVideoFrameNumber() > 0) {
-                this.videoFrameNumber = newStatistics.getVideoFrameNumber();
-            }
-            if (newStatistics.getVideoFps() > 0) {
-                this.videoFps = newStatistics.getVideoFps();
-            }
-
-            if (newStatistics.getVideoQuality() > 0) {
-                this.videoQuality = newStatistics.getVideoQuality();
-            }
-
-            if (newStatistics.getSize() > 0) {
-                this.size = newStatistics.getSize();
-            }
-
-            if (newStatistics.getTime() > 0) {
-                this.time = newStatistics.getTime();
-            }
-
-            if (newStatistics.getBitrate() > 0) {
-                this.bitrate = newStatistics.getBitrate();
-            }
-
-            if (newStatistics.getSpeed() > 0) {
-                this.speed = newStatistics.getSpeed();
-            }
-        }
+    public long getSessionId() {
+        return sessionId;
     }
 
-    public long getExecutionId() {
-        return executionId;
-    }
-
-    public void setExecutionId(long executionId) {
-        this.executionId = executionId;
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
     public int getVideoFrameNumber() {
@@ -156,8 +123,8 @@ public class Statistics {
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("Statistics{");
-        stringBuilder.append("executionId=");
-        stringBuilder.append(executionId);
+        stringBuilder.append("sessionId=");
+        stringBuilder.append(sessionId);
         stringBuilder.append(", videoFrameNumber=");
         stringBuilder.append(videoFrameNumber);
         stringBuilder.append(", videoFps=");

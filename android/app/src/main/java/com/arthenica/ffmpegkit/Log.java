@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,44 +20,43 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Logs for running executions.
+ * <p>Log entry for an execute session.
  */
-public class LogMessage {
-
-    private final long executionId;
+public class Log {
+    private final long sessionId;
     private final Level level;
-    private final String text;
+    private final String message;
 
-    public LogMessage(final long executionId, final Level level, final String text) {
-        this.executionId = executionId;
+    public Log(final long sessionId, final Level level, final String message) {
+        this.sessionId = sessionId;
         this.level = level;
-        this.text = text;
+        this.message = message;
     }
 
-    public long getExecutionId() {
-        return executionId;
+    public long getSessionId() {
+        return sessionId;
     }
 
     public Level getLevel() {
         return level;
     }
 
-    public String getText() {
-        return text;
+    public String getMessage() {
+        return message;
     }
 
     @Override
     public String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("LogMessage{");
-        stringBuilder.append("executionId=");
-        stringBuilder.append(executionId);
+        stringBuilder.append("Log{");
+        stringBuilder.append("sessionId=");
+        stringBuilder.append(sessionId);
         stringBuilder.append(", level=");
         stringBuilder.append(level);
-        stringBuilder.append(", text=");
+        stringBuilder.append(", message=");
         stringBuilder.append("\'");
-        stringBuilder.append(text);
+        stringBuilder.append(message);
         stringBuilder.append('\'');
         stringBuilder.append('}');
 

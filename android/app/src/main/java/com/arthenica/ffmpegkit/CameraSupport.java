@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Taner Sener
+ * Copyright (c) 2019-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -34,7 +34,9 @@ import static android.content.Context.CAMERA_SERVICE;
 import static com.arthenica.ffmpegkit.FFmpegKitConfig.TAG;
 
 /**
- * Utility class for camera devices.
+ * <p>Helper class to find camera devices supported.
+ * <p>Note that camera devices can only be detected on Android API Level 24+. On older API levels
+ * an empty list will be returned.
  */
 class CameraSupport {
 

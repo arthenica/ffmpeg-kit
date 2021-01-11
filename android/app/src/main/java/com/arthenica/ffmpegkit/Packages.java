@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>Provides helper methods to extract binary package information.
+ * <p>Helper class to extract binary package information.
  */
 class Packages {
 
@@ -39,7 +39,6 @@ class Packages {
         supportedExternalLibraries.add("gnutls");
         supportedExternalLibraries.add("kvazaar");
         supportedExternalLibraries.add("mp3lame");
-        supportedExternalLibraries.add("libaom");
         supportedExternalLibraries.add("libass");
         supportedExternalLibraries.add("iconv");
         supportedExternalLibraries.add("libilbc");
@@ -137,7 +136,6 @@ class Packages {
                     externalLibraryList.contains("gnutls") &&
                     externalLibraryList.contains("kvazaar") &&
                     externalLibraryList.contains("mp3lame") &&
-                    externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
                     externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libilbc") &&
@@ -172,7 +170,6 @@ class Packages {
                     externalLibraryList.contains("gnutls") &&
                     externalLibraryList.contains("kvazaar") &&
                     externalLibraryList.contains("mp3lame") &&
-                    externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
                     externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libilbc") &&
@@ -200,7 +197,6 @@ class Packages {
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("kvazaar") &&
-                    externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
                     externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libtheora") &&

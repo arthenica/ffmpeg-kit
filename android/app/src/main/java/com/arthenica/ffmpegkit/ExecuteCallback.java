@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,18 +20,16 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Represents a callback function to receive an asynchronous execution result.
+ * <p>Callback function to receive execution results.
  */
 @FunctionalInterface
 public interface ExecuteCallback {
 
     /**
-     * <p>Called when an asynchronous FFmpeg execution is completed.
+     * <p>Called when an execution is completed.
      *
-     * @param executionId id of the execution that completed
-     * @param returnCode  return code of the execution completed, 0 on successful completion, 255
-     *                    on user cancel, other non-zero codes on error
+     * @param session of with completed execution
      */
-    void apply(long executionId, int returnCode);
+    void apply(final Session session);
 
 }

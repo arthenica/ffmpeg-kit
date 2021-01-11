@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -19,29 +19,24 @@
 
 package com.arthenica.ffmpegkit;
 
-import android.os.AsyncTask;
-
 /**
- * <p>Utility class to get media information asynchronously.
+ * <p>Executes a MediaInformation session asynchronously.
  */
-public class AsyncGetMediaInformationTask extends AsyncTask<String, MediaInformation, MediaInformation> {
-    private final String path;
-    private final GetMediaInformationCallback getMediaInformationCallback;
+public class AsyncGetMediaInformationTask implements Runnable {
+    private final MediaInformationSession mediaInformationSession;
+    private final ExecuteCallback executeCallback;
 
-    public AsyncGetMediaInformationTask(final String path, final GetMediaInformationCallback getMediaInformationCallback) {
-        this.path = path;
-        this.getMediaInformationCallback = getMediaInformationCallback;
+    public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession) {
+        this.mediaInformationSession = mediaInformationSession;
+        this.executeCallback = mediaInformationSession.getExecuteCallback();
     }
 
     @Override
-    protected MediaInformation doInBackground(final String... arguments) {
-        return FFprobeKit.getMediaInformation(path);
-    }
+    public void run() {
+        FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession);
 
-    @Override
-    protected void onPostExecute(final MediaInformation mediaInformation) {
-        if (getMediaInformationCallback != null) {
-            getMediaInformationCallback.apply(mediaInformation);
+        if (executeCallback != null) {
+            executeCallback.apply(mediaInformationSession);
         }
     }
 

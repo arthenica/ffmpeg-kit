@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Taner Sener
+ * Copyright (c) 2020-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -30,7 +30,7 @@ public enum Signal {
     SIGTERM(15),
     SIGXCPU(24);
 
-    private int value;
+    private final int value;
 
     Signal(int value) {
         this.value = value;

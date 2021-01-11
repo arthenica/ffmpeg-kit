@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Taner Sener
+ * Copyright (c) 2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -19,32 +19,9 @@
 
 package com.arthenica.ffmpegkit;
 
-import java.util.Date;
-
-/**
- * <p>Represents an ongoing FFmpeg execution.
- */
-public class FFmpegExecution {
-    private final Date startTime;
-    private final long executionId;
-    private final String command;
-
-    public FFmpegExecution(final long executionId, final String[] arguments) {
-        this.startTime = new Date();
-        this.executionId = executionId;
-        this.command = FFmpegKit.argumentsToString(arguments);
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public long getExecutionId() {
-        return executionId;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
+public enum SessionState {
+    CREATED,
+    RUNNING,
+    FAILED,
+    COMPLETED
 }

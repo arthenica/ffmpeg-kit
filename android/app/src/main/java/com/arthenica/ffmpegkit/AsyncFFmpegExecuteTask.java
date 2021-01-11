@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -19,44 +19,29 @@
 
 package com.arthenica.ffmpegkit;
 
-import android.os.AsyncTask;
-
 /**
- * <p>Utility class to execute an FFmpeg command asynchronously.
+ * <p>Executes an FFmpeg session asynchronously.
  */
-public class AsyncFFmpegExecuteTask extends AsyncTask<Void, Integer, Integer> {
-    private final String[] arguments;
+public class AsyncFFmpegExecuteTask implements Runnable {
+    private final FFmpegSession ffmpegSession;
     private final ExecuteCallback executeCallback;
-    private final Long executionId;
 
-    public AsyncFFmpegExecuteTask(final String command, final ExecuteCallback executeCallback) {
-        this(FFmpegKit.parseArguments(command), executeCallback);
-    }
-
-    public AsyncFFmpegExecuteTask(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(FFmpegKit.DEFAULT_EXECUTION_ID, arguments, executeCallback);
-    }
-
-    public AsyncFFmpegExecuteTask(final long executionId, final String command, final ExecuteCallback executeCallback) {
-        this(executionId, FFmpegKit.parseArguments(command), executeCallback);
-    }
-
-    public AsyncFFmpegExecuteTask(final long executionId, final String[] arguments, final ExecuteCallback executeCallback) {
-        this.executionId = executionId;
-        this.arguments = arguments;
-        this.executeCallback = executeCallback;
+    public AsyncFFmpegExecuteTask(final FFmpegSession ffmpegSession) {
+        this.ffmpegSession = ffmpegSession;
+        this.executeCallback = ffmpegSession.getExecuteCallback();
     }
 
     @Override
-    protected Integer doInBackground(final Void... unused) {
-        return FFmpegKitConfig.ffmpegExecute(executionId, this.arguments);
-    }
+    public void run() {
+        FFmpegKitConfig.ffmpegExecute(ffmpegSession);
 
-    @Override
-    protected void onPostExecute(final Integer rc) {
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getGlobalExecuteCallbackFunction();
+        if (globalExecuteCallbackFunction != null) {
+            globalExecuteCallbackFunction.apply(ffmpegSession);
+        }
+
         if (executeCallback != null) {
-            executeCallback.apply(executionId, rc);
+            executeCallback.apply(ffmpegSession);
         }
     }
-
 }

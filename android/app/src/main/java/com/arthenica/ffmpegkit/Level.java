@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,7 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Helper enumeration type for log levels.
+ * <p>Enumeration type for log levels.
  */
 public enum Level {
 
@@ -79,7 +79,7 @@ public enum Level {
      */
     AV_LOG_TRACE(56);
 
-    private int value;
+    private final int value;
 
     /**
      * <p>Returns enumeration defined by value.

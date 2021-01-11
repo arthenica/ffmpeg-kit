@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -19,12 +19,24 @@
 
 package com.arthenica.ffmpegkit;
 
-/**
- * <p>Represents a callback function to receive asynchronous getMediaInformation result.
- */
-@FunctionalInterface
-public interface GetMediaInformationCallback {
+public class ReturnCode {
 
-    void apply(MediaInformation mediaInformation);
+    public static int NOT_SET = -999;
+
+    public static int SUCCESS = 0;
+
+    public static int CANCEL = 255;
+
+    public static boolean isSuccess(final int returnCode) {
+        return (returnCode == SUCCESS);
+    }
+
+    public static boolean isFailure(final int returnCode) {
+        return (returnCode != NOT_SET) && (returnCode != SUCCESS) && (returnCode != CANCEL);
+    }
+
+    public static boolean isCancel(final int returnCode) {
+        return (returnCode == CANCEL);
+    }
 
 }

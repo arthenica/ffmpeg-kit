@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,11 +20,16 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Represents a callback function to receive logs from running executions
+ * <p>Callback function to receive logs for executions.
  */
 @FunctionalInterface
 public interface LogCallback {
 
-    void apply(final LogMessage message);
+    /**
+     * <p>Called when a log entry is received.
+     *
+     * @param log log entry
+     */
+    void apply(final Log log);
 
 }

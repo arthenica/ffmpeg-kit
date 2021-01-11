@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -19,34 +19,24 @@
 
 package com.arthenica.ffmpegkit;
 
-import android.os.AsyncTask;
-
 /**
- * <p>Utility class to execute an FFprobe command asynchronously.
+ * <p>Executes an FFprobe execution asynchronously.
  */
-public class AsyncFFprobeExecuteTask extends AsyncTask<Void, Integer, Integer> {
-    private final String[] arguments;
-    private final ExecuteCallback ExecuteCallback;
+public class AsyncFFprobeExecuteTask implements Runnable {
+    private final FFprobeSession ffprobeSession;
+    private final ExecuteCallback executeCallback;
 
-    public AsyncFFprobeExecuteTask(final String command, final ExecuteCallback executeCallback) {
-        this.arguments = FFmpegKit.parseArguments(command);
-        this.ExecuteCallback = executeCallback;
-    }
-
-    public AsyncFFprobeExecuteTask(final String[] arguments, final ExecuteCallback executeCallback) {
-        this.arguments = arguments;
-        ExecuteCallback = executeCallback;
+    public AsyncFFprobeExecuteTask(final FFprobeSession ffprobeSession) {
+        this.ffprobeSession = ffprobeSession;
+        this.executeCallback = ffprobeSession.getExecuteCallback();
     }
 
     @Override
-    protected Integer doInBackground(final Void... unused) {
-        return FFprobeKit.execute(this.arguments);
-    }
+    public void run() {
+        FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-    @Override
-    protected void onPostExecute(final Integer rc) {
-        if (ExecuteCallback != null) {
-            ExecuteCallback.apply(FFmpegKit.DEFAULT_EXECUTION_ID, rc);
+        if (executeCallback != null) {
+            executeCallback.apply(ffprobeSession);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -31,7 +31,7 @@
 /** Callback data structure */
 struct CallbackData {
   int type;                 // 1 (log callback) or 2 (statistics callback)
-  long executionId;         // execution id
+  long sessionId;           // session identifier
 
   int logLevel;             // log level
   AVBPrint logData;         // log data
@@ -47,19 +47,15 @@ struct CallbackData {
   struct CallbackData *next;
 };
 
-/** Execution map variables */
-const int EXECUTION_MAP_SIZE = 1000;
-static volatile int executionMap[EXECUTION_MAP_SIZE];
-static pthread_mutex_t executionMapMutex;
+/** Session map variables */
+const int SESSION_MAP_SIZE = 1000;
+static volatile int sessionMap[SESSION_MAP_SIZE];
+static pthread_mutex_t sessionMapMutex;
 
 /** Redirection control variables */
 static pthread_mutex_t lockMutex;
 static pthread_mutex_t monitorMutex;
 static pthread_cond_t monitorCondition;
-
-/** Last command output variables */
-static pthread_mutex_t logMutex;
-static AVBPrint lastCommandOutput;
 
 pthread_t callbackThread;
 int redirectionEnabled;
@@ -79,6 +75,9 @@ static jmethodID logMethod;
 /** Global reference of statistics redirection method in Java */
 static jmethodID statisticsMethod;
 
+/** Global reference of closeParcelFileDescriptor method in Java */
+static jmethodID closeParcelFileDescriptorMethod;
+
 /** Global reference of String class in Java */
 static jclass stringClass;
 
@@ -86,7 +85,7 @@ static jclass stringClass;
 static jmethodID stringConstructor;
 
 /** Full name of the Config class */
-const char *configClassName = "com/arthenica/ffmpegkit/Config";
+const char *configClassName = "com/arthenica/ffmpegkit/FFmpegKitConfig";
 
 /** Full name of String class */
 const char *stringClassName = "java/lang/String";
@@ -98,8 +97,8 @@ volatile int handleSIGTERM = 1;
 volatile int handleSIGXCPU = 1;
 volatile int handleSIGPIPE = 1;
 
-/** Holds the id of the current execution */
-__thread volatile long executionId = 0;
+/** Holds the id of the current session */
+__thread volatile long sessionId = 0;
 
 /** Holds the default log level */
 int configuredLogLevel = AV_LOG_INFO;
@@ -118,7 +117,6 @@ JNINativeMethod configMethods[] = {
     {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe},
     {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate},
     {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable},
-    {"getNativeLastCommandOutput", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLastCommandOutput},
     {"ignoreNativeSignal", "(I)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal}
 };
 
@@ -215,23 +213,12 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
-void logInit() {
-    pthread_mutexattr_t attributes;
-    pthread_mutexattr_init(&attributes);
-    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
-
-    pthread_mutex_init(&logMutex, &attributes);
-    pthread_mutexattr_destroy(&attributes);
-
-    av_bprint_init(&lastCommandOutput, 0, AV_BPRINT_SIZE_UNLIMITED);
-}
-
 void executionMapLockInit() {
     pthread_mutexattr_t attributes;
     pthread_mutexattr_init(&attributes);
     pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
 
-    pthread_mutex_init(&executionMapMutex, &attributes);
+    pthread_mutex_init(&sessionMapMutex, &attributes);
     pthread_mutexattr_destroy(&attributes);
 }
 
@@ -244,52 +231,24 @@ void monitorUnInit() {
     pthread_cond_destroy(&monitorCondition);
 }
 
-void logUnInit() {
-    pthread_mutex_destroy(&logMutex);
-}
-
 void executionMapLockUnInit() {
-    pthread_mutex_destroy(&executionMapMutex);
+    pthread_mutex_destroy(&sessionMapMutex);
 }
 
 void mutexLock() {
     pthread_mutex_lock(&lockMutex);
 }
 
-void lastCommandOutputLock() {
-    pthread_mutex_lock(&logMutex);
-}
-
-void executionMapLock() {
-    pthread_mutex_lock(&executionMapMutex);
+void sessionMapLock() {
+    pthread_mutex_lock(&sessionMapMutex);
 }
 
 void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
 }
 
-void lastCommandOutputUnlock() {
-    pthread_mutex_unlock(&logMutex);
-}
-
-void executionMapUnlock() {
-    pthread_mutex_unlock(&executionMapMutex);
-}
-
-void clearLastCommandOutput() {
-    lastCommandOutputLock();
-    av_bprint_clear(&lastCommandOutput);
-    lastCommandOutputUnlock();
-}
-
-void appendLastCommandOutput(AVBPrint *logMessage) {
-    if (logMessage->len <= 0) {
-        return;
-    }
-
-    lastCommandOutputLock();
-    av_bprintf(&lastCommandOutput, "%s", logMessage->str);
-    lastCommandOutputUnlock();
+void sessionMapUnlock() {
+    pthread_mutex_unlock(&sessionMapMutex);
 }
 
 void monitorWait(int milliSeconds) {
@@ -331,7 +290,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 1;
-    newData->executionId = executionId;
+    newData->sessionId = sessionId;
     newData->logLevel = level;
     av_bprint_init(&newData->logData, 0, AV_BPRINT_SIZE_UNLIMITED);
     av_bprintf(&newData->logData, "%s", data->str);
@@ -368,7 +327,7 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 2;
-    newData->executionId = executionId;
+    newData->sessionId = sessionId;
     newData->statisticsFrameNumber = frameNumber;
     newData->statisticsFps = fps;
     newData->statisticsQuality = quality;
@@ -403,17 +362,17 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 }
 
 /**
- * Adds an execution id to the execution map.
+ * Adds a session id to the session map.
  *
- * @param id execution id
+ * @param id session id
  */
-void addExecution(long id) {
-    executionMapLock();
+void addSession(long id) {
+    sessionMapLock();
 
-    int key = id % EXECUTION_MAP_SIZE;
-    executionMap[key] = 1;
+    int key = id % SESSION_MAP_SIZE;
+    sessionMap[key] = 1;
 
-    executionMapUnlock();
+    sessionMapUnlock();
 }
 
 /**
@@ -449,36 +408,50 @@ struct CallbackData *callbackDataRemove() {
 }
 
 /**
- * Removes an execution id from the execution map.
+ * Removes a session id from the session map.
  *
- * @param id execution id
+ * @param id session id
  */
-void removeExecution(long id) {
-    executionMapLock();
+void removeSession(long id) {
+    sessionMapLock();
 
-    int key = id % EXECUTION_MAP_SIZE;
-    executionMap[key] = 0;
+    int key = id % SESSION_MAP_SIZE;
+    sessionMap[key] = 0;
 
-    executionMapUnlock();
+    sessionMapUnlock();
 }
 
 /**
- * Checks whether a cancel request for the given execution id exists in the execution map.
+ * Adds a cancel session request to the session map.
  *
- * @param id execution id
+ * @param id session id
+ */
+void cancelSession(long id) {
+    sessionMapLock();
+
+    int key = id % SESSION_MAP_SIZE;
+    sessionMap[key] = 2;
+
+    sessionMapUnlock();
+}
+
+/**
+ * Checks whether a cancel request for the given session id exists in the session map.
+ *
+ * @param id session id
  * @return 1 if exists, false otherwise
  */
 int cancelRequested(long id) {
     int found = 0;
 
-    executionMapLock();
+    sessionMapLock();
 
-    int key = id % EXECUTION_MAP_SIZE;
-    if (executionMap[key] == 0) {
+    int key = id % SESSION_MAP_SIZE;
+    if (sessionMap[key] == 2) {
         found = 1;
     }
 
-    executionMapUnlock();
+    sessionMapUnlock();
 
     return found;
 }
@@ -519,7 +492,6 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
 
     if (fullLine.len > 0) {
         logCallbackDataAdd(level, &fullLine);
-        appendLastCommandOutput(&fullLine);
     }
 
     av_bprint_finalize(part, NULL);
@@ -576,7 +548,7 @@ void *callbackThreadFunction() {
 
                 jbyteArray byteArray = (jbyteArray) (*env)->NewByteArray(env, size);
                 (*env)->SetByteArrayRegion(env, byteArray, 0, size, callbackData->logData.str);
-                (*env)->CallStaticVoidMethod(env, configClass, logMethod, (jlong) callbackData->executionId, callbackData->logLevel, byteArray);
+                (*env)->CallStaticVoidMethod(env, configClass, logMethod, (jlong) callbackData->sessionId, callbackData->logLevel, byteArray);
                 (*env)->DeleteLocalRef(env, byteArray);
 
                 // CLEAN LOG DATA
@@ -587,7 +559,7 @@ void *callbackThreadFunction() {
                 // STATISTICS CALLBACK
 
                 (*env)->CallStaticVoidMethod(env, configClass, statisticsMethod,
-                    (jlong) callbackData->executionId, callbackData->statisticsFrameNumber,
+                    (jlong) callbackData->sessionId, callbackData->statisticsFrameNumber,
                     callbackData->statisticsFps, callbackData->statisticsQuality,
                     callbackData->statisticsSize, callbackData->statisticsTime,
                     callbackData->statisticsBitrate, callbackData->statisticsSpeed);
@@ -611,6 +583,15 @@ void *callbackThreadFunction() {
 }
 
 /**
+ * Used by saf_wrapper; is expected to be called from a Java thread, therefore we don't need attach/detach
+ */
+void closeParcelFileDescriptor(int fd) {
+    JNIEnv *env = NULL;
+    (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    (*env)->CallStaticVoidMethod(env, configClass, closeParcelFileDescriptorMethod, fd);
+}
+
+/**
  * Called when 'ffmpegkit' native library is loaded.
  *
  * @param vm pointer to the running virtual machine
@@ -630,7 +611,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 12) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 13) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -655,6 +636,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
+    closeParcelFileDescriptorMethod = (*env)->GetStaticMethodID(env, localConfigClass, "closeParcelFileDescriptor", "(I)V");
+    if (logMethod == NULL) {
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "closeParcelFileDescriptor");
+        return JNI_FALSE;
+    }
+
     stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
     if (stringConstructor == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
@@ -671,13 +658,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     callbackDataHead = NULL;
     callbackDataTail = NULL;
     
-    for(int i = 0; i<EXECUTION_MAP_SIZE; i++) {
-        executionMap[i] = 0;
+    for(int i = 0; i<SESSION_MAP_SIZE; i++) {
+        sessionMap[i] = 0;
     }
     
     mutexInit();
     monitorInit();
-    logInit();
     executionMapLockInit();
 
     return JNI_VERSION_1_6;
@@ -782,7 +768,7 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
- * @param id execution id
+ * @param id session id
  * @param stringArray reference to the object holding FFmpeg command arguments
  * @return zero on successful execution, non-zero on error
  */
@@ -819,18 +805,15 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
         }
     }
 
-    // LAST COMMAND OUTPUT SHOULD BE CLEARED BEFORE STARTING A NEW EXECUTION
-    clearLastCommandOutput();
-
     // REGISTER THE ID BEFORE STARTING EXECUTION
-    executionId = (long) id;
-    addExecution((long) id);
+    sessionId = (long) id;
+    addSession((long) id);
 
     // RUN
     int retCode = ffmpeg_execute(argumentCount, argv);
 
     // ALWAYS REMOVE THE ID FROM THE MAP
-    removeExecution((long) id);
+    removeSession((long) id);
 
     // CLEANUP
     if (tempArray != NULL) {
@@ -851,7 +834,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
- * @param id execution id
+ * @param id session id
  */
 JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel(JNIEnv *env, jclass object, jlong id) {
     cancel_operation(id);
@@ -902,25 +885,6 @@ JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvi
     (*env)->ReleaseStringUTFChars(env, variableName, variableNameString);
     (*env)->ReleaseStringUTFChars(env, variableValue, variableValueString);
     return rc;
-}
-
-/**
- * Returns log output of the last executed command natively.
- *
- * @param env pointer to native method interface
- * @param object reference to the class on which this method is invoked
- * @return output of the last executed command
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
-    int size = lastCommandOutput.len;
-    if (size > 0) {
-        jbyteArray byteArray = (*env)->NewByteArray(env, size);
-        (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput.str);
-        jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
-        return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
-    }
-
-    return (*env)->NewStringUTF(env, "");
 }
 
 /**

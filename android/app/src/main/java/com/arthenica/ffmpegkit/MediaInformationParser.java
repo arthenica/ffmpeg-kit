@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -21,6 +21,8 @@ package com.arthenica.ffmpegkit;
 
 import android.util.Log;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,12 +30,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Helper class for parsing {@link MediaInformation}.
+ * Parser for {@link MediaInformation}.
  */
 public class MediaInformationParser {
 
     /**
-     * Extracts MediaInformation from the given ffprobe json output.
+     * Extracts <code>MediaInformation</code> from the given ffprobe json output. Note that this
+     * method does not throw {@link JSONException} as {@link #fromWithError(String)} does and
+     * handles errors internally.
      *
      * @param ffprobeJsonOutput ffprobe json output
      * @return created {@link MediaInformation} instance of null if a parsing error occurs
@@ -42,8 +46,7 @@ public class MediaInformationParser {
         try {
             return fromWithError(ffprobeJsonOutput);
         } catch (JSONException e) {
-            Log.e(FFmpegKitConfig.TAG, "MediaInformation parsing failed.", e);
-            e.printStackTrace();
+            Log.e(FFmpegKitConfig.TAG, String.format("MediaInformation parsing failed.%s", Exceptions.getStackTraceString(e)));
             return null;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -28,15 +28,16 @@ import java.util.List;
  */
 public class MediaInformation {
 
-    private static final String KEY_MEDIA_PROPERTIES = "format";
-    private static final String KEY_FILENAME = "filename";
-    private static final String KEY_FORMAT = "format_name";
-    private static final String KEY_FORMAT_LONG = "format_long_name";
-    private static final String KEY_START_TIME = "start_time";
-    private static final String KEY_DURATION = "duration";
-    private static final String KEY_SIZE = "size";
-    private static final String KEY_BIT_RATE = "bit_rate";
-    private static final String KEY_TAGS = "tags";
+    /* COMMON KEYS */
+    public static final String KEY_MEDIA_PROPERTIES = "format";
+    public static final String KEY_FILENAME = "filename";
+    public static final String KEY_FORMAT = "format_name";
+    public static final String KEY_FORMAT_LONG = "format_long_name";
+    public static final String KEY_START_TIME = "start_time";
+    public static final String KEY_DURATION = "duration";
+    public static final String KEY_SIZE = "size";
+    public static final String KEY_BIT_RATE = "bit_rate";
+    public static final String KEY_TAGS = "tags";
 
     /**
      * Stores all properties.

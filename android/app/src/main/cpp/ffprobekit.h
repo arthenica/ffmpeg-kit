@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Taner Sener
+ * Copyright (c) 2020-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -25,8 +25,8 @@
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    nativeFFprobeExecute
- * Signature: ([Ljava/lang/String;)I
+ * Signature: (J[Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *, jclass, jobjectArray);
+JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *, jclass, jlong, jobjectArray);
 
 #endif /* FFPROBE_KIT_H */

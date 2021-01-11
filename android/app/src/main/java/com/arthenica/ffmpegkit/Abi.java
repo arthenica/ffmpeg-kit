@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,7 +20,9 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Helper enumeration type for Android ABIs; includes only supported ABIs.
+ * <p>Enumeration type for Android ABIs.
+ *
+ * @author Taner Sener
  */
 public enum Abi {
 
@@ -59,7 +61,7 @@ public enum Abi {
      */
     ABI_UNKNOWN("unknown");
 
-    private String name;
+    private final String name;
 
     /**
      * <p>Returns enumeration defined by ABI name.
@@ -97,7 +99,7 @@ public enum Abi {
     }
 
     /**
-     * Creates new enum.
+     * Creates a new enum.
      *
      * @param abiName ABI name
      */

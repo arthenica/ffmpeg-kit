@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Taner Sener
+ * Copyright (c) 2020-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -29,20 +29,21 @@
 /** Forward declaration for function defined in fftools_ffprobe.c */
 int ffprobe_execute(int argc, char **argv);
 
-/** Forward declaration for function defined in ffmpegkit.c */
-void clearLastCommandOutput();
-
 extern int configuredLogLevel;
+extern __thread volatile long sessionId;
+extern void addSession(long id);
+extern void removeSession(long id);
 
 /**
  * Synchronously executes FFprobe natively with arguments provided.
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
+ * @param id session id
  * @param stringArray reference to the object holding FFprobe command arguments
  * @return zero on successful execution, non-zero on error
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *env, jclass object, jobjectArray stringArray) {
+JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *env, jclass object, jlong id, jobjectArray stringArray) {
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
@@ -75,11 +76,15 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
         }
     }
 
-    // LAST COMMAND OUTPUT SHOULD BE CLEARED BEFORE STARTING A NEW EXECUTION
-    clearLastCommandOutput();
+    // REGISTER THE ID BEFORE STARTING EXECUTION
+    sessionId = (long) id;
+    addSession((long) id);
 
     // RUN
     int retCode = ffprobe_execute(argumentCount, argv);
+
+    // ALWAYS REMOVE THE ID FROM THE MAP
+    removeSession((long) id);
 
     // CLEANUP
     if (tempArray != NULL) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,11 +20,16 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Represents a callback function to receive statistics from running executions.
+ * <p>Callback function to receive statistics for executions.
  */
 @FunctionalInterface
 public interface StatisticsCallback {
 
+    /**
+     * <p>Called when a statistics entry is received.
+     *
+     * @param statistics statistics entry
+     */
     void apply(final Statistics statistics);
 
 }

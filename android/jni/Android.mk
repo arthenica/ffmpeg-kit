@@ -61,12 +61,12 @@ include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module, cpu-features)
 
+MY_SRC_FILES := ffmpegkit.c ffprobekit.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c saf_wrapper.c
+
 ifeq ($(TARGET_PLATFORM),android-16)
-    MY_SRC_FILES := ffmpegkit.c ffprobekit.c android_lts_support.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
+    MY_SRC_FILES += android_lts_support.c
 else ifeq ($(TARGET_PLATFORM),android-17)
-    MY_SRC_FILES := ffmpegkit.c ffprobekit.c android_lts_support.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
-else
-    MY_SRC_FILES := ffmpegkit.c ffprobekit.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
+    MY_SRC_FILES += android_lts_support.c
 endif
 
 MY_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare

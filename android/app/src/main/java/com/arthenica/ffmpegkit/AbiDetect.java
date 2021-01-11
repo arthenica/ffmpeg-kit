@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,7 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>This class is used to detect running ABI name using Google <code>cpu-features</code> library.
+ * <p>Detects running ABI name using Google <code>cpu-features</code> library.
  */
 public class AbiDetect {
 
@@ -46,8 +46,8 @@ public class AbiDetect {
     private AbiDetect() {
     }
 
-    static void setArmV7aNeonLoaded(final boolean armV7aNeonLoaded) {
-        AbiDetect.armV7aNeonLoaded = armV7aNeonLoaded;
+    static void setArmV7aNeonLoaded() {
+        armV7aNeonLoaded = true;
     }
 
     /**

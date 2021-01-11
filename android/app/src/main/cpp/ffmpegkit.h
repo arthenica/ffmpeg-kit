@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -94,7 +94,7 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * Method:    nativeFFmpegExecute
  * Signature: (J[Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(JNIEnv *, jclass, jlong id, jobjectArray);
+JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(JNIEnv *, jclass, jlong, jobjectArray);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
@@ -123,13 +123,6 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue);
-
-/*
- * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
- * Method:    getNativeLastCommandOutput
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLastCommandOutput(JNIEnv *env, jclass object);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
