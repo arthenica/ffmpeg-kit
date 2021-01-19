@@ -25,15 +25,26 @@ package com.arthenica.ffmpegkit;
 public class AsyncGetMediaInformationTask implements Runnable {
     private final MediaInformationSession mediaInformationSession;
     private final ExecuteCallback executeCallback;
+    private final Integer waitTimeout;
 
     public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession) {
+        this(mediaInformationSession, AbstractSession.DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+    }
+
+    public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession, final Integer waitTimeout) {
         this.mediaInformationSession = mediaInformationSession;
         this.executeCallback = mediaInformationSession.getExecuteCallback();
+        this.waitTimeout = waitTimeout;
     }
 
     @Override
     public void run() {
-        FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession);
+        FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession, waitTimeout);
+
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getGlobalExecuteCallbackFunction();
+        if (globalExecuteCallbackFunction != null) {
+            globalExecuteCallbackFunction.apply(mediaInformationSession);
+        }
 
         if (executeCallback != null) {
             executeCallback.apply(mediaInformationSession);

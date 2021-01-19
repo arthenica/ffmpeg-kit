@@ -27,12 +27,12 @@ import java.util.concurrent.Executor;
  * <p>Main class for FFmpeg operations. Supports synchronous {@link #execute(String...)} and
  * asynchronous {@link #executeAsync(String, ExecuteCallback)} methods to execute FFmpeg commands.
  * <pre>
- *      int rc = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
- *      Log.i(Config.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+ *      FFmpegSession session = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
+ *      Log.i(Config.TAG, String.format("Command execution completed with %d.", session.getReturnCode());
  * </pre>
  * <pre>
- *      long executionId = FFmpeg.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
- *      Log.i(Config.TAG, String.format("Asynchronous execution %d started.", executionId));
+ *      FFmpegSession session = FFmpeg.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
+ *      Log.i(Config.TAG, String.format("Asynchronous session %d started.", session.getSessionId()));
  * </pre>
  */
 public class FFmpegKit {
@@ -231,17 +231,18 @@ public class FFmpegKit {
     }
 
     /**
-     * <p>Cancels the last execution started.
+     * <p>Cancels all ongoing executions.
      *
      * <p>This function does not wait for termination to complete and returns immediately.
      */
     public static void cancel() {
-        Session lastSession = FFmpegKitConfig.getLastSession();
-        if (lastSession != null) {
-            FFmpegKitConfig.nativeFFmpegCancel(lastSession.getSessionId());
-        } else {
-            android.util.Log.w(FFmpegKitConfig.TAG, "FFmpegKit cancel skipped. The last execution does not exist.");
-        }
+
+        /*
+         * ZERO (0) IS A SPECIAL SESSION ID
+         * WHEN IT IS PASSED TO THIS METHOD, A SIGINT IS GENERATED WHICH CANCELS ALL ONGOING
+         * EXECUTIONS
+         */
+        FFmpegKitConfig.nativeFFmpegCancel(0);
     }
 
     /**
@@ -249,7 +250,7 @@ public class FFmpegKit {
      *
      * <p>This function does not wait for termination to complete and returns immediately.
      *
-     * @param sessionId id of the session that will be stopped
+     * @param sessionId id of the session that will be cancelled
      */
     public static void cancel(final long sessionId) {
         FFmpegKitConfig.nativeFFmpegCancel(sessionId);

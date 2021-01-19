@@ -22,7 +22,6 @@ package com.arthenica.ffmpegkit;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.stream.Stream;
 
 /**
  * <p>An FFprobe execute session.
@@ -33,17 +32,30 @@ public class FFprobeSession extends AbstractSession implements Session {
                           final ExecuteCallback executeCallback,
                           final LogCallback logCallback,
                           final StatisticsCallback statisticsCallback) {
-        super(arguments, executeCallback, logCallback, statisticsCallback);
+        this(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+    }
+
+    FFprobeSession(final String[] arguments,
+                   final ExecuteCallback executeCallback,
+                   final LogCallback logCallback,
+                   final StatisticsCallback statisticsCallback,
+                   final LogRedirectionStrategy logRedirectionStrategy) {
+        super(arguments, executeCallback, logCallback, statisticsCallback, logRedirectionStrategy);
+    }
+
+    @Override
+    public Queue<Statistics> getAllStatistics(final int waitTimeout) {
+        return new LinkedList<>();
+    }
+
+    @Override
+    public Queue<Statistics> getAllStatistics() {
+        return new LinkedList<>();
     }
 
     @Override
     public Queue<Statistics> getStatistics() {
         return new LinkedList<>();
-    }
-
-    @Override
-    public Stream<Statistics> getStatisticsAsStream() {
-        return new LinkedList<Statistics>().stream();
     }
 
     @Override

@@ -131,4 +131,11 @@ JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvi
  */
 JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal(JNIEnv *env, jclass object, jint signum);
 
+/*
+ * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
+ * Method:    messagesInTransmit
+ * Signature: (J)I
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env, jclass object, jlong id);
+
 #endif /* FFMPEG_KIT_H */

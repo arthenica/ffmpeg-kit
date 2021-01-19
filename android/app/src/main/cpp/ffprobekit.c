@@ -33,6 +33,7 @@ extern int configuredLogLevel;
 extern __thread volatile long sessionId;
 extern void addSession(long id);
 extern void removeSession(long id);
+extern void resetMessagesInTransmit(long id);
 
 /**
  * Synchronously executes FFprobe natively with arguments provided.
@@ -76,9 +77,11 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
         }
     }
 
-    // REGISTER THE ID BEFORE STARTING EXECUTION
+    // REGISTER THE ID BEFORE STARTING THE EXECUTION
     sessionId = (long) id;
     addSession((long) id);
+
+    resetMessagesInTransmit(sessionId);
 
     // RUN
     int retCode = ffprobe_execute(argumentCount, argv);

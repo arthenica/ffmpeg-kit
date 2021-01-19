@@ -22,22 +22,22 @@ package com.arthenica.ffmpegkit;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public abstract class AbstractSession implements Session {
 
     /**
      * Generates ids for execute sessions.
      */
-    private static final AtomicLong sessionIdGenerator = new AtomicLong(1);
+    protected static final AtomicLong sessionIdGenerator = new AtomicLong(1);
+
+    /**
+     * Defines how long default `getAll` methods wait.
+     */
+    protected static final int DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT = 5000;
 
     protected final ExecuteCallback executeCallback;
     protected final LogCallback logCallback;
@@ -52,11 +52,13 @@ public abstract class AbstractSession implements Session {
     protected SessionState state;
     protected int returnCode;
     protected String failStackTrace;
+    protected final LogRedirectionStrategy logRedirectionStrategy;
 
     public AbstractSession(final String[] arguments,
                            final ExecuteCallback executeCallback,
                            final LogCallback logCallback,
-                           final StatisticsCallback statisticsCallback) {
+                           final StatisticsCallback statisticsCallback,
+                           final LogRedirectionStrategy logRedirectionStrategy) {
         this.sessionId = sessionIdGenerator.getAndIncrement();
         this.createTime = new Date();
         this.startTime = null;
@@ -69,36 +71,45 @@ public abstract class AbstractSession implements Session {
         this.state = SessionState.CREATED;
         this.returnCode = ReturnCode.NOT_SET;
         this.failStackTrace = null;
+        this.logRedirectionStrategy = logRedirectionStrategy;
     }
 
+    @Override
     public ExecuteCallback getExecuteCallback() {
         return executeCallback;
     }
 
+    @Override
     public LogCallback getLogCallback() {
         return logCallback;
     }
 
+    @Override
     public StatisticsCallback getStatisticsCallback() {
         return statisticsCallback;
     }
 
+    @Override
     public long getSessionId() {
         return sessionId;
     }
 
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
+    @Override
     public Date getStartTime() {
         return startTime;
     }
 
+    @Override
     public Date getEndTime() {
         return endTime;
     }
 
+    @Override
     public long getDuration() {
         final Date startTime = this.startTime;
         final Date endTime = this.endTime;
@@ -109,85 +120,141 @@ public abstract class AbstractSession implements Session {
         return -1;
     }
 
+    @Override
     public String[] getArguments() {
         return arguments;
     }
 
+    @Override
     public String getCommand() {
         return FFmpegKit.argumentsToString(arguments);
     }
 
+    protected void waitForCallbackMessagesInTransmit(final int timeout) {
+        final long start = System.currentTimeMillis();
+
+        /*
+         * WE GIVE MAX 5 SECONDS TO TRANSMIT ALL NATIVE MESSAGES
+         */
+        while (thereAreCallbackMessagesInTransmit() && (System.currentTimeMillis() < (start + timeout))) {
+            synchronized (this) {
+                try {
+                    wait(100);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+    }
+
+    @Override
+    public Queue<Log> getAllLogs(final int waitTimeout) {
+        waitForCallbackMessagesInTransmit(waitTimeout);
+
+        if (thereAreCallbackMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogs was asked to return all logs but there are still logs being transmitted for session id %d.", sessionId));
+        }
+
+        return logs;
+    }
+
+    @Override
+    public Queue<Log> getAllLogs() {
+        return getAllLogs(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+    }
+
+    @Override
     public Queue<Log> getLogs() {
         return logs;
     }
 
-    public Stream<Log> getLogsAsStream() {
-        return logs.stream();
+    @Override
+    public String getAllLogsAsString(final int waitTimeout) {
+        waitForCallbackMessagesInTransmit(waitTimeout);
+
+        if (thereAreCallbackMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogsAsString was asked to return all logs but there are still logs being transmitted for session id %d.", sessionId));
+        }
+
+        return getLogsAsString();
     }
 
+    @Override
+    public String getAllLogsAsString() {
+        return getAllLogsAsString(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+    }
+
+    @Override
     public String getLogsAsString() {
-        final Optional<String> concatenatedStringOption = logs.stream().map(new Function<Log, String>() {
-            @Override
-            public String apply(final Log log) {
-                return log.getMessage();
-            }
-        }).reduce(new BinaryOperator<String>() {
-            @Override
-            public String apply(final String s1, final String s2) {
-                return s1 + s2;
-            }
-        });
+        final StringBuilder concatenatedString = new StringBuilder();
 
-        return concatenatedStringOption.orElseGet(new Supplier<String>() {
+        for (Log log : logs) {
+            concatenatedString.append(log.getMessage());
+        }
 
-            @Override
-            public String get() {
-                return "";
-            }
-        });
+        return concatenatedString.toString();
     }
 
+    @Override
     public SessionState getState() {
         return state;
     }
 
+    @Override
     public int getReturnCode() {
         return returnCode;
     }
 
+    @Override
     public String getFailStackTrace() {
         return failStackTrace;
     }
 
+    @Override
+    public LogRedirectionStrategy getLogRedirectionStrategy() {
+        return logRedirectionStrategy;
+    }
+
+    @Override
+    public boolean thereAreCallbackMessagesInTransmit() {
+        return (FFmpegKitConfig.messagesInTransmit(sessionId) != 0);
+    }
+
+    @Override
     public void addLog(final Log log) {
         this.logs.add(log);
     }
 
+    @Override
     public Future<?> getFuture() {
         return future;
     }
 
+    @Override
     public void setFuture(final Future<?> future) {
         this.future = future;
     }
 
+    @Override
     public void startRunning() {
         this.state = SessionState.RUNNING;
         this.startTime = new Date();
     }
 
+    @Override
     public void complete(final int returnCode) {
         this.returnCode = returnCode;
         this.state = SessionState.COMPLETED;
         this.endTime = new Date();
     }
 
+    @Override
     public void fail(final Exception exception) {
         this.failStackTrace = Exceptions.getStackTraceString(exception);
         this.state = SessionState.FAILED;
         this.endTime = new Date();
     }
 
+    @Override
     public void cancel() {
         if (state == SessionState.RUNNING) {
             FFmpegKit.cancel(sessionId);

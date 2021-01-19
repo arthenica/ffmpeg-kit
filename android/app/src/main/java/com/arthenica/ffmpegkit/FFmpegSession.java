@@ -21,7 +21,6 @@ package com.arthenica.ffmpegkit;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Stream;
 
 /**
  * <p>An FFmpeg execute session.
@@ -33,19 +32,33 @@ public class FFmpegSession extends AbstractSession implements Session {
                          final ExecuteCallback executeCallback,
                          final LogCallback logCallback,
                          final StatisticsCallback statisticsCallback) {
-        super(arguments, executeCallback, logCallback, statisticsCallback);
+        super(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
 
         this.statistics = new ConcurrentLinkedQueue<>();
     }
 
+    @Override
+    public Queue<Statistics> getAllStatistics(final int waitTimeout) {
+        waitForCallbackMessagesInTransmit(waitTimeout);
+
+        if (thereAreCallbackMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllStatistics was asked to return all statistics but there are still statistics being transmitted for session id %d.", sessionId));
+        }
+
+        return getStatistics();
+    }
+
+    @Override
+    public Queue<Statistics> getAllStatistics() {
+        return getAllStatistics(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+    }
+
+    @Override
     public Queue<Statistics> getStatistics() {
         return statistics;
     }
 
-    public Stream<Statistics> getStatisticsAsStream() {
-        return statistics.stream();
-    }
-
+    @Override
     public void addStatistics(final Statistics statistics) {
         this.statistics.add(statistics);
     }

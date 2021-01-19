@@ -30,7 +30,7 @@ public class MediaInformationSession extends FFprobeSession implements Session {
                                    final ExecuteCallback executeCallback,
                                    final LogCallback logCallback,
                                    final StatisticsCallback statisticsCallback) {
-        super(arguments, executeCallback, logCallback, statisticsCallback);
+        super(arguments, executeCallback, logCallback, statisticsCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
     }
 
     public MediaInformation getMediaInformation() {

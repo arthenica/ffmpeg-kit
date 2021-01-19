@@ -50,6 +50,7 @@ struct CallbackData {
 /** Session map variables */
 const int SESSION_MAP_SIZE = 1000;
 static volatile int sessionMap[SESSION_MAP_SIZE];
+static volatile int sessionInTransitMessageCountMap[SESSION_MAP_SIZE];
 static pthread_mutex_t sessionMapMutex;
 
 /** Redirection control variables */
@@ -113,11 +114,12 @@ JNINativeMethod configMethods[] = {
     {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion},
     {"nativeFFmpegExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute},
     {"nativeFFmpegCancel", "(J)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel},
-    {"nativeFFprobeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute},
+    {"nativeFFprobeExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute},
     {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe},
     {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate},
     {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable},
-    {"ignoreNativeSignal", "(I)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal}
+    {"ignoreNativeSignal", "(I)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal},
+    {"messagesInTransmit", "(J)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit}
 };
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
@@ -213,7 +215,7 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
-void executionMapLockInit() {
+void sessionMapLockInit() {
     pthread_mutexattr_t attributes;
     pthread_mutexattr_init(&attributes);
     pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
@@ -231,7 +233,7 @@ void monitorUnInit() {
     pthread_cond_destroy(&monitorCondition);
 }
 
-void executionMapLockUnInit() {
+void sessionMapLockUnInit() {
     pthread_mutex_destroy(&sessionMapMutex);
 }
 
@@ -314,6 +316,9 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
         callbackDataTail = newData;
     }
 
+    int key = sessionId % SESSION_MAP_SIZE;
+    sessionInTransitMessageCountMap[key] += 1;
+
     mutexUnlock();
 
     monitorNotify();
@@ -355,6 +360,9 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 
         callbackDataTail = newData;
     }
+
+    int key = sessionId % SESSION_MAP_SIZE;
+    sessionInTransitMessageCountMap[key] += 1;
 
     mutexUnlock();
 
@@ -454,6 +462,20 @@ int cancelRequested(long id) {
     sessionMapUnlock();
 
     return found;
+}
+
+/**
+ * Resets the number of messages in transmit for this session.
+ *
+ * @param id session id
+ */
+void resetMessagesInTransmit(long id) {
+    mutexLock();
+
+    int key = id % SESSION_MAP_SIZE;
+    sessionInTransitMessageCountMap[key] = 0;
+
+    mutexUnlock();
 }
 
 /**
@@ -566,6 +588,9 @@ void *callbackThreadFunction() {
 
             }
 
+            int key = callbackData->sessionId % SESSION_MAP_SIZE;
+            sessionInTransitMessageCountMap[key] -= 1;
+
             // CLEAN STRUCT
             callbackData->next = NULL;
             av_free(callbackData);
@@ -611,7 +636,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 13) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 14) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -664,7 +689,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     
     mutexInit();
     monitorInit();
-    executionMapLockInit();
+    sessionMapLockInit();
 
     return JNI_VERSION_1_6;
 }
@@ -805,9 +830,11 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
         }
     }
 
-    // REGISTER THE ID BEFORE STARTING EXECUTION
+    // REGISTER THE ID BEFORE STARTING THE EXECUTION
     sessionId = (long) id;
     addSession((long) id);
+
+    resetMessagesInTransmit(sessionId);
 
     // RUN
     int retCode = ffmpeg_execute(argumentCount, argv);
@@ -906,4 +933,23 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNative
     } else if (signum == SIGPIPE) {
         handleSIGPIPE = 0;
     }
+}
+
+/**
+ * Returns the number of native messages which are not transmitted to the Java callbacks for the
+ * given session.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param id session id
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env, jclass object, jlong id) {
+    mutexLock();
+
+    int key = id % SESSION_MAP_SIZE;
+    int count = sessionInTransitMessageCountMap[key];
+
+    mutexUnlock();
+
+    return count;
 }

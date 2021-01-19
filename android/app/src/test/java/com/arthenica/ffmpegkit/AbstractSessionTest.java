@@ -28,7 +28,7 @@ public class AbstractSessionTest {
 
     @Test
     public void getLogsAsStringTest() {
-        final FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, null, null, null);
+        final FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, null, null, null, LogRedirectionStrategy.ALWAYS_PRINT_LOGS);
 
         String logMessage1 = "i am log one";
         String logMessage2 = "i am log two";

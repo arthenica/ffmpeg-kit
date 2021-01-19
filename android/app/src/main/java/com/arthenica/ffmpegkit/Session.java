@@ -22,7 +22,6 @@ package com.arthenica.ffmpegkit;
 import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.Future;
-import java.util.stream.Stream;
 
 /**
  * <p>Interface for ffmpeg and ffprobe execute sessions.
@@ -49,21 +48,33 @@ public interface Session {
 
     String getCommand();
 
+    Queue<Log> getAllLogs(final int waitTimeout);
+
+    Queue<Log> getAllLogs();
+
     Queue<Log> getLogs();
 
-    Stream<Log> getLogsAsStream();
+    String getAllLogsAsString(final int waitTimeout);
+
+    String getAllLogsAsString();
 
     String getLogsAsString();
 
-    Queue<Statistics> getStatistics();
+    Queue<Statistics> getAllStatistics(final int waitTimeout);
 
-    Stream<Statistics> getStatisticsAsStream();
+    Queue<Statistics> getAllStatistics();
+
+    Queue<Statistics> getStatistics();
 
     SessionState getState();
 
     int getReturnCode();
 
     String getFailStackTrace();
+
+    LogRedirectionStrategy getLogRedirectionStrategy();
+
+    boolean thereAreCallbackMessagesInTransmit();
 
     void addLog(final Log log);
 
