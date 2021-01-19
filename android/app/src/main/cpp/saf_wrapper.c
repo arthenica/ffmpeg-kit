@@ -38,30 +38,30 @@ void closeParcelFileDescriptor(int fd);
 #undef avformat_open_input
 
 static int fd_read_packet(void* opaque, uint8_t* buf, int buf_size) {
-    int fd = (int)opaque;
-    return read(fd, buf, buf_size);
+    int *fd = opaque;
+    return read(*fd, buf, buf_size);
 }
 
 static int fd_write_packet(void* opaque, uint8_t* buf, int buf_size) {
-    int fd = (int)opaque;
-    return write(fd, buf, buf_size);
+    int *fd = opaque;
+    return write(*fd, buf, buf_size);
 }
 
 static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
-    int fd = (int)opaque;
+    int *fd = opaque;
 
-    if (fd < 0) {
+    if (*fd < 0) {
         return AVERROR(EINVAL);
     }
 
     int64_t ret;
     if (whence == AVSEEK_SIZE) {
         struct stat st;
-        ret = fstat(fd, &st);
+        ret = fstat(*fd, &st);
         return ret < 0 ? AVERROR(errno) : (S_ISFIFO(st.st_mode) ? 0 : st.st_size);
     }
 
-    ret = lseek(fd, offset, whence);
+    ret = lseek(*fd, offset, whence);
 
     return ret < 0 ? AVERROR(errno) : ret;
 }
@@ -70,29 +70,30 @@ static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
  * returns NULL if the filename is not of expected format (e.g. 'saf:72/video.md4')
  */
 static AVIOContext *create_fd_avio_context(const char *filename, int flags) {
-    union {int fd; void* opaque;} fdunion;
-    fdunion.fd = -1;
+    int *fd = av_mallocz(sizeof(int));
+    *fd = -1;
     const char *fd_ptr = NULL;
     if (av_strstart(filename, "saf:", &fd_ptr)) {
         char *final;
-        fdunion.fd = strtol(fd_ptr, &final, 10);
+        *fd = strtol(fd_ptr, &final, 10);
         if (fd_ptr == final) { /* No digits found */
-            fdunion.fd = -1;
+            *fd = -1;
         }
     }
 
-    if (fdunion.fd >= 0) {
+    if (*fd >= 0) {
         int write_flag = flags & AVIO_FLAG_WRITE ? 1 : 0;
-        return avio_alloc_context(av_malloc(4096), 4096, write_flag, fdunion.opaque, fd_read_packet, write_flag ? fd_write_packet : NULL, fd_seek);
+        return avio_alloc_context(av_malloc(4096), 4096, write_flag, fd, fd_read_packet, write_flag ? fd_write_packet : NULL, fd_seek);
     }
     return NULL;
 }
 
 static void close_fd_avio_context(AVIOContext *ctx) {
     if (fd_seek(ctx->opaque, 0, AVSEEK_SIZE) >= 0) {
-        int fd = (int)ctx->opaque;
-        close(fd);
-        closeParcelFileDescriptor(fd);
+        int *fd = ctx->opaque;
+        close(*fd);
+        closeParcelFileDescriptor(*fd);
+        av_freep(fd);
     }
     ctx->opaque = NULL;
 }
