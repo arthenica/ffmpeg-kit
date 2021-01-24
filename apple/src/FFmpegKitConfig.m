@@ -607,42 +607,47 @@ void callbackBlockFunction() {
 }
 
 /**
- * Registers fonts inside the given path, so they are available in FFmpeg filters.
+ * Registers the fonts inside the given path, so they become available to use in FFmpeg filters.
  *
- * Note that you need to build FFmpegKit with fontconfig
- * enabled or use a prebuilt package with fontconfig inside to use this feature.
+ * Note that you need to build FFmpegKit with fontconfig enabled or use a prebuilt package with
+ * fontconfig inside to use this feature.
  *
  * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
  * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
 + (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
+    [FFmpegKitConfig setFontDirectoryList:[NSArray arrayWithObject:fontDirectoryPath] with:fontNameMapping];
+}
+
+/**
+ * Registers the fonts inside the given array of font directories, so they become available to use
+ * in FFmpeg filters.
+ *
+ * Note that you need to build FFmpegKit with fontconfig enabled or use a prebuilt package with
+ * fontconfig inside to use this feature.
+ *
+ * @param fontDirectoryArray array of directories which contain fonts (.ttf and .otf files)
+ * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
+ */
++ (void)setFontDirectoryList:(NSArray*)fontDirectoryArray with:(NSDictionary*)fontNameMapping {
     NSError *error = nil;
     BOOL isDirectory = YES;
     BOOL isFile = NO;
     int validFontNameMappingCount = 0;
-    NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@".ffmpegkit"];
+    NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@"fontconfig"];
     NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@"fonts.conf"];
-    int activeLogLevel = av_log_get_level();
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&isDirectory]) {
-
         if (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
-            if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
-                NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
-            }
+            NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
             return;
         }
-
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
-            NSLog(@"Created temporary font conf directory: TRUE.");
-        }
+        NSLog(@"Created temporary font conf directory: TRUE.");
     }
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&isFile]) {
         BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
-            NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
-        }
+        NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
     }
 
     /* PROCESS MAPPINGS FIRST */
@@ -666,28 +671,31 @@ void callbackBlockFunction() {
         }
     }
 
-    NSString *fontConfiguration = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@%@%@\n%@\n%@\n",
+    NSMutableString *fontConfiguration = [NSMutableString stringWithFormat:@"%@\n%@\n%@\n%@\n",
                             @"<?xml version=\"1.0\"?>",
                             @"<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">",
                             @"<fontconfig>",
-                            @"    <dir>.</dir>",
-                            @"    <dir>", fontDirectoryPath, @"</dir>",
-                            fontNameMappingBlock,
-                            @"</fontconfig>"];
+                            @"    <dir prefix=\"cwd\">.</dir>"];
+    for (int i=0; i < [fontDirectoryArray count]; i++) {
+        NSString *fontDirectoryPath = [fontDirectoryArray objectAtIndex:i];
+        [fontConfiguration appendString: @"    <dir>"];
+        [fontConfiguration appendString: fontDirectoryPath];
+        [fontConfiguration appendString: @"</dir>"];
+    }
+    [fontConfiguration appendString:fontNameMappingBlock];
+    [fontConfiguration appendString:@"</fontconfig>"];
 
     if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
-            NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
-        }
+        NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
         return;
     }
-    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
-        NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
-    }
+
+    NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
 
     [FFmpegKitConfig setFontconfigConfigurationPath:tempConfigurationDirectory];
 
-    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+    for (int i=0; i < [fontDirectoryArray count]; i++) {
+        NSString *fontDirectoryPath = [fontDirectoryArray objectAtIndex:i];
         NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
     }
 }

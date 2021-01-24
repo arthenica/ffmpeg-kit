@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -397,7 +398,8 @@ public class FFmpegKitConfig {
     }
 
     /**
-     * <p>Registers fonts inside the given path, so they become available to use in FFmpeg filters.
+     * <p>Registers the fonts inside the given path, so they become available to use in FFmpeg
+     * filters.
      *
      * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
      * enabled or use a prebuilt package with <code>fontconfig</code> inside to use this feature.
@@ -408,10 +410,26 @@ public class FFmpegKitConfig {
      *                          friendly names
      */
     public static void setFontDirectory(final Context context, final String fontDirectoryPath, final Map<String, String> fontNameMapping) {
+        setFontDirectoryList(context, Collections.singletonList(fontDirectoryPath), fontNameMapping);
+    }
+
+    /**
+     * <p>Registers the fonts inside the given list of font directories, so they become available
+     * to use in FFmpeg filters.
+     *
+     * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
+     * enabled or use a prebuilt package with <code>fontconfig</code> inside to use this feature.
+     *
+     * @param context           application context to access application data
+     * @param fontDirectoryList list of directories which contain fonts (.ttf and .otf files)
+     * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
+     *                          friendly names
+     */
+    public static void setFontDirectoryList(final Context context, final List<String> fontDirectoryList, final Map<String, String> fontNameMapping) {
         final File cacheDir = context.getCacheDir();
         int validFontNameMappingCount = 0;
 
-        final File tempConfigurationDirectory = new File(cacheDir, ".ffmpegkit");
+        final File tempConfigurationDirectory = new File(cacheDir, "fontconfig");
         if (!tempConfigurationDirectory.exists()) {
             boolean tempFontConfDirectoryCreated = tempConfigurationDirectory.mkdirs();
             android.util.Log.d(TAG, String.format("Created temporary font conf directory: %s.", tempFontConfDirectoryCreated));
@@ -446,30 +464,37 @@ public class FFmpegKitConfig {
             }
         }
 
-        final String fontConfig = "<?xml version=\"1.0\"?>\n" +
-                "<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n" +
-                "<fontconfig>\n" +
-                "    <dir>.</dir>\n" +
-                "    <dir>" + fontDirectoryPath + "</dir>\n" +
-                fontNameMappingBlock +
-                "</fontconfig>";
+        final StringBuilder fontConfigBuilder = new StringBuilder();
+        fontConfigBuilder.append("<?xml version=\"1.0\"?>\n");
+        fontConfigBuilder.append("<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n");
+        fontConfigBuilder.append("<fontconfig>\n");
+        fontConfigBuilder.append("    <dir prefix=\"cwd\">.</dir>\n");
+        for (String fontDirectoryPath : fontDirectoryList) {
+            fontConfigBuilder.append("    <dir>");
+            fontConfigBuilder.append(fontDirectoryPath);
+            fontConfigBuilder.append("</dir>\n");
+        }
+        fontConfigBuilder.append(fontNameMappingBlock);
+        fontConfigBuilder.append("</fontconfig>");
 
         final AtomicReference<FileOutputStream> reference = new AtomicReference<>();
         try {
             final FileOutputStream outputStream = new FileOutputStream(fontConfiguration);
             reference.set(outputStream);
 
-            outputStream.write(fontConfig.getBytes());
+            outputStream.write(fontConfigBuilder.toString().getBytes());
             outputStream.flush();
 
             android.util.Log.d(TAG, String.format("Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount));
 
             setFontconfigConfigurationPath(tempConfigurationDirectory.getAbsolutePath());
 
-            android.util.Log.d(TAG, String.format("Font directory %s registered successfully.", fontDirectoryPath));
+            for (String fontDirectoryPath : fontDirectoryList) {
+                android.util.Log.d(TAG, String.format("Font directory %s registered successfully.", fontDirectoryPath));
+            }
 
         } catch (final IOException e) {
-            android.util.Log.e(TAG, String.format("Failed to set font directory: %s.%s", fontDirectoryPath, Exceptions.getStackTraceString(e)));
+            android.util.Log.e(TAG, String.format("Failed to set font directory: %s.%s", Arrays.toString(fontDirectoryList.toArray()), Exceptions.getStackTraceString(e)));
         } finally {
             if (reference.get() != null) {
                 try {

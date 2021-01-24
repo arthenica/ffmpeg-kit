@@ -1843,12 +1843,6 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     int ret;
     float t;
 
-    // FORWARD IT BEFORE PROCESSING
-    forward_report(is_last_report, timer_start, cur_time);
-
-    if (!print_stats && !is_last_report && !progress_avio)
-        return;
-
     if (!is_last_report) {
         if (last_time == -1) {
             last_time = cur_time;
@@ -1858,6 +1852,11 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
             return;
         last_time = cur_time;
     }
+
+    forward_report(is_last_report, timer_start, cur_time);
+
+    if (!print_stats && !is_last_report && !progress_avio)
+        return;
 
     t = (cur_time-timer_start) / 1000000.0;
 
