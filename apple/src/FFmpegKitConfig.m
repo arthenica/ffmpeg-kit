@@ -916,11 +916,21 @@ void callbackBlockFunction() {
  * @return the full path of named pipe
  */
 + (NSString*)registerNewFFmpegPipe {
+    NSError *error = nil;
+    BOOL isDirectory;
 
-    // PIPES ARE CREATED UNDER THE CACHE DIRECTORY
+    // PIPES ARE CREATED UNDER THE PIPES DIRECTORY
     NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *pipesDir = [cacheDir stringByAppendingPathComponent:@"pipes"];
 
-    NSString *newFFmpegPipePath = [NSString stringWithFormat:@"%@/%@%d", cacheDir, FFMPEG_KIT_PIPE_PREFIX, (++lastCreatedPipeIndex)];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:pipesDir isDirectory:&isDirectory]) {
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:pipesDir withIntermediateDirectories:YES attributes:nil error:&error]) {
+            NSLog(@"Failed to create pipes directory: %@. Operation failed with %@.", pipesDir, error);
+            return nil;
+        }
+    }
+
+    NSString *newFFmpegPipePath = [NSString stringWithFormat:@"%@/%@%d", pipesDir, FFMPEG_KIT_PIPE_PREFIX, (++lastCreatedPipeIndex)];
 
     // FIRST CLOSE OLD PIPES WITH THE SAME NAME
     [FFmpegKitConfig closeFFmpegPipe:newFFmpegPipePath];
@@ -929,10 +939,7 @@ void callbackBlockFunction() {
     if (rc == 0) {
         return newFFmpegPipePath;
     } else {
-        int activeLogLevel = av_log_get_level();
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
-            NSLog(@"Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.", newFFmpegPipePath, rc);
-        }
+        NSLog(@"Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.", newFFmpegPipePath, rc);
         return nil;
     }
 }

@@ -509,10 +509,19 @@ public class FFmpegKitConfig {
      */
     public static String registerNewFFmpegPipe(final Context context) {
 
-        // PIPES ARE CREATED UNDER THE CACHE DIRECTORY
+        // PIPES ARE CREATED UNDER THE PIPES DIRECTORY
         final File cacheDir = context.getCacheDir();
+        final File pipesDir = new File(cacheDir, "pipes");
 
-        final String newFFmpegPipePath = MessageFormat.format("{0}{1}{2}{3}", cacheDir, File.separator, FFMPEG_KIT_NAMED_PIPE_PREFIX, pipeIndexGenerator.getAndIncrement());
+        if (!pipesDir.exists()) {
+            final boolean pipesDirCreated = pipesDir.mkdirs();
+            if (!pipesDirCreated) {
+                android.util.Log.e(TAG, String.format("Failed to create pipes directory: %s.", pipesDir.getAbsolutePath()));
+                return null;
+            }
+        }
+
+        final String newFFmpegPipePath = MessageFormat.format("{0}{1}{2}{3}", pipesDir, File.separator, FFMPEG_KIT_NAMED_PIPE_PREFIX, pipeIndexGenerator.getAndIncrement());
 
         // FIRST CLOSE OLD PIPES WITH THE SAME NAME
         closeFFmpegPipe(newFFmpegPipePath);
