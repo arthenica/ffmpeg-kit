@@ -979,7 +979,7 @@ public class FFmpegKitConfig {
                 pfdMap.delete(fd);
             }
         } catch (final Throwable t) {
-            android.util.Log.e(TAG, String.format("Failed to close file descriptor %d.%s", fd, Exceptions.getStackTraceString(t)));
+            android.util.Log.e(TAG, String.format("Failed to close file descriptor: %d.%s", fd, Exceptions.getStackTraceString(t)));
         }
     }
 
