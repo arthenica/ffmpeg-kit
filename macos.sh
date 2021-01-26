@@ -68,6 +68,9 @@ while [ ! $# -eq 0 ]; do
 
     skip_library "${SKIP_LIBRARY}"
     ;;
+  --no-framework)
+    NO_FRAMEWORK="1"
+    ;;
   --no-output-redirection)
     no_output_redirection
     ;;
@@ -223,30 +226,39 @@ for run_arch in {0..12}; do
   fi
 done
 
-# BUILD FFMPEG-KIT
-if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
+echo -e -n "\n"
 
-  # INITIALIZE TARGET FOLDERS
-  initialize_prebuilt_macos_folders
+# DO NOT BUILD FRAMEWORKS
+if [[ ${NO_FRAMEWORK} -ne 1 ]]; then
 
-  # PREPARE PLATFORM ARCHITECTURE STRINGS
-  build_apple_architecture_variant_strings
+  # BUILD FFMPEG-KIT
+  if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
-  if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
-    echo -e -n "\n\nCreating universal libraries and xcframeworks under prebuilt: "
+    # INITIALIZE TARGET FOLDERS
+    initialize_prebuilt_macos_folders
 
-    create_universal_libraries_for_macos_xcframeworks
+    # PREPARE PLATFORM ARCHITECTURE STRINGS
+    build_apple_architecture_variant_strings
 
-    create_frameworks_for_macos_xcframeworks
+    if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
+      echo -e -n "\nCreating universal libraries and xcframeworks under prebuilt: "
 
-    create_macos_xcframeworks
-  else
-    echo -e -n "\n\nCreating universal libraries and frameworks under prebuilt: "
+      create_universal_libraries_for_macos_xcframeworks
 
-    create_universal_libraries_for_macos_default_frameworks
+      create_frameworks_for_macos_xcframeworks
 
-    create_macos_default_frameworks
+      create_macos_xcframeworks
+    else
+      echo -e -n "\nCreating universal libraries and frameworks under prebuilt: "
+
+      create_universal_libraries_for_macos_default_frameworks
+
+      create_macos_default_frameworks
+    fi
+
+    echo -e "ok\n"
   fi
 
-  echo -e "ok\n"
+else
+  echo -e "INFO: Skipped creating macOS frameworks.\n" 1>>"${BASEDIR}"/build.log 2>&1
 fi

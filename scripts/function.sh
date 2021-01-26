@@ -595,7 +595,11 @@ display_help_advanced_options() {
   echo -e "Advanced options:"
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
   echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even if it is detected as already downloaded [no]"
-  echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even if it is detected as already built [no]\n"
+  echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even if it is detected as already built [no]"
+  if [ -n "$1" ]; then
+    echo -e "$1"
+  fi
+  echo -e ""
 }
 
 #

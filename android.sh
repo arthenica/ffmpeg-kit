@@ -61,6 +61,9 @@ while [ ! $# -eq 0 ]; do
 
     skip_library "${SKIP_LIBRARY}"
     ;;
+  --no-archive)
+    NO_ARCHIVE="1"
+    ;;
   --no-output-redirection)
     no_output_redirection
     ;;
@@ -270,25 +273,33 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     echo "skipped"
   fi
 
-  echo -e -n "\n\nCreating Android archive under prebuilt: "
+  echo -e -n "\n"
 
-  # BUILD ANDROID ARCHIVE
-  ./gradlew ffmpeg-kit-android-lib:clean ffmpeg-kit-android-lib:assembleRelease ffmpeg-kit-android-lib:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
-  if [ $? -ne 0 ]; then
-    echo -e "failed\n"
-    exit 1
+  # DO NOT BUILD ANDROID ARCHIVE
+  if [[ ${NO_ARCHIVE} -ne 1 ]]; then
+
+    echo -e -n "\nCreating Android archive under prebuilt: "
+
+    # BUILD ANDROID ARCHIVE
+    ./gradlew ffmpeg-kit-android-lib:clean ffmpeg-kit-android-lib:assembleRelease ffmpeg-kit-android-lib:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
+    if [ $? -ne 0 ]; then
+      echo -e "failed\n"
+      exit 1
+    fi
+
+    # COPY ANDROID ARCHIVE TO PREBUILT DIRECTORY
+    FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_aar_directory)/ffmpeg-kit"
+    rm -rf "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
+    mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1
+    if [ $? -ne 0 ]; then
+      echo -e "failed\n"
+      exit 1
+    fi
+
+    echo -e "INFO: Created ffmpeg-kit Android archive successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "ok\n"
+  else
+    echo -e "INFO: Skipped creating Android archive.\n" 1>>"${BASEDIR}"/build.log 2>&1
   fi
-
-  # COPY ANDROID ARCHIVE TO PREBUILT DIRECTORY
-  FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_aar_directory)/ffmpeg-kit"
-  rm -rf "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
-  mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
-  cp "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1
-  if [ $? -ne 0 ]; then
-    echo -e "failed\n"
-    exit 1
-  fi
-
-  echo -e "Created ffmpeg-kit Android archive successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
-  echo -e "ok\n"
 fi

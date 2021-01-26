@@ -48,7 +48,7 @@ under the prebuilt folder.\n"
 
   display_help_common_libraries
   display_help_gpl_libraries
-  display_help_advanced_options
+  display_help_advanced_options "  --no-archive\t\t\tdo not build Android archive [no]"
 }
 
 enable_main_build() {
