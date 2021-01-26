@@ -11,7 +11,7 @@ fi
 # UPDATE BUILD FLAGS
 # LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
 if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ ${API} -lt 18 ]]; then
-  LTS_SUPPORT_LIBS=" -Wl,--no-whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
+  LTS_SUPPORT_LIBS=" -Wl,--no-whole-archive ${BASEDIR}/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
 else
   LTS_SUPPORT_LIBS=""
 fi

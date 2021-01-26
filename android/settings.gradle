@@ -1,4 +1,4 @@
-include ':app'
+include ':ffmpeg-kit-android-lib'
 include ':ffmpeg-kit'
 project(':ffmpeg-kit').projectDir = new File('..')
 rootProject.name = 'ffmpeg-kit-android'
