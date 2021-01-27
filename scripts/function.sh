@@ -246,7 +246,7 @@ from_library_name() {
 is_library_supported_on_platform() {
   local library_index=$(from_library_name "$1")
   case ${library_index} in
-  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20)
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 17 | 18 | 19 | 20)
     echo "0"
     ;;
   21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 39 | 40)
@@ -1614,6 +1614,11 @@ download_gnu_config() {
 
 is_gnu_config_files_up_to_date() {
   echo $(grep aarch64-apple-darwin config.guess | wc -l 2>>"${BASEDIR}"/build.log)
+}
+
+get_user_friendly_ffmpeg_version() {
+  local USER_FRIENDLY_NAME=$(get_library_source "ffmpeg" 4)
+  echo ${USER_FRIENDLY_NAME:1}
 }
 
 get_cpu_count() {

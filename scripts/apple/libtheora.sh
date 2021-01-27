@@ -7,7 +7,7 @@ make distclean 2>/dev/null 1>/dev/null
 if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_libtheora} -eq 1 ]]; then
 
   # WORKAROUND NOT TO RUN CONFIGURE AT THE END OF autogen.sh
-  $SED_INLINE 's/$srcdir\/configure/#$srcdir\/configure/g' "${BASEDIR}"/src/"${LIB_NAME}"/autogen.sh || return 1
+  ${SED_INLINE} 's/$srcdir\/configure/#$srcdir\/configure/g' "${BASEDIR}"/src/"${LIB_NAME}"/autogen.sh || return 1
 
   ./autogen.sh || return 1
 fi

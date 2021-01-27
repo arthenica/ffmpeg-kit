@@ -20,7 +20,7 @@ fi
   --host="${HOST}" || return 1
 
 # WORKAROUND TO DISABLE BUILDING OF doc FOLDER (doc depends on c2man which is not available on all platforms)
-$SED_INLINE 's/ doc / /g' "${BASEDIR}"/src/"${LIB_NAME}"/Makefile || return 1
+${SED_INLINE} 's/ doc / /g' "${BASEDIR}"/src/"${LIB_NAME}"/Makefile || return 1
 
 make -j$(get_cpu_count) || return 1
 

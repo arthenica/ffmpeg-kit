@@ -22,7 +22,7 @@ fi
   --host="${HOST}" || return 1
 
 # WORKAROUND TO DISABLE BUILDING OF DOCBOOK - BUILD SCRIPTS DO NOT GENERATE A TARGET FOR IT
-$SED_INLINE 's/dist_man_MANS = .*/dist_man_MANS =/g' "${BASEDIR}"/src/"${LIB_NAME}"/doc/Makefile || return 1
+${SED_INLINE} 's/dist_man_MANS = .*/dist_man_MANS =/g' "${BASEDIR}"/src/"${LIB_NAME}"/doc/Makefile || return 1
 
 make -j$(get_cpu_count) || return 1
 
