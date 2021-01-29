@@ -121,6 +121,11 @@ for library in {1..58}; do
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libchromaprint 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-chromaprint"
       ;;
+    dav1d)
+      FFMPEG_CFLAGS+=" $(pkg-config --cflags dav1d 2>>"${BASEDIR}"/build.log)"
+      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static dav1d 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libdav1d"
+      ;;
     fontconfig)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags fontconfig 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static fontconfig 2>>"${BASEDIR}"/build.log)"
@@ -263,11 +268,6 @@ for library in {1..58}; do
       FFMPEG_CFLAGS+=" $(pkg-config --cflags vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
-      ;;
-    wavpack)
-      FFMPEG_CFLAGS+=" $(pkg-config --cflags wavpack 2>>"${BASEDIR}"/build.log)"
-      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static wavpack 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libwavpack"
       ;;
     x264)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags x264 2>>"${BASEDIR}"/build.log)"

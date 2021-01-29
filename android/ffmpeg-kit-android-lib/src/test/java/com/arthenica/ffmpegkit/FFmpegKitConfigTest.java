@@ -92,6 +92,7 @@ public class FFmpegKitConfigTest {
 
         final List<String> supportedExternalLibraries = new ArrayList<>();
         supportedExternalLibraries.add("chromaprint");
+        supportedExternalLibraries.add("dav1d");
         supportedExternalLibraries.add("fontconfig");
         supportedExternalLibraries.add("freetype");
         supportedExternalLibraries.add("fribidi");
@@ -118,7 +119,6 @@ public class FFmpegKitConfigTest {
         supportedExternalLibraries.add("speex");
         supportedExternalLibraries.add("tesseract");
         supportedExternalLibraries.add("twolame");
-        supportedExternalLibraries.add("wavpack");
         supportedExternalLibraries.add("x264");
         supportedExternalLibraries.add("x265");
         supportedExternalLibraries.add("xvidcore");

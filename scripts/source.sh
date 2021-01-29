@@ -21,6 +21,11 @@ get_library_source() {
     SOURCE_ID="v0.6.0"
     SOURCE_TYPE="TAG"
     ;;
+  dav1d)
+    SOURCE_REPO_URL="https://code.videolan.org/videolan/dav1d"
+    SOURCE_ID="0.8.1"
+    SOURCE_TYPE="TAG"
+    ;;
   expat)
     SOURCE_REPO_URL="https://github.com/tanersener/libexpat"
     SOURCE_ID="R_2_2_10"
@@ -30,7 +35,7 @@ get_library_source() {
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
     SOURCE_ID="9f38fac053010205806ece11e6aea9b7d3bde041"
     SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.4-dev-2765-g9f38fac053"      # git describe --tags
+    SOURCE_GIT_DESCRIBE="n4.4-dev-2765-g9f38fac053" # git describe --tags
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
@@ -230,11 +235,6 @@ get_library_source() {
   vo-amrwbenc)
     SOURCE_REPO_URL="https://github.com/tanersener/vo-amrwbenc"
     SOURCE_ID="v0.1.3"
-    SOURCE_TYPE="TAG"
-    ;;
-  wavpack)
-    SOURCE_REPO_URL="https://github.com/tanersener/wavpack"
-    SOURCE_ID="5.3.0"
     SOURCE_TYPE="TAG"
     ;;
   x264)

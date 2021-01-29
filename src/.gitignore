@@ -1,5 +1,6 @@
 chromaprint
 cpu-features
+dav1d
 expat
 ffmpeg
 fontconfig
@@ -42,7 +43,6 @@ tesseract
 tiff
 twolame
 vo-amrwbenc
-wavpack
 x264
 x265
 xvidcore

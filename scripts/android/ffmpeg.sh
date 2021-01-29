@@ -92,6 +92,11 @@ for library in {1..58}; do
         exit 1
       fi
       ;;
+    dav1d)
+      CFLAGS+=" $(pkg-config --cflags dav1d 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static dav1d 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libdav1d"
+      ;;
     fontconfig)
       CFLAGS+=" $(pkg-config --cflags fontconfig 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static fontconfig 2>>"${BASEDIR}"/build.log)"
@@ -240,11 +245,6 @@ for library in {1..58}; do
       CFLAGS+=" $(pkg-config --cflags vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
-      ;;
-    wavpack)
-      CFLAGS+=" $(pkg-config --cflags wavpack 2>>"${BASEDIR}"/build.log)"
-      LDFLAGS+=" $(pkg-config --libs --static wavpack 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libwavpack"
       ;;
     x264)
       CFLAGS+=" $(pkg-config --cflags x264 2>>"${BASEDIR}"/build.log)"

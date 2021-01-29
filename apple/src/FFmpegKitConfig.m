@@ -424,6 +424,7 @@ void callbackBlockFunction() {
 
 + (void)initialize {
     supportedExternalLibraries = [[NSMutableArray alloc] init];
+    [supportedExternalLibraries addObject:@"dav1d"];
     [supportedExternalLibraries addObject:@"fontconfig"];
     [supportedExternalLibraries addObject:@"freetype"];
     [supportedExternalLibraries addObject:@"fribidi"];
@@ -452,7 +453,6 @@ void callbackBlockFunction() {
     [supportedExternalLibraries addObject:@"speex"];
     [supportedExternalLibraries addObject:@"tesseract"];
     [supportedExternalLibraries addObject:@"twolame"];
-    [supportedExternalLibraries addObject:@"wavpack"];
     [supportedExternalLibraries addObject:@"x264"];
     [supportedExternalLibraries addObject:@"x265"];
     [supportedExternalLibraries addObject:@"xvid"];
@@ -755,7 +755,8 @@ void callbackBlockFunction() {
     }
 
     if (fullGpl) {
-        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
+        if ([enabledLibraryArray containsObject:@"dav1d"] &&
+            [enabledLibraryArray containsObject:@"fontconfig"] &&
             [enabledLibraryArray containsObject:@"freetype"] &&
             [enabledLibraryArray containsObject:@"fribidi"] &&
             [enabledLibraryArray containsObject:@"gmp"] &&
@@ -779,7 +780,6 @@ void callbackBlockFunction() {
             [enabledLibraryArray containsObject:@"soxr"] &&
             [enabledLibraryArray containsObject:@"speex"] &&
             [enabledLibraryArray containsObject:@"twolame"] &&
-            [enabledLibraryArray containsObject:@"wavpack"] &&
             [enabledLibraryArray containsObject:@"x264"] &&
             [enabledLibraryArray containsObject:@"x265"] &&
             [enabledLibraryArray containsObject:@"xvid"]) {
@@ -790,7 +790,8 @@ void callbackBlockFunction() {
     }
 
     if (full) {
-        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
+        if ([enabledLibraryArray containsObject:@"dav1d"] &&
+            [enabledLibraryArray containsObject:@"fontconfig"] &&
             [enabledLibraryArray containsObject:@"freetype"] &&
             [enabledLibraryArray containsObject:@"fribidi"] &&
             [enabledLibraryArray containsObject:@"gmp"] &&
@@ -812,8 +813,7 @@ void callbackBlockFunction() {
             [enabledLibraryArray containsObject:@"snappy"] &&
             [enabledLibraryArray containsObject:@"soxr"] &&
             [enabledLibraryArray containsObject:@"speex"] &&
-            [enabledLibraryArray containsObject:@"twolame"] &&
-            [enabledLibraryArray containsObject:@"wavpack"]) {
+            [enabledLibraryArray containsObject:@"twolame"]) {
             return @"full";
         } else {
             return @"custom";
@@ -821,7 +821,8 @@ void callbackBlockFunction() {
     }
 
     if (video) {
-        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
+        if ([enabledLibraryArray containsObject:@"dav1d"] &&
+            [enabledLibraryArray containsObject:@"fontconfig"] &&
             [enabledLibraryArray containsObject:@"freetype"] &&
             [enabledLibraryArray containsObject:@"fribidi"] &&
             [enabledLibraryArray containsObject:@"kvazaar"] &&
@@ -847,8 +848,7 @@ void callbackBlockFunction() {
             [enabledLibraryArray containsObject:@"shine"] &&
             [enabledLibraryArray containsObject:@"soxr"] &&
             [enabledLibraryArray containsObject:@"speex"] &&
-            [enabledLibraryArray containsObject:@"twolame"] &&
-            [enabledLibraryArray containsObject:@"wavpack"]) {
+            [enabledLibraryArray containsObject:@"twolame"]) {
             return @"audio";
         } else {
             return @"custom";

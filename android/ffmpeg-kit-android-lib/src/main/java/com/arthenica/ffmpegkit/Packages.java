@@ -32,6 +32,7 @@ class Packages {
 
     static {
         supportedExternalLibraries = new ArrayList<>();
+        supportedExternalLibraries.add("dav1d");
         supportedExternalLibraries.add("fontconfig");
         supportedExternalLibraries.add("freetype");
         supportedExternalLibraries.add("fribidi");
@@ -59,7 +60,6 @@ class Packages {
         supportedExternalLibraries.add("speex");
         supportedExternalLibraries.add("tesseract");
         supportedExternalLibraries.add("twolame");
-        supportedExternalLibraries.add("wavpack");
         supportedExternalLibraries.add("x264");
         supportedExternalLibraries.add("x265");
         supportedExternalLibraries.add("xvid");
@@ -129,7 +129,8 @@ class Packages {
         }
 
         if (fullGpl) {
-            if (externalLibraryList.contains("fontconfig") &&
+            if (externalLibraryList.contains("dav1d") &&
+                    externalLibraryList.contains("fontconfig") &&
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("gmp") &&
@@ -152,7 +153,6 @@ class Packages {
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
                     externalLibraryList.contains("twolame") &&
-                    externalLibraryList.contains("wavpack") &&
                     externalLibraryList.contains("x264") &&
                     externalLibraryList.contains("x265") &&
                     externalLibraryList.contains("xvid")) {
@@ -163,7 +163,8 @@ class Packages {
         }
 
         if (full) {
-            if (externalLibraryList.contains("fontconfig") &&
+            if (externalLibraryList.contains("dav1d") &&
+                    externalLibraryList.contains("fontconfig") &&
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("gmp") &&
@@ -184,8 +185,7 @@ class Packages {
                     externalLibraryList.contains("snappy") &&
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
-                    externalLibraryList.contains("twolame") &&
-                    externalLibraryList.contains("wavpack")) {
+                    externalLibraryList.contains("twolame")) {
                 return "full";
             } else {
                 return "custom";
@@ -193,7 +193,8 @@ class Packages {
         }
 
         if (video) {
-            if (externalLibraryList.contains("fontconfig") &&
+            if (externalLibraryList.contains("dav1d") &&
+                    externalLibraryList.contains("fontconfig") &&
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("kvazaar") &&
@@ -218,8 +219,7 @@ class Packages {
                     externalLibraryList.contains("shine") &&
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
-                    externalLibraryList.contains("twolame") &&
-                    externalLibraryList.contains("wavpack")) {
+                    externalLibraryList.contains("twolame")) {
                 return "audio";
             } else {
                 return "custom";

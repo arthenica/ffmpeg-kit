@@ -1204,6 +1204,31 @@ get_sdk_path() {
   echo "$(xcrun --sdk "$(get_sdk_name)" --show-sdk-path)"
 }
 
+create_mason_cross_file() {
+  cat >"$1" <<EOF
+[binaries]
+c = '$CC'
+cpp = '$CXX'
+ar = '$AR'
+strip = '$STRIP'
+pkgconfig = 'pkg-config'
+
+[properties]
+sys_root = '$SDK_PATH'
+has_function_printf = true
+
+[host_machine]
+system = '$(get_meson_target_host_family)'
+cpu_family = '$(get_meson_target_cpu_family)'
+cpu = '$(get_target_cpu)'
+endian = 'little'
+
+[built-in options]
+default_library = 'static'
+prefix = '${LIB_INSTALL_PREFIX}'
+EOF
+}
+
 create_fontconfig_package_config() {
   local FONTCONFIG_VERSION="$1"
 

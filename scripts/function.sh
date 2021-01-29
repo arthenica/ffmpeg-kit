@@ -64,7 +64,7 @@ get_library_name() {
   13) echo "opencore-amr" ;;
   14) echo "shine" ;;
   15) echo "speex" ;;
-  16) echo "wavpack" ;;
+  16) echo "dav1d" ;;
   17) echo "kvazaar" ;;
   18) echo "x264" ;;
   19) echo "xvidcore" ;;
@@ -194,7 +194,7 @@ from_library_name() {
   opencore-amr) echo 13 ;;
   shine) echo 14 ;;
   speex) echo 15 ;;
-  wavpack) echo 16 ;;
+  dav1d) echo 16 ;;
   kvazaar) echo 17 ;;
   x264) echo 18 ;;
   xvidcore) echo 19 ;;
@@ -246,7 +246,7 @@ from_library_name() {
 is_library_supported_on_platform() {
   local library_index=$(from_library_name "$1")
   case ${library_index} in
-  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 17 | 18 | 19 | 20)
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20)
     echo "0"
     ;;
   21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 39 | 40)
@@ -375,6 +375,34 @@ get_package_config_file_name() {
   44) echo "samplerate" ;;
   55) echo "uuid" ;;
   *) echo "$(get_library_name "$1")" ;;
+  esac
+}
+
+get_meson_target_host_family() {
+  case ${FFMPEG_KIT_BUILD_TYPE} in
+  android)
+    echo "android"
+    ;;
+  *)
+    echo "darwin"
+    ;;
+  esac
+}
+
+get_meson_target_cpu_family() {
+  case ${ARCH} in
+  arm*)
+    echo "arm"
+    ;;
+  x86-64*)
+    echo "x86_64"
+    ;;
+  x86*)
+    echo "x86"
+    ;;
+  *)
+    echo "${ARCH}"
+    ;;
   esac
 }
 
@@ -546,6 +574,7 @@ display_help_licensing() {
 
 display_help_common_libraries() {
   echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
+  echo -e "  --enable-dav1d\t\tbuild with dav1d [no]"
   echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
   echo -e "  --enable-freetype\t\tbuild with freetype [no]"
   echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
@@ -578,8 +607,7 @@ display_help_common_libraries() {
   echo -e "  --enable-speex\t\tbuild with speex [no]"
   echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild with twolame [no]"
-  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
-  echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]\n"
 }
 
 display_help_gpl_libraries() {
@@ -744,6 +772,9 @@ set_library() {
     # CPU-FEATURES IS ALWAYS ENABLED
     ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=1
     ;;
+  dav1d)
+    ENABLED_LIBRARIES[LIBRARY_DAV1D]=$2
+    ;;
   fontconfig)
     ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
     ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
@@ -879,9 +910,6 @@ set_library() {
     ;;
   vo-amrwbenc)
     ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
-    ;;
-  wavpack)
-    ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
     ;;
   x264)
     ENABLED_LIBRARIES[LIBRARY_X264]=$2
