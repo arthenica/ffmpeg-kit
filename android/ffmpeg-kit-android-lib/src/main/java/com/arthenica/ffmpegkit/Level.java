@@ -26,7 +26,7 @@ public enum Level {
 
     /**
      * This log level is defined by FFmpegKit. It is used to specify logs printed to stderr by
-     * ffmpeg. Logs that has this level are not filtered and always redirected.
+     * FFmpeg. Logs that has this level are not filtered and always redirected.
      */
     AV_LOG_STDERR(-16),
 
@@ -82,7 +82,7 @@ public enum Level {
     private final int value;
 
     /**
-     * <p>Returns enumeration defined by value.
+     * <p>Returns the enumeration defined by provided value.
      *
      * @param value level value
      * @return enumeration defined by value
@@ -121,7 +121,7 @@ public enum Level {
     }
 
     /**
-     * Creates new enum.
+     * Creates a new enum.
      *
      * @param value level value
      */

@@ -34,17 +34,17 @@ import static android.content.Context.CAMERA_SERVICE;
 import static com.arthenica.ffmpegkit.FFmpegKitConfig.TAG;
 
 /**
- * <p>Helper class to find camera devices supported.
- * <p>Note that camera devices can only be detected on Android API Level 24+. On older API levels
- * an empty list will be returned.
+ * <p>Helper class to detect camera devices that can be used in
+ * <code>FFmpeg</code>/<code>FFprobe</code> commands.
  */
 class CameraSupport {
 
     /**
-     * <p>Compatibility method for extracting supported camera ids.
+     * <p>Lists camera ids that can be used in <code>FFmpeg</code>/<code>FFprobe</code> commands.
      *
      * @param context application context
-     * @return returns the list of supported camera ids
+     * @return the list of supported camera ids on Android API Level 24+, an empty list on older
+     * API levels
      */
     static List<String> extractSupportedCameraIds(final Context context) {
         final List<String> detectedCameraIdList = new ArrayList<>();

@@ -21,18 +21,19 @@ package com.arthenica.ffmpegkit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
- * <p>Main class for FFmpeg operations. Supports synchronous {@link #execute(String...)} and
- * asynchronous {@link #executeAsync(String, ExecuteCallback)} methods to execute FFmpeg commands.
+ * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both
+ * synchronously and asynchronously.
  * <pre>
- *      FFmpegSession session = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
- *      Log.i(Config.TAG, String.format("Command execution completed with %d.", session.getReturnCode());
+ * FFmpegSession session = FFmpegKit.execute("-i file1.mp4 -c:v libxvid file1.avi");
+ *
+ * FFmpegSession asyncSession = FFmpegKit.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
  * </pre>
+ * <p>Provides overloaded <code>execute</code> methods to define session specific callbacks.
  * <pre>
- *      FFmpegSession session = FFmpeg.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
- *      Log.i(Config.TAG, String.format("Asynchronous session %d started.", session.getSessionId()));
+ * FFmpegSession asyncSession = FFmpegKit.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback, logCallback, statisticsCallback);
  * </pre>
  */
 public class FFmpegKit {
@@ -52,10 +53,10 @@ public class FFmpegKit {
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param arguments FFmpeg command options/arguments as string array
-     * @return ffmpeg session created for this execution
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession execute(final String[] arguments) {
-        final FFmpegSession session = new FFmpegSession(arguments, null, null, null);
+        final FFmpegSession session = new FFmpegSession(arguments);
 
         FFmpegKitConfig.ffmpegExecute(session);
 
@@ -66,12 +67,12 @@ public class FFmpegKit {
      * <p>Asynchronously executes FFmpeg with arguments provided.
      *
      * @param arguments       FFmpeg command options/arguments as string array
-     * @param executeCallback callback that will be notified when the execution is completed
-     * @return ffmpeg session created for this execution
+     * @param executeCallback callback that will be called when the execution is completed
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String[] arguments,
                                              final ExecuteCallback executeCallback) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback, null, null);
+        final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -82,10 +83,10 @@ public class FFmpegKit {
      * <p>Asynchronously executes FFmpeg with arguments provided.
      *
      * @param arguments          FFmpeg command options/arguments as string array
-     * @param executeCallback    callback that will be notified when execution is completed
-     * @param logCallback        callback that will receive log entries
+     * @param executeCallback    callback that will be called when the execution is completed
+     * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
-     * @return ffmpeg session created for this execution
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String[] arguments,
                                              final ExecuteCallback executeCallback,
@@ -102,17 +103,16 @@ public class FFmpegKit {
      * <p>Asynchronously executes FFmpeg with arguments provided.
      *
      * @param arguments       FFmpeg command options/arguments as string array
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param executor        executor that will be used to run this asynchronous operation
-     * @return ffmpeg session created for this execution
+     * @param executeCallback callback that will be called when the execution is completed
+     * @param executorService executor service that will be used to run this asynchronous operation
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String[] arguments,
                                              final ExecuteCallback executeCallback,
-                                             final Executor executor) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback, null, null);
+                                             final ExecutorService executorService) {
+        final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
 
-        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(session);
-        executor.execute(asyncFFmpegExecuteTask);
+        FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
         return session;
     }
@@ -121,32 +121,31 @@ public class FFmpegKit {
      * <p>Asynchronously executes FFmpeg with arguments provided.
      *
      * @param arguments          FFmpeg command options/arguments as string array
-     * @param executeCallback    callback that will be notified when execution is completed
-     * @param logCallback        callback that will receive log entries
+     * @param executeCallback    callback that will be called when the execution is completed
+     * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
-     * @param executor           executor that will be used to run this asynchronous operation
-     * @return ffmpeg session created for this execution
+     * @param executorService    executor service that will be used to run this asynchronous operation
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String[] arguments,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
-                                             final Executor executor) {
+                                             final ExecutorService executorService) {
         final FFmpegSession session = new FFmpegSession(arguments, executeCallback, logCallback, statisticsCallback);
 
-        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(session);
-        executor.execute(asyncFFmpegExecuteTask);
+        FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
         return session;
     }
 
     /**
      * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments. You can use single and double quote characters to specify arguments inside
+     * into arguments. You can use single or double quote characters to specify arguments inside
      * your command.
      *
      * @param command FFmpeg command
-     * @return ffmpeg session created for this execution
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession execute(final String command) {
         return execute(parseArguments(command));
@@ -154,12 +153,12 @@ public class FFmpegKit {
 
     /**
      * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments. You can use single and double quote characters to specify arguments inside
+     * into arguments. You can use single or double quote characters to specify arguments inside
      * your command.
      *
      * @param command         FFmpeg command
-     * @param executeCallback callback that will be notified when execution is completed
-     * @return ffmpeg session created for this execution
+     * @param executeCallback callback that will be called when the execution is completed
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback) {
@@ -168,14 +167,14 @@ public class FFmpegKit {
 
     /**
      * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments. You can use single and double quote characters to specify arguments inside
+     * into arguments. You can use single or double quote characters to specify arguments inside
      * your command.
      *
      * @param command            FFmpeg command
-     * @param executeCallback    callback that will be notified when execution is completed
-     * @param logCallback        callback that will receive log entries
+     * @param executeCallback    callback that will be called when the execution is completed
+     * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
-     * @return ffmpeg session created for this execution
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback,
@@ -186,52 +185,50 @@ public class FFmpegKit {
 
     /**
      * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments. You can use single and double quote characters to specify arguments inside
+     * into arguments. You can use single or double quote characters to specify arguments inside
      * your command.
      *
      * @param command         FFmpeg command
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param executor        executor that will be used to run this asynchronous operation
-     * @return ffmpeg session created for this execution
+     * @param executeCallback callback that will be called when the execution is completed
+     * @param executorService executor service that will be used to run this asynchronous operation
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback,
-                                             final Executor executor) {
-        final FFmpegSession session = new FFmpegSession(parseArguments(command), executeCallback, null, null);
+                                             final ExecutorService executorService) {
+        final FFmpegSession session = new FFmpegSession(parseArguments(command), executeCallback);
 
-        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(session);
-        executor.execute(asyncFFmpegExecuteTask);
+        FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
         return session;
     }
 
     /**
      * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments. You can use single and double quote characters to specify arguments inside
+     * into arguments. You can use single or double quote characters to specify arguments inside
      * your command.
      *
      * @param command            FFmpeg command
-     * @param executeCallback    callback that will be notified when execution is completed
-     * @param logCallback        callback that will receive log entries
+     * @param executeCallback    callback that will be called when the execution is completed
+     * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
-     * @param executor           executor that will be used to run this asynchronous operation
-     * @return ffmpeg session created for this execution
+     * @param executorService    executor service that will be used to run this asynchronous operation
+     * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
-                                             final Executor executor) {
+                                             final ExecutorService executorService) {
         final FFmpegSession session = new FFmpegSession(parseArguments(command), executeCallback, logCallback, statisticsCallback);
 
-        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(session);
-        executor.execute(asyncFFmpegExecuteTask);
+        FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
         return session;
     }
 
     /**
-     * <p>Cancels all ongoing executions.
+     * <p>Cancels all running sessions.
      *
      * <p>This function does not wait for termination to complete and returns immediately.
      */
@@ -240,13 +237,13 @@ public class FFmpegKit {
         /*
          * ZERO (0) IS A SPECIAL SESSION ID
          * WHEN IT IS PASSED TO THIS METHOD, A SIGINT IS GENERATED WHICH CANCELS ALL ONGOING
-         * EXECUTIONS
+         * SESSIONS
          */
         FFmpegKitConfig.nativeFFmpegCancel(0);
     }
 
     /**
-     * <p>Cancels the given execution.
+     * <p>Cancels the session specified with <code>sessionId</code>.
      *
      * <p>This function does not wait for termination to complete and returns immediately.
      *
@@ -257,7 +254,7 @@ public class FFmpegKit {
     }
 
     /**
-     * <p>Lists all FFmpeg sessions in the session history
+     * <p>Lists all FFmpeg sessions in the session history.
      *
      * @return all FFmpeg sessions in the session history
      */
@@ -266,7 +263,8 @@ public class FFmpegKit {
     }
 
     /**
-     * <p>Parses the given command into arguments.
+     * <p>Parses the given command into arguments. Uses space character to split the arguments.
+     * Supports single and double quote characters.
      *
      * @param command string command
      * @return array of arguments
@@ -323,10 +321,10 @@ public class FFmpegKit {
     }
 
     /**
-     * <p>Combines arguments into a string.
+     * <p>Concatenates arguments into a string adding a space character between two arguments.
      *
      * @param arguments arguments
-     * @return string containing all arguments
+     * @return concatenated string containing all arguments
      */
     static String argumentsToString(final String[] arguments) {
         if (arguments == null) {

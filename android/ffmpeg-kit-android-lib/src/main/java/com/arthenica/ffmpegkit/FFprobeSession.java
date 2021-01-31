@@ -19,52 +19,56 @@
 
 package com.arthenica.ffmpegkit;
 
-import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
- * <p>An FFprobe execute session.
+ * <p>An FFprobe session.
  */
 public class FFprobeSession extends AbstractSession implements Session {
 
-    public FFprobeSession(final String[] arguments,
-                          final ExecuteCallback executeCallback,
-                          final LogCallback logCallback,
-                          final StatisticsCallback statisticsCallback) {
-        this(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments command arguments
+     */
+    public FFprobeSession(final String[] arguments) {
+        this(arguments, null);
     }
 
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments       command arguments
+     * @param executeCallback session specific execute callback function
+     */
+    public FFprobeSession(final String[] arguments, final ExecuteCallback executeCallback) {
+        this(arguments, executeCallback, null);
+    }
+
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments       command arguments
+     * @param executeCallback session specific execute callback function
+     * @param logCallback     session specific log callback function
+     */
+    FFprobeSession(final String[] arguments,
+                   final ExecuteCallback executeCallback,
+                   final LogCallback logCallback) {
+        this(arguments, executeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+    }
+
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments              command arguments
+     * @param executeCallback        session specific execute callback function
+     * @param logCallback            session specific log callback function
+     * @param logRedirectionStrategy session specific log redirection strategy
+     */
     FFprobeSession(final String[] arguments,
                    final ExecuteCallback executeCallback,
                    final LogCallback logCallback,
-                   final StatisticsCallback statisticsCallback,
                    final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, executeCallback, logCallback, statisticsCallback, logRedirectionStrategy);
-    }
-
-    @Override
-    public Queue<Statistics> getAllStatistics(final int waitTimeout) {
-        return new LinkedList<>();
-    }
-
-    @Override
-    public Queue<Statistics> getAllStatistics() {
-        return new LinkedList<>();
-    }
-
-    @Override
-    public Queue<Statistics> getStatistics() {
-        return new LinkedList<>();
-    }
-
-    @Override
-    public void addStatistics(final Statistics statistics) {
-        /*
-         * ffprobe does not support statistics.
-         * So, this method should never have been called.
-         */
-        android.util.Log.w(FFmpegKitConfig.TAG, MessageFormat.format("FFprobe execute session {0} received statistics.", sessionId));
+        super(arguments, executeCallback, logCallback, logRedirectionStrategy);
     }
 
     @Override

@@ -66,32 +66,11 @@ class Packages {
     }
 
     /**
-     * Returns enabled external libraries by FFmpeg.
+     * Returns the FFmpegKit binary package name.
      *
-     * @return enabled external libraries
+     * @return predicted FFmpegKit binary package name
      */
-    static List<String> getExternalLibraries() {
-        final String buildConfiguration = AbiDetect.getNativeBuildConf();
-
-        final List<String> enabledLibraryList = new ArrayList<>();
-        for (String supportedExternalLibrary : supportedExternalLibraries) {
-            if (buildConfiguration.contains("enable-" + supportedExternalLibrary) ||
-                    buildConfiguration.contains("enable-lib" + supportedExternalLibrary)) {
-                enabledLibraryList.add(supportedExternalLibrary);
-            }
-        }
-
-        Collections.sort(enabledLibraryList);
-
-        return enabledLibraryList;
-    }
-
-    /**
-     * Returns FFmpegKit binary package name.
-     *
-     * @return guessed FFmpegKit binary package name
-     */
-    static String getPackageName() {
+    public static String getPackageName() {
         final List<String> externalLibraryList = getExternalLibraries();
         final boolean speex = externalLibraryList.contains("speex");
         final boolean fribidi = externalLibraryList.contains("fribidi");
@@ -264,6 +243,27 @@ class Packages {
         } else {
             return "custom";
         }
+    }
+
+    /**
+     * Returns enabled external libraries by FFmpeg.
+     *
+     * @return enabled external libraries
+     */
+    public static List<String> getExternalLibraries() {
+        final String buildConfiguration = AbiDetect.getNativeBuildConf();
+
+        final List<String> enabledLibraryList = new ArrayList<>();
+        for (String supportedExternalLibrary : supportedExternalLibraries) {
+            if (buildConfiguration.contains("enable-" + supportedExternalLibrary) ||
+                    buildConfiguration.contains("enable-lib" + supportedExternalLibrary)) {
+                enabledLibraryList.add(supportedExternalLibrary);
+            }
+        }
+
+        Collections.sort(enabledLibraryList);
+
+        return enabledLibraryList;
     }
 
 }

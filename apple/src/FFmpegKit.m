@@ -17,210 +17,98 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "fftools_ffmpeg.h"
-
-#include "FFmpegKit.h"
-#include "ArchDetect.h"
-#include "AtomicLong.h"
-#include "FFmpegExecution.h"
-#include "FFmpegKitConfig.h"
-
-/** Forward declaration for function defined in fftools_ffmpeg.c */
-int ffmpeg_execute(int argc, char **argv);
+#import "fftools_ffmpeg.h"
+#import "ArchDetect.h"
+#import "AtomicLong.h"
+#import "FFmpegKit.h"
+#import "FFmpegKitConfig.h"
+#import "Packages.h"
 
 @implementation FFmpegKit
-
-/** Global library version */
-NSString *const FFMPEG_KIT_VERSION = @"4.4";
-
-extern int lastReturnCode;
-extern NSMutableString *lastCommandOutput;
-
-long const DEFAULT_EXECUTION_ID = 0;
-AtomicLong *executionIdCounter;
-
-extern __thread volatile long executionId;
-int cancelRequested(long executionId);
-void addExecution(long executionId);
-void removeExecution(long executionId);
-
-NSMutableArray *executions;
-NSLock *executionsLock;
-
-extern int configuredLogLevel;
 
 + (void)initialize {
     [FFmpegKitConfig class];
 
-    executionIdCounter = [[AtomicLong alloc] initWithInitialValue:3000];
-
-    executions = [[NSMutableArray alloc] init];
-    executionsLock = [[NSLock alloc] init];
-
-    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@\n", [FFmpegKitConfig getPackageName], [ArchDetect getArch], [FFmpegKitConfig getVersion], [FFmpegKitConfig getBuildDate]);
+    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@\n", [Packages getPackageName], [ArchDetect getArch], [FFmpegKitConfig getVersion], [FFmpegKitConfig getBuildDate]);
 }
 
-+ (int)executeWithId:(long)newExecutionId andArguments:(NSArray*)arguments {
-    lastCommandOutput = [[NSMutableString alloc] init];
-
-    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
-    av_log_set_level(configuredLogLevel);
-
-    FFmpegExecution* currentFFmpegExecution = [[FFmpegExecution alloc] initWithExecutionId:newExecutionId andArguments:arguments];
-    [executionsLock lock];
-    [executions addObject: currentFFmpegExecution];
-    [executionsLock unlock];
-
-    char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
-
-    /* PRESERVING CALLING FORMAT
-     *
-     * ffmpeg <arguments>
-     */
-    commandCharPArray[0] = (char *)av_malloc(sizeof(char) * ([LIB_NAME length] + 1));
-    strcpy(commandCharPArray[0], [LIB_NAME UTF8String]);
-
-    for (int i=0; i < [arguments count]; i++) {
-        NSString *argument = [arguments objectAtIndex:i];
-        commandCharPArray[i + 1] = (char *) [argument UTF8String];
-    }
-
-    // REGISTER THE ID BEFORE STARTING EXECUTION
-    executionId = newExecutionId;
-    addExecution(newExecutionId);
-
-    // RUN
-    lastReturnCode = ffmpeg_execute(([arguments count] + 1), commandCharPArray);
-
-    // ALWAYS REMOVE THE ID FROM THE MAP
-    removeExecution(newExecutionId);
-
-    // CLEANUP
-    av_free(commandCharPArray[0]);
-    av_free(commandCharPArray);
-
-    [executionsLock lock];
-    [executions removeObject: currentFFmpegExecution];
-    [executionsLock unlock];
-
-    return lastReturnCode;
++ (FFmpegSession*)executeWithArguments:(NSArray*)arguments {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments];
+    [FFmpegKitConfig ffmpegExecute:session];
+    return session;
 }
 
-/**
- * Synchronously executes FFmpeg with arguments provided.
- *
- * @param arguments FFmpeg command options/arguments as string array
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)executeWithArguments:(NSArray*)arguments {
-    return [self executeWithId:DEFAULT_EXECUTION_ID andArguments:arguments];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session];
+    return session;
 }
 
-/**
- * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
- *
- * @param arguments FFmpeg command options/arguments as string array
- * @param delegate delegate that will be notified when execution is completed
- * @return a unique id that represents this execution
- */
-+ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate {
-    return [self executeWithArgumentsAsync:arguments withCallback:delegate andDispatchQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session];
+    return session;
 }
 
-/**
- * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
- *
- * @param arguments FFmpeg command options/arguments as string array
- * @param delegate delegate that will be notified when execution is completed
- * @param queue dispatch queue that will be used to run this asynchronous operation
- * @return a unique id that represents this execution
- */
-+ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue {
-    const long newExecutionId = [executionIdCounter incrementAndGet];
-
-    dispatch_async(queue, ^{
-        const int returnCode = [self executeWithId:newExecutionId andArguments:arguments];
-        if (delegate != nil) {
-            [delegate executeCallback:executionId:returnCode];
-        }
-    });
-
-    return newExecutionId;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
+    return session;
 }
 
-/**
- * Synchronously executes FFmpeg command provided. Space character is used to split command into arguments.
- *
- * @param command FFmpeg command
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute:(NSString*)command {
-    return [self executeWithArguments: [self parseArguments: command]];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
+    return session;
 }
 
-/**
- * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
- *
- * @param command FFmpeg command
- * @param delegate delegate that will be notified when execution is completed
- * @return a unique id that represents this execution
- */
-+ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate {
-    return [self executeAsync:command withCallback:delegate andDispatchQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
++ (FFmpegSession*)execute:(NSString*)command {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command]];
+    [FFmpegKitConfig ffmpegExecute:session];
+    return session;
 }
 
-/**
- * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
- *
- * @param command FFmpeg command
- * @param delegate delegate that will be notified when execution is completed
- * @param queue dispatch queue that will be used to run this asynchronous operation
- * @return a unique id that represents this execution
- */
-+ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue {
-    return [self executeWithArgumentsAsync:[self parseArguments:command] withCallback:delegate andDispatchQueue:queue];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session];
+    return session;
 }
 
-/**
- * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split command into arguments.
- *
- * @param command FFmpeg command
- * @param delimiter arguments delimiter
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute:(NSString*)command delimiter:(NSString*)delimiter {
-
-    // SPLITTING ARGUMENTS
-    NSArray* argumentArray = [command componentsSeparatedByString:(delimiter == nil ? @" ": delimiter)];
-    return [self executeWithArguments:argumentArray];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session];
+    return session;
 }
 
-/**
- * Cancels an ongoing operation.
- *
- * This function does not wait for termination to complete and returns immediately.
- */
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
+    return session;
+}
+
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+    [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
+    return session;
+}
+
 + (void)cancel {
-    cancel_operation(DEFAULT_EXECUTION_ID);
+
+    /*
+     * ZERO (0) IS A SPECIAL SESSION ID
+     * WHEN IT IS PASSED TO THIS METHOD, A SIGINT IS GENERATED WHICH CANCELS ALL ONGOING SESSIONS
+     */
+    cancel_operation(0);
 }
 
-/**
- * Cancels an ongoing operation.
- *
- * This function does not wait for termination to complete and returns immediately.
- *
- * @param executionId execution id
- */
-+ (void)cancel:(long)executionId {
-    cancel_operation(executionId);
++ (void)cancel:(long)sessionId {
+    cancel_operation(sessionId);
 }
 
-/**
- * Parses the given command into arguments.
- *
- * @param command string command
- * @return array of arguments
- */
++ (NSArray*)listSessions {
+    return [FFmpegKitConfig getFFmpegSessions];
+}
+
 + (NSArray*)parseArguments:(NSString*)command {
     NSMutableArray *argumentArray = [[NSMutableArray alloc] init];
     NSMutableString *currentArgument = [[NSMutableString alloc] init];
@@ -272,15 +160,9 @@ extern int configuredLogLevel;
     return argumentArray;
 }
 
-/**
- * <p>Combines arguments into a string.
- *
- * @param arguments arguments
- * @return string containing all arguments
- */
 + (NSString*)argumentsToString:(NSArray*)arguments {
     if (arguments == nil) {
-        return @"null";
+        return @"nil";
     }
 
     NSMutableString *string = [NSMutableString stringWithString:@""];
@@ -293,18 +175,6 @@ extern int configuredLogLevel;
     }
 
     return string;
-}
-
-/**
- * <p>Lists ongoing executions.
- *
- * @return list of ongoing executions
- */
-+ (NSArray*)listExecutions {
-    [executionsLock lock];
-    NSArray *array = [NSArray arrayWithArray:executions];
-    [executionsLock unlock];
-    return array;
 }
 
 @end

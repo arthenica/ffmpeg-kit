@@ -17,7 +17,29 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Foundation/Foundation.h>
+#ifndef FFMPEG_KIT_STREAM_INFORMATION_H
+#define FFMPEG_KIT_STREAM_INFORMATION_H
+
+#import <Foundation/Foundation.h>
+
+extern NSString* const StreamKeyIndex;
+extern NSString* const StreamKeyType;
+extern NSString* const StreamKeyCodec;
+extern NSString* const StreamKeyCodecLong;
+extern NSString* const StreamKeyFormat;
+extern NSString* const StreamKeyWidth;
+extern NSString* const StreamKeyHeight;
+extern NSString* const StreamKeyBitRate;
+extern NSString* const StreamKeySampleRate;
+extern NSString* const StreamKeySampleFormat;
+extern NSString* const StreamKeyChannelLayout;
+extern NSString* const StreamKeySampleAspectRatio;
+extern NSString* const StreamKeyDisplayAspectRatio;
+extern NSString* const StreamKeyAverageFrameRate;
+extern NSString* const StreamKeyRealFrameRate;
+extern NSString* const StreamKeyTimeBase;
+extern NSString* const StreamKeyCodecTimeBase;
+extern NSString* const StreamKeyTags;
 
 /**
  * Stream information class.
@@ -181,3 +203,5 @@
 - (NSDictionary*)getAllProperties;
 
 @end
+
+#endif // FFMPEG_KIT_STREAM_INFORMATION_H

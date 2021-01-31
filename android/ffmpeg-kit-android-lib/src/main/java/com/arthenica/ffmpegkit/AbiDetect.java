@@ -20,18 +20,19 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Detects running ABI name using Google <code>cpu-features</code> library.
+ * <p>Detects the running ABI name natively using Google <code>cpu-features</code> library.
  */
 public class AbiDetect {
 
     static {
         armV7aNeonLoaded = false;
 
-        System.loadLibrary("ffmpegkit_abidetect");
+        NativeLoader.loadFFmpegKitAbiDetect();
 
         /* ALL LIBRARIES LOADED AT STARTUP */
-        FFmpegKitConfig.class.getName();
         FFmpegKit.class.getName();
+        FFmpegKitConfig.class.getName();
+        FFprobeKit.class.getName();
     }
 
     static final String ARM_V7A = "arm-v7a";
@@ -51,9 +52,9 @@ public class AbiDetect {
     }
 
     /**
-     * <p>Returns loaded ABI name.
+     * <p>Returns the ABI name loaded.
      *
-     * @return loaded ABI name
+     * @return ABI name loaded
      */
     public static String getAbi() {
         if (armV7aNeonLoaded) {
@@ -64,28 +65,37 @@ public class AbiDetect {
     }
 
     /**
-     * <p>Returns loaded ABI name.
+     * <p>Returns the ABI name of the cpu running.
      *
-     * @return loaded ABI name
+     * @return ABI name of the cpu running
      */
-    public native static String getNativeAbi();
+    public static String getCpuAbi() {
+        return getNativeCpuAbi();
+    }
 
     /**
-     * <p>Returns ABI name of the running cpu.
+     * <p>Returns the ABI name loaded natively.
      *
-     * @return ABI name of the running cpu
+     * @return ABI name loaded
      */
-    public native static String getNativeCpuAbi();
+    native static String getNativeAbi();
 
     /**
-     * <p>Returns whether FFmpegKit release is a long term release or not.
+     * <p>Returns the ABI name of the cpu running natively.
+     *
+     * @return ABI name of the cpu running
+     */
+    native static String getNativeCpuAbi();
+
+    /**
+     * <p>Returns whether FFmpegKit release is a long term release or not natively.
      *
      * @return yes or no
      */
     native static boolean isNativeLTSBuild();
 
     /**
-     * <p>Returns build configuration for <code>FFmpeg</code>.
+     * <p>Returns the build configuration for <code>FFmpeg</code> natively.
      *
      * @return build configuration string
      */

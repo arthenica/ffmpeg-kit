@@ -38,13 +38,11 @@ void closeParcelFileDescriptor(int fd);
 #undef avformat_open_input
 
 static int fd_read_packet(void* opaque, uint8_t* buf, int buf_size) {
-    int *fd = opaque;
-    return read(*fd, buf, buf_size);
+    return read(*(int*)opaque, buf, buf_size);
 }
 
 static int fd_write_packet(void* opaque, uint8_t* buf, int buf_size) {
-    int *fd = opaque;
-    return write(*fd, buf, buf_size);
+    return write(*(int*)opaque, buf, buf_size);
 }
 
 static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
@@ -70,31 +68,36 @@ static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
  * returns NULL if the filename is not of expected format (e.g. 'saf:72/video.md4')
  */
 static AVIOContext *create_fd_avio_context(const char *filename, int flags) {
-    int *fd = av_mallocz(sizeof(int));
-    *fd = -1;
-    const char *fd_ptr = NULL;
+    int fd = -1;
+    const char* fd_ptr = NULL;
+
     if (av_strstart(filename, "saf:", &fd_ptr)) {
         char *final;
-        *fd = strtol(fd_ptr, &final, 10);
+        fd = strtol(fd_ptr, &final, 10);
         if (fd_ptr == final) { /* No digits found */
-            *fd = -1;
+            fd = -1;
         }
     }
 
-    if (*fd >= 0) {
+    if (fd >= 0) {
+        int *opaque = av_mallocz(sizeof(int));
+        *opaque = fd;
         int write_flag = flags & AVIO_FLAG_WRITE ? 1 : 0;
-        return avio_alloc_context(av_malloc(4096), 4096, write_flag, fd, fd_read_packet, write_flag ? fd_write_packet : NULL, fd_seek);
+        return avio_alloc_context(av_malloc(4096), 4096, write_flag, opaque, fd_read_packet, write_flag ? fd_write_packet : NULL, fd_seek);
     }
+
     return NULL;
 }
 
 static void close_fd_avio_context(AVIOContext *ctx) {
-    if (fd_seek(ctx->opaque, 0, AVSEEK_SIZE) >= 0) {
-        int *fd = ctx->opaque;
-        closeParcelFileDescriptor(*fd);
-        av_freep(&fd);
+    if (ctx) {
+        if (fd_seek(ctx->opaque, 0, AVSEEK_SIZE) >= 0) {
+            int *fd = ctx->opaque;
+            closeParcelFileDescriptor(*fd);
+            av_freep(&fd);
+        }
+        ctx->opaque = NULL;
     }
-    ctx->opaque = NULL;
 }
 
 int android_avformat_open_input(AVFormatContext **ps, const char *filename,
@@ -115,6 +118,7 @@ int android_avio_open2(AVIOContext **s, const char *filename, int flags,
         *s = fd_context;
         return 0;
     }
+
     return avio_open2(s, filename, flags, int_cb, options);
 }
 

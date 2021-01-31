@@ -17,26 +17,26 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "StreamInformation.h"
+#import "StreamInformation.h"
 
-#define KEY_INDEX @"index"
-#define KEY_TYPE @"codec_type"
-#define KEY_CODEC @"codec_name"
-#define KEY_CODEC_LONG @"codec_long_name"
-#define KEY_FORMAT @"pix_fmt"
-#define KEY_WIDTH @"width"
-#define KEY_HEIGHT @"height"
-#define KEY_BIT_RATE @"bit_rate"
-#define KEY_SAMPLE_RATE @"sample_rate"
-#define KEY_SAMPLE_FORMAT @"sample_fmt"
-#define KEY_CHANNEL_LAYOUT @"channel_layout"
-#define KEY_SAMPLE_ASPECT_RATIO @"sample_aspect_ratio"
-#define KEY_DISPLAY_ASPECT_RATIO @"display_aspect_ratio"
-#define KEY_AVERAGE_FRAME_RATE @"avg_frame_rate"
-#define KEY_REAL_FRAME_RATE @"r_frame_rate"
-#define KEY_TIME_BASE @"time_base"
-#define KEY_CODEC_TIME_BASE @"codec_time_base"
-#define KEY_TAGS @"tags"
+NSString* const StreamKeyIndex = @"index";
+NSString* const StreamKeyType = @"codec_type";
+NSString* const StreamKeyCodec = @"codec_name";
+NSString* const StreamKeyCodecLong = @"codec_long_name";
+NSString* const StreamKeyFormat = @"pix_fmt";
+NSString* const StreamKeyWidth = @"width";
+NSString* const StreamKeyHeight = @"height";
+NSString* const StreamKeyBitRate = @"bit_rate";
+NSString* const StreamKeySampleRate = @"sample_rate";
+NSString* const StreamKeySampleFormat = @"sample_fmt";
+NSString* const StreamKeyChannelLayout = @"channel_layout";
+NSString* const StreamKeySampleAspectRatio = @"sample_aspect_ratio";
+NSString* const StreamKeyDisplayAspectRatio = @"display_aspect_ratio";
+NSString* const StreamKeyAverageFrameRate = @"avg_frame_rate";
+NSString* const StreamKeyRealFrameRate = @"r_frame_rate";
+NSString* const StreamKeyTimeBase = @"time_base";
+NSString* const StreamKeyCodecTimeBase = @"codec_time_base";
+NSString* const StreamKeyTags = @"tags";
 
 @implementation StreamInformation {
 
@@ -57,75 +57,75 @@
 }
 
 - (NSNumber*)getIndex {
-    return [self getNumberProperty:KEY_INDEX];
+    return [self getNumberProperty:StreamKeyIndex];
 }
 
 - (NSString*)getType {
-    return [self getStringProperty:KEY_TYPE];
+    return [self getStringProperty:StreamKeyType];
 }
 
 - (NSString*)getCodec {
-    return [self getStringProperty:KEY_CODEC];
+    return [self getStringProperty:StreamKeyCodec];
 }
 
 - (NSString*)getFullCodec {
-    return [self getStringProperty:KEY_CODEC_LONG];
+    return [self getStringProperty:StreamKeyCodecLong];
 }
 
 - (NSString*)getFormat {
-    return [self getStringProperty:KEY_FORMAT];
+    return [self getStringProperty:StreamKeyFormat];
 }
 
 - (NSNumber*)getWidth {
-    return [self getNumberProperty:KEY_WIDTH];
+    return [self getNumberProperty:StreamKeyWidth];
 }
 
 - (NSNumber*)getHeight {
-    return [self getNumberProperty:KEY_HEIGHT];
+    return [self getNumberProperty:StreamKeyHeight];
 }
 
 - (NSString*)getBitrate {
-    return [self getStringProperty:KEY_BIT_RATE];
+    return [self getStringProperty:StreamKeyBitRate];
 }
 
 - (NSString*)getSampleRate {
-    return [self getStringProperty:KEY_SAMPLE_RATE];
+    return [self getStringProperty:StreamKeySampleRate];
 }
 
 - (NSString*)getSampleFormat {
-    return [self getStringProperty:KEY_SAMPLE_FORMAT];
+    return [self getStringProperty:StreamKeySampleFormat];
 }
 
 - (NSString*)getChannelLayout {
-    return [self getStringProperty:KEY_CHANNEL_LAYOUT];
+    return [self getStringProperty:StreamKeyChannelLayout];
 }
 
 - (NSString*)getSampleAspectRatio {
-    return [self getStringProperty:KEY_SAMPLE_ASPECT_RATIO];
+    return [self getStringProperty:StreamKeySampleAspectRatio];
 }
 
 - (NSString*)getDisplayAspectRatio {
-    return [self getStringProperty:KEY_DISPLAY_ASPECT_RATIO];
+    return [self getStringProperty:StreamKeyDisplayAspectRatio];
 }
 
 - (NSString*)getAverageFrameRate {
-    return [self getStringProperty:KEY_AVERAGE_FRAME_RATE];
+    return [self getStringProperty:StreamKeyAverageFrameRate];
 }
 
 - (NSString*)getRealFrameRate {
-    return [self getStringProperty:KEY_REAL_FRAME_RATE];
+    return [self getStringProperty:StreamKeyRealFrameRate];
 }
 
 - (NSString*)getTimeBase {
-    return [self getStringProperty:KEY_TIME_BASE];
+    return [self getStringProperty:StreamKeyTimeBase];
 }
 
 - (NSString*)getCodecTimeBase {
-    return [self getStringProperty:KEY_CODEC_TIME_BASE];
+    return [self getStringProperty:StreamKeyCodecTimeBase];
 }
 
 - (NSDictionary*)getTags {
-    return [self getProperties:KEY_TAGS];
+    return [self getProperties:StreamKeyTags];
 }
 
 - (NSString*)getStringProperty:(NSString*)key {

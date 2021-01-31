@@ -17,17 +17,17 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MediaInformation.h"
+#import "MediaInformation.h"
 
-#define KEY_MEDIA_PROPERTIES @"format"
-#define KEY_FILENAME @"filename"
-#define KEY_FORMAT @"format_name"
-#define KEY_FORMAT_LONG @"format_long_name"
-#define KEY_START_TIME @"start_time"
-#define KEY_DURATION @"duration"
-#define KEY_SIZE @"size"
-#define KEY_BIT_RATE @"bit_rate"
-#define KEY_TAGS @"tags"
+NSString* const MediaKeyMediaProperties =  @"format";
+NSString* const MediaKeyFilename = @"filename";
+NSString* const MediaKeyFormat = @"format_name";
+NSString* const MediaKeyFormatLong = @"format_long_name";
+NSString* const MediaKeyStartTime = @"start_time";
+NSString* const MediaKeyDuration = @"duration";
+NSString* const MediaKeySize = @"size";
+NSString* const MediaKeyBitRate = @"bit_rate";
+NSString* const MediaKeyTags = @"tags";
 
 @implementation MediaInformation {
 
@@ -54,35 +54,35 @@
 }
 
 - (NSString*)getFilename {
-    return [self getStringProperty:KEY_FILENAME];
+    return [self getStringProperty:MediaKeyFilename];
 }
 
 - (NSString*)getFormat {
-    return [self getStringProperty:KEY_FORMAT];
+    return [self getStringProperty:MediaKeyFormat];
 }
 
 - (NSString*)getLongFormat {
-    return [self getStringProperty:KEY_FORMAT_LONG];
+    return [self getStringProperty:MediaKeyFormatLong];
 }
 
 - (NSString*)getStartTime {
-    return [self getStringProperty:KEY_START_TIME];
+    return [self getStringProperty:MediaKeyStartTime];
 }
 
 - (NSString*)getDuration {
-    return [self getStringProperty:KEY_DURATION];
+    return [self getStringProperty:MediaKeyDuration];
 }
 
 - (NSString*)getSize {
-    return [self getStringProperty:KEY_SIZE];
+    return [self getStringProperty:MediaKeySize];
 }
 
 - (NSString*)getBitrate {
-    return [self getStringProperty:KEY_BIT_RATE];
+    return [self getStringProperty:MediaKeyBitRate];
 }
 
 - (NSDictionary*)getTags {
-    return [self getProperties:KEY_TAGS];
+    return [self getProperties:MediaKeyTags];
 }
 
 - (NSArray*)getStreams {
@@ -117,7 +117,7 @@
 }
 
 - (NSDictionary*)getMediaProperties {
-    return dictionary[KEY_MEDIA_PROPERTIES];
+    return dictionary[MediaKeyMediaProperties];
 }
 
 - (NSDictionary*)getAllProperties {

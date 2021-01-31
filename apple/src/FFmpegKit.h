@@ -17,102 +17,168 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <Foundation/Foundation.h>
-#include "ExecuteDelegate.h"
+#ifndef FFMPEG_KIT_H
+#define FFMPEG_KIT_H
 
-/** Global library version */
-extern NSString *const FFMPEG_KIT_VERSION;
+#import <string.h>
+#import <stdlib.h>
+#import <Foundation/Foundation.h>
+#import "ExecuteDelegate.h"
+#import "LogDelegate.h"
+#import "FFmpegSession.h"
+#import "StatisticsDelegate.h"
 
 /**
- * Main class for FFmpeg operations.
+ * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both
+ * synchronously and asynchronously.
+ * <pre>
+ * FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v libxvid file1.avi"];
+ *
+ * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteDelegate:executeDelegate];
+ * </pre>
+ * <p>Provides overloaded <code>execute</code> methods to define session specific delegates.
+ * <pre>
+ * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+ * </pre>
  */
 @interface FFmpegKit : NSObject
 
 /**
- * Synchronously executes FFmpeg with arguments provided.
+ * <p>Synchronously executes FFmpeg with arguments provided.
  *
  * @param arguments FFmpeg command options/arguments as string array
- * @return zero on successful execution, 255 on user cancel and non-zero on error
+ * @return FFmpeg session created for this execution
  */
-+ (int)executeWithArguments:(NSArray*)arguments;
++ (FFmpegSession*)executeWithArguments:(NSArray*)arguments;
 
 /**
- * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
+ * <p>Asynchronously executes FFmpeg with arguments provided.
  *
- * @param arguments FFmpeg command options/arguments as string array
- * @param delegate delegate that will be notified when execution is completed
- * @return returns a unique id that represents this execution
+ * @param arguments       FFmpeg command options/arguments as string array
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @return FFmpeg session created for this execution
  */
-+ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
 
 /**
- * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
+ * <p>Asynchronously executes FFmpeg with arguments provided.
  *
- * @param arguments FFmpeg command options/arguments as string array
- * @param delegate delegate that will be notified when execution is completed
- * @param queue dispatch queue that will be used to run this asynchronous operation
- * @return returns a unique id that represents this execution
+ * @param arguments          FFmpeg command options/arguments as string array
+ * @param executeDelegate    delegate that will be called when the execution is completed
+ * @param logDelegate        delegate that will receive logs
+ * @param statisticsDelegate delegate that will receive statistics
+ * @return FFmpeg session created for this execution
  */
-+ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
 
 /**
- * Synchronously executes FFmpeg command provided. Space character is used to split command into arguments.
+ * <p>Asynchronously executes FFmpeg with arguments provided.
  *
- * @param command FFmpeg command
- * @return zero on successful execution, 255 on user cancel and non-zero on error
+ * @param arguments       FFmpeg command options/arguments as string array
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFmpeg session created for this execution
  */
-+ (int)execute:(NSString*)command;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
+ * <p>Asynchronously executes FFmpeg with arguments provided.
  *
- * @param command FFmpeg command
- * @param delegate delegate that will be notified when execution is completed
- * @return returns a unique id that represents this execution
+ * @param arguments          FFmpeg command options/arguments as string array
+ * @param executeDelegate    delegate that will be called when the execution is completed
+ * @param logDelegate        delegate that will receive logs
+ * @param statisticsDelegate delegate that will receive statistics
+ * @param queue              dispatch queue that will be used to run this asynchronous operation
+ * @return FFmpeg session created for this execution
  */
-+ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
- *
- * @param command FFmpeg command
- * @param delegate delegate that will be notified when execution is completed
- * @param queue dispatch queue that will be used to run this asynchronous operation
- * @return returns a unique id that represents this execution
- */
-+ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue;
-
-/**
- * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split command into arguments.
+ * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
  * @param command FFmpeg command
- * @param delimiter arguments delimiter
- * @deprecated argument splitting mechanism used in this method is pretty simple and prone to errors. Consider
- * using a more advanced method like execute or executeWithArguments
- * @return zero on successful execution, 255 on user cancel and non-zero on error
+ * @return FFmpeg session created for this execution
  */
-+ (int)execute:(NSString*)command delimiter:(NSString*)delimiter __attribute__((deprecated));
++ (FFmpegSession*)execute:(NSString*)command;
 
 /**
- * Cancels an ongoing operation.
+ * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
- * This function does not wait for termination to complete and returns immediately.
+ * @param command         FFmpeg command
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @return FFmpeg session created for this execution
+ */
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+
+/**
+ * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
+ *
+ * @param command            FFmpeg command
+ * @param executeDelegate    delegate that will be called when the execution is completed
+ * @param logDelegate        delegate that will receive logs
+ * @param statisticsDelegate delegate that will receive statistics
+ * @return FFmpeg session created for this execution
+ */
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
+
+/**
+ * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
+ *
+ * @param command         FFmpeg command
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFmpeg session created for this execution
+ */
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
+ *
+ * @param command            FFmpeg command
+ * @param executeDelegate    delegate that will be called when the execution is completed
+ * @param logDelegate        delegate that will receive logs
+ * @param statisticsDelegate delegate that will receive statistics
+ * @param queue              dispatch queue that will be used to run this asynchronous operation
+ * @return FFmpeg session created for this execution
+ */
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Cancels all running sessions.
+ *
+ * <p>This function does not wait for termination to complete and returns immediately.
  */
 + (void)cancel;
 
 /**
- * Cancels an ongoing operation.
+ * <p>Cancels the session specified with <code>sessionId</code>.
  *
- * This function does not wait for termination to complete and returns immediately.
+ * <p>This function does not wait for termination to complete and returns immediately.
  *
- * @param executionId execution id
+ * @param sessionId id of the session that will be cancelled
  */
-+ (void)cancel:(long)executionId;
++ (void)cancel:(long)sessionId;
 
 /**
- * Parses the given command into arguments.
+ * <p>Lists all FFmpeg sessions in the session history.
+ *
+ * @return all FFmpeg sessions in the session history
+ */
++ (NSArray*)listSessions;
+
+/**
+ * <p>Parses the given command into arguments. Uses space character to split the arguments.
+ * Supports single and double quote characters.
  *
  * @param command string command
  * @return array of arguments
@@ -120,18 +186,13 @@ extern NSString *const FFMPEG_KIT_VERSION;
 + (NSArray*)parseArguments:(NSString*)command;
 
 /**
- * <p>Combines arguments into a string.
+ * <p>Concatenates arguments into a string adding a space character between two arguments.
  *
  * @param arguments arguments
- * @return string containing all arguments
+ * @return concatenated string containing all arguments
  */
 + (NSString*)argumentsToString:(NSArray*)arguments;
 
-/**
- * <p>Lists ongoing executions.
- *
- * @return list of ongoing executions
- */
-+ (NSArray*)listExecutions;
-
 @end
+
+#endif // FFMPEG_KIT_H

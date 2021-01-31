@@ -20,7 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Callback function to receive logs for executions.
+ * <p>Callback function that receives logs generated for <code>FFmpegKit</code> sessions.
  */
 @FunctionalInterface
 public interface LogCallback {

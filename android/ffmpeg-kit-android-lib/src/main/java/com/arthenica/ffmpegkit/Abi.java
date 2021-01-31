@@ -20,9 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Enumeration type for Android ABIs.
- *
- * @author Taner Sener
+ * <p>Enumeration for Android ABIs.
  */
 public enum Abi {
 
@@ -64,10 +62,10 @@ public enum Abi {
     private final String name;
 
     /**
-     * <p>Returns enumeration defined by ABI name.
+     * <p>Returns the enumeration defined for the given ABI name.
      *
      * @param abiName ABI name
-     * @return enumeration defined by ABI name
+     * @return enumeration defined for the ABI name
      */
     public static Abi from(final String abiName) {
         if (abiName == null) {
@@ -90,9 +88,9 @@ public enum Abi {
     }
 
     /**
-     * Returns ABI name as defined in Android NDK documentation.
+     * Returns the ABI name.
      *
-     * @return ABI name
+     * @return ABI name as defined in Android NDK documentation
      */
     public String getName() {
         return name;

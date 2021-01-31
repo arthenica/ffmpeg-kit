@@ -3,45 +3,61 @@ lib_LTLIBRARIES = libffmpegkit.la
 libffmpegkit_la_LIBADD = @FFMPEG_LIBS@
 
 libffmpegkit_la_SOURCES = \
+    AbstractSession.m \
     ArchDetect.m \
     AtomicLong.m \
-    FFmpegExecution.m \
     FFmpegKit.m \
-    ffmpegkit_exception.m \
     FFmpegKitConfig.m \
+    FFmpegSession.m \
     FFprobeKit.m \
+    FFprobeSession.m \
+    Log.m \
+    MediaInformation.m \
+    MediaInformationJsonParser.m \
+    MediaInformationSession.m \
+    Packages.m \
+    ReturnCode.m \
+    Statistics.m \
+    StreamInformation.m \
+    ffmpegkit_exception.m \
     fftools_cmdutils.c \
     fftools_ffmpeg.c \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
-    fftools_ffprobe.c \
-    MediaInformation.m \
-    MediaInformationParser.m \
-    Statistics.m \
-    StreamInformation.m
+    fftools_ffprobe.c
 
 if FFMPEGKIT_VIDEOTOOLBOX
     libffmpegkit_la_SOURCES += fftools_ffmpeg_videotoolbox.c
 endif
 
 include_HEADERS = \
+    AbstractSession.h \
     ArchDetect.h \
     AtomicLong.h \
     ExecuteDelegate.h \
-    FFmpegExecution.h \
     FFmpegKit.h \
-	ffmpegkit_exception.h \
     FFmpegKitConfig.h \
+    FFmpegSession.h \
 	FFprobeKit.h \
-	fftools_cmdutils.h \
-    fftools_ffmpeg.h \
+	FFprobeSession.h \
+	Level.h \
+	Log.h \
 	LogDelegate.h \
+	LogRedirectionStrategy.h \
 	MediaInformation.h \
-	MediaInformationParser.h \
+	MediaInformationJsonParser.h \
+	MediaInformationSession.h \
+	Packages.h \
+	ReturnCode.h \
+	Session.h \
+	SessionState.h \
 	Statistics.h \
 	StatisticsDelegate.h \
-	StreamInformation.h
+	StreamInformation.h \
+	ffmpegkit_exception.h \
+	fftools_cmdutils.h \
+    fftools_ffmpeg.h
 
 libffmpegkit_la_CFLAGS = $(CFLAGS)
 libffmpegkit_la_OBJCFLAGS = $(CFLAGS)

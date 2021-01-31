@@ -445,7 +445,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationMp3() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_MP3);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_MP3);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mp3", "sample.mp3");
@@ -463,7 +463,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationJpg() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_JPG);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_JPG);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "image2", "sample.jpg");
@@ -475,7 +475,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationGif() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_GIF);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_GIF);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "gif", "sample.gif");
@@ -487,7 +487,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationMp4() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_MP4);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_MP4);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "sample.mp4");
@@ -508,7 +508,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationPng() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_PNG);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_PNG);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "png_pipe", "sample.png");
@@ -520,7 +520,7 @@ public class FFmpegKitTest {
 
     @Test
     public void mediaInformationOgg() {
-        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_OGG);
+        MediaInformation mediaInformation = MediaInformationJsonParser.from(MEDIA_INFORMATION_OGG);
 
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "ogg", "sample.ogg");

@@ -35,7 +35,7 @@ public class AsyncFFmpegExecuteTask implements Runnable {
     public void run() {
         FFmpegKitConfig.ffmpegExecute(ffmpegSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getGlobalExecuteCallbackFunction();
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
         if (globalExecuteCallbackFunction != null) {
             globalExecuteCallbackFunction.apply(ffmpegSession);
         }

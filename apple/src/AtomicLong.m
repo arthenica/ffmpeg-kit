@@ -17,17 +17,23 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AtomicLong.h"
+#import "AtomicLong.h"
+
+@interface AtomicLong()
+
+@property (strong) NSRecursiveLock* lock;
+
+@end
 
 @implementation AtomicLong {
-    NSRecursiveLock *lock;
-    long value;
+    long _value;
 }
 
-- (instancetype)initWithInitialValue:(long)initialValue {
+- (instancetype)initWithValue:(long)value {
     self = [super init];
     if (self) {
-        value = initialValue;
+        _value = value;
+        _lock = [[NSRecursiveLock alloc] init];
     }
 
     return self;
@@ -36,10 +42,21 @@
 - (long)incrementAndGet {
     long returnValue;
 
-    [lock lock];
-    value += 1;
-    returnValue = value;
-    [lock unlock];
+    [self.lock lock];
+    _value += 1;
+    returnValue = _value;
+    [self.lock unlock];
+
+    return returnValue;
+}
+
+- (long)getAndIncrement {
+    long returnValue;
+
+    [self.lock lock];
+    returnValue = _value;
+    _value += 1;
+    [self.lock unlock];
 
     return returnValue;
 }

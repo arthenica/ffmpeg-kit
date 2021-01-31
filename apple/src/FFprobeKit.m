@@ -17,131 +17,133 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "libavutil/ffversion.h"
-#include "fftools_ffmpeg.h"
-
-#include "FFmpegKit.h"
-#include "FFmpegKitConfig.h"
-#include "FFprobeKit.h"
-
-/** Forward declaration for function defined in fftools_ffprobe.c */
-int ffprobe_execute(int argc, char **argv);
+#import "fftools_ffmpeg.h"
+#import "FFmpegKit.h"
+#import "FFmpegKitConfig.h"
+#import "FFprobeKit.h"
 
 @implementation FFprobeKit
-
-extern int lastReturnCode;
-extern NSMutableString *lastCommandOutput;
-extern int configuredLogLevel;
 
 + (void)initialize {
     [FFmpegKitConfig class];
 }
 
-/**
- * Synchronously executes FFprobe with arguments provided.
- *
- * @param arguments FFprobe command options/arguments as string array
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)executeWithArguments:(NSArray*)arguments {
-    lastCommandOutput = [[NSMutableString alloc] init];
-
-    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
-    av_log_set_level(configuredLogLevel);
-
-    char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
-
-    /* PRESERVING CALLING FORMAT
-     *
-     * ffprobe <arguments>
-     */
-    commandCharPArray[0] = (char *)av_malloc(sizeof(char) * ([LIB_NAME length] + 1));
-    strcpy(commandCharPArray[0], [LIB_NAME UTF8String]);
-
-    for (int i=0; i < [arguments count]; i++) {
-        NSString *argument = [arguments objectAtIndex:i];
-        commandCharPArray[i + 1] = (char *) [argument UTF8String];
-    }
-
-    // RUN
-    lastReturnCode = ffprobe_execute(([arguments count] + 1), commandCharPArray);
-
-    // CLEANUP
-    av_free(commandCharPArray[0]);
-    av_free(commandCharPArray);
-
-    return lastReturnCode;
++ (FFprobeSession*)executeWithArguments:(NSArray*)arguments {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments];
+    [FFmpegKitConfig ffprobeExecute:session];
+    return session;
 }
 
-/**
- * Synchronously executes FFprobe command provided. Space character is used to split command
- * into arguments.
- *
- * @param command FFprobe command
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute:(NSString*)command {
-    return [FFprobeKit executeWithArguments: [FFmpegKit parseArguments: command]];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session];
+    return session;
 }
 
-/**
- * Returns media information for the given file.
- *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param path or uri of media file
- * @return media information
- */
-+ (MediaInformation*)getMediaInformation:(NSString*)path {
-    return [FFprobeKit getMediaInformationFromCommandArguments:[[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil]];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session];
+    return session;
 }
 
-/**
- * Returns media information for the given command.
- *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param command
- * @return media information
- */
-+ (MediaInformation*)getMediaInformationFromCommand:(NSString*)command {
-    return [FFprobeKit getMediaInformationFromCommandArguments:[FFmpegKit parseArguments: command]];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
+    return session;
 }
 
-/**
- * Returns media information for given file.
- *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param path path or uri of media file
- * @param timeout complete timeout
- * @deprecated this method is deprecated since v4.3.1. You can still use this method but
- * timeout parameter is not effective anymore.
- * @return media information
- */
-+ (MediaInformation*)getMediaInformation:(NSString*)path timeout:(long)timeout {
-    return [FFprobeKit getMediaInformation:path];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
+    return session;
 }
 
-+ (MediaInformation*)getMediaInformationFromCommandArguments:(NSArray*)arguments {
-    int rc = [FFprobeKit executeWithArguments:arguments];
++ (FFprobeSession*)execute:(NSString*)command {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command]];
+    [FFmpegKitConfig ffprobeExecute:session];
+    return session;
+}
 
-    if (rc == 0) {
-        return [MediaInformationParser from:[FFmpegKitConfig getLastCommandOutput]];
-    } else {
-        int activeLogLevel = av_log_get_level();
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
-            NSLog(@"%@", [FFmpegKitConfig getLastCommandOutput]);
-        }
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session];
+    return session;
+}
 
-        return nil;
-    }
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session];
+    return session;
+}
+
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
+    return session;
+}
+
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformation:(NSString*)path {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
+    [FFmpegKitConfig getMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformation:(NSString*)path withTimeout:(int)waitTimeout {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
+    [FFmpegKitConfig getMediaInformationExecute:session withTimeout:waitTimeout];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withTimeout:(int)waitTimeout {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:waitTimeout];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
+    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationFromCommand:(NSString*)command {
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:[FFmpegKit parseArguments:command]];
+    [FFmpegKitConfig getMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
+    return session;
+}
+
++ (NSArray*)listSessions {
+    return [FFmpegKitConfig getFFprobeSessions];
 }
 
 @end

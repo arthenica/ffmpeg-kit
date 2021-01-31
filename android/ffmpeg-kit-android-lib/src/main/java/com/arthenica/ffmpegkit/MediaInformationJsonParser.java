@@ -30,16 +30,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Parser for {@link MediaInformation}.
+ * A parser that constructs {@link MediaInformation} from FFprobe's json output.
  */
-public class MediaInformationParser {
+public class MediaInformationJsonParser {
 
     /**
-     * Extracts <code>MediaInformation</code> from the given ffprobe json output. Note that this
+     * Extracts <code>MediaInformation</code> from the given FFprobe json output. Note that this
      * method does not throw {@link JSONException} as {@link #fromWithError(String)} does and
      * handles errors internally.
      *
-     * @param ffprobeJsonOutput ffprobe json output
+     * @param ffprobeJsonOutput FFprobe json output
      * @return created {@link MediaInformation} instance of null if a parsing error occurs
      */
     public static MediaInformation from(final String ffprobeJsonOutput) {
@@ -52,7 +52,7 @@ public class MediaInformationParser {
     }
 
     /**
-     * Extracts MediaInformation from the given ffprobe json output.
+     * Extracts MediaInformation from the given FFprobe json output.
      *
      * @param ffprobeJsonOutput ffprobe json output
      * @return created {@link MediaInformation} instance

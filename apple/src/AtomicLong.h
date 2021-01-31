@@ -17,15 +17,22 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Foundation/Foundation.h>
+#ifndef FFMPEG_KIT_ATOMIC_LONG_H
+#define FFMPEG_KIT_ATOMIC_LONG_H
+
+#import <Foundation/Foundation.h>
 
 /**
  * Represents an atomic long data type.
  */
 @interface AtomicLong : NSObject
 
-- (instancetype)initWithInitialValue:(long)initialValue;
+- (instancetype)initWithValue:(long)value;
 
 - (long)incrementAndGet;
 
+- (long)getAndIncrement;
+
 @end
+
+#endif // FFMPEG_KIT_ATOMIC_LONG_H

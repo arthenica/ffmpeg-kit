@@ -17,9 +17,9 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MediaInformationParser.h"
+#import "MediaInformationJsonParser.h"
 
-@implementation MediaInformationParser
+@implementation MediaInformationJsonParser
 
 + (MediaInformation*)from:(NSString*)ffprobeJsonOutput {
     NSError *error;

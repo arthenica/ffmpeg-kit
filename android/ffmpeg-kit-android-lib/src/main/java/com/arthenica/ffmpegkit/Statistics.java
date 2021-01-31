@@ -32,17 +32,6 @@ public class Statistics {
     private double bitrate;
     private double speed;
 
-    public Statistics() {
-        sessionId = 0;
-        videoFrameNumber = 0;
-        videoFps = 0;
-        videoQuality = 0;
-        size = 0;
-        time = 0;
-        bitrate = 0;
-        speed = 0;
-    }
-
     public Statistics(final long sessionId, final int videoFrameNumber, final float videoFps, final float videoQuality, final long size, final int time, final double bitrate, final double speed) {
         this.sessionId = sessionId;
         this.videoFrameNumber = videoFrameNumber;

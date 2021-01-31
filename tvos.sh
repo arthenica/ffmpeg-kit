@@ -22,14 +22,14 @@ enable_default_tvos_architectures
 enable_main_build
 
 # SELECT XCODE VERSION USED FOR BUILDING
-XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh)
+XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh 2>>"${BASEDIR}"/build.log)
 if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
   source "${XCODE_FOR_FFMPEG_KIT}" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
 # DETECT TVOS SDK VERSION
 DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version)"
-echo -e "INFO: Using SDK ${DETECTED_TVOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "\nINFO: Using SDK ${DETECTED_TVOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS

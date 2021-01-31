@@ -18,6 +18,7 @@
  */
 
 #include <pthread.h>
+#include <stdatomic.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -27,6 +28,9 @@
 #include "fftools_ffmpeg.h"
 #include "ffmpegkit.h"
 #include "ffprobekit.h"
+
+# define LogType 1
+# define StatisticsType 2
 
 /** Callback data structure */
 struct CallbackData {
@@ -47,11 +51,10 @@ struct CallbackData {
   struct CallbackData *next;
 };
 
-/** Session map variables */
+/** Session control variables */
 const int SESSION_MAP_SIZE = 1000;
-static volatile int sessionMap[SESSION_MAP_SIZE];
-static volatile int sessionInTransitMessageCountMap[SESSION_MAP_SIZE];
-static pthread_mutex_t sessionMapMutex;
+static atomic_short sessionMap[SESSION_MAP_SIZE];
+static atomic_int sessionInTransitMessageCountMap[SESSION_MAP_SIZE];
 
 /** Redirection control variables */
 static pthread_mutex_t lockMutex;
@@ -215,15 +218,6 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
-void sessionMapLockInit() {
-    pthread_mutexattr_t attributes;
-    pthread_mutexattr_init(&attributes);
-    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
-
-    pthread_mutex_init(&sessionMapMutex, &attributes);
-    pthread_mutexattr_destroy(&attributes);
-}
-
 void mutexUnInit() {
     pthread_mutex_destroy(&lockMutex);
 }
@@ -233,24 +227,12 @@ void monitorUnInit() {
     pthread_cond_destroy(&monitorCondition);
 }
 
-void sessionMapLockUnInit() {
-    pthread_mutex_destroy(&sessionMapMutex);
-}
-
 void mutexLock() {
     pthread_mutex_lock(&lockMutex);
 }
 
-void sessionMapLock() {
-    pthread_mutex_lock(&sessionMapMutex);
-}
-
 void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
-}
-
-void sessionMapUnlock() {
-    pthread_mutex_unlock(&sessionMapMutex);
 }
 
 void monitorWait(int milliSeconds) {
@@ -291,7 +273,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
-    newData->type = 1;
+    newData->type = LogType;
     newData->sessionId = sessionId;
     newData->logLevel = level;
     av_bprint_init(&newData->logData, 0, AV_BPRINT_SIZE_UNLIMITED);
@@ -316,12 +298,11 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
         callbackDataTail = newData;
     }
 
-    int key = sessionId % SESSION_MAP_SIZE;
-    sessionInTransitMessageCountMap[key] += 1;
-
     mutexUnlock();
 
     monitorNotify();
+
+    atomic_fetch_add(&sessionInTransitMessageCountMap[sessionId % SESSION_MAP_SIZE], 1);
 }
 
 /**
@@ -331,7 +312,7 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
-    newData->type = 2;
+    newData->type = StatisticsType;
     newData->sessionId = sessionId;
     newData->statisticsFrameNumber = frameNumber;
     newData->statisticsFps = fps;
@@ -361,12 +342,11 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
         callbackDataTail = newData;
     }
 
-    int key = sessionId % SESSION_MAP_SIZE;
-    sessionInTransitMessageCountMap[key] += 1;
-
     mutexUnlock();
 
     monitorNotify();
+
+    atomic_fetch_add(&sessionInTransitMessageCountMap[sessionId % SESSION_MAP_SIZE], 1);
 }
 
 /**
@@ -375,12 +355,7 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
  * @param id session id
  */
 void addSession(long id) {
-    sessionMapLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    sessionMap[key] = 1;
-
-    sessionMapUnlock();
+    atomic_store(&sessionMap[id % SESSION_MAP_SIZE], 1);
 }
 
 /**
@@ -421,12 +396,7 @@ struct CallbackData *callbackDataRemove() {
  * @param id session id
  */
 void removeSession(long id) {
-    sessionMapLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    sessionMap[key] = 0;
-
-    sessionMapUnlock();
+    atomic_store(&sessionMap[id % SESSION_MAP_SIZE], 0);
 }
 
 /**
@@ -435,12 +405,7 @@ void removeSession(long id) {
  * @param id session id
  */
 void cancelSession(long id) {
-    sessionMapLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    sessionMap[key] = 2;
-
-    sessionMapUnlock();
+    atomic_store(&sessionMap[id % SESSION_MAP_SIZE], 2);
 }
 
 /**
@@ -450,18 +415,11 @@ void cancelSession(long id) {
  * @return 1 if exists, false otherwise
  */
 int cancelRequested(long id) {
-    int found = 0;
-
-    sessionMapLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    if (sessionMap[key] == 2) {
-        found = 1;
+    if (atomic_load(&sessionMap[id % SESSION_MAP_SIZE]) == 2) {
+        return 1;
+    } else {
+        return 0;
     }
-
-    sessionMapUnlock();
-
-    return found;
 }
 
 /**
@@ -470,12 +428,7 @@ int cancelRequested(long id) {
  * @param id session id
  */
 void resetMessagesInTransmit(long id) {
-    mutexLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    sessionInTransitMessageCountMap[key] = 0;
-
-    mutexUnlock();
+    atomic_store(&sessionInTransitMessageCountMap[id % SESSION_MAP_SIZE], 0);
 }
 
 /**
@@ -556,13 +509,13 @@ void *callbackThreadFunction() {
         }
     }
 
-    LOGD("Callback thread started.\n");
+    LOGD("Async callback block started.\n");
 
     while(redirectionEnabled) {
 
         struct CallbackData *callbackData = callbackDataRemove();
         if (callbackData != NULL) {
-            if (callbackData->type == 1) {
+            if (callbackData->type == LogType) {
 
                 // LOG CALLBACK
 
@@ -588,8 +541,7 @@ void *callbackThreadFunction() {
 
             }
 
-            int key = callbackData->sessionId % SESSION_MAP_SIZE;
-            sessionInTransitMessageCountMap[key] -= 1;
+            atomic_fetch_sub(&sessionInTransitMessageCountMap[callbackData->sessionId % SESSION_MAP_SIZE], 1);
 
             // CLEAN STRUCT
             callbackData->next = NULL;
@@ -602,7 +554,7 @@ void *callbackThreadFunction() {
 
     (*globalVm)->DetachCurrentThread(globalVm);
 
-    LOGD("Callback thread stopped.\n");
+    LOGD("Async callback block stopped.\n");
 
     return NULL;
 }
@@ -678,18 +630,18 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     configClass = (jclass) ((*env)->NewGlobalRef(env, localConfigClass));
     stringClass = (jclass) ((*env)->NewGlobalRef(env, localStringClass));
 
-    redirectionEnabled = 0;
-
     callbackDataHead = NULL;
     callbackDataTail = NULL;
     
     for(int i = 0; i<SESSION_MAP_SIZE; i++) {
-        sessionMap[i] = 0;
+        atomic_init(&sessionMap[i], 0);
+        atomic_init(&sessionInTransitMessageCountMap[i], 0);
     }
-    
+
     mutexInit();
     monitorInit();
-    sessionMapLockInit();
+
+    redirectionEnabled = 0;
 
     return JNI_VERSION_1_6;
 }
@@ -802,10 +754,10 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
     int argumentCount = 1;
     char **argv = NULL;
 
-    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW RUN
     av_log_set_level(configuredLogLevel);
 
-    if (stringArray != NULL) {
+    if (stringArray) {
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
         argumentCount = programArgumentCount + 1;
 
@@ -820,8 +772,8 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
     argv[0] = (char *)av_malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
     strcpy(argv[0], LIB_NAME);
 
-    // PREPARE
-    if (stringArray != NULL) {
+    // PREPARE ARRAY ELEMENTS
+    if (stringArray) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
             if (tempArray[i] != NULL) {
@@ -830,20 +782,20 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
         }
     }
 
-    // REGISTER THE ID BEFORE STARTING THE EXECUTION
+    // REGISTER THE ID BEFORE STARTING THE SESSION
     sessionId = (long) id;
     addSession((long) id);
 
     resetMessagesInTransmit(sessionId);
 
     // RUN
-    int retCode = ffmpeg_execute(argumentCount, argv);
+    int returnCode = ffmpeg_execute(argumentCount, argv);
 
     // ALWAYS REMOVE THE ID FROM THE MAP
     removeSession((long) id);
 
     // CLEANUP
-    if (tempArray != NULL) {
+    if (tempArray) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             (*env)->ReleaseStringUTFChars(env, tempArray[i], argv[i + 1]);
         }
@@ -853,7 +805,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
     av_free(argv[0]);
     av_free(argv);
 
-    return retCode;
+    return returnCode;
 }
 
 /**
@@ -944,12 +896,5 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNative
  * @param id session id
  */
 JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env, jclass object, jlong id) {
-    mutexLock();
-
-    int key = id % SESSION_MAP_SIZE;
-    int count = sessionInTransitMessageCountMap[key];
-
-    mutexUnlock();
-
-    return count;
+    return atomic_load(&sessionInTransitMessageCountMap[id % SESSION_MAP_SIZE]);
 }

@@ -22,54 +22,121 @@ package com.arthenica.ffmpegkit;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.util.Date;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Abstract session implementation which includes common features shared by <code>FFmpeg</code>
+ * and <code>FFprobe</code> sessions.
+ */
 public abstract class AbstractSession implements Session {
 
     /**
-     * Generates ids for execute sessions.
+     * Generates unique ids for sessions.
      */
     protected static final AtomicLong sessionIdGenerator = new AtomicLong(1);
 
     /**
-     * Defines how long default `getAll` methods wait.
+     * Defines how long default "getAll" methods wait, in milliseconds.
      */
-    protected static final int DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT = 5000;
+    public static final int DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT = 5000;
 
-    protected final ExecuteCallback executeCallback;
-    protected final LogCallback logCallback;
-    protected final StatisticsCallback statisticsCallback;
+    /**
+     * Session identifier.
+     */
     protected final long sessionId;
+
+    /**
+     * Session specific execute callback function.
+     */
+    protected final ExecuteCallback executeCallback;
+
+    /**
+     * Session specific log callback function.
+     */
+    protected final LogCallback logCallback;
+
+    /**
+     * Date and time the session was created.
+     */
     protected final Date createTime;
+
+    /**
+     * Date and time the session was started.
+     */
     protected Date startTime;
+
+    /**
+     * Date and time the session has ended.
+     */
     protected Date endTime;
+
+    /**
+     * Command arguments as an array.
+     */
     protected final String[] arguments;
-    protected final Queue<Log> logs;
+
+    /**
+     * Log entries received for this session.
+     */
+    protected final List<Log> logs;
+
+    /**
+     * Log entry lock.
+     */
+    protected final Object logsLock;
+
+    /**
+     * Future created for sessions executed asynchronously.
+     */
     protected Future<?> future;
+
+    /**
+     * State of the session.
+     */
     protected SessionState state;
-    protected int returnCode;
+
+    /**
+     * Return code for the completed sessions.
+     */
+    protected ReturnCode returnCode;
+
+    /**
+     * Stack trace of the error received while trying to execute this session.
+     */
     protected String failStackTrace;
+
+    /**
+     * Session specific log redirection strategy.
+     */
     protected final LogRedirectionStrategy logRedirectionStrategy;
 
+    /**
+     * Creates a new abstract session.
+     *
+     * @param arguments              command arguments
+     * @param executeCallback        session specific execute callback function
+     * @param logCallback            session specific log callback function
+     * @param logRedirectionStrategy session specific log redirection strategy
+     */
     public AbstractSession(final String[] arguments,
                            final ExecuteCallback executeCallback,
                            final LogCallback logCallback,
-                           final StatisticsCallback statisticsCallback,
                            final LogRedirectionStrategy logRedirectionStrategy) {
         this.sessionId = sessionIdGenerator.getAndIncrement();
-        this.createTime = new Date();
-        this.startTime = null;
-        this.arguments = arguments;
         this.executeCallback = executeCallback;
         this.logCallback = logCallback;
-        this.statisticsCallback = statisticsCallback;
-        this.logs = new ConcurrentLinkedQueue<>();
+        this.createTime = new Date();
+        this.startTime = null;
+        this.endTime = null;
+        this.arguments = arguments;
+        this.logs = new LinkedList<>();
+        this.logsLock = new Object();
         this.future = null;
         this.state = SessionState.CREATED;
-        this.returnCode = ReturnCode.NOT_SET;
+        this.returnCode = null;
         this.failStackTrace = null;
         this.logRedirectionStrategy = logRedirectionStrategy;
     }
@@ -82,11 +149,6 @@ public abstract class AbstractSession implements Session {
     @Override
     public LogCallback getLogCallback() {
         return logCallback;
-    }
-
-    @Override
-    public StatisticsCallback getStatisticsCallback() {
-        return statisticsCallback;
     }
 
     @Override
@@ -117,7 +179,7 @@ public abstract class AbstractSession implements Session {
             return (endTime.getTime() - startTime.getTime());
         }
 
-        return -1;
+        return 0;
     }
 
     @Override
@@ -130,68 +192,75 @@ public abstract class AbstractSession implements Session {
         return FFmpegKit.argumentsToString(arguments);
     }
 
-    protected void waitForCallbackMessagesInTransmit(final int timeout) {
-        final long start = System.currentTimeMillis();
-
-        /*
-         * WE GIVE MAX 5 SECONDS TO TRANSMIT ALL NATIVE MESSAGES
-         */
-        while (thereAreCallbackMessagesInTransmit() && (System.currentTimeMillis() < (start + timeout))) {
-            synchronized (this) {
-                try {
-                    wait(100);
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
-    }
-
     @Override
-    public Queue<Log> getAllLogs(final int waitTimeout) {
-        waitForCallbackMessagesInTransmit(waitTimeout);
+    public List<Log> getAllLogs(final int waitTimeout) {
+        waitForAsynchronousMessagesInTransmit(waitTimeout);
 
-        if (thereAreCallbackMessagesInTransmit()) {
-            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogs was asked to return all logs but there are still logs being transmitted for session id %d.", sessionId));
+        if (thereAreAsynchronousMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogs was called to return all logs but there are still logs being transmitted for session id %d.", sessionId));
         }
 
-        return logs;
+        return getLogs();
+    }
+
+    /**
+     * Returns all log entries generated for this session. If there are asynchronous
+     * messages that are not delivered yet, this method waits for them until
+     * {@link #DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT} expires.
+     *
+     * @return list of log entries generated for this session
+     */
+    @Override
+    public List<Log> getAllLogs() {
+        return getAllLogs(DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
     }
 
     @Override
-    public Queue<Log> getAllLogs() {
-        return getAllLogs(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
-    }
-
-    @Override
-    public Queue<Log> getLogs() {
-        return logs;
+    public List<Log> getLogs() {
+        synchronized (logsLock) {
+            return new LinkedList<>(logs);
+        }
     }
 
     @Override
     public String getAllLogsAsString(final int waitTimeout) {
-        waitForCallbackMessagesInTransmit(waitTimeout);
+        waitForAsynchronousMessagesInTransmit(waitTimeout);
 
-        if (thereAreCallbackMessagesInTransmit()) {
-            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogsAsString was asked to return all logs but there are still logs being transmitted for session id %d.", sessionId));
+        if (thereAreAsynchronousMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllLogsAsString was called to return all logs but there are still logs being transmitted for session id %d.", sessionId));
         }
 
         return getLogsAsString();
     }
 
+    /**
+     * Returns all log entries generated for this session as a concatenated string. If there are
+     * asynchronous messages that are not delivered yet, this method waits for them until
+     * {@link #DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT} expires.
+     *
+     * @return all log entries generated for this session as a concatenated string
+     */
     @Override
     public String getAllLogsAsString() {
-        return getAllLogsAsString(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+        return getAllLogsAsString(DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
     }
 
     @Override
     public String getLogsAsString() {
         final StringBuilder concatenatedString = new StringBuilder();
 
-        for (Log log : logs) {
-            concatenatedString.append(log.getMessage());
+        synchronized (logsLock) {
+            for (Log log : logs) {
+                concatenatedString.append(log.getMessage());
+            }
         }
 
         return concatenatedString.toString();
+    }
+
+    @Override
+    public String getOutput() {
+        return getAllLogsAsString();
     }
 
     @Override
@@ -200,7 +269,7 @@ public abstract class AbstractSession implements Session {
     }
 
     @Override
-    public int getReturnCode() {
+    public ReturnCode getReturnCode() {
         return returnCode;
     }
 
@@ -215,13 +284,15 @@ public abstract class AbstractSession implements Session {
     }
 
     @Override
-    public boolean thereAreCallbackMessagesInTransmit() {
+    public boolean thereAreAsynchronousMessagesInTransmit() {
         return (FFmpegKitConfig.messagesInTransmit(sessionId) != 0);
     }
 
     @Override
     public void addLog(final Log log) {
-        this.logs.add(log);
+        synchronized (logsLock) {
+            this.logs.add(log);
+        }
     }
 
     @Override
@@ -230,35 +301,67 @@ public abstract class AbstractSession implements Session {
     }
 
     @Override
-    public void setFuture(final Future<?> future) {
+    public void cancel() {
+        if (state == SessionState.RUNNING) {
+            FFmpegKit.cancel(sessionId);
+        }
+    }
+
+    /**
+     * Waits for all asynchronous messages to be transmitted until the given timeout.
+     *
+     * @param timeout wait timeout in milliseconds
+     */
+    protected void waitForAsynchronousMessagesInTransmit(final int timeout) {
+        final long start = System.currentTimeMillis();
+
+        while (thereAreAsynchronousMessagesInTransmit() && (System.currentTimeMillis() < (start + timeout))) {
+            synchronized (this) {
+                try {
+                    wait(100);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the future created for this session.
+     *
+     * @param future future that runs this session asynchronously
+     */
+    void setFuture(final Future<?> future) {
         this.future = future;
     }
 
-    @Override
-    public void startRunning() {
+    /**
+     * Starts running the session.
+     */
+    void startRunning() {
         this.state = SessionState.RUNNING;
         this.startTime = new Date();
     }
 
-    @Override
-    public void complete(final int returnCode) {
+    /**
+     * Completes running the session with the provided return code.
+     *
+     * @param returnCode return code of the execution
+     */
+    void complete(final ReturnCode returnCode) {
         this.returnCode = returnCode;
         this.state = SessionState.COMPLETED;
         this.endTime = new Date();
     }
 
-    @Override
-    public void fail(final Exception exception) {
+    /**
+     * Ends running the session with a failure.
+     *
+     * @param exception execution received
+     */
+    void fail(final Exception exception) {
         this.failStackTrace = Exceptions.getStackTraceString(exception);
         this.state = SessionState.FAILED;
         this.endTime = new Date();
-    }
-
-    @Override
-    public void cancel() {
-        if (state == SessionState.RUNNING) {
-            FFmpegKit.cancel(sessionId);
-        }
     }
 
 }

@@ -49,10 +49,10 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
     int argumentCount = 1;
     char **argv = NULL;
 
-    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW RUN
     av_log_set_level(configuredLogLevel);
 
-    if (stringArray != NULL) {
+    if (stringArray) {
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
         argumentCount = programArgumentCount + 1;
 
@@ -67,8 +67,8 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
     argv[0] = (char *)av_malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
     strcpy(argv[0], LIB_NAME);
 
-    // PREPARE
-    if (stringArray != NULL) {
+    // PREPARE ARRAY ELEMENTS
+    if (stringArray) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
             if (tempArray[i] != NULL) {
@@ -77,20 +77,20 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
         }
     }
 
-    // REGISTER THE ID BEFORE STARTING THE EXECUTION
+    // REGISTER THE ID BEFORE STARTING THE SESSION
     sessionId = (long) id;
     addSession((long) id);
 
     resetMessagesInTransmit(sessionId);
 
     // RUN
-    int retCode = ffprobe_execute(argumentCount, argv);
+    int returnCode = ffprobe_execute(argumentCount, argv);
 
     // ALWAYS REMOVE THE ID FROM THE MAP
     removeSession((long) id);
 
     // CLEANUP
-    if (tempArray != NULL) {
+    if (tempArray) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             (*env)->ReleaseStringUTFChars(env, tempArray[i], argv[i + 1]);
         }
@@ -100,5 +100,5 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprob
     av_free(argv[0]);
     av_free(argv);
 
-    return retCode;
+    return returnCode;
 }

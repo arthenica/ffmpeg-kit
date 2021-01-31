@@ -19,48 +19,160 @@
 
 package com.arthenica.ffmpegkit;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * <p>An FFmpeg execute session.
+ * <p>An FFmpeg session.
  */
 public class FFmpegSession extends AbstractSession implements Session {
-    private final Queue<Statistics> statistics;
 
+    /**
+     * Session specific statistics callback function.
+     */
+    private final StatisticsCallback statisticsCallback;
+
+    /**
+     * Statistics entries received for this session.
+     */
+    private final List<Statistics> statistics;
+
+    /**
+     * Statistics entry lock.
+     */
+    private final Object statisticsLock;
+
+    /**
+     * Builds a new FFmpeg session.
+     *
+     * @param arguments command arguments
+     */
+    public FFmpegSession(final String[] arguments) {
+        this(arguments, null);
+    }
+
+    /**
+     * Builds a new FFmpeg session.
+     *
+     * @param arguments       command arguments
+     * @param executeCallback session specific execute callback function
+     */
+    public FFmpegSession(final String[] arguments, final ExecuteCallback executeCallback) {
+        this(arguments, executeCallback, null, null);
+    }
+
+    /**
+     * Builds a new FFmpeg session.
+     *
+     * @param arguments          command arguments
+     * @param executeCallback    session specific execute callback function
+     * @param logCallback        session specific log callback function
+     * @param statisticsCallback session specific statistics callback function
+     */
     public FFmpegSession(final String[] arguments,
                          final ExecuteCallback executeCallback,
                          final LogCallback logCallback,
                          final StatisticsCallback statisticsCallback) {
-        super(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
-
-        this.statistics = new ConcurrentLinkedQueue<>();
+        this(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
-    @Override
-    public Queue<Statistics> getAllStatistics(final int waitTimeout) {
-        waitForCallbackMessagesInTransmit(waitTimeout);
+    /**
+     * Builds a new FFmpeg session.
+     *
+     * @param arguments              command arguments
+     * @param executeCallback        session specific execute callback function
+     * @param logCallback            session specific log callback function
+     * @param statisticsCallback     session specific statistics callback function
+     * @param logRedirectionStrategy session specific log redirection strategy
+     */
+    public FFmpegSession(final String[] arguments,
+                         final ExecuteCallback executeCallback,
+                         final LogCallback logCallback,
+                         final StatisticsCallback statisticsCallback,
+                         final LogRedirectionStrategy logRedirectionStrategy) {
+        super(arguments, executeCallback, logCallback, logRedirectionStrategy);
 
-        if (thereAreCallbackMessagesInTransmit()) {
-            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllStatistics was asked to return all statistics but there are still statistics being transmitted for session id %d.", sessionId));
+        this.statisticsCallback = statisticsCallback;
+
+        this.statistics = new LinkedList<>();
+        this.statisticsLock = new Object();
+    }
+
+    /**
+     * Returns the session specific statistics callback function.
+     *
+     * @return session specific statistics callback function
+     */
+    public StatisticsCallback getStatisticsCallback() {
+        return statisticsCallback;
+    }
+
+    /**
+     * Returns all statistics entries generated for this session. If there are asynchronous
+     * messages that are not delivered yet, this method waits for them until the given timeout.
+     *
+     * @param waitTimeout wait timeout for asynchronous messages in milliseconds
+     * @return list of statistics entries generated for this session
+     */
+    public List<Statistics> getAllStatistics(final int waitTimeout) {
+        waitForAsynchronousMessagesInTransmit(waitTimeout);
+
+        if (thereAreAsynchronousMessagesInTransmit()) {
+            android.util.Log.i(FFmpegKitConfig.TAG, String.format("getAllStatistics was called to return all statistics but there are still statistics being transmitted for session id %d.", sessionId));
         }
 
         return getStatistics();
     }
 
-    @Override
-    public Queue<Statistics> getAllStatistics() {
-        return getAllStatistics(DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+    /**
+     * Returns all statistics entries generated for this session. If there are asynchronous
+     * messages that are not delivered yet, this method waits for them until
+     * {@link #DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT} expires.
+     *
+     * @return list of statistics entries generated for this session
+     */
+    public List<Statistics> getAllStatistics() {
+        return getAllStatistics(DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
     }
 
-    @Override
-    public Queue<Statistics> getStatistics() {
-        return statistics;
+    /**
+     * Returns all statistics entries delivered for this session. Note that if there are
+     * asynchronous messages that are not delivered yet, this method will not wait for
+     * them and will return immediately.
+     *
+     * @return list of statistics entries received for this session
+     */
+    public List<Statistics> getStatistics() {
+        synchronized (statisticsLock) {
+            return statistics;
+        }
     }
 
-    @Override
+    /**
+     * Returns the last received statistics entry.
+     *
+     * @return the last received statistics entry or null if there are not any statistics entries
+     * received
+     */
+    public Statistics getLastReceivedStatistics() {
+        synchronized (statisticsLock) {
+            if (statistics.size() > 0) {
+                return statistics.get(0);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Adds a new statistics entry for this session.
+     *
+     * @param statistics statistics entry
+     */
     public void addStatistics(final Statistics statistics) {
-        this.statistics.add(statistics);
+        synchronized (statisticsLock) {
+            this.statistics.add(statistics);
+        }
     }
 
     @Override

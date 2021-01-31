@@ -17,10 +17,25 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef FFMPEG_KIT_LOG_DELEGATE_H
+#define FFMPEG_KIT_LOG_DELEGATE_H
+
+#import <Foundation/Foundation.h>
+#import "Log.h"
+
 /**
- * Use this delegate to receive logs from running executions.
+ * <p>Delegate that receives logs generated for <code>FFmpegKit</code> sessions.
  */
 @protocol LogDelegate<NSObject>
 @required
-- (void)logCallback:(long)executionId :(int)level :(NSString*)message;
+
+/**
+ * <p>Called when a log entry is received.
+ *
+ * @param log log entry
+ */
+- (void)logCallback:(Log*)log;
+
 @end
+
+#endif // FFMPEG_KIT_LOG_DELEGATE_H

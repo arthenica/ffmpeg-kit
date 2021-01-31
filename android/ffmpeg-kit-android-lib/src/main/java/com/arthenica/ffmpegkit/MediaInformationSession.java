@@ -20,24 +20,62 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>A custom FFprobe execute session, which produces a <code>MediaInformation</code> object
- * using the output of the execution.
+ * <p>A custom FFprobe session, which produces a <code>MediaInformation</code> object using the
+ * FFprobe output.
  */
 public class MediaInformationSession extends FFprobeSession implements Session {
+
+    /**
+     * Media information extracted in the session.
+     */
     private MediaInformation mediaInformation;
 
-    public MediaInformationSession(final String[] arguments,
-                                   final ExecuteCallback executeCallback,
-                                   final LogCallback logCallback,
-                                   final StatisticsCallback statisticsCallback) {
-        super(arguments, executeCallback, logCallback, statisticsCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+    /**
+     * Creates a new media information session.
+     *
+     * @param arguments command arguments
+     */
+    public MediaInformationSession(final String[] arguments) {
+        this(arguments, null);
     }
 
+    /**
+     * Creates a new media information session.
+     *
+     * @param arguments       command arguments
+     * @param executeCallback session specific execute callback function
+     */
+    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback) {
+        this(arguments, executeCallback, null);
+    }
+
+    /**
+     * Creates a new media information session.
+     *
+     * @param arguments       command arguments
+     * @param executeCallback session specific execute callback function
+     * @param logCallback     session specific log callback function
+     */
+    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback, final LogCallback logCallback) {
+        super(arguments, executeCallback, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+    }
+
+    /**
+     * Returns the media information extracted in this session.
+     *
+     * @return media information extracted or null if the command failed or the output can not be
+     * parsed
+     */
     public MediaInformation getMediaInformation() {
         return mediaInformation;
     }
 
-    public void setMediaInformation(MediaInformation mediaInformation) {
+    /**
+     * Sets the media information extracted in this session.
+     *
+     * @param mediaInformation media information extracted
+     */
+    public void setMediaInformation(final MediaInformation mediaInformation) {
         this.mediaInformation = mediaInformation;
     }
 

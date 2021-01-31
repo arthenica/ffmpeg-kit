@@ -17,32 +17,32 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ArchDetect.h"
-#include "FFmpegKitConfig.h"
-#include "FFmpegKit.h"
+#import <sys/types.h>
+#import <sys/sysctl.h>
+#import <mach/machine.h>
+#import "ArchDetect.h"
+#import "FFmpegKitConfig.h"
+#import "FFmpegKit.h"
+#import "FFprobeKit.h"
 
 @implementation ArchDetect
 
 + (void)initialize {
-    [FFmpegKitConfig class];
     [FFmpegKit class];
+    [FFmpegKitConfig class];
+    [FFprobeKit class];
 }
 
-/**
- * Returns running cpu architecture name.
- *
- * @return running cpu architecture name as NSString
- */
 + (NSString*)getCpuArch {
-    NSMutableString *cpu = [[NSMutableString alloc] init];
+    NSMutableString* cpu = [[NSMutableString alloc] init];
     size_t size;
     cpu_type_t type;
     cpu_subtype_t subtype;
     size = sizeof(type);
-    sysctlbyname("hw.cputype", &type, &size, NULL, 0);
+    sysctlbyname("hw.cputype", &type, &size, nil, 0);
 
     size = sizeof(subtype);
-    sysctlbyname("hw.cpusubtype", &subtype, &size, NULL, 0);
+    sysctlbyname("hw.cpusubtype", &subtype, &size, nil, 0);
 
     if (type == CPU_TYPE_X86_64) {
         [cpu appendString:@"x86_64"];
@@ -118,9 +118,11 @@
             case CPU_SUBTYPE_ARM_V7S:
                 [cpu appendString:@"v7s"];
             break;
+#ifndef FFMPEG_KIT_LTS
             case CPU_SUBTYPE_ARM_V8:
                 [cpu appendString:@"v8"];
             break;
+#endif
         }
 
     #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120100
@@ -141,11 +143,6 @@
     return cpu;
 }
 
-/**
- * Returns loaded architecture name.
- *
- * @return loaded architecture name as NSString
- */
 + (NSString*)getArch {
     NSMutableString *arch = [[NSMutableString alloc] init];
 
@@ -155,6 +152,10 @@
     [arch appendString:@"armv7s"];
 #elif FFMPEG_KIT_ARM64
     [arch appendString:@"arm64"];
+#elif FFMPEG_KIT_ARM64_MAC_CATALYST
+    [arch appendString:@"arm64_mac_catalyst"];
+#elif FFMPEG_KIT_ARM64_SIMULATOR
+    [arch appendString:@"arm64_simulator"];
 #elif FFMPEG_KIT_ARM64E
     [arch appendString:@"arm64e"];
 #elif FFMPEG_KIT_I386
@@ -166,19 +167,6 @@
 #endif
 
     return arch;
-}
-
-/**
- * Returns whether FFmpegKit release is a long term release or not.
- *
- * @return yes=1 or no=0
- */
-+ (int)isLTSBuild {
-    #if defined(FFMPEG_KIT_LTS)
-        return 1;
-    #else
-        return 0;
-    #endif
 }
 
 @end

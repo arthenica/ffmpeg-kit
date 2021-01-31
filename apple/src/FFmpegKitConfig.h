@@ -17,116 +17,263 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <Foundation/Foundation.h>
-#include "LogDelegate.h"
-#include "StatisticsDelegate.h"
+#ifndef FFMPEG_KIT_CONFIG_H
+#define FFMPEG_KIT_CONFIG_H
 
-/** Common return code values */
-extern int const RETURN_CODE_SUCCESS;
-extern int const RETURN_CODE_CANCEL;
+#import <stdio.h>
+#import <pthread.h>
+#import <unistd.h>
+#import <Foundation/Foundation.h>
+#import "ExecuteDelegate.h"
+#import "FFmpegSession.h"
+#import "FFprobeSession.h"
+#import "LogDelegate.h"
+#import "MediaInformationSession.h"
+#import "StatisticsDelegate.h"
 
-/** Identifier used for IOS logging. */
-extern NSString *const LIB_NAME;
+/** Global library version */
+extern NSString* const FFmpegKitVersion;
 
-/**
- * Print no output.
- */
-#define AV_LOG_QUIET    -8
-
-/**
- * Something went really wrong and we will crash now.
- */
-#define AV_LOG_PANIC     0
-
-/**
- * Something went wrong and recovery is not possible.
- * For example, no header was found for a format which depends
- * on headers or an illegal combination of parameters is used.
- */
-#define AV_LOG_FATAL     8
+typedef NS_ENUM(NSUInteger, Signal) {
+    SignalInt = 2,
+    SignalQuit = 3,
+    SignalPipe = 13,
+    SignalTerm = 15,
+    SignalXcpu = 24
+};
 
 /**
- * Something went wrong and cannot losslessly be recovered.
- * However, not all future data is affected.
- */
-#define AV_LOG_ERROR    16
-
-/**
- * Something somehow does not look correct. This may or may not
- * lead to problems. An example would be the use of '-vstrict -2'.
- */
-#define AV_LOG_WARNING  24
-
-/**
- * Standard information.
- */
-#define AV_LOG_INFO     32
-
-/**
- * Detailed information.
- */
-#define AV_LOG_VERBOSE  40
-
-/**
- * Stuff which is only useful for libav* developers.
- */
-#define AV_LOG_DEBUG    48
-
-/**
- * This class is used to configure FFmpegKit library utilities/tools.
- *
- * 1. LogDelegate: This class redirects FFmpeg/FFprobe output to NSLog by default. As
- * an alternative, it is possible not to print messages to NSLog and pass them to a
- * LogDelegate function. This function can decide whether to print these logs, show them
- * inside another container or ignore them.
- *
- * 2. setLogLevel:/getLogLevel: Use this methods to set/get
- * FFmpeg/FFprobe log severity.
- *
- * 3. StatsDelegate: It is possible to receive statistics about ongoing
- * operation by defining a StatsDelegate or by calling
- * getLastReceivedStats method.
- *
- * 4. Font configuration: It is possible to register custom fonts with
- * setFontconfigConfigurationPath: and
- * setFontDirectory:with: methods.
- *
+ * <p>Configuration class of <code>FFmpegKit</code> library. Allows customizing the global library
+ * options. Provides helper methods to support additional resources.
  */
 @interface FFmpegKitConfig : NSObject
 
 /**
- * Enables log and statistics redirection.
- * When redirection is not enabled FFmpeg/FFprobe logs are printed to stderr. By enabling
- * redirection, they are routed to NSLog and can be routed further to a log delegate.
- * Statistics redirection behaviour is similar. Statistics are not printed at all if
- * redirection is not enabled. If it is enabled then it is possible to define a statistics
- * delegate but if you don't, they are not printed anywhere and only saved as
- * 'lastReceivedStatistics' data which can be polled with
- * '{@link #'getLastReceivedStatistics()'.
- * Note that redirection is enabled by default. If you do not want to use its functionality
- * please use 'disableRedirection()' to disable it.
+ * <p>Enables log and statistics redirection.
+ *
+ * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to NSLog and sessions
+ * collect log and statistics entries for the executions. It is possible to define global or
+ * session specific log/statistics delegates as well.
+ *
+ * <p>Note that redirection is enabled by default. If you do not want to use its functionality
+ * please use disableRedirection method to disable it.
  */
 + (void)enableRedirection;
 
 /**
- * Disables log and statistics redirection.
+ * <p>Disables log and statistics redirection.
+ *
+ * <p>When redirection is disabled logs are printed to stderr, all logs and statistics
+ * delegates are disabled and <code>FFprobe</code>'s <code>getMediaInformation</code> methods
+ * do not work.
  */
 + (void)disableRedirection;
 
 /**
- * Returns log level.
+ * <p>Sets and overrides <code>fontconfig</code> configuration directory.
  *
- * @return log level
+ * @param path directory that contains fontconfig configuration (fonts.conf)
+ * @return zero on success, non-zero on error
+ */
++ (int)setFontconfigConfigurationPath:(NSString*)path;
+
+/**
+ * <p>Registers the fonts inside the given path, so they become available to use in FFmpeg
+ * filters.
+ *
+ * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
+ * enabled or use a prebuilt package with <code>fontconfig</code> inside to be able to use
+ * fonts in <code>FFmpeg</code>.
+ *
+ * @param fontDirectoryPath directory that contains fonts (.ttf and .otf files)
+ * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
+ *                          friendly names
+ */
++ (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
+
+/**
+ * <p>Registers the fonts inside the given array of font directories, so they become available
+ * to use in FFmpeg filters.
+ *
+ * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
+ * enabled or use a prebuilt package with <code>fontconfig</code> inside to be able to use
+ * fonts in <code>FFmpeg</code>.
+ *
+ * @param fontDirectoryList array of directories that contain fonts (.ttf and .otf files)
+ * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
+ *                          friendly names
+ */
++ (void)setFontDirectoryList:(NSArray*)fontDirectoryList with:(NSDictionary*)fontNameMapping;
+
+/**
+ * <p>Creates a new named pipe to use in <code>FFmpeg</code> operations.
+ *
+ * <p>Please note that creator is responsible of closing created pipes.
+ *
+ * @return the full path of the named pipe
+ */
++ (NSString*)registerNewFFmpegPipe;
+
+/**
+ * <p>Closes a previously created <code>FFmpeg</code> pipe.
+ *
+ * @param ffmpegPipePath full path of the FFmpeg pipe
+ */
++ (void)closeFFmpegPipe:(NSString*)ffmpegPipePath;
+
+/**
+ * <p>Returns the version of FFmpeg bundled within <code>FFmpegKit</code> library.
+ *
+ * @return the version of FFmpeg
+ */
++ (NSString*)getFFmpegVersion;
+
+/**
+ * Returns FFmpegKit library version.
+ *
+ * @return FFmpegKit version
+ */
++ (NSString*)getVersion;
+
+/**
+ * <p>Returns whether FFmpegKit release is a Long Term Release or not.
+ *
+ * @return true/yes or false/no
+ */
++ (int)isLTSBuild;
+
+/**
+ * Returns FFmpegKit library build date.
+ *
+ * @return FFmpegKit library build date
+ */
++ (NSString*)getBuildDate;
+
+/**
+ * <p>Sets an environment variable.
+ *
+ * @param variableName  environment variable name
+ * @param variableValue environment variable value
+ * @return zero on success, non-zero on error
+ */
++ (int)setEnvironmentVariable:(NSString*)variableName value:(NSString*)variableValue;
+
+/**
+ * <p>Registers a new ignored signal. Ignored signals are not handled by <code>FFmpegKit</code>
+ * library.
+ *
+ * @param signal signal to be ignored
+ */
++ (void)ignoreSignal:(Signal)signal;
+
+/**
+ * <p>Synchronously executes the FFmpeg session provided.
+ *
+ * @param ffmpegSession FFmpeg session which includes command options/arguments
+ */
++ (void)ffmpegExecute:(FFmpegSession*)ffmpegSession;
+
+/**
+ * <p>Synchronously executes the FFprobe session provided.
+ *
+ * @param ffprobeSession FFprobe session which includes command options/arguments
+ */
++ (void)ffprobeExecute:(FFprobeSession*)ffprobeSession;
+
+/**
+ * <p>Synchronously executes the media information session provided.
+ *
+ * @param mediaInformationSession media information session which includes command options/arguments
+ * @param waitTimeout             max time to wait until media information is transmitted
+ */
++ (void)getMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Asynchronously executes the FFmpeg session provided.
+ *
+ * @param ffmpegSession FFmpeg session which includes command options/arguments
+ */
++ (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession;
+
+/**
+ * <p>Asynchronously executes the FFmpeg session provided.
+ *
+ * @param ffmpegSession   FFmpeg session which includes command options/arguments
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ */
++ (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Asynchronously executes the FFprobe session provided.
+ *
+ * @param ffprobeSession FFprobe session which includes command options/arguments
+ */
++ (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession;
+
+/**
+ * <p>Asynchronously executes the FFprobe session provided.
+ *
+ * @param ffprobeSession  FFprobe session which includes command options/arguments
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ */
++ (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Asynchronously executes the media information session provided.
+ *
+ * @param mediaInformationSession media information session which includes command options/arguments
+ * @param waitTimeout             max time to wait until media information is transmitted
+ */
++ (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Asynchronously executes the media information session provided.
+ *
+ * @param mediaInformationSession media information session which includes command options/arguments
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @param waitTimeout             max time to wait until media information is transmitted
+ */
++ (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Sets a global log delegate to redirect FFmpeg/FFprobe logs.
+ *
+ * @param logDelegate log delegate or nil to disable a previously defined log delegate
+ */
++ (void)enableLogDelegate:(id<LogDelegate>)logDelegate;
+
+/**
+ * <p>Sets a global statistics delegate to redirect FFmpeg statistics.
+ *
+ * @param statisticsDelegate statistics delegate or nil to disable a previously defined statistics delegate
+ */
++ (void)enableStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
+
+/**
+ * <p>Sets a global execute delegate to receive execution results.
+ *
+ * @param executeDelegate execute delegate or nil to disable a previously execute delegate
+ */
++ (void)enableExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+
+/**
+ * <p>Returns the global execute delegate.
+ *
+ * @return global execute delegate
+ */
++ (id<ExecuteDelegate>)getExecuteDelegate;
+
+/**
+ * Returns the current log level.
+ *
+ * @return current log level
  */
 + (int)getLogLevel;
 
 /**
- * Sets log level.
+ * Sets the log level.
  *
- * @param level log level
+ * @param level new log level
  */
 + (void)setLogLevel:(int)level;
 
@@ -139,128 +286,93 @@ extern NSString *const LIB_NAME;
 + (NSString*)logLevelToString:(int)level;
 
 /**
- * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
+ * Returns the session history size.
  *
- * @param newLogDelegate log delegate or nil to disable a previously defined delegate
+ * @return session history size
  */
-+ (void)setLogDelegate:(id<LogDelegate>)newLogDelegate;
++ (int)getSessionHistorySize;
 
 /**
- * Sets a StatisticsDelegate. statisticsCallback method inside StatisticsDelegate is used to redirect statistics.
+ * Sets the session history size.
  *
- * @param newStatisticsDelegate statistics delegate or nil to disable a previously defined delegate
+ * @param sessionHistorySize session history size, should be smaller than 1000
  */
-+ (void)setStatisticsDelegate:(id<StatisticsDelegate>)newStatisticsDelegate;
++ (void)setSessionHistorySize:(int)sessionHistorySize;
 
 /**
- * Returns the last received statistics data. It is recommended to call it before starting a new execution.
+ * Returns the session specified with <code>sessionId</code> from the session history.
  *
- * @return last received statistics data
+ * @param sessionId session identifier
+ * @return session specified with sessionId or nil if it is not found in the history
  */
-+ (Statistics*)getLastReceivedStatistics;
++ (id<Session>)getSession:(long)sessionId;
 
 /**
- * Resets last received statistics.
+ * Returns the last session created from the session history.
+ *
+ * @return the last session created or nil if session history is empty
  */
-+ (void)resetStatistics;
++ (id<Session>)getLastSession;
 
 /**
- * Sets and overrides fontconfig configuration directory.
+ * Returns the last session completed from the session history.
  *
- * @param path directory which contains fontconfig configuration (fonts.conf)
+ * @return the last session completed. If there are no completed sessions in the history this
+ * method will return nil
  */
-+ (void)setFontconfigConfigurationPath:(NSString*)path;
++ (id<Session>)getLastCompletedSession;
 
 /**
- * Registers fonts inside the given path, so they are available to use in FFmpeg filters.
+ * <p>Returns all sessions in the session history.
  *
- * Note that you need to build FFmpegKit with fontconfig
- * enabled or use a prebuilt package with fontconfig inside to use this feature.
- *
- * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
- * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
+ * @return all sessions in the session history
  */
-+ (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
++ (NSArray*)getSessions;
 
 /**
- * Returns package name.
+ * <p>Returns all FFmpeg sessions in the session history.
  *
- * @return guessed package name according to supported external libraries
+ * @return all FFmpeg sessions in the session history
  */
-+ (NSString*)getPackageName;
++ (NSArray*)getFFmpegSessions;
 
 /**
- * Returns supported external libraries.
+ * <p>Returns all FFprobe sessions in the session history.
  *
- * @return array of supported external libraries
+ * @return all FFprobe sessions in the session history
  */
-+ (NSArray*)getExternalLibraries;
++ (NSArray*)getFFprobeSessions;
 
 /**
- * Creates a new named pipe to use in FFmpeg operations.
+ * <p>Returns sessions that have the given state.
  *
- * Please note that creator is responsible of closing created pipes.
- *
- * @return the full path of named pipe
+ * @return sessions that have the given state from the session history
  */
-+ (NSString*)registerNewFFmpegPipe;
++ (NSArray*)getSessionsByState:(SessionState)state;
 
 /**
- * Closes a previously created FFmpeg pipe.
+ * Returns the active log redirection strategy.
  *
- * @param ffmpegPipePath full path of ffmpeg pipe
+ * @return log redirection strategy
  */
-+ (void)closeFFmpegPipe:(NSString*)ffmpegPipePath;
++ (LogRedirectionStrategy)getLogRedirectionStrategy;
 
 /**
- * Returns FFmpeg version bundled within the library.
+ * <p>Sets the log redirection strategy
  *
- * @return FFmpeg version
+ * @param logRedirectionStrategy log redirection strategy
  */
-+ (NSString*)getFFmpegVersion;
++ (void)setLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
- * Returns FFmpegKit library version.
+ * <p>Returns the number of async messages that are not transmitted to the delegates for
+ * this session.
  *
- * @return FFmpegKit version
+ * @param sessionId id of the session
+ * @return number of async messages that are not transmitted to the delegates for this session
  */
-+ (NSString*)getVersion;
-
-/**
- * Returns FFmpegKit library build date.
- *
- * @return FFmpegKit library build date
- */
-+ (NSString*)getBuildDate;
-
-/**
- * Returns return code of last executed command.
- *
- * @return return code of last executed command
- */
-+ (int)getLastReturnCode;
-
-/**
- * Returns log output of last executed single FFmpeg/FFprobe command.
- *
- * This method does not support executing multiple concurrent commands. If you execute
- * multiple commands at the same time, this method will return output from all executions.
- *
- * Please note that disabling redirection using FFmpegKitConfig.disableRedirection() method
- * also disables this functionality.
- *
- * @return output of last executed command
- */
-+ (NSString*)getLastCommandOutput;
-
-/**
- * Registers a new ignored signal. Ignored signals are not handled by the library.
- *
- * By default, the following 5 signals are handled: SIGINT, SIGQUIT, SIGPIPE, SIGTERM and SIGXCPU. Any of them can be
- * ignored.
- *
- * @param signum signal number to ignore
- */
-+ (void)ignoreSignal:(int)signum;
++ (int)messagesInTransmit:(long)sessionId;
 
 @end
+
+#endif // FFMPEG_KIT_CONFIG_H

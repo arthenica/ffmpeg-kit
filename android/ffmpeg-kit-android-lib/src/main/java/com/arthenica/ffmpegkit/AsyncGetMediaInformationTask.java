@@ -28,7 +28,7 @@ public class AsyncGetMediaInformationTask implements Runnable {
     private final Integer waitTimeout;
 
     public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession) {
-        this(mediaInformationSession, AbstractSession.DEFAULT_TIMEOUT_FOR_CALLBACK_MESSAGES_IN_TRANSMIT);
+        this(mediaInformationSession, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
     }
 
     public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession, final Integer waitTimeout) {
@@ -41,7 +41,7 @@ public class AsyncGetMediaInformationTask implements Runnable {
     public void run() {
         FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession, waitTimeout);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getGlobalExecuteCallbackFunction();
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
         if (globalExecuteCallbackFunction != null) {
             globalExecuteCallbackFunction.apply(mediaInformationSession);
         }

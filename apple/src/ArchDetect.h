@@ -17,35 +17,30 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#include <mach/machine.h>
-#include <Foundation/Foundation.h>
+#ifndef FFMPEG_KIT_ARCH_DETECT_H
+#define FFMPEG_KIT_ARCH_DETECT_H
+
+#import <Foundation/Foundation.h>
 
 /**
- * This class is used to detect running architecture.
+ * Detects the running architecture.
  */
 @interface ArchDetect : NSObject
 
 /**
- * Returns running cpu architecture name.
+ * Returns architecture name of the cpu running.
  *
- * @return running cpu architecture name as NSString
+ * @return architecture name of the cpu running
  */
 + (NSString*)getCpuArch;
 
 /**
- * Returns loaded architecture name.
+ * Returns architecture name loaded.
  *
- * @return loaded architecture name as NSString
+ * @return architecture name loaded
  */
 + (NSString*)getArch;
 
-/**
- * Returns whether FFmpegKit release is a long term release or not.
- *
- * @return yes=1 or no=0
- */
-+ (int)isLTSBuild;
-
 @end
+
+#endif // FFMPEG_KIT_ARCH_DETECT_H

@@ -20,7 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Log entry for an execute session.
+ * <p>Log entry for an <code>FFmpegKit</code> session.
  */
 public class Log {
     private final long sessionId;

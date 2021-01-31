@@ -17,108 +17,65 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Statistics.h"
+#import "Statistics.h"
 
 @implementation Statistics {
-    long executionId;
-    int videoFrameNumber;
-    float videoFps;
-    float videoQuality;
-    long size;
-    int time;
-    double bitrate;
-    double speed;
+    long _sessionId;
+    int _videoFrameNumber;
+    float _videoFps;
+    float _videoQuality;
+    long _size;
+    int _time;
+    double _bitrate;
+    double _speed;
 }
 
-- (instancetype)init {
+- (instancetype)init:(long)sessionId videoFrameNumber:(int)videoFrameNumber videoFps:(float)videoFps videoQuality:(float)videoQuality size:(int64_t)size time:(int)time bitrate:(double)bitrate speed:(double)speed {
     self = [super init];
     if (self) {
-        executionId = 0;
-        videoFrameNumber = 0;
-        videoFps = 0;
-        videoQuality = 0;
-        size = 0;
-        time = 0;
-        bitrate = 0;
-        speed = 0;
+        _sessionId = sessionId;
+        _videoFrameNumber = videoFrameNumber;
+        _videoFps = videoFps;
+        _videoQuality = videoQuality;
+        _size = size;
+        _time = time;
+        _bitrate = bitrate;
+        _speed = speed;
     }
 
     return self;
 }
 
-- (instancetype)initWithId:(long)currentExecutionId videoFrameNumber:(int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed {
-    self = [super init];
-    if (self) {
-        executionId = currentExecutionId;
-        videoFrameNumber = newVideoFrameNumber;
-        videoFps = newVideoFps;
-        videoQuality = newVideoQuality;
-        size = newSize;
-        time = newTime;
-        bitrate = newBitrate;
-        speed = newSpeed;
-    }
-
-    return self;
-}
-
-- (void)update:(Statistics*)statistics {
-    if (statistics != nil) {
-        executionId = [statistics getExecutionId];
-        if ([statistics getVideoFrameNumber] > 0) {
-            videoFrameNumber = [statistics getVideoFrameNumber];
-        }
-        if ([statistics getVideoFps] > 0) {
-            videoFps = [statistics getVideoFps];
-        }
-        if ([statistics getVideoQuality] > 0) {
-            videoQuality = [statistics getVideoQuality];
-        }
-        if ([statistics getSize] > 0) {
-            size = [statistics getSize];
-        }
-        if ([statistics getTime] > 0) {
-            time = [statistics getTime];
-        }
-        if ([statistics getBitrate] > 0) {
-            bitrate = [statistics getBitrate];
-        }
-        if ([statistics getSpeed] > 0) {
-            speed = [statistics getSpeed];
-        }
-    }
-}
-
-- (long)getExecutionId {
-    return executionId;
+- (long)getSessionId {
+    return _sessionId;
 }
 
 - (int)getVideoFrameNumber {
-    return videoFrameNumber;
+    return _videoFrameNumber;
 }
 
 - (float)getVideoFps {
-    return videoFps;
+    return _videoFps;
 }
 
 - (float)getVideoQuality {
-    return videoQuality;
+    return _videoQuality;
 }
 
 - (long)getSize {
-    return size;
+    return _size;
 }
 
 - (int)getTime {
-    return time;
+    return _time;
 }
 
 - (double)getBitrate {
-    return bitrate;
+    return _bitrate;
 }
 
 - (double)getSpeed {
-    return speed;
+    return _speed;
 }
 
 @end

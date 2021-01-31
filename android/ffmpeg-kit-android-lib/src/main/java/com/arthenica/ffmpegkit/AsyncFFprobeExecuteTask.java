@@ -20,7 +20,7 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Executes an FFprobe execution asynchronously.
+ * <p>Executes an FFprobe session asynchronously.
  */
 public class AsyncFFprobeExecuteTask implements Runnable {
     private final FFprobeSession ffprobeSession;
@@ -35,7 +35,7 @@ public class AsyncFFprobeExecuteTask implements Runnable {
     public void run() {
         FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getGlobalExecuteCallbackFunction();
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
         if (globalExecuteCallbackFunction != null) {
             globalExecuteCallbackFunction.apply(ffprobeSession);
         }

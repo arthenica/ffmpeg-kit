@@ -17,8 +17,21 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Foundation/Foundation.h>
-#include "StreamInformation.h"
+#ifndef FFMPEG_KIT_MEDIA_INFORMATION_H
+#define FFMPEG_KIT_MEDIA_INFORMATION_H
+
+#import <Foundation/Foundation.h>
+#import "StreamInformation.h"
+
+extern NSString* const MediaKeyMediaProperties;
+extern NSString* const MediaKeyFilename;
+extern NSString* const MediaKeyFormat;
+extern NSString* const MediaKeyFormatLong;
+extern NSString* const MediaKeyStartTime;
+extern NSString* const MediaKeyDuration;
+extern NSString* const MediaKeySize;
+extern NSString* const MediaKeyBitRate;
+extern NSString* const MediaKeyTags;
 
 /**
  * Media information class.
@@ -126,3 +139,5 @@
 - (NSDictionary*)getAllProperties;
 
 @end
+
+#endif // FFMPEG_KIT_MEDIA_INFORMATION_H

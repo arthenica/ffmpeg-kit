@@ -20,15 +20,31 @@
 package com.arthenica.ffmpegkit;
 
 /**
- * <p>Callback function to receive execution results.
+ * <p>Callback function invoked when an asynchronous session ends running.
+ * <p>Session has either {@link SessionState#COMPLETED} or {@link SessionState#FAILED} state when
+ * the callback is invoked.
+ * <p>If it has {@link SessionState#COMPLETED} state, <code>ReturnCode</code> should be checked to
+ * see the execution result.
+ * <p>If <code>getState</code> returns {@link SessionState#FAILED} then
+ * <code>getFailStackTrace</code> should be used to get the failure reason.
+ * <pre>
+ *  switch (session.getState()) {
+ *      case COMPLETED: {
+ *          ReturnCode returnCode = session.getReturnCode();
+ *      } break;
+ *      case FAILED: {
+ *          String failStackTrace = session.getFailStackTrace();
+ *      } break;
+ *  }
+ * </pre>
  */
 @FunctionalInterface
 public interface ExecuteCallback {
 
     /**
-     * <p>Called when an execution is completed.
+     * <p>Called when an asynchronous session ends running.
      *
-     * @param session of with completed execution
+     * @param session session
      */
     void apply(final Session session);
 

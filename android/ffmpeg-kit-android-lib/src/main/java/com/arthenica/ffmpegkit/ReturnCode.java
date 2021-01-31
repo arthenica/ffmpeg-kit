@@ -21,22 +21,35 @@ package com.arthenica.ffmpegkit;
 
 public class ReturnCode {
 
-    public static int NOT_SET = -999;
-
     public static int SUCCESS = 0;
 
     public static int CANCEL = 255;
 
-    public static boolean isSuccess(final int returnCode) {
-        return (returnCode == SUCCESS);
+    private final int value;
+
+    public ReturnCode(final int value) {
+        this.value = value;
     }
 
-    public static boolean isFailure(final int returnCode) {
-        return (returnCode != NOT_SET) && (returnCode != SUCCESS) && (returnCode != CANCEL);
+    public int getValue() {
+        return value;
     }
 
-    public static boolean isCancel(final int returnCode) {
-        return (returnCode == CANCEL);
+    public boolean isSuccess() {
+        return (value == SUCCESS);
+    }
+
+    public boolean isError() {
+        return ((value != SUCCESS) && (value != CANCEL));
+    }
+
+    public boolean isCancel() {
+        return (value == CANCEL);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 
 }

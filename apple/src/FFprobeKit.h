@@ -17,71 +17,225 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <Foundation/Foundation.h>
+#ifndef FFPROBE_KIT_H
+#define FFPROBE_KIT_H
 
-#include "MediaInformationParser.h"
+#import <string.h>
+#import <stdlib.h>
+#import <Foundation/Foundation.h>
+#import "FFprobeSession.h"
+#import "MediaInformationJsonParser.h"
 
 /**
- * Main class for FFprobe operations.
+ * <p>Main class to run <code>FFprobe</code> commands. Supports executing commands both
+ * synchronously and asynchronously.
+ * <pre>
+ * FFprobeSession *session = [FFprobeKit execute:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4"];
+ *
+ * FFprobeSession *asyncSession = [FFprobeKit executeAsync:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4" withExecuteDelegate:executeDelegate];
+ * </pre>
+ * <p>Provides overloaded <code>execute</code> methods to define session specific delegates.
+ * <pre>
+ * FFprobeSession *session = [FFprobeKit executeAsync:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4" withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+ * </pre>
+ * <p>It can extract media information for a file or a url, using getMediaInformation method.
+ * <pre>
+ *      MediaInformationSession *session = [FFprobeKit getMediaInformation:@"file1.mp4"];
+ * </pre>
  */
 @interface FFprobeKit : NSObject
 
 /**
- * Synchronously executes FFprobe with arguments provided.
+ * <p>Synchronously executes FFprobe with arguments provided.
  *
  * @param arguments FFprobe command options/arguments as string array
- * @return zero on successful execution, 255 on user cancel and non-zero on error
+ * @return FFprobe session created for this execution
  */
-+ (int)executeWithArguments:(NSArray*)arguments;
++ (FFprobeSession*)executeWithArguments:(NSArray*)arguments;
 
 /**
- * Synchronously executes FFprobe command provided. Space character is used to split command
- * into arguments.
+ * <p>Asynchronously executes FFprobe with arguments provided.
+ *
+ * @param arguments       FFprobe command options/arguments as string array
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @return FFprobe session created for this execution
+ */
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+
+/**
+ * <p>Asynchronously executes FFprobe with arguments provided.
+ *
+ * @param arguments       FFprobe command options/arguments as string array
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @return FFprobe session created for this execution
+ */
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate;
+
+/**
+ * <p>Asynchronously executes FFprobe with arguments provided.
+ *
+ * @param arguments       FFprobe command options/arguments as string array
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFprobe session created for this execution
+ */
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Asynchronously executes FFprobe with arguments provided.
+ *
+ * @param arguments       FFprobe command options/arguments as string array
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFprobe session created for this execution
+ */
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Synchronously executes FFprobe command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
  * @param command FFprobe command
- * @return zero on successful execution, 255 on user cancel and non-zero on error
+ * @return FFprobe session created for this execution
  */
-+ (int)execute:(NSString*)command;
++ (FFprobeSession*)execute:(NSString*)command;
 
 /**
- * Returns media information for the given file.
+ * <p>Asynchronously executes FFprobe command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param path or uri of media file
- * @return media information
+ * @param command         FFprobe command
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @return FFprobe session created for this execution
  */
-+ (MediaInformation*)getMediaInformation:(NSString*)path;
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
 
 /**
- * Returns media information for the given command.
+ * <p>Asynchronously executes FFprobe command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param command ffprobe command
- * @return media information
+ * @param command         FFprobe command
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @return FFprobe session created for this execution
  */
-+ (MediaInformation*)getMediaInformationFromCommand:(NSString*)command;
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate;
 
 /**
- * Returns media information for given file.
+ * <p>Asynchronously executes FFprobe command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
  *
- * This method does not support executing multiple concurrent operations. If you execute
- * multiple operations (execute or getMediaInformation) at the same time, the response of this
- * method is not predictable.
- *
- * @param path path or uri of media file
- * @param timeout complete timeout
- * @deprecated this method is deprecated since v4.3.1. You can still use this method but
- * timeout parameter is not effective anymore.
- * @return media information
+ * @param command         FFprobe command
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFprobe session created for this execution
  */
-+ (MediaInformation*)getMediaInformation:(NSString*)path timeout:(long)timeout __attribute__((deprecated));
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Asynchronously executes FFprobe command provided. Space character is used to split command
+ * into arguments. You can use single or double quote characters to specify arguments inside
+ * your command.
+ *
+ * @param command         FFprobe command
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return FFprobe session created for this execution
+ */
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Extracts media information for the file specified with path.
+ *
+ * @param path path or uri of a media file
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformation:(NSString*)path;
+
+/**
+ * <p>Extracts media information for the file specified with path.
+ *
+ * @param path        path or uri of a media file
+ * @param waitTimeout max time to wait until media information is transmitted
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformation:(NSString*)path withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Extracts media information for the file specified with path asynchronously.
+ *
+ * @param path            path or uri of a media file
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+
+/**
+ * <p>Extracts media information for the file specified with path asynchronously.
+ *
+ * @param path            path or uri of a media file
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @param waitTimeout     max time to wait until media information is transmitted
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Extracts media information for the file specified with path asynchronously.
+ *
+ * @param path            path or uri of a media file
+ * @param executeDelegate delegate that will be called when the execution is completed
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
+
+/**
+ * <p>Extracts media information for the file specified with path asynchronously.
+ *
+ * @param path            path or uri of a media file
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @param waitTimeout     max time to wait until media information is transmitted
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Extracts media information using the command provided asynchronously.
+ *
+ * @param command FFprobe command that prints media information for a file in JSON format
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationFromCommand:(NSString*)command;
+
+/**
+ * <p>Extracts media information using the command provided asynchronously.
+ *
+ * @param command         FFprobe command that prints media information for a file in JSON format
+ * @param executeDelegate delegate that will be notified when execution is completed
+ * @param logDelegate     delegate that will receive logs
+ * @param waitTimeout     max time to wait until media information is transmitted
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
+
+/**
+ * <p>Lists all FFprobe sessions in the session history.
+ *
+ * @return all FFprobe sessions in the session history
+ */
++ (NSArray*)listSessions;
 
 @end
+
+#endif // FFPROBE_KIT_H
