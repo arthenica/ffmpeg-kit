@@ -41,7 +41,11 @@ public class NativeLoader {
 
     private static void loadLibrary(final String libraryName) {
         if (isTestModeDisabled()) {
-            System.loadLibrary(libraryName);
+            try {
+                System.loadLibrary(libraryName);
+            } catch (final UnsatisfiedLinkError e) {
+                throw new Error(String.format("FFmpegKit failed to start on %s.", getDeviceDebugInformation()), e);
+            }
         }
     }
 
@@ -141,7 +145,7 @@ public class NativeLoader {
                         loadLibrary(ffmpegLibrary + "_neon");
                     }
                     nativeFFmpegLoaded = true;
-                } catch (final UnsatisfiedLinkError e) {
+                } catch (final Error e) {
                     android.util.Log.i(FFmpegKitConfig.TAG, String.format("NEON supported armeabi-v7a ffmpeg library not found. Loading default armeabi-v7a library.%s", Exceptions.getStackTraceString(e)));
                     nativeFFmpegTriedAndFailed = true;
                 }
@@ -170,7 +174,7 @@ public class NativeLoader {
                 loadLibrary("ffmpegkit_armv7a_neon");
                 nativeFFmpegKitLoaded = true;
                 AbiDetect.setArmV7aNeonLoaded();
-            } catch (final UnsatisfiedLinkError e) {
+            } catch (final Error e) {
                 android.util.Log.i(FFmpegKitConfig.TAG, String.format("NEON supported armeabi-v7a ffmpegkit library not found. Loading default armeabi-v7a library.%s", Exceptions.getStackTraceString(e)));
             }
         }
@@ -178,6 +182,35 @@ public class NativeLoader {
         if (!nativeFFmpegKitLoaded) {
             loadLibrary("ffmpegkit");
         }
+    }
+
+    static String getDeviceDebugInformation() {
+        final StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("brand: ");
+        stringBuilder.append(Build.BRAND);
+        stringBuilder.append(", model: ");
+        stringBuilder.append(Build.MODEL);
+        stringBuilder.append(", device: ");
+        stringBuilder.append(Build.DEVICE);
+        stringBuilder.append(", api level: ");
+        stringBuilder.append(Build.VERSION.SDK_INT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            stringBuilder.append(", abis: ");
+            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_ABIS));
+            stringBuilder.append(", 32bit abis: ");
+            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_32_BIT_ABIS));
+            stringBuilder.append(", 64bit abis: ");
+            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_64_BIT_ABIS));
+        } else {
+            stringBuilder.append(", cpu abis: ");
+            stringBuilder.append(Build.CPU_ABI);
+            stringBuilder.append(", cpu abi2s: ");
+            stringBuilder.append(Build.CPU_ABI2);
+        }
+
+        return stringBuilder.toString();
     }
 
 }
