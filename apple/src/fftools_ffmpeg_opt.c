@@ -70,6 +70,7 @@ static const char *const opt_name_codec_names[]               = {"c", "codec", "
 static const char *const opt_name_audio_channels[]            = {"ac", NULL};
 static const char *const opt_name_audio_sample_rate[]         = {"ar", NULL};
 static const char *const opt_name_frame_rates[]               = {"r", NULL};
+static const char *const opt_name_max_frame_rates[]           = {"fpsmax", NULL};
 static const char *const opt_name_frame_sizes[]               = {"s", NULL};
 static const char *const opt_name_frame_pix_fmts[]            = {"pix_fmt", NULL};
 static const char *const opt_name_ts_scale[]                  = {"itsscale", NULL};
@@ -1705,7 +1706,7 @@ OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int sourc
     AVStream *st;
     OutputStream *ost;
     AVCodecContext *video_enc;
-    char *frame_rate = NULL, *frame_aspect_ratio = NULL;
+    char *frame_rate = NULL, *max_frame_rate = NULL, *frame_aspect_ratio = NULL;
 
     ost = new_output_stream(o, oc, AVMEDIA_TYPE_VIDEO, source_index);
     st  = ost->st;
@@ -1716,8 +1717,21 @@ OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int sourc
         av_log(NULL, AV_LOG_FATAL, "Invalid framerate value: %s\n", frame_rate);
         exit_program(1);
     }
-    if (frame_rate && video_sync_method == VSYNC_PASSTHROUGH)
-        av_log(NULL, AV_LOG_ERROR, "Using -vsync 0 and -r can produce invalid output files\n");
+
+    MATCH_PER_STREAM_OPT(max_frame_rates, str, max_frame_rate, oc, st);
+    if (max_frame_rate && av_parse_video_rate(&ost->max_frame_rate, max_frame_rate) < 0) {
+        av_log(NULL, AV_LOG_FATAL, "Invalid maximum framerate value: %s\n", max_frame_rate);
+        exit_program(1);
+    }
+
+    if (frame_rate && max_frame_rate) {
+        av_log(NULL, AV_LOG_ERROR, "Only one of -fpsmax and -r can be set for a stream.\n");
+        exit_program(1);
+    }
+
+    if ((frame_rate || max_frame_rate) &&
+        video_sync_method == VSYNC_PASSTHROUGH)
+        av_log(NULL, AV_LOG_ERROR, "Using -vsync 0 and -r/-fpsmax can produce invalid output files\n");
 
     MATCH_PER_STREAM_OPT(frame_aspect_ratios, str, frame_aspect_ratio, oc, st);
     if (frame_aspect_ratio) {
@@ -2658,6 +2672,9 @@ loop_end:
         if(o->recording_time != INT64_MAX)
             av_dict_set(&oc->metadata, "duration", NULL, 0);
         av_dict_set(&oc->metadata, "creation_time", NULL, 0);
+        av_dict_set(&oc->metadata, "company_name", NULL, 0);
+        av_dict_set(&oc->metadata, "product_name", NULL, 0);
+        av_dict_set(&oc->metadata, "product_version", NULL, 0);
     }
     if (!o->metadata_streams_manual)
         for (i = of->ost_index; i < nb_output_streams; i++) {

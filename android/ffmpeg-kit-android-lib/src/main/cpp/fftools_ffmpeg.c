@@ -1006,10 +1006,10 @@ static void output_packet(OutputFile *of, AVPacket *pkt,
     /* apply the output bitstream filters */
     if (ost->bsf_ctx) {
         ret = av_bsf_send_packet(ost->bsf_ctx, eof ? NULL : pkt);
-                if (ret < 0)
-                    goto finish;
+        if (ret < 0)
+            goto finish;
         while ((ret = av_bsf_receive_packet(ost->bsf_ctx, pkt)) >= 0)
-                write_packet(of, pkt, ost, 0);
+            write_packet(of, pkt, ost, 0);
         if (ret == AVERROR(EAGAIN))
             ret = 0;
     } else if (!eof)
@@ -1396,8 +1396,8 @@ static void do_video_out(OutputFile *of,
   /* duplicates frame if needed */
   for (i = 0; i < nb_frames; i++) {
     AVFrame *in_picture;
-        int forced_keyframe = 0;
-        double pts_time;
+    int forced_keyframe = 0;
+    double pts_time;
     av_init_packet(&pkt);
     pkt.data = NULL;
     pkt.size = 0;
@@ -3556,7 +3556,7 @@ static int init_output_stream_encode(OutputStream *ost, AVFrame *frame)
             ost->frame_rate = ist->framerate;
         if (ist && !ost->frame_rate.num)
             ost->frame_rate = ist->st->r_frame_rate;
-        if (ist && !ost->frame_rate.num) {
+        if (ist && !ost->frame_rate.num && !ost->max_frame_rate.num) {
             ost->frame_rate = (AVRational){25, 1};
             av_log(NULL, AV_LOG_WARNING,
                    "No information "
@@ -3565,6 +3565,11 @@ static int init_output_stream_encode(OutputStream *ost, AVFrame *frame)
                    "if you want a different framerate.\n",
                    ost->file_index, ost->index);
         }
+
+        if (ost->max_frame_rate.num &&
+            (av_q2d(ost->frame_rate) > av_q2d(ost->max_frame_rate) ||
+            !ost->frame_rate.den))
+            ost->frame_rate = ost->max_frame_rate;
 
         if (ost->enc->supported_framerates && !ost->force_fps) {
             int idx = av_find_nearest_q_idx(ost->frame_rate, ost->enc->supported_framerates);

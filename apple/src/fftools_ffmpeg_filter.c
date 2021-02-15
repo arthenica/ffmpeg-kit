@@ -648,13 +648,6 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
         pad_idx = 0;
     }
 
-    if (audio_volume != 256 && 0) {
-        char args[256];
-
-        snprintf(args, sizeof(args), "%f", audio_volume / 256.);
-        AUTO_INSERT_FILTER("-vol", "volume", args);
-    }
-
     if (ost->apad && of->shortest) {
         char args[256];
         int i;
@@ -1210,15 +1203,6 @@ int ifilter_parameters_from_frame(InputFilter *ifilter, const AVFrame *frame)
             return AVERROR(ENOMEM);
     }
 
-    return 0;
-}
-
-int ist_in_filtergraph(FilterGraph *fg, InputStream *ist)
-{
-    int i;
-    for (i = 0; i < fg->nb_inputs; i++)
-        if (fg->inputs[i]->ist == ist)
-            return 1;
     return 0;
 }
 
