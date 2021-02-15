@@ -184,6 +184,7 @@ public class NativeLoader {
         }
     }
 
+    @SuppressWarnings("deprecation")
     static String getDeviceDebugInformation() {
         final StringBuilder stringBuilder = new StringBuilder();
 
