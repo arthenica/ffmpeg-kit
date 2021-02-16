@@ -32,6 +32,14 @@
     return self;
 }
 
++ (BOOL)isSuccess:(ReturnCode*)value {
+    return (value != nil) && ([value getValue] == ReturnCodeSuccess);
+}
+
++ (BOOL)isCancel:(ReturnCode*)value {
+    return (value != nil) && ([value getValue] == ReturnCodeCancel);
+}
+
 - (int)getValue {
     return _value;
 }

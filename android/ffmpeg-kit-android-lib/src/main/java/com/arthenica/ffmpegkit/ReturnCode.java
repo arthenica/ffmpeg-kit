@@ -31,6 +31,14 @@ public class ReturnCode {
         this.value = value;
     }
 
+    public static boolean isSuccess(final ReturnCode returnCode) {
+        return (returnCode != null && returnCode.getValue() == SUCCESS);
+    }
+
+    public static boolean isCancel(final ReturnCode returnCode) {
+        return (returnCode != null && returnCode.getValue() == CANCEL);
+    }
+
     public int getValue() {
         return value;
     }
