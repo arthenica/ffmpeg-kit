@@ -21,14 +21,12 @@
 #define FFMPEG_KIT_SESSION_H
 
 #import <Foundation/Foundation.h>
-#import "ExecuteDelegate.h"
+#import "ExecuteCallback.h"
 #import "Log.h"
-#import "LogDelegate.h"
+#import "LogCallback.h"
 #import "LogRedirectionStrategy.h"
 #import "ReturnCode.h"
 #import "SessionState.h"
-
-@protocol ExecuteDelegate;
 
 /**
  * <p>Common interface for all <code>FFmpegKit</code> sessions.
@@ -38,18 +36,18 @@
 @required
 
 /**
- * Returns the session specific execute delegate.
+ * Returns the session specific execute callback.
  *
- * @return session specific execute delegate
+ * @return session specific execute callback
  */
-- (id<ExecuteDelegate>)getExecuteDelegate;
+- (ExecuteCallback)getExecuteCallback;
 
 /**
- * Returns the session specific log delegate.
+ * Returns the session specific log callback.
  *
- * @return session specific log delegate
+ * @return session specific log callback
  */
-- (id<LogDelegate>)getLogDelegate;
+- (LogCallback)getLogCallback;
 
 /**
  * Returns the session identifier.

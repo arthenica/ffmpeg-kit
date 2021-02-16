@@ -23,10 +23,10 @@
 #import <string.h>
 #import <stdlib.h>
 #import <Foundation/Foundation.h>
-#import "ExecuteDelegate.h"
-#import "LogDelegate.h"
+#import "ExecuteCallback.h"
+#import "LogCallback.h"
 #import "FFmpegSession.h"
-#import "StatisticsDelegate.h"
+#import "StatisticsCallback.h"
 
 /**
  * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both
@@ -34,11 +34,11 @@
  * <pre>
  * FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v libxvid file1.avi"];
  *
- * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteDelegate:executeDelegate];
+ * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteCallback:executeCallback];
  * </pre>
- * <p>Provides overloaded <code>execute</code> methods to define session specific delegates.
+ * <p>Provides overloaded <code>execute</code> methods to define session specific callbacks.
  * <pre>
- * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
+ * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withExecuteCallback:executeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
  * </pre>
  */
 @interface FFmpegKit : NSObject
@@ -55,43 +55,43 @@
  * <p>Asynchronously executes FFmpeg with arguments provided.
  *
  * @param arguments       FFmpeg command options/arguments as string array
- * @param executeDelegate delegate that will be called when the execution is completed
+ * @param executeCallback callback that will be called when the execution is completed
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
  * <p>Asynchronously executes FFmpeg with arguments provided.
  *
  * @param arguments          FFmpeg command options/arguments as string array
- * @param executeDelegate    delegate that will be called when the execution is completed
- * @param logDelegate        delegate that will receive logs
- * @param statisticsDelegate delegate that will receive statistics
+ * @param executeCallback    callback that will be called when the execution is completed
+ * @param logCallback        callback that will receive logs
+ * @param statisticsCallback callback that will receive statistics
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
  * <p>Asynchronously executes FFmpeg with arguments provided.
  *
  * @param arguments       FFmpeg command options/arguments as string array
- * @param executeDelegate delegate that will be called when the execution is completed
+ * @param executeCallback callback that will be called when the execution is completed
  * @param queue           dispatch queue that will be used to run this asynchronous operation
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
  * <p>Asynchronously executes FFmpeg with arguments provided.
  *
  * @param arguments          FFmpeg command options/arguments as string array
- * @param executeDelegate    delegate that will be called when the execution is completed
- * @param logDelegate        delegate that will receive logs
- * @param statisticsDelegate delegate that will receive statistics
+ * @param executeCallback    callback that will be called when the execution is completed
+ * @param logCallback        callback that will receive logs
+ * @param statisticsCallback callback that will receive statistics
  * @param queue              dispatch queue that will be used to run this asynchronous operation
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue;
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
  * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
@@ -109,10 +109,10 @@
  * your command.
  *
  * @param command         FFmpeg command
- * @param executeDelegate delegate that will be called when the execution is completed
+ * @param executeCallback callback that will be called when the execution is completed
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
  * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
@@ -120,12 +120,12 @@
  * your command.
  *
  * @param command            FFmpeg command
- * @param executeDelegate    delegate that will be called when the execution is completed
- * @param logDelegate        delegate that will receive logs
- * @param statisticsDelegate delegate that will receive statistics
+ * @param executeCallback    callback that will be called when the execution is completed
+ * @param logCallback        callback that will receive logs
+ * @param statisticsCallback callback that will receive statistics
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
  * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
@@ -133,11 +133,11 @@
  * your command.
  *
  * @param command         FFmpeg command
- * @param executeDelegate delegate that will be called when the execution is completed
+ * @param executeCallback callback that will be called when the execution is completed
  * @param queue           dispatch queue that will be used to run this asynchronous operation
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue;
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
  * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
@@ -145,13 +145,13 @@
  * your command.
  *
  * @param command            FFmpeg command
- * @param executeDelegate    delegate that will be called when the execution is completed
- * @param logDelegate        delegate that will receive logs
- * @param statisticsDelegate delegate that will receive statistics
+ * @param executeCallback    callback that will be called when the execution is completed
+ * @param logCallback        callback that will receive logs
+ * @param statisticsCallback callback that will receive statistics
  * @param queue              dispatch queue that will be used to run this asynchronous operation
  * @return FFmpeg session created for this execution
  */
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue;
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
  * <p>Cancels all running sessions.

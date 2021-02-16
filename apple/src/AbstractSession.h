@@ -38,11 +38,11 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
  * Creates a new abstract session.
  *
  * @param arguments              command arguments
- * @param executeDelegate        session specific execute delegate
- * @param logDelegate            session specific log delegate
+ * @param executeCallback        session specific execute callback
+ * @param logCallback            session specific log callback
  * @param logRedirectionStrategy session specific log redirection strategy
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
  * Waits for all asynchronous messages to be transmitted until the given timeout.

@@ -34,26 +34,26 @@
     return session;
 }
 
-+ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
-+ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
-+ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
-+ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
++ (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
@@ -64,26 +64,26 @@
     return session;
 }
 
-+ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
-+ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
-+ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
-+ (FFprobeSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
++ (FFprobeSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
@@ -102,30 +102,30 @@
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback {
     NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withTimeout:(int)waitTimeout {
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withTimeout:(int)waitTimeout {
     NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:waitTimeout];
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
     NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
++ (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
     NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
 }
@@ -136,8 +136,8 @@
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate];
++ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
 }

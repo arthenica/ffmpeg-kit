@@ -17,24 +17,24 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "ExecuteDelegate.h"
+#import "ExecuteCallback.h"
 #import "FFmpegSession.h"
 #import "FFmpegKitConfig.h"
-#import "LogDelegate.h"
-#import "StatisticsDelegate.h"
+#import "LogCallback.h"
+#import "StatisticsCallback.h"
 
 @implementation FFmpegSession {
-    id<StatisticsDelegate> _statisticsDelegate;
+    StatisticsCallback _statisticsCallback;
     NSMutableArray* _statistics;
     NSRecursiveLock* _statisticsLock;
 }
 
 - (instancetype)init:(NSArray*)arguments {
 
-    self = [super init:arguments withExecuteDelegate:nil withLogDelegate:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
-        _statisticsDelegate = nil;
+        _statisticsCallback = nil;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -42,12 +42,12 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
 
-    self = [super init:arguments withExecuteDelegate:executeDelegate withLogDelegate:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
-        _statisticsDelegate = nil;
+        _statisticsCallback = nil;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -55,12 +55,12 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
 
-    self = [super init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
-        _statisticsDelegate = statisticsDelegate;
+        _statisticsCallback = statisticsCallback;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -68,12 +68,12 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
 
-    self = [super init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withLogRedirectionStrategy:logRedirectionStrategy];
+    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
 
     if (self) {
-        _statisticsDelegate = statisticsDelegate;
+        _statisticsCallback = statisticsCallback;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -81,8 +81,8 @@
     return self;
 }
 
-- (id<StatisticsDelegate>)getStatisticsDelegate {
-    return _statisticsDelegate;
+- (StatisticsCallback)getStatisticsCallback {
+    return _statisticsCallback;
 }
 
 - (NSArray*)getAllStatisticsWithTimeout:(int)waitTimeout {

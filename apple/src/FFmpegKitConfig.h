@@ -24,12 +24,12 @@
 #import <pthread.h>
 #import <unistd.h>
 #import <Foundation/Foundation.h>
-#import "ExecuteDelegate.h"
+#import "ExecuteCallback.h"
 #import "FFmpegSession.h"
 #import "FFprobeSession.h"
-#import "LogDelegate.h"
+#import "LogCallback.h"
 #import "MediaInformationSession.h"
-#import "StatisticsDelegate.h"
+#import "StatisticsCallback.h"
 
 /** Global library version */
 extern NSString* const FFmpegKitVersion;
@@ -53,7 +53,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to NSLog and sessions
  * collect log and statistics entries for the executions. It is possible to define global or
- * session specific log/statistics delegates as well.
+ * session specific log/statistics callbacks as well.
  *
  * <p>Note that redirection is enabled by default. If you do not want to use its functionality
  * please use disableRedirection method to disable it.
@@ -64,7 +64,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * <p>Disables log and statistics redirection.
  *
  * <p>When redirection is disabled logs are printed to stderr, all logs and statistics
- * delegates are disabled and <code>FFprobe</code>'s <code>getMediaInformation</code> methods
+ * callbacks are disabled and <code>FFprobe</code>'s <code>getMediaInformation</code> methods
  * do not work.
  */
 + (void)disableRedirection;
@@ -236,32 +236,32 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
 
 /**
- * <p>Sets a global log delegate to redirect FFmpeg/FFprobe logs.
+ * <p>Sets a global log callback to redirect FFmpeg/FFprobe logs.
  *
- * @param logDelegate log delegate or nil to disable a previously defined log delegate
+ * @param logCallback log callback or nil to disable a previously defined log callback
  */
-+ (void)enableLogDelegate:(id<LogDelegate>)logDelegate;
++ (void)enableLogCallback:(LogCallback)logCallback;
 
 /**
- * <p>Sets a global statistics delegate to redirect FFmpeg statistics.
+ * <p>Sets a global statistics callback to redirect FFmpeg statistics.
  *
- * @param statisticsDelegate statistics delegate or nil to disable a previously defined statistics delegate
+ * @param statisticsCallback statistics callback or nil to disable a previously defined statistics callback
  */
-+ (void)enableStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
++ (void)enableStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
- * <p>Sets a global execute delegate to receive execution results.
+ * <p>Sets a global execute callback to receive execution results.
  *
- * @param executeDelegate execute delegate or nil to disable a previously execute delegate
+ * @param executeCallback execute callback or nil to disable a previously execute callback
  */
-+ (void)enableExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
++ (void)enableExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
- * <p>Returns the global execute delegate.
+ * <p>Returns the global execute callback.
  *
- * @return global execute delegate
+ * @return global execute callback
  */
-+ (id<ExecuteDelegate>)getExecuteDelegate;
++ (ExecuteCallback)getExecuteCallback;
 
 /**
  * Returns the current log level.
@@ -365,11 +365,11 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)setLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
- * <p>Returns the number of async messages that are not transmitted to the delegates for
+ * <p>Returns the number of async messages that are not transmitted to the callbacks for
  * this session.
  *
  * @param sessionId id of the session
- * @return number of async messages that are not transmitted to the delegates for this session
+ * @return number of async messages that are not transmitted to the callbacks for this session
  */
 + (int)messagesInTransmit:(long)sessionId;
 

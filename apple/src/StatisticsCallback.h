@@ -17,25 +17,17 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FFMPEG_KIT_STATISTICS_DELEGATE_H
-#define FFMPEG_KIT_STATISTICS_DELEGATE_H
+#ifndef FFMPEG_KIT_STATISTICS_CALLBACK_H
+#define FFMPEG_KIT_STATISTICS_CALLBACK_H
 
 #import <Foundation/Foundation.h>
 #import "Statistics.h"
 
 /**
- * <p>Delegate that receives statistics generated for <code>FFmpegKit</code> sessions.
- */
-@protocol StatisticsDelegate<NSObject>
-@required
-
-/**
- * <p>Called when a statistics entry is received.
+ * <p>Callback that receives statistics generated for <code>FFmpegKit</code> sessions.
  *
  * @param statistics statistics entry
  */
-- (void)statisticsCallback:(Statistics*)statistics;
+typedef void (^StatisticsCallback)(Statistics* statistics);
 
-@end
-
-#endif // FFMPEG_KIT_STATISTICS_DELEGATE_H
+#endif // FFMPEG_KIT_STATISTICS_CALLBACK_H

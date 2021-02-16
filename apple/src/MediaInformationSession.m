@@ -17,8 +17,8 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "ExecuteDelegate.h"
-#import "LogDelegate.h"
+#import "ExecuteCallback.h"
+#import "LogCallback.h"
 #import "MediaInformation.h"
 #import "MediaInformationSession.h"
 
@@ -28,21 +28,21 @@
 
 - (instancetype)init:(NSArray*)arguments {
 
-    self = [super init:arguments withExecuteDelegate:nil withLogDelegate:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
 
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
 
-    self = [super init:arguments withExecuteDelegate:executeDelegate withLogDelegate:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
 
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback {
 
-    self = [super init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
 
     return self;
 }

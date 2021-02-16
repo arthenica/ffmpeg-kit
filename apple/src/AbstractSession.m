@@ -19,10 +19,10 @@
 
 #import "AbstractSession.h"
 #import "AtomicLong.h"
-#import "ExecuteDelegate.h"
+#import "ExecuteCallback.h"
 #import "FFmpegKit.h"
 #import "FFmpegKitConfig.h"
-#import "LogDelegate.h"
+#import "LogCallback.h"
 #import "ReturnCode.h"
 
 int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit = 5000;
@@ -31,8 +31,8 @@ static AtomicLong *sessionIdGenerator = nil;
 
 @implementation AbstractSession {
     long _sessionId;
-    id<ExecuteDelegate> _executeDelegate;
-    id<LogDelegate> _logDelegate;
+    ExecuteCallback _executeCallback;
+    LogCallback _logCallback;
     NSDate* _createTime;
     NSDate* _startTime;
     NSDate* _endTime;
@@ -49,12 +49,12 @@ static AtomicLong *sessionIdGenerator = nil;
     sessionIdGenerator = [[AtomicLong alloc] initWithValue:1];
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
     self = [super init];
     if (self) {
         _sessionId = [sessionIdGenerator incrementAndGet];
-        _executeDelegate = executeDelegate;
-        _logDelegate = logDelegate;
+        _executeCallback = executeCallback;
+        _logCallback = logCallback;
         _createTime = [NSDate date];
         _startTime = nil;
         _endTime = nil;
@@ -70,12 +70,12 @@ static AtomicLong *sessionIdGenerator = nil;
     return self;
 }
 
-- (id<ExecuteDelegate>)getExecuteDelegate {
-    return _executeDelegate;
+- (ExecuteCallback)getExecuteCallback {
+    return _executeCallback;
 }
 
-- (id<LogDelegate>)getLogDelegate {
-    return _logDelegate;
+- (LogCallback)getLogCallback {
+    return _logCallback;
 }
 
 - (long)getSessionId {

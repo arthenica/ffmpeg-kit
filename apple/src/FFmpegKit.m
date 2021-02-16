@@ -38,26 +38,26 @@
     return session;
 }
 
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
-    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session];
     return session;
 }
 
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate {
-    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session];
     return session;
 }
 
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
     return session;
 }
 
-+ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
++ (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
     return session;
 }
@@ -68,26 +68,26 @@
     return session;
 }
 
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate {
-    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session];
     return session;
 }
 
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate {
-    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session];
     return session;
 }
 
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
     return session;
 }
 
-+ (FFmpegSession*)executeAsync:(NSString*)command withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate onDispatchQueue:(dispatch_queue_t)queue {
-    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteDelegate:executeDelegate withLogDelegate:logDelegate withStatisticsDelegate:statisticsDelegate];
++ (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback onDispatchQueue:(dispatch_queue_t)queue {
+    FFmpegSession* session = [[FFmpegSession alloc] init:[FFmpegKit parseArguments:command] withExecuteCallback:executeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
     [FFmpegKitConfig asyncFFmpegExecute:session onDispatchQueue:queue];
     return session;
 }

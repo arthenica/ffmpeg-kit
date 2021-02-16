@@ -39,28 +39,28 @@
  * Builds a new FFprobe session.
  *
  * @param arguments       command arguments
- * @param executeDelegate session specific execute delegate
+ * @param executeCallback session specific execute callback
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
  * Builds a new FFprobe session.
  *
  * @param arguments       command arguments
- * @param executeDelegate session specific execute delegate
- * @param logDelegate     session specific log delegate
+ * @param executeCallback session specific execute callback
+ * @param logCallback     session specific log callback
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback;
 
 /**
  * Builds a new FFprobe session.
  *
  * @param arguments              command arguments
- * @param executeDelegate        session specific execute delegate
- * @param logDelegate            session specific log delegate
+ * @param executeCallback        session specific execute callback
+ * @param logCallback            session specific log callback
  * @param logRedirectionStrategy session specific log redirection strategy
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 @end
 

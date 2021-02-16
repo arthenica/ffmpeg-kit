@@ -60,14 +60,14 @@ static atomic_int sessionInTransitMessageCountMap[SESSION_MAP_SIZE];
 
 static dispatch_queue_t asyncDispatchQueue;
 
-/** Holds delegate defined to redirect logs */
-static id<LogDelegate> logDelegate;
+/** Holds callback defined to redirect logs */
+static LogCallback logCallback;
 
-/** Holds delegate defined to redirect statistics */
-static id<StatisticsDelegate> statisticsDelegate;
+/** Holds callback defined to redirect statistics */
+static StatisticsCallback statisticsCallback;
 
-/** Holds delegate defined to redirect asynchronous execution results */
-static id<ExecuteDelegate> executeDelegate;
+/** Holds callback defined to redirect asynchronous execution results */
+static ExecuteCallback executeCallback;
 
 static LogRedirectionStrategy globalLogRedirectionStrategy;
 
@@ -364,8 +364,8 @@ void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float qu
 void process_log(long sessionId, int levelValue, NSString* logMessage) {
     int activeLogLevel = av_log_get_level();
     Log* log = [[Log alloc] init:sessionId:levelValue:logMessage];
-    BOOL globalDelegateDefined = false;
-    BOOL sessionDelegateDefined = false;
+    BOOL globalCallbackDefined = false;
+    BOOL sessionCallbackDefined = false;
     LogRedirectionStrategy activeLogRedirectionStrategy = globalLogRedirectionStrategy;
 
     // LevelAVLogStdErr logs are always redirected
@@ -378,30 +378,31 @@ void process_log(long sessionId, int levelValue, NSString* logMessage) {
     if (session != nil) {
         activeLogRedirectionStrategy = [session getLogRedirectionStrategy];
         [session addLog:log];
-        
-        if ([session getLogDelegate] != nil) {
-            sessionDelegateDefined = TRUE;
+
+        LogCallback sessionLogCallback = [session getLogCallback];
+        if (sessionLogCallback != nil) {
+            sessionCallbackDefined = TRUE;
 
             @try {
-                // NOTIFY SESSION DELEGATE DEFINED
-                [[session getLogDelegate] logCallback:log];
+                // NOTIFY SESSION CALLBACK DEFINED
+                sessionLogCallback(log);
             }
             @catch(NSException* exception) {
-                NSLog(@"Exception thrown inside session LogDelegate block. %@", [exception callStackSymbols]);
+                NSLog(@"Exception thrown inside session LogCallback block. %@", [exception callStackSymbols]);
             }
         }
     }
     
-    id<LogDelegate> activeLogDelegate = logDelegate;
-    if (activeLogDelegate != nil) {
-        globalDelegateDefined = TRUE;
+    LogCallback globalLogCallback = logCallback;
+    if (globalLogCallback != nil) {
+        globalCallbackDefined = TRUE;
 
         @try {
-            // NOTIFY GLOBAL DELEGATE DEFINED
-            [activeLogDelegate logCallback:log];
+            // NOTIFY GLOBAL CALLBACK DEFINED
+            globalLogCallback(log);
         }
         @catch(NSException* exception) {
-            NSLog(@"Exception thrown inside global LogDelegate block. %@", [exception callStackSymbols]);
+            NSLog(@"Exception thrown inside global LogCallback block. %@", [exception callStackSymbols]);
         }
     }
     
@@ -410,19 +411,19 @@ void process_log(long sessionId, int levelValue, NSString* logMessage) {
         case LogRedirectionStrategyNeverPrintLogs: {
             return;
         }
-        case LogRedirectionStrategyPrintLogsWhenGlobalDelegateNotDefined: {
-            if (globalDelegateDefined) {
+        case LogRedirectionStrategyPrintLogsWhenGlobalCallbackNotDefined: {
+            if (globalCallbackDefined) {
                 return;
             }
         }
         break;
-        case LogRedirectionStrategyPrintLogsWhenSessionDelegateNotDefined: {
-            if (sessionDelegateDefined) {
+        case LogRedirectionStrategyPrintLogsWhenSessionCallbackNotDefined: {
+            if (sessionCallbackDefined) {
                 return;
             }
         }
-        case LogRedirectionStrategyPrintLogsWhenNoDelegatesDefined: {
-            if (globalDelegateDefined || sessionDelegateDefined) {
+        case LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined: {
+            if (globalCallbackDefined || sessionCallbackDefined) {
                 return;
             }
         }
@@ -450,30 +451,31 @@ void process_statistics(long sessionId, int videoFrameNumber, float videoFps, fl
     if (session != nil && [session isFFmpeg]) {
         FFmpegSession *ffmpegSession = (FFmpegSession*)session;
         [ffmpegSession addStatistics:statistics];
-        
-        if ([ffmpegSession getStatisticsDelegate] != nil) {
+
+        StatisticsCallback sessionStatisticsCallback = [ffmpegSession getStatisticsCallback];
+        if (sessionStatisticsCallback != nil) {
             @try {
-                [[ffmpegSession getStatisticsDelegate] statisticsCallback:statistics];
+                sessionStatisticsCallback(statistics);
             }
             @catch(NSException* exception) {
-                NSLog(@"Exception thrown inside session StatisticsDelegate block. %@", [exception callStackSymbols]);
+                NSLog(@"Exception thrown inside session StatisticsCallback block. %@", [exception callStackSymbols]);
             }
         }
     }
     
-    id<StatisticsDelegate> activeStatisticsDelegate = statisticsDelegate;
-    if (activeStatisticsDelegate != nil) {
+    StatisticsCallback globalStatisticsCallback = statisticsCallback;
+    if (globalStatisticsCallback != nil) {
         @try {
-            [activeStatisticsDelegate statisticsCallback:statistics];
+            globalStatisticsCallback(statistics);
         }
         @catch(NSException* exception) {
-            NSLog(@"Exception thrown inside global StatisticsDelegate block. %@", [exception callStackSymbols]);
+            NSLog(@"Exception thrown inside global StatisticsCallback block. %@", [exception callStackSymbols]);
         }
     }
 }
 
 /**
- * Forwards asynchronous messages to Delegates.
+ * Forwards asynchronous messages to Callbacks.
  */
 void callbackBlockFunction() {
     int activeLogLevel = av_log_get_level();
@@ -624,11 +626,11 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
     
     asyncDispatchQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-    logDelegate = nil;
-    statisticsDelegate = nil;
-    executeDelegate = nil;
+    logCallback = nil;
+    statisticsCallback = nil;
+    executeCallback = nil;
     
-    globalLogRedirectionStrategy = LogRedirectionStrategyPrintLogsWhenNoDelegatesDefined;
+    globalLogRedirectionStrategy = LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined;
     
     redirectionEnabled = 0;
     lock = [[NSRecursiveLock alloc] init];
@@ -885,14 +887,14 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue {
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffmpegExecute:ffmpegSession];
-        id<ExecuteDelegate> globalExecuteDelegate = [FFmpegKitConfig getExecuteDelegate];
-        if (globalExecuteDelegate != nil) {
-            [globalExecuteDelegate executeCallback:ffmpegSession];
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            globalExecuteCallback(ffmpegSession);
         }
         
-        id<ExecuteDelegate> executeDelegate = [ffmpegSession getExecuteDelegate];
-        if (executeDelegate != nil) {
-            [executeDelegate executeCallback:ffmpegSession];
+        ExecuteCallback sessionExecuteCallback = [ffmpegSession getExecuteCallback];
+        if (sessionExecuteCallback != nil) {
+            sessionExecuteCallback(ffmpegSession);
         }
     });
 }
@@ -904,14 +906,14 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue {
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffprobeExecute:ffprobeSession];
-        id<ExecuteDelegate> globalExecuteDelegate = [FFmpegKitConfig getExecuteDelegate];
-        if (globalExecuteDelegate != nil) {
-            [globalExecuteDelegate executeCallback:ffprobeSession];
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            globalExecuteCallback(ffprobeSession);
         }
         
-        id<ExecuteDelegate> executeDelegate = [ffprobeSession getExecuteDelegate];
-        if (executeDelegate != nil) {
-            [executeDelegate executeCallback:ffprobeSession];
+        ExecuteCallback sessionExecuteCallback = [ffprobeSession getExecuteCallback];
+        if (sessionExecuteCallback != nil) {
+            sessionExecuteCallback(ffprobeSession);
         }
     });
 }
@@ -923,32 +925,32 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
     dispatch_async(queue, ^{
         [FFmpegKitConfig getMediaInformationExecute:mediaInformationSession withTimeout:waitTimeout];
-        id<ExecuteDelegate> globalExecuteDelegate = [FFmpegKitConfig getExecuteDelegate];
-        if (globalExecuteDelegate != nil) {
-            [globalExecuteDelegate executeCallback:mediaInformationSession];
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            globalExecuteCallback(mediaInformationSession);
         }
         
-        id<ExecuteDelegate> executeDelegate = [mediaInformationSession getExecuteDelegate];
-        if (executeDelegate != nil) {
-            [executeDelegate executeCallback:mediaInformationSession];
+        ExecuteCallback sessionExecuteCallback = [mediaInformationSession getExecuteCallback];
+        if (sessionExecuteCallback != nil) {
+            sessionExecuteCallback(mediaInformationSession);
         }
     });
 }
 
-+ (void)enableLogDelegate:(id<LogDelegate>)delegate {
-    logDelegate = delegate;
++ (void)enableLogCallback:(LogCallback)callback {
+    logCallback = callback;
 }
 
-+ (void)enableStatisticsDelegate:(id<StatisticsDelegate>)delegate {
-    statisticsDelegate = delegate;
++ (void)enableStatisticsCallback:(StatisticsCallback)callback {
+    statisticsCallback = callback;
 }
 
-+ (void)enableExecuteDelegate:(id<ExecuteDelegate>)delegate {
-    executeDelegate = delegate;
++ (void)enableExecuteCallback:(ExecuteCallback)callback {
+    executeCallback = callback;
 }
 
-+ (id<ExecuteDelegate>)getExecuteDelegate {
-    return executeDelegate;
++ (ExecuteCallback)getExecuteCallback {
+    return executeCallback;
 }
 
 + (int)getLogLevel {

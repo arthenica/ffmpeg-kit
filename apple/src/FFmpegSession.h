@@ -22,7 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import "AbstractSession.h"
-#import "StatisticsDelegate.h"
+#import "StatisticsCallback.h"
 
 /**
  * <p>An FFmpeg session.
@@ -40,37 +40,37 @@
  * Builds a new FFmpeg session.
  *
  * @param arguments       command arguments
- * @param executeDelegate session specific execute delegate
+ * @param executeCallback session specific execute callback
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
  * Builds a new FFmpeg session.
  *
  * @param arguments          command arguments
- * @param executeDelegate    session specific execute delegate
- * @param logDelegate        session specific log delegate
- * @param statisticsDelegate session specific statistics delegate
+ * @param executeCallback    session specific execute callback
+ * @param logCallback        session specific log callback
+ * @param statisticsCallback session specific statistics callback
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
  * Builds a new FFmpeg session.
  *
  * @param arguments              command arguments
- * @param executeDelegate        session specific execute delegate
- * @param logDelegate            session specific log delegate
- * @param statisticsDelegate     session specific statistics delegate
+ * @param executeCallback        session specific execute callback
+ * @param logCallback            session specific log callback
+ * @param statisticsCallback     session specific statistics callback
  * @param logRedirectionStrategy session specific log redirection strategy
  */
-- (instancetype)init:(NSArray*)arguments withExecuteDelegate:(id<ExecuteDelegate>)executeDelegate withLogDelegate:(id<LogDelegate>)logDelegate withStatisticsDelegate:(id<StatisticsDelegate>)statisticsDelegate withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
+- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
- * Returns the session specific statistics delegate.
+ * Returns the session specific statistics callback.
  *
- * @return session specific statistics delegate
+ * @return session specific statistics callback
  */
-- (id<StatisticsDelegate>)getStatisticsDelegate;
+- (StatisticsCallback)getStatisticsCallback;
 
 /**
  * Returns all statistics entries generated for this session. If there are asynchronous

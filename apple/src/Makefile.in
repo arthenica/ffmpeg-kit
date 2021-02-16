@@ -411,7 +411,7 @@ include_HEADERS = \
     AbstractSession.h \
     ArchDetect.h \
     AtomicLong.h \
-    ExecuteDelegate.h \
+    ExecuteCallback.h \
     FFmpegKit.h \
     FFmpegKitConfig.h \
     FFmpegSession.h \
@@ -419,7 +419,7 @@ include_HEADERS = \
 	FFprobeSession.h \
 	Level.h \
 	Log.h \
-	LogDelegate.h \
+	LogCallback.h \
 	LogRedirectionStrategy.h \
 	MediaInformation.h \
 	MediaInformationJsonParser.h \
@@ -429,7 +429,7 @@ include_HEADERS = \
 	Session.h \
 	SessionState.h \
 	Statistics.h \
-	StatisticsDelegate.h \
+	StatisticsCallback.h \
 	StreamInformation.h \
 	ffmpegkit_exception.h \
 	fftools_cmdutils.h \

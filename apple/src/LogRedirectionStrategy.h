@@ -22,9 +22,9 @@
 
 typedef NS_ENUM(NSUInteger, LogRedirectionStrategy) {
     LogRedirectionStrategyAlwaysPrintLogs,
-    LogRedirectionStrategyPrintLogsWhenNoDelegatesDefined,
-    LogRedirectionStrategyPrintLogsWhenGlobalDelegateNotDefined,
-    LogRedirectionStrategyPrintLogsWhenSessionDelegateNotDefined,
+    LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined,
+    LogRedirectionStrategyPrintLogsWhenGlobalCallbackNotDefined,
+    LogRedirectionStrategyPrintLogsWhenSessionCallbackNotDefined,
     LogRedirectionStrategyNeverPrintLogs
 };
 

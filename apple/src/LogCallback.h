@@ -17,25 +17,17 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FFMPEG_KIT_LOG_DELEGATE_H
-#define FFMPEG_KIT_LOG_DELEGATE_H
+#ifndef FFMPEG_KIT_LOG_CALLBACK_H
+#define FFMPEG_KIT_LOG_CALLBACK_H
 
 #import <Foundation/Foundation.h>
 #import "Log.h"
 
 /**
- * <p>Delegate that receives logs generated for <code>FFmpegKit</code> sessions.
- */
-@protocol LogDelegate<NSObject>
-@required
-
-/**
- * <p>Called when a log entry is received.
+ * <p>Callback that receives logs generated for <code>FFmpegKit</code> sessions.
  *
  * @param log log entry
  */
-- (void)logCallback:(Log*)log;
+typedef void (^LogCallback)(Log* log);
 
-@end
-
-#endif // FFMPEG_KIT_LOG_DELEGATE_H
+#endif // FFMPEG_KIT_LOG_CALLBACK_H

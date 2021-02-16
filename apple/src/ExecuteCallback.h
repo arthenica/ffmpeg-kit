@@ -17,18 +17,15 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FFMPEG_KIT_EXECUTE_DELEGATE_H
-#define FFMPEG_KIT_EXECUTE_DELEGATE_H
-
-#import <Foundation/Foundation.h>
-#import "Session.h"
+#ifndef FFMPEG_KIT_EXECUTE_CALLBACK_H
+#define FFMPEG_KIT_EXECUTE_CALLBACK_H
 
 @protocol Session;
 
 /**
- * <p>Delegate invoked when an asynchronous session ends running.
+ * <p>Callback invoked when an asynchronous session ends running.
  * <p>Session has either SessionStateCompleted or SessionStateFailed state when
- * the delegate is invoked.
+ * the callback is invoked.
  * <p>If it has SessionStateCompleted state, <code>ReturnCode</code> should be checked to
  * see the execution result.
  * <p>If <code>getState</code> returns SessionStateFailed then
@@ -43,17 +40,11 @@
  *          break;
  *  }
  * </pre>
- */
-@protocol ExecuteDelegate<NSObject>
-@required
-
-/**
- * Called when an execution is completed.
  *
  * @param session session of the completed execution
  */
-- (void)executeCallback:(id<Session>)session;
+typedef void (^ExecuteCallback)(id<Session> session);
 
-@end
+#import "Session.h"
 
-#endif // FFMPEG_KIT_EXECUTE_DELEGATE_H
+#endif // FFMPEG_KIT_EXECUTE_CALLBACK_H
