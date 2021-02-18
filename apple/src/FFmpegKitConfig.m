@@ -296,6 +296,15 @@ void removeSession(long sessionId) {
 }
 
 /**
+ * Adds a cancel session request to the session map.
+ *
+ * @param sessionId session id
+ */
+void cancelSession(long sessionId) {
+    atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 2);
+}
+
+/**
  * Checks whether a cancel request for the given session id exists in the session map.
  *
  * @param sessionId session id
