@@ -89,14 +89,7 @@ x86-64)
   TARGET_CPU="x86_64"
   TARGET_ARCH="x86_64"
   ASM_OPTIONS=" --disable-neon --disable-asm"
-  case $FFMPEG_KIT_BUILD_TYPE in
-  macos)
-    BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
-    ;;
-  *)
-    BITCODE_FLAGS=""
-    ;;
-  esac
+  BITCODE_FLAGS=""
   ;;
 x86-64-mac-catalyst)
   TARGET_CPU="x86_64"

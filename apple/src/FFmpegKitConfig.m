@@ -894,6 +894,8 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 }
 
 + (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue {
+    [FFmpegKitConfig addSession:ffmpegSession];
+
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffmpegExecute:ffmpegSession];
         ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
@@ -913,6 +915,8 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 }
 
 + (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue {
+    [FFmpegKitConfig addSession:ffprobeSession];
+
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffprobeExecute:ffprobeSession];
         ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
@@ -932,6 +936,8 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 }
 
 + (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
+    [FFmpegKitConfig addSession:mediaInformationSession];
+
     dispatch_async(queue, ^{
         [FFmpegKitConfig getMediaInformationExecute:mediaInformationSession withTimeout:waitTimeout];
         ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
@@ -1003,19 +1009,27 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 }
 
 + (void)addSession:(id<Session>)session {
+    NSNumber* sessionIdNumber = [NSNumber numberWithLong:[session getSessionId]];
+
     [sessionHistoryLock lock];
 
-    [sessionHistoryMap setObject:session forKey:[NSNumber numberWithLong:[session getSessionId]]];
-    [sessionHistoryList addObject:session];
-    if ([sessionHistoryList count] > sessionHistorySize) {
-        id<Session> first = [sessionHistoryList firstObject];
-        if (first != nil) {
-            NSNumber* key = [NSNumber numberWithLong:[first getSessionId]];
-            [sessionHistoryList removeObject:key];
-            [sessionHistoryMap removeObjectForKey:key];
+    /*
+     * ASYNC SESSIONS CALL THIS METHOD TWICE
+     * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+     */
+    if ([sessionHistoryMap objectForKey:sessionIdNumber] == nil) {
+        [sessionHistoryMap setObject:session forKey:sessionIdNumber];
+        [sessionHistoryList addObject:session];
+        if ([sessionHistoryList count] > sessionHistorySize) {
+            id<Session> first = [sessionHistoryList firstObject];
+            if (first != nil) {
+                NSNumber* key = [NSNumber numberWithLong:[first getSessionId]];
+                [sessionHistoryList removeObject:key];
+                [sessionHistoryMap removeObjectForKey:key];
+            }
         }
     }
-    
+
     [sessionHistoryLock unlock];
 }
 
@@ -1128,6 +1142,16 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 
 + (int)messagesInTransmit:(long)sessionId {
     return atomic_load(&sessionInTransitMessageCountMap[sessionId % SESSION_MAP_SIZE]);
+}
+
++ (NSString*)sessionStateToString:(SessionState)state {
+    switch (state) {
+        case SessionStateCreated: return @"CREATED";
+        case SessionStateRunning: return @"RUNNING";
+        case SessionStateFailed: return @"FAILED";
+        case SessionStateCompleted: return @"COMPLETED";
+        default: return @"";
+    }
 }
 
 @end

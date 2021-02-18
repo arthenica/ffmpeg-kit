@@ -27,6 +27,8 @@
 @implementation FFmpegKit
 
 + (void)initialize {
+    NSLog(@"Loading ffmpeg-kit.\n");
+
     [FFmpegKitConfig class];
 
     NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@\n", [Packages getPackageName], [ArchDetect getArch], [FFmpegKitConfig getVersion], [FFmpegKitConfig getBuildDate]);

@@ -29,6 +29,10 @@
     NSRecursiveLock* _statisticsLock;
 }
 
++ (void)initialize {
+    // EMPTY INITIALIZE
+}
+
 - (instancetype)init:(NSArray*)arguments {
 
     self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];

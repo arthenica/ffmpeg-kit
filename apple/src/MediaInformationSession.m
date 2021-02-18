@@ -26,6 +26,10 @@
     MediaInformation* _mediaInformation;
 }
 
++ (void)initialize {
+    // EMPTY INITIALIZE
+}
+
 - (instancetype)init:(NSArray*)arguments {
 
     self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];

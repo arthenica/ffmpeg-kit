@@ -373,6 +373,14 @@ typedef NS_ENUM(NSUInteger, Signal) {
  */
 + (int)messagesInTransmit:(long)sessionId;
 
+/**
+ * Converts session state to string.
+ *
+ * @param state session state
+ * @return string value
+ */
++ (NSString*)sessionStateToString:(SessionState)state;
+
 @end
 
 #endif // FFMPEG_KIT_CONFIG_H

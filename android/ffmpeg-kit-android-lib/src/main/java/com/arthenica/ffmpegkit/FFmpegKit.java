@@ -269,7 +269,7 @@ public class FFmpegKit {
      * @param command string command
      * @return array of arguments
      */
-    static String[] parseArguments(final String command) {
+    public static String[] parseArguments(final String command) {
         final List<String> argumentList = new ArrayList<>();
         StringBuilder currentArgument = new StringBuilder();
 
@@ -326,7 +326,7 @@ public class FFmpegKit {
      * @param arguments arguments
      * @return concatenated string containing all arguments
      */
-    static String argumentsToString(final String[] arguments) {
+    public static String argumentsToString(final String[] arguments) {
         if (arguments == null) {
             return "null";
         }

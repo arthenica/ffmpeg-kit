@@ -52,7 +52,7 @@ static AtomicLong *sessionIdGenerator = nil;
 - (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
     self = [super init];
     if (self) {
-        _sessionId = [sessionIdGenerator incrementAndGet];
+        _sessionId = [sessionIdGenerator getAndIncrement];
         _executeCallback = executeCallback;
         _logCallback = logCallback;
         _createTime = [NSDate date];
@@ -150,7 +150,7 @@ static AtomicLong *sessionIdGenerator = nil;
         NSLog(@"getAllLogsAsStringWithTimeout was called to return all logs but there are still logs being transmitted for session id %ld.", _sessionId);
     }
 
-    return [self getAllLogsAsString];
+    return [self getLogsAsString];
 }
 
 - (NSString*)getAllLogsAsString {

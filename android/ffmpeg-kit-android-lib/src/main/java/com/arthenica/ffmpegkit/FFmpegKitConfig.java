@@ -664,6 +664,8 @@ public class FFmpegKitConfig {
      * @param ffmpegSession FFmpeg session which includes command options/arguments
      */
     public static void asyncFFmpegExecute(final FFmpegSession ffmpegSession) {
+        addSession(ffmpegSession);
+
         AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(ffmpegSession);
         Future<?> future = asyncExecutorService.submit(asyncFFmpegExecuteTask);
         ffmpegSession.setFuture(future);
@@ -676,6 +678,8 @@ public class FFmpegKitConfig {
      * @param executorService executor service that will be used to run this asynchronous operation
      */
     public static void asyncFFmpegExecute(final FFmpegSession ffmpegSession, final ExecutorService executorService) {
+        addSession(ffmpegSession);
+
         AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(ffmpegSession);
         Future<?> future = executorService.submit(asyncFFmpegExecuteTask);
         ffmpegSession.setFuture(future);
@@ -687,6 +691,8 @@ public class FFmpegKitConfig {
      * @param ffprobeSession FFprobe session which includes command options/arguments
      */
     public static void asyncFFprobeExecute(final FFprobeSession ffprobeSession) {
+        addSession(ffprobeSession);
+
         AsyncFFprobeExecuteTask asyncFFmpegExecuteTask = new AsyncFFprobeExecuteTask(ffprobeSession);
         Future<?> future = asyncExecutorService.submit(asyncFFmpegExecuteTask);
         ffprobeSession.setFuture(future);
@@ -699,6 +705,8 @@ public class FFmpegKitConfig {
      * @param executorService executor service that will be used to run this asynchronous operation
      */
     public static void asyncFFprobeExecute(final FFprobeSession ffprobeSession, final ExecutorService executorService) {
+        addSession(ffprobeSession);
+
         AsyncFFprobeExecuteTask asyncFFmpegExecuteTask = new AsyncFFprobeExecuteTask(ffprobeSession);
         Future<?> future = executorService.submit(asyncFFmpegExecuteTask);
         ffprobeSession.setFuture(future);
@@ -711,6 +719,8 @@ public class FFmpegKitConfig {
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final int waitTimeout) {
+        addSession(mediaInformationSession);
+
         AsyncGetMediaInformationTask asyncGetMediaInformationTask = new AsyncGetMediaInformationTask(mediaInformationSession, waitTimeout);
         Future<?> future = asyncExecutorService.submit(asyncGetMediaInformationTask);
         mediaInformationSession.setFuture(future);
@@ -724,6 +734,8 @@ public class FFmpegKitConfig {
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final ExecutorService executorService, final int waitTimeout) {
+        addSession(mediaInformationSession);
+
         AsyncGetMediaInformationTask asyncGetMediaInformationTask = new AsyncGetMediaInformationTask(mediaInformationSession, waitTimeout);
         Future<?> future = executorService.submit(asyncGetMediaInformationTask);
         mediaInformationSession.setFuture(future);
@@ -936,12 +948,20 @@ public class FFmpegKitConfig {
      */
     static void addSession(final Session session) {
         synchronized (sessionHistoryLock) {
-            sessionHistoryMap.put(session.getSessionId(), session);
-            sessionHistoryList.add(session);
-            if (sessionHistoryList.size() > sessionHistorySize) {
-                try {
-                    sessionHistoryList.remove(0);
-                } catch (final IndexOutOfBoundsException ignored) {
+
+            /*
+             * ASYNC SESSIONS CALL THIS METHOD TWICE
+             * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+             */
+            final boolean sessionAlreadyAdded = sessionHistoryMap.containsKey(session.getSessionId());
+            if (!sessionAlreadyAdded) {
+                sessionHistoryMap.put(session.getSessionId(), session);
+                sessionHistoryList.add(session);
+                if (sessionHistoryList.size() > sessionHistorySize) {
+                    try {
+                        sessionHistoryList.remove(0);
+                    } catch (final IndexOutOfBoundsException ignored) {
+                    }
                 }
             }
         }

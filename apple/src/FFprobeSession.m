@@ -31,6 +31,10 @@
     return self;
 }
 
++ (void)initialize {
+    // EMPTY INITIALIZE
+}
+
 - (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
 
     self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];

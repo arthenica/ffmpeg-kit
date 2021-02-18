@@ -4,7 +4,7 @@
 ASM_OPTIONS=""
 case ${ARCH} in
 *-mac-catalyst)
-  ASM_OPTIONS="--disable-video-cocoa --disable-render-metal --disable-haptic --disable-diskaudio --disable-joystick"
+  ASM_OPTIONS="--disable-video-cocoa --disable-render-metal --disable-diskaudio"
   ;;
 esac
 
@@ -33,6 +33,8 @@ overwrite_file "${FFMPEG_KIT_TMPDIR}"/source/config/config.sub "${BASEDIR}"/src/
   --enable-static \
   --disable-shared \
   --disable-video-opengl \
+  --disable-joystick \
+  --disable-haptic \
   ${ASM_OPTIONS} \
   --host="${HOST}" || return 1
 

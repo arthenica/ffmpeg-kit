@@ -50,9 +50,9 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param executeCallback session specific execute callback function
      * @param logCallback     session specific log callback function
      */
-    FFprobeSession(final String[] arguments,
-                   final ExecuteCallback executeCallback,
-                   final LogCallback logCallback) {
+    public FFprobeSession(final String[] arguments,
+                          final ExecuteCallback executeCallback,
+                          final LogCallback logCallback) {
         this(arguments, executeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
@@ -64,10 +64,10 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param logCallback            session specific log callback function
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    FFprobeSession(final String[] arguments,
-                   final ExecuteCallback executeCallback,
-                   final LogCallback logCallback,
-                   final LogRedirectionStrategy logRedirectionStrategy) {
+    public FFprobeSession(final String[] arguments,
+                          final ExecuteCallback executeCallback,
+                          final LogCallback logCallback,
+                          final LogRedirectionStrategy logRedirectionStrategy) {
         super(arguments, executeCallback, logCallback, logRedirectionStrategy);
     }
 

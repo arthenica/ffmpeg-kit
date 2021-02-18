@@ -17,48 +17,28 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#import <stdatomic.h>
 #import "AtomicLong.h"
 
-@interface AtomicLong()
-
-@property (strong) NSRecursiveLock* lock;
-
-@end
-
 @implementation AtomicLong {
-    long _value;
+    atomic_int _value;
 }
 
 - (instancetype)initWithValue:(long)value {
     self = [super init];
     if (self) {
-        _value = value;
-        _lock = [[NSRecursiveLock alloc] init];
+        atomic_init(&_value, value);
     }
 
     return self;
 }
 
 - (long)incrementAndGet {
-    long returnValue;
-
-    [self.lock lock];
-    _value += 1;
-    returnValue = _value;
-    [self.lock unlock];
-
-    return returnValue;
+    return (long)atomic_fetch_add(&_value, 1) + 1;
 }
 
 - (long)getAndIncrement {
-    long returnValue;
-
-    [self.lock lock];
-    returnValue = _value;
-    _value += 1;
-    [self.lock unlock];
-
-    return returnValue;
+    return (long)atomic_fetch_add(&_value, 1);
 }
 
 @end

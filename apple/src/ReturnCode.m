@@ -56,4 +56,8 @@
     return (_value == ReturnCodeCancel);
 }
 
+- (NSString*)description {
+   return [NSString stringWithFormat:@"%d", _value];
+}
+
 @end
