@@ -157,6 +157,9 @@ if [[ -n ${DISPLAY_HELP} ]]; then
   exit 0
 fi
 
+# DISABLE NOT SUPPORTED ARCHITECTURES
+disable_tvos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}" "${DETECTED_TVOS_SDK_VERSION}"
+
 # CHECK SOME RULES FOR .xcframework BUNDLES
 
 # 1. DO NOT ALLOW --lts AND --xcframework OPTIONS TOGETHER

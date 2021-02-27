@@ -95,6 +95,36 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
 # 1. architecture index
 # 2. detected sdk version
 #
+disable_tvos_architecture_not_supported_on_detected_sdk_version() {
+  local ARCH_NAME=$(get_arch_name $1)
+
+  case ${ARCH_NAME} in
+  arm64-simulator)
+
+    # INTRODUCED IN TVOS SDK 14
+    if [[ $2 == 14* ]]; then
+      local SUPPORTED=1
+    else
+      local SUPPORTED=0
+    fi
+    ;;
+  *)
+    local SUPPORTED=1
+    ;;
+  esac
+
+  if [[ ${SUPPORTED} -ne 1 ]]; then
+    if [[ -z ${BUILD_FORCE} ]]; then
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on SDK $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+      disable_arch "${ARCH_NAME}"
+    fi
+  fi
+}
+
+#
+# 1. architecture index
+# 2. detected sdk version
+#
 disable_macos_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
 
@@ -925,7 +955,7 @@ get_apple_architectures_for_variant() {
     done
     ;;
   "${ARCH_VAR_TVOS}")
-    for index in ${ARCH_ARM64} ${ARCH_X86_64}; do
+    for index in ${ARCH_ARM64} ${ARCH_X86_64} ${ARCH_ARM64_SIMULATOR}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
@@ -935,7 +965,7 @@ get_apple_architectures_for_variant() {
     done
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    for index in ${ARCH_X86_64}; do
+    for index in ${ARCH_X86_64} ${ARCH_ARM64_SIMULATOR}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
@@ -1140,8 +1170,18 @@ get_sdk_name() {
       ;;
     esac
     ;;
-  i386 | arm64-simulator)
+  i386)
     echo "iphonesimulator"
+    ;;
+  arm64-simulator)
+    case ${FFMPEG_KIT_BUILD_TYPE} in
+    ios)
+      echo "iphonesimulator"
+      ;;
+    tvos)
+      echo "appletvsimulator"
+      ;;
+    esac
     ;;
   *-mac-catalyst)
     echo "macosx"
@@ -1180,8 +1220,18 @@ get_min_version_cflags() {
       ;;
     esac
     ;;
-  i386 | arm64-simulator)
+  i386)
     echo "-mios-simulator-version-min=$(get_min_sdk_version)"
+    ;;
+  arm64-simulator)
+    case ${FFMPEG_KIT_BUILD_TYPE} in
+    ios)
+      echo "-mios-simulator-version-min=$(get_min_sdk_version)"
+      ;;
+    tvos)
+      echo "-mappletvsimulator-version-min=$(get_min_sdk_version)"
+      ;;
+    esac
     ;;
   *-mac-catalyst)
     echo "-miphoneos-version-min=$(get_min_sdk_version)"

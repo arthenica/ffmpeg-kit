@@ -10,8 +10,8 @@ enable_default_macos_architectures() {
 display_help() {
   COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
-  echo -e "\n'$COMMAND' builds FFmpegKit for macOS platform. By default two architectures (arm64 and x86-64) are built \
-without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
+  echo -e "\n'$COMMAND' builds FFmpegKit for macOS platform. By default two architectures (arm64 and x86-64) are \
+enabled without any external libraries. Options can be used to disable architectures and/or enable external libraries. \
 Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
 When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"

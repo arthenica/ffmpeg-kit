@@ -5,15 +5,16 @@ source "${BASEDIR}/scripts/function-apple.sh"
 enable_default_tvos_architectures() {
   ENABLED_ARCHITECTURES[ARCH_ARM64]=1
   ENABLED_ARCHITECTURES[ARCH_X86_64]=1
+  ENABLED_ARCHITECTURES[ARCH_ARM64_SIMULATOR]=1
 }
 
 display_help() {
   COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
-  echo -e "\n'$COMMAND' builds FFmpegKit for tvOS platform. By default two architectures (arm64 and x86-64) are built \
-without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
-Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends, libraries are created under the prebuilt folder.\n"
+  echo -e "\n'$COMMAND' builds FFmpegKit for tvOS platform. By default three architectures (arm64, arm64-simulator \
+and x86-64) are enabled without any external libraries. Options can be used to disable architectures and/or enable \
+external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be \
+set explicitly. When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
@@ -23,6 +24,7 @@ When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Architectures:"
 
   echo -e "  --disable-arm64\t\tdo not build arm64 architecture [yes]"
+  echo -e "  --disable-arm64-simulator\tdo not build arm64-simulator architecture [yes]"
   echo -e "  --disable-x86-64\t\tdo not build x86-64 architecture [yes]\n"
 
   echo -e "Libraries:"
@@ -73,7 +75,7 @@ get_common_cflags() {
   arm64)
     echo "-fstrict-aliasing -fembed-bitcode -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
     ;;
-  x86-64)
+  x86-64 | arm64-simulator)
     echo "-fstrict-aliasing -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
     ;;
   esac
@@ -83,6 +85,9 @@ get_arch_specific_cflags() {
   case ${ARCH} in
   arm64)
     echo "-arch arm64 -target $(get_target) -march=armv8-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64"
+    ;;
+  arm64-simulator)
+    echo "-arch arm64 -target $(get_target) -march=armv8-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64_SIMULATOR"
     ;;
   x86-64)
     echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"
@@ -107,7 +112,7 @@ get_size_optimization_cflags() {
       ;;
     esac
     ;;
-  x86-64)
+  x86-64 | arm64-simulator)
     case $1 in
     x264 | ffmpeg)
       ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
@@ -134,7 +139,7 @@ get_size_optimization_asm_cflags() {
     arm64)
       ARCH_OPTIMIZATION="-Oz"
       ;;
-    x86-64)
+    x86-64 | arm64-simulator)
       ARCH_OPTIMIZATION="-O2"
       ;;
     esac
@@ -307,6 +312,9 @@ get_arch_specific_ldflags() {
   arm64)
     echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
     ;;
+  arm64-simulator)
+    echo "-arch arm64 -march=armv8-a+crc+crypto"
+    ;;
   x86-64)
     echo "-arch x86_64 -march=x86-64"
     ;;
@@ -367,7 +375,7 @@ set_toolchain_paths() {
 
   LOCAL_ASMFLAGS="$(get_asmflags "$1")"
   case ${ARCH} in
-  arm64)
+  arm64*)
     if [ "$1" == "x265" ]; then
       export AS="${LOCAL_GAS_PREPROCESSOR}"
       export AS_ARGUMENTS="-arch aarch64"
