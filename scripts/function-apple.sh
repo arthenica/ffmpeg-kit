@@ -424,15 +424,16 @@ create_ffmpeg_kit_universal_library() {
 # 1. library index
 # 2. library version
 # 3. static library name
-# 4. architecture variant
+# 4. framework name
+# 5. architecture variant
 #
 create_single_framework() {
   local LIBRARY_INDEX="$1"
   local LIBRARY_VERSION="$2"
   local STATIC_LIBRARY_NAME="$3"
-  local ARCHITECTURE_VARIANT="$4"
+  local FRAMEWORK_NAME="$4"
+  local ARCHITECTURE_VARIANT="$5"
   local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-  local FRAMEWORK_NAME="$3"
   local FRAMEWORK_PATH=${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/${FRAMEWORK_NAME}.framework
 
   initialize_folder "${FRAMEWORK_PATH}"
@@ -478,34 +479,34 @@ create_framework() {
 
   if [[ ${LIBRARY_LIBTHEORA} == "${LIBRARY_INDEX}" ]]; then
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheora" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoraenc" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoradec" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheora" "libtheora" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoraenc" "libtheoraenc" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoradec" "libtheoradec" "${ARCHITECTURE_VARIANT}"
 
   elif [[ ${LIBRARY_LIBVORBIS} == "${LIBRARY_INDEX}" ]]; then
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisfile" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisenc" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbis" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisfile" "libvorbisfile" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisenc" "libvorbisenc" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbis" "libvorbis" "${ARCHITECTURE_VARIANT}"
 
   elif [[ ${LIBRARY_LIBWEBP} == "${LIBRARY_INDEX}" ]]; then
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpmux" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpdemux" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebp" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpmux" "libwebpmux" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpdemux" "libwebpdemux" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebp" "libwebp" "${ARCHITECTURE_VARIANT}"
 
   elif [[ ${LIBRARY_OPENCOREAMR} == "${LIBRARY_INDEX}" ]]; then
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libopencore-amrnb" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libopencore-amrnb" "libopencore-amrnb" "${ARCHITECTURE_VARIANT}"
 
   elif [[ ${LIBRARY_NETTLE} == "${LIBRARY_INDEX}" ]]; then
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libnettle" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libhogweed" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libnettle" "libnettle" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libhogweed" "libhogweed" "${ARCHITECTURE_VARIANT}"
 
   else
 
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "$(get_static_archive_name "${LIBRARY_INDEX}")" "${ARCHITECTURE_VARIANT}"
+    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "$(get_static_archive_name "${LIBRARY_INDEX}")" "${LIBRARY_NAME}" "${ARCHITECTURE_VARIANT}"
 
   fi
 
@@ -678,7 +679,7 @@ create_xcframework() {
 
   else
 
-    create_single_xcframework "$(get_static_archive_name "${LIBRARY_INDEX}")"
+    create_single_xcframework "${LIBRARY_NAME}"
 
   fi
 
