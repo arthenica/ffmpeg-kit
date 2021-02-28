@@ -469,6 +469,12 @@ create_framework() {
   local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
   local PACKAGE_CONFIG_FILE_NAME=$(get_package_config_file_name "${LIBRARY_INDEX}")
 
+  if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
+
+    # THERE ARE NO ARCHITECTURES ENABLED FOR THIS LIBRARY TYPE
+    return
+  fi
+
   # EACH ENABLED LIBRARY HAS TO HAVE A .pc FILE AND A VERSION
   local LIBRARY_VERSION=$(get_external_library_version "${PACKAGE_CONFIG_FILE_NAME}")
   if [[ -z ${LIBRARY_VERSION} ]]; then

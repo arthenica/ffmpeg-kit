@@ -464,32 +464,32 @@ initialize_prebuilt_ios_folders() {
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONEOS}") -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONEOS}")" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONEOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONEOS}")"
+      initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONEOS}")"
     fi
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONESIMULATOR}") -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONESIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONESIMULATOR}")" 1>>"${BASEDIR}"/build.log 2>&1
+      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONESIMULATOR}")"
+      initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONESIMULATOR}")"
     fi
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MAC_CATALYST}") -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MAC_CATALYST}")" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MAC_CATALYST}")" 1>>"${BASEDIR}"/build.log 2>&1
+      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MAC_CATALYST}")"
+      initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MAC_CATALYST}")"
     fi
 
     echo -e "DEBUG: Initializing xcframework directory at ${BASEDIR}/prebuilt/$(get_xcframework_directory)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # XCF BUILDS GENERATE XCFFRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_xcframework_directory)" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_xcframework_directory)"
   else
 
     echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")"
 
     echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")"
   fi
 }
 

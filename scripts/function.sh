@@ -332,8 +332,17 @@ is_arch_supported_on_platform() {
     ;;
 
     # IOS
-  $ARCH_ARMV7 | $ARCH_ARMV7S | $ARCH_ARM64E | $ARCH_I386 | $ARCH_X86_64_MAC_CATALYST | $ARCH_ARM64_MAC_CATALYST | $ARCH_ARM64_SIMULATOR)
+  $ARCH_ARMV7 | $ARCH_ARMV7S | $ARCH_ARM64E | $ARCH_I386 | $ARCH_X86_64_MAC_CATALYST | $ARCH_ARM64_MAC_CATALYST)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+      echo 1
+    else
+      echo 0
+    fi
+    ;;
+
+    # IOS OR TVOS
+  $ARCH_ARM64_SIMULATOR)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
       echo 1
     else
       echo 0

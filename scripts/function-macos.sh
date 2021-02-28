@@ -376,24 +376,24 @@ initialize_prebuilt_macos_folders() {
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MACOS}") -eq 1 ]]; then
-      mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
-      mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
+      initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")"
     fi
 
     echo -e "DEBUG: Initializing xcframework directory at ${BASEDIR}/prebuilt/$(get_xcframework_directory)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # XCF BUILDS GENERATE XCFFRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_xcframework_directory)" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_xcframework_directory)"
   else
 
     echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    mkdir -p "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
 
     echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-    mkdir -p "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")" 1>>"${BASEDIR}"/build.log 2>&1
+    initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")"
   fi
 }
 

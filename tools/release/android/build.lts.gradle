@@ -41,5 +41,9 @@ task javadoc(type: Javadoc) {
 dependencies {
     implementation 'com.arthenica:smart-exception-java:0.1.0'
     testImplementation "androidx.test.ext:junit:1.1.2"
-    testImplementation "org.json:json:20190722"
+    testImplementation "org.json:json:20201115"
+}
+
+if (System.properties.containsKey('releaseFFmpegKit')) {
+    apply from: "${rootProject.projectDir}/../tools/release/android/release.template.gradle"
 }

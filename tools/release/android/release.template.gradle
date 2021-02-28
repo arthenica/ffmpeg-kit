@@ -1,149 +1,3 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
-buildscript {
-    repositories {
-	google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-    }
-}
-
-android {
-    compileSdkVersion Integer.parseInt(releaseTargetSdk)
-    ndkVersion "21.3.6528147"
-
-    defaultConfig {
-        minSdkVersion Integer.parseInt(releaseMinSdk)
-        targetSdkVersion Integer.parseInt(releaseTargetSdk)
-        versionCode Integer.parseInt(releaseVersionCode)
-        versionName releaseVersionName
-        project.archivesBaseName = releaseProject
-        consumerProguardFiles 'proguard-rules.pro'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ["../libs"]
-        }
-    }
-
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    libraryVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
-        }
-    }
-}
-
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = releaseProject
-
-    publishedGroupId = 'com.arthenica'
-    libraryName = releaseProject
-    artifact = releaseProject
-
-    libraryDescription = releaseProjectDescription
-
-    siteUrl = 'https://github.com/tanersener/ffmpeg-kit'
-    issueTrackerUrl = 'https://github.com/tanersener/ffmpeg-kit/issues'
-    gitUrl = 'https://github.com/tanersener/ffmpeg-kit.git'
-
-    libraryVersion = releaseVersionName
-
-    developerId = 'tanersener'
-    developerName = 'Taner Sener'
-    developerEmail = 'tanersener@gmail.com'
-
-    if (Project.hasProperty('releaseGPL')) {
-        licenseName = 'GNU General Public License version 3'
-        licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.txt'
-        allLicenses = ["GPL-3.0"]
-    } else {
-        licenseName = 'GNU Lesser General Public License, Version 3'
-        licenseUrl = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
-        allLicenses = ["LGPL-3.0"]
-    }
-}
-
-group = publishedGroupId
-version = libraryVersion
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            packaging 'aar'
-            groupId publishedGroupId
-            artifactId artifact
-
-            name libraryName
-            description libraryDescription
-            url siteUrl
-
-            licenses {
-                license {
-                    name licenseName
-                    url licenseUrl
-                }
-            }
-            developers {
-                developer {
-                    id developerId
-                    name developerName
-                    email developerEmail
-                }
-            }
-            scm {
-                connection gitUrl
-                developerConnection gitUrl
-                url siteUrl
-            }
-        }
-    }
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = bintrayRepo
-        name = bintrayName
-        desc = libraryDescription
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        issueTrackerUrl = issueTrackerUrl
-        licenses = allLicenses
-        dryRun = true
-        publish = false
-        override = false
-        publicDownloadNumbers = false
-        version {
-            desc = libraryDescription
-        }
-    }
-}
-
 task sourcesJar(type: Jar) {
     archiveClassifier.set('sources')
     from android.sourceSets.main.java.srcDirs
@@ -165,14 +19,87 @@ artifacts {
     archives sourcesJar
 }
 
-dependencies {
-    testImplementation "androidx.test.ext:junit:1.1.2"
-    testImplementation "org.json:json:20190722"
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.arthenica'
+archivesBaseName = releaseProject
+version = releaseVersionName
+
+File propertiesFile = project.rootProject.file('local.properties')
+if (propertiesFile.exists()) {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream(propertiesFile))
+    properties.each { name, value ->
+        ext[name] = value
+    }
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
+ext {
+    publishedGroupId = group
+    artifact = releaseProject
+    libraryName = releaseProject
+    libraryVersion = version
+    libraryDescription = releaseProjectDescription
+
+    siteUrl = 'https://github.com/tanersener/ffmpeg-kit'
+    gitUrl = 'https://github.com/tanersener/ffmpeg-kit.git'
+
+    developerId = 'tanersener'
+    developerName = 'Taner Sener'
+    developerEmail = 'tanersener@gmail.com'
+
+    if (Project.hasProperty('releaseGPL')) {
+        licenseName = 'GNU General Public License version 3'
+        licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+    } else {
+        licenseName = 'GNU Lesser General Public License, Version 3'
+        licenseUrl = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
     }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                packaging 'aar'
+                name = libraryName
+                description = libraryDescription
+                url = siteUrl
+
+                licenses {
+                    license {
+                        name = licenseName
+                        url = licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
 }
