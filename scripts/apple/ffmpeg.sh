@@ -102,7 +102,7 @@ esac
 CONFIGURE_POSTFIX=""
 
 # SET CONFIGURE OPTIONS
-for library in {1..58}; do
+for library in {1..59}; do
   if [[ ${!library} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
@@ -319,7 +319,7 @@ for library in {1..58}; do
         CONFIGURE_POSTFIX+=" --enable-bzlib"
         ;;
       *-coreimage)
-        CONFIGURE_POSTFIX+=" --enable-coreimage"
+        CONFIGURE_POSTFIX+=" --enable-coreimage --enable-appkit"
         ;;
       *-libiconv)
         CONFIGURE_POSTFIX+=" --enable-iconv"
@@ -352,7 +352,7 @@ for library in {1..58}; do
     elif [[ ${library} -eq $((LIBRARY_APPLE_BZIP2 + 1)) ]]; then
       CONFIGURE_POSTFIX+=" --disable-bzlib"
     elif [[ ${library} -eq $((LIBRARY_APPLE_COREIMAGE + 1)) ]]; then
-      CONFIGURE_POSTFIX+=" --disable-coreimage"
+      CONFIGURE_POSTFIX+=" --disable-coreimage --disable-appkit"
     elif [[ ${library} -eq $((LIBRARY_APPLE_LIBICONV + 1)) ]]; then
       CONFIGURE_POSTFIX+=" --disable-iconv"
     elif [[ ${library} -eq $((LIBRARY_APPLE_OPENCL + 1)) ]]; then
@@ -496,7 +496,6 @@ ${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffb
   --disable-nvenc \
   --disable-vaapi \
   --disable-vdpau \
-  --disable-appkit \
   --disable-alsa \
   --disable-cuda \
   --disable-cuvid \
