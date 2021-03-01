@@ -4,15 +4,6 @@
 source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh || return 1
 
 LIB_NAME=$1
-
-echo -e "----------------------------------------------------------------"
-echo -e "\nINFO: Building ${LIB_NAME} with the following environment variables\n"
-env
-echo -e "----------------------------------------------------------------\n"
-echo -e "INFO: System information\n"
-echo -e "INFO: $(uname -a)\n"
-echo -e "----------------------------------------------------------------\n"
-
 ENABLED_LIBRARY_PATH="${LIB_INSTALL_BASE}/${LIB_NAME}"
 
 # DELETE THE PREVIOUS BUILD OF THE LIBRARY
@@ -30,6 +21,14 @@ export CFLAGS=$(get_cflags "${LIB_NAME}")
 export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
 export LDFLAGS=$(get_ldflags "${LIB_NAME}")
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
+
+echo -e "----------------------------------------------------------------"
+echo -e "\nINFO: Building ${LIB_NAME} for ${HOST} with the following environment variables\n"
+env
+echo -e "----------------------------------------------------------------\n"
+echo -e "INFO: System information\n"
+echo -e "INFO: $(uname -a)\n"
+echo -e "----------------------------------------------------------------\n"
 
 cd "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 

@@ -6,7 +6,7 @@ source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR
 LIB_NAME="ffmpeg-kit"
 
 echo -e "----------------------------------------------------------------" 1>>"${BASEDIR}"/build.log 2>&1
-echo -e "\nINFO: Building ${LIB_NAME} with the following environment variables\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "\nINFO: Building ${LIB_NAME} for ${HOST} with the following environment variables\n" 1>>"${BASEDIR}"/build.log 2>&1
 env 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "----------------------------------------------------------------\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: System information\n" 1>>"${BASEDIR}"/build.log 2>&1

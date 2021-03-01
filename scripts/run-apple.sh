@@ -4,15 +4,6 @@
 source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh || return 1
 
 LIB_NAME=$1
-
-echo -e "----------------------------------------------------------------"
-echo -e "\nINFO: Building ${LIB_NAME} with the following environment variables\n"
-env
-echo -e "----------------------------------------------------------------\n"
-echo -e "INFO: System information\n"
-echo -e "INFO: $(uname -a)\n"
-echo -e "----------------------------------------------------------------\n"
-
 ENABLED_LIBRARY_PATH="${LIB_INSTALL_BASE}/${LIB_NAME}"
 
 # DELETE THE PREVIOUS BUILD OF THE LIBRARY
@@ -36,6 +27,14 @@ cd "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 LIB_INSTALL_PREFIX="${ENABLED_LIBRARY_PATH}"
 BUILD_DIR=$(get_cmake_build_directory)
 CMAKE_SYSTEM_NAME=$(get_apple_cmake_system_name)
+
+echo -e "----------------------------------------------------------------"
+echo -e "\nINFO: Building ${LIB_NAME} for ${HOST} with the following environment variables\n"
+env
+echo -e "----------------------------------------------------------------\n"
+echo -e "INFO: System information\n"
+echo -e "INFO: $(uname -a)\n"
+echo -e "----------------------------------------------------------------\n"
 
 rm -rf "${LIB_INSTALL_PREFIX}" || return 1
 rm -rf "${BUILD_DIR}" || return 1
