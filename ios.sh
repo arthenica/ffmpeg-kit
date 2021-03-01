@@ -188,7 +188,13 @@ if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]
   disable_arch "arm64-simulator"
 fi
 
-# 3. DISABLE x86-64-mac-catalyst WHEN x86-64 IS ENABLED IN framework BUNDLES
+# 3. DISABLE arm64-simulator WHEN arm64-mac-catalyst IS ENABLED IN framework BUNDLES
+if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_MAC_CATALYST}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
+  echo -e "INFO: Disabled arm64-simulator architecture which can not co-exist with arm64-mac-catalyst in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  disable_arch "arm64-simulator"
+fi
+
+# 4. DISABLE x86-64-mac-catalyst WHEN x86-64 IS ENABLED IN framework BUNDLES
 if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
   echo -e "INFO: Disabled x86-64-mac-catalyst architecture which can not co-exist with x86-64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "x86-64-mac-catalyst"
