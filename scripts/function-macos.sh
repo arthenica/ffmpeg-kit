@@ -315,9 +315,9 @@ set_toolchain_paths() {
     LOCAL_GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
   fi
 
-  export AR="$(xcrun --sdk "$(get_sdk_name)" -f ar)"
+  export AR="$(xcrun --sdk "$(get_sdk_name)" -f ar 2>>"${BASEDIR}"/build.log)"
   export CC="clang"
-  export OBJC="$(xcrun --sdk "$(get_sdk_name)" -f clang)"
+  export OBJC="$(xcrun --sdk "$(get_sdk_name)" -f clang 2>>"${BASEDIR}"/build.log)"
   export CXX="clang++"
 
   LOCAL_ASMFLAGS="$(get_asmflags $1)"
@@ -336,10 +336,10 @@ set_toolchain_paths() {
     ;;
   esac
 
-  export LD="$(xcrun --sdk "$(get_sdk_name)" -f ld)"
-  export RANLIB="$(xcrun --sdk "$(get_sdk_name)" -f ranlib)"
-  export STRIP="$(xcrun --sdk "$(get_sdk_name)" -f strip)"
-  export NM="$(xcrun --sdk "$(get_sdk_name)" -f nm)"
+  export LD="$(xcrun --sdk "$(get_sdk_name)" -f ld 2>>"${BASEDIR}"/build.log)"
+  export RANLIB="$(xcrun --sdk "$(get_sdk_name)" -f ranlib 2>>"${BASEDIR}"/build.log)"
+  export STRIP="$(xcrun --sdk "$(get_sdk_name)" -f strip 2>>"${BASEDIR}"/build.log)"
+  export NM="$(xcrun --sdk "$(get_sdk_name)" -f nm 2>>"${BASEDIR}"/build.log)"
 
   export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/$(get_build_directory)/pkgconfig"
   export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"

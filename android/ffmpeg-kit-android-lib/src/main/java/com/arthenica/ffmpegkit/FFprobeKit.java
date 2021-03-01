@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutorService;
  * </pre>
  * <p>It can extract media information for a file or a url, using {@link #getMediaInformation(String)} method.
  * <pre>
- *      MediaInformationSession session = FFprobeKit.getMediaInformation("file1.mp4");
+ * MediaInformationSession session = FFprobeKit.getMediaInformation("file1.mp4");
  * </pre>
  */
 public class FFprobeKit {

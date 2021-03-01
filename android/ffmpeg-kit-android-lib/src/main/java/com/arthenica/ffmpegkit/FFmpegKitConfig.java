@@ -47,8 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * <p>Configuration class of <code>FFmpegKit</code> library. Allows customizing the global library
- * options. Provides helper methods to support additional resources.
+ * <p>Configuration class of <code>FFmpegKit</code> library.
  */
 public class FFmpegKitConfig {
 
@@ -488,7 +487,7 @@ public class FFmpegKitConfig {
      * Returns the list of camera ids supported. These devices can be used in <code>FFmpeg</code>
      * commands.
      *
-     * <p>Note that this method requires API Level >= 24. On older API levels it returns an empty
+     * <p>Note that this method requires API Level &ge; 24. On older API levels it returns an empty
      * list.
      *
      * @param context application context
@@ -878,8 +877,10 @@ public class FFmpegKitConfig {
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
      * input url that can be used in FFmpeg and FFprobe commands.
      *
-     * <p>Requires API Level >= 19. On older API levels it returns an empty url.
+     * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
+     * @param context application context
+     * @param uri saf uri
      * @return input url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForRead(final Context context, final Uri uri) {
@@ -890,8 +891,10 @@ public class FFmpegKitConfig {
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
      * output url that can be used in FFmpeg and FFprobe commands.
      *
-     * <p>Requires API Level >= 19. On older API levels it returns an empty url.
+     * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
+     * @param context application context
+     * @param uri saf uri
      * @return output url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForWrite(final Context context, final Uri uri) {
@@ -1065,6 +1068,7 @@ public class FFmpegKitConfig {
     /**
      * <p>Returns sessions that have the given state.
      *
+     * @param state session state
      * @return sessions that have the given state from the session history
      */
     public static List<Session> getSessionsByState(final SessionState state) {

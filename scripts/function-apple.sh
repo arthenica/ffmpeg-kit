@@ -1268,7 +1268,7 @@ get_min_sdk_version() {
 }
 
 get_sdk_path() {
-  echo "$(xcrun --sdk "$(get_sdk_name)" --show-sdk-path)"
+  echo "$(xcrun --sdk "$(get_sdk_name)" --show-sdk-path 2>>"${BASEDIR}"/build.log)"
 }
 
 create_mason_cross_file() {

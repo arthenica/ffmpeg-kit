@@ -36,6 +36,8 @@ task javadoc(type: Javadoc) {
     destinationDir = file("${projectDir}/../../docs/android/javadoc")
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     source = android.sourceSets.main.java.srcDirs
+    configurations.implementation.setCanBeResolved(true)
+    classpath += configurations.implementation
 }
 
 dependencies {

@@ -11,8 +11,8 @@ export IOS_LTS_OPTIONS="--disable-armv7s --lts --enable-ios-audiotoolbox --enabl
 export TVOS_MAIN_OPTIONS="--xcframework --enable-tvos-bzip2 --enable-tvos-audiotoolbox --enable-tvos-libiconv --enable-tvos-videotoolbox --enable-tvos-zlib"
 export TVOS_LTS_OPTIONS="--disable-arm64-simulator --lts --enable-tvos-bzip2 --enable-tvos-audiotoolbox --enable-tvos-libiconv --enable-tvos-zlib"
 
-export TVOS_MAIN_OPTIONS="--xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib"
-export TVOS_LTS_OPTIONS="--disable-arm64 --lts --enable-macos-audiotoolbox --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib"
+export MACOS_MAIN_OPTIONS="--xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib"
+export MACOS_LTS_OPTIONS="--disable-arm64 --lts --enable-macos-audiotoolbox --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib"
 
 if [[ "${RELEASE_TYPE}" == "android" ]]; then
   export ANDROID_EXTRA_VIDEO_PACKAGES="--enable-libiconv "

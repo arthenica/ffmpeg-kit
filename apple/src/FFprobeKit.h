@@ -224,6 +224,7 @@
  * @param command         FFprobe command that prints media information for a file in JSON format
  * @param executeCallback callback that will be notified when execution is completed
  * @param logCallback     callback that will receive logs
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
  * @param waitTimeout     max time to wait until media information is transmitted
  * @return media information session created for this execution
  */
