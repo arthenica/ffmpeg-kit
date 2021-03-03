@@ -51,7 +51,7 @@ create_package() {
     cp "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/LICENSE "${CURRENT_UNIVERSAL_PACKAGE}"/LICENSE || exit 1
 
     cd "${ALL_UNIVERSAL_DIRECTORY}" || exit 1
-    zip -r "${PACKAGE_NAME}-${PACKAGE_VERSION}-ios-static-universal.zip" "${PACKAGE_NAME}"-universal || exit 1
+    zip -r "ffmpeg-kit-$1-${PACKAGE_VERSION}-ios-static-universal.zip" "${PACKAGE_NAME}"-universal || exit 1
 }
 
 if [[ $# -ne 1 ]];
