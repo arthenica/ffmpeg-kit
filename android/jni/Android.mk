@@ -12,18 +12,20 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     endif
 endif
 
-ifeq ($(TARGET_PLATFORM),android-16)
+ifeq ("$(shell test -e $(MY_LOCAL_PATH)/../build/.lts && echo lts)","lts")
+    MY_LTS_POSTFIX := -lts
+else
+    MY_LTS_POSTFIX :=
+endif
+
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     ifeq ($(MY_ARMV7_NEON), true)
-        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon-lts
+        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon$(MY_LTS_POSTFIX)
     else
-        MY_BUILD_DIR := android-$(TARGET_ARCH)-lts
+        MY_BUILD_DIR := android-$(TARGET_ARCH)$(MY_LTS_POSTFIX)
     endif
 else
-    ifeq ($(MY_ARMV7_NEON), true)
-        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon
-    else
-        MY_BUILD_DIR := android-$(TARGET_ARCH)
-    endif
+    MY_BUILD_DIR := android-$(TARGET_ARCH)$(MY_LTS_POSTFIX)
 endif
 
 FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/include

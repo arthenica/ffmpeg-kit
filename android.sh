@@ -221,6 +221,7 @@ export API=${ORIGINAL_API}
 # SET ARCHITECTURES TO BUILD
 rm -f "${BASEDIR}"/android/build/.armv7 1>>"${BASEDIR}"/build.log 2>&1
 rm -f "${BASEDIR}"/android/build/.armv7neon 1>>"${BASEDIR}"/build.log 2>&1
+rm -f "${BASEDIR}"/android/build/.lts 1>>"${BASEDIR}"/build.log 2>&1
 ANDROID_ARCHITECTURES=""
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]] || [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
@@ -243,6 +244,10 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_X86]} -eq 1 ]]; then
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_X86_64]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
+fi
+if [[ ! -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
+  cat >"${BASEDIR}"/android/build/.lts <<EOF
+EOF
 fi
 
 # BUILD FFMPEG-KIT

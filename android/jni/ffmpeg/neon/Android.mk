@@ -1,4 +1,4 @@
-ifeq ($(TARGET_PLATFORM),android-16)
+ifeq ($(MY_LTS_POSTFIX),-lts)
     LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon-lts/ffmpeg/lib
 else
     LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon/ffmpeg/lib
