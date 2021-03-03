@@ -1,4 +1,4 @@
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v4.4-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-min) [![Build Status](https://travis-ci.org/tanersener/ffmpeg-kit.svg?branch=master)](https://travis-ci.org/tanersener/ffmpeg-kit)
+# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v4.4-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) [![Build Status](https://travis-ci.org/tanersener/ffmpeg-kit.svg?branch=master)](https://travis-ci.org/tanersener/ffmpeg-kit)
 
 FFmpeg Kit for applications.
 
@@ -24,13 +24,22 @@ FFmpeg Kit for applications.
 
 - Licensed under `LGPL 3.0`, or `GPL v3.0` if GPL licensed libraries are enabled
 
+#### 1.1 Android
+
+See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android).
+
+#### 1.2 iOS, macOS, tvOS
+
+See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple).
+
 ### 2. Build Scripts
 Use `android.sh`, `ios.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each platform.
 
 All four scripts support additional options to enable external libraries or disable platform architectures.
 
-Refer to `Android` page for `Android` devices and `Apple` page for `iOS`, `macOS`, `tvOS` devices to see the 
-prerequisites for each platform.
+Refer to [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android) page for `Android` devices and
+[Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) page for `iOS`, `macOS`, `tvOS` devices to see 
+the prerequisites for each platform.
 
 ### 3. FFmpegKit Library
 
@@ -39,6 +48,10 @@ provides additional features on top of `FFmpeg` to enable platform specific reso
 
 `Android` library has a `Java` API and `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C` API, 
 which are identical.
+
+See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android) page to learn how the `Java` API 
+can be used on `Android` devices and [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) page to 
+learn more about `Objective-C` API for `iOS`, `macOS`, `tvOS` devices.
 
 ### 4. Binary Packages
 
