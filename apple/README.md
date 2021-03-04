@@ -2,57 +2,46 @@
 
 ### 1. Features
 #### 1.1 iOS
-- Builds `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `arm64e`, `i386`, `x86_64`, `x86_64-mac-catalyst` and 
+- Supports `iOS SDK 12.1+` on Main releases and `iOS SDK 9.3+` on LTS releases
+- Includes `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `arm64e`, `i386`, `x86_64`, `x86_64-mac-catalyst` and 
   `arm64-mac-catalyst` architectures
-- Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `AVFoundation`, `VideoToolbox` system frameworks
 - Objective-C API
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
-- Supports `iOS SDK 9.3` or later
 
 #### 1.2 macOS
-- Builds `arm64` and `x86_64` architectures
-- Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `AVFoundation`, `CoreImage`, 
-  `OpenCL`, `OpenGL`, `VideoToolbox` system frameworks
+- Supports `macOS SDK 10.15+` on Main releases and `macOS SDK 10.11+` on LTS releases
+- Includes `arm64` and `x86_64` architectures
 - Objective-C API
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
-- Supports `macOS SDK 10.11` or later
 
 #### 1.3 tvOS
-- Builds `arm64`, `arm64-simulator` and `x86_64` architectures
-- Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `VideoToolbox` system frameworks
+- Supports `tvOS SDK 10.2+` on Main releases and `tvOS SDK 9.2+` on LTS releases
+- Includes `arm64`, `arm64-simulator` and `x86_64` architectures
 - Objective-C API
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
-- Supports `tvOS SDK 9.2` or later
 
 ### 2. Building
 
-Run `ios.sh`/`macos.sh`/`tvos.sh` at project root directory to build `ffmpeg-kit` and `ffmpeg` shared libraries for a 
+Run `ios.sh`/`macos.sh`/`tvos.sh` at project root directory to build `ffmpeg-kit` and `ffmpeg` static libraries for a 
 platform.
 
 Optionally, use `apple.sh` to combine bundles created by these three scripts in a single bundle.
 
+Please note that `FFmpegKit` project repository includes the source code of `FFmpegKit` only. `ios.sh`, `macos.sh` and 
+`tvos.sh` need network connectivity and internet access to `github.com` in order to download the source code of
+`FFmpeg` and external libraries enabled.
+
 #### 2.1 Prerequisites
 
-`ios.sh`/`macos.sh`/`tvos.sh` requires the following packages and tools.
-
-1. Use your package manager (brew, etc.) to install the following packages.
-
-    ```
-    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget autopoint meson ninja
-    ```
-
-2. `ios.sh`/`macos.sh`/`tvos.sh` needs network connectivity and internet access to `github.com` in order to download
-   the source code of all libraries except `ffmpeg-kit`.
-
-3. Install the tools necessary listed below in `2.1.x`.
+`ios.sh`, `macos.sh` and `tvos.sh` require the following tools and packages.
 
 ##### 2.1.1 iOS
 
@@ -72,14 +61,24 @@ Optionally, use `apple.sh` to combine bundles created by these three scripts in 
 - **tvOS SDK 9.2** or later
 - **Command Line Tools**
 
+##### 2.1.4 Packages
+
+Use your package manager (brew, etc.) to install the following packages.
+
+```
+autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget autopoint meson ninja
+```
+
 #### 2.2 Options
 
-Use `--enable-<library name>` flags to support additional external or system libraries and
+Use `--enable-<library name>` flag to support additional external or system libraries and
 `--disable-<architecture name>` to disable architectures you don't want to build.
 
 ```
 ./ios.sh --enable-fontconfig --disable-armv7
+
 ./macos.sh --enable-freetype --enable-macos-avfoundation --disable-arm64
+
 ./tv.sh --enable-dav1d --enable-libvpx --disable-arm64-simulator
 ```
 
@@ -110,7 +109,7 @@ All libraries created can be found under the `prebuilt` directory.
 
 #### 3.1 Objective API
 
-1. add `FFmpegKit` dependency to your `Podfile` in `ffmpeg-kit-<platform>-<package name>` pattern. Use one of the 
+1. Add `FFmpegKit` dependency to your `Podfile` in `ffmpeg-kit-<platform>-<package name>` pattern. Use one of the 
    `FFmpegKit` package names given in the project [README](https://github.com/tanersener/ffmpeg-kit).
 
     - iOS
@@ -128,24 +127,68 @@ All libraries created can be found under the `prebuilt` directory.
     pod 'ffmpeg-kit-tvos-full', '~> 4.4.LTS'
     ```
 
-2. Execute synchronous FFmpeg commands.
+2. Execute synchronous `FFmpeg` commands.
 
     ```
     #include <ffmpegkit/FFmpegKit.h>
 
-    FFmpegSession* session = [FFmpegKit execute:@"-i file1.mp4 -c:v mpeg4 file2.mp4"];
-    ReturnCode* returnCode = [session getReturnCode];
+    FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v mpeg4 file2.mp4"];
+    ReturnCode *returnCode = [session getReturnCode];
     if ([ReturnCode isSuccess:returnCode]) {
+
         // SUCCESS
+
     } else if ([ReturnCode isCancel:returnCode]) {
+
         // CANCEL
+
     } else {
+
         // FAILURE
         NSLog(@"Command failed with state %@ and rc %@.%@", [FFmpegKitConfig sessionStateToString:[session getState]], returnCode, [session getFailStackTrace]);
+
     }
     ```
 
-3. Execute asynchronous FFmpeg commands by providing session specific execute/log/session callbacks.
+3. Each `execute` call (sync or async) creates a new session. Access every detail about your execution from the
+   session created.
+
+    ```
+    FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v mpeg4 file2.mp4"];
+
+    // Unique session id created for this execution
+    long sessionId = [session getSessionId];
+
+    // Command arguments as a single string
+    NSString *command = [session getCommand];
+
+    // Command arguments
+    NSArray *arguments = [session getArguments];
+   
+    // State of the execution. Shows whether it is still running or completed
+    SessionState state = [session getState];
+
+    // Return code for completed sessions. Will be null if session is still running or ends with a failure
+    ReturnCode *returnCode = [session getReturnCode];
+
+    NSDate *startTime =[session getStartTime];
+    NSDate *endTime =[session getEndTime];
+    long duration =[session getDuration];
+
+    // Console output generated for this execution
+    NSString *output = [session getOutput];
+
+    // The stack trace if FFmpegKit fails to run a command
+    NSString *failStackTrace = [session getFailStackTrace];
+
+    // The list of logs generated for this execution
+    NSArray *logs = [session getLogs];
+
+    // The list of statistics generated for this execution
+    NSArray *statistics = [session getStatistics];
+    ```
+
+4. Execute asynchronous `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
 
     ```
     id<Session> session = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withExecuteCallback:^(id<Session> session){
@@ -167,23 +210,36 @@ All libraries created can be found under the `prebuilt` directory.
     }];
     ```
 
-4. Execute synchronous FFprobe commands.
+5. Execute `FFprobe` commands.
+
+    - Synchronous
 
     ```
     FFprobeSession *session = [FFprobeKit execute:ffprobeCommand];
+
     if ([ReturnCode isSuccess:[session getReturnCode]]) {
         NSLog(@"Command failed. Please check output for the details.");
     }
     ```
 
-5. Get session output.
+   - Asynchronous
 
     ```
-    FFmpegSession session = FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
-    NSLog([session getOutput]);
+    [FFprobeKit executeAsync:ffmpegCommand withExecuteCallback:^(id<Session> session) {
+
+        CALLED WHEN SESSION IS EXECUTED
+
+    }];
     ```
 
-6. Stop ongoing FFmpeg operations.
+6. Get media information for a file.
+
+    ```
+    MediaInformationSession *mediaInformation = [FFprobeKit getMediaInformation:"<file path or uri>"];
+    MediaInformation *mediaInformation =[mediaInformation getMediaInformation];
+    ```
+
+7. Stop ongoing `FFmpeg` operations.
 
    - Stop all executions
        ```
@@ -194,19 +250,12 @@ All libraries created can be found under the `prebuilt` directory.
        [FFmpegKit cancel:sessionId];
        ```
 
-7. Get media information for a file.
+8. Get previous `FFmpeg` and `FFprobe` sessions from session history.
 
     ```
-    MediaInformationSession *mediaInformation = [FFprobeKit getMediaInformation:"<file path or uri>"];
-    MediaInformation *mediaInformation =[mediaInformation getMediaInformation];
-    ```
-
-8. List previous FFmpeg sessions.
-
-   ```
-    NSArray* ffmpegSessions = [FFmpegKit listSessions];
-    for (int i = 0; i < [ffmpegSessions count]; i++) {
-        FFmpegSession* session = [ffmpegSessions objectAtIndex:i];
+    NSArray* sessions = [FFmpegKitConfig getSessions];
+    for (int i = 0; i < [sessions count]; i++) {
+        id<Session> session = [sessions objectAtIndex:i];
         NSLog(@"Session %d = id: %ld, startTime: %@, duration: %ld, state:%@, returnCode:%@.\n",
             i,
             [session getSessionId],
@@ -215,9 +264,47 @@ All libraries created can be found under the `prebuilt` directory.
             [FFmpegKitConfig sessionStateToString:[session getState]],
             [session getReturnCode]);
     }
-   ```
+    ```
+
+9. Enable global callbacks.
+
+    - Execute Callback, called when an async execution is ended
+
+        ```
+        [FFmpegKitConfig enableExecuteCallback:^(id<Session> session) {
+            ...
+        }];
+        ```
+
+    - Log Callback, called when a session generates logs
+
+        ```
+        [FFmpegKitConfig enableLogCallback:^(Log *log) {
+            ...
+        }];
+        ```
+
+    - Statistics Callback, called when a session generates statistics
+
+        ```
+        [FFmpegKitConfig enableStatisticsCallback:^(Statistics *statistics) {
+            ...
+        }];
+        ```
+
+10. Ignore the handling of a signal. Required by `Mono` and frameworks that use `Mono`, e.g. `Unity` and `Xamarin`.
+
+    ```
+    [FFmpegKitConfig ignoreSignal:SIGXCPU];
+    ```
+
+11. Register system fonts and custom font directories.
+
+    ```
+    [FFmpegKitConfig setFontDirectoryList:<array of folders with fonts> with:nil];
+    ```
 
 ### 4. Test Application
 
-You can see how `FFmpegKit` is used inside an application by running test applications developed under the
-[FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
+You can see how `FFmpegKit` is used inside an application by running `iOS`, `macOS` and `tvOS` test applications 
+developed under the [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
