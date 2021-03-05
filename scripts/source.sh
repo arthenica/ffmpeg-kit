@@ -22,8 +22,8 @@ get_library_source() {
     SOURCE_TYPE="TAG"
     ;;
   dav1d)
-    SOURCE_REPO_URL="https://code.videolan.org/videolan/dav1d"
-    SOURCE_ID="0.8.1"
+    SOURCE_REPO_URL="https://github.com/tanersener/dav1d"
+    SOURCE_ID="0.8.2"
     SOURCE_TYPE="TAG"
     ;;
   expat)
