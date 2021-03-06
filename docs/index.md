@@ -1,8 +1,8 @@
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v4.4.LTS-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) [![Build Status](https://travis-ci.org/tanersener/ffmpeg-kit.svg?branch=master)](https://travis-ci.org/tanersener/ffmpeg-kit)
+# FFmpegKit
 
 FFmpeg Kit for applications.
 
-<img src="https://github.com/tanersener/ffmpeg-kit/blob/development/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
+<img src="https://github.com/tanersener/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
 
 ### 1. Features
 - Scripts to build FFmpeg libraries
@@ -14,13 +14,13 @@ FFmpeg Kit for applications.
 
 ### 2. Android
 
-See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android) to learn more about `FFmpegKit` for 
-`Android`. 
+See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android) to learn more about `FFmpegKit` for
+`Android`.
 
 ### 3. iOS, macOS, tvOS
 
-See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) to use `FFmpegKit` on `Apple` platforms 
-(`iOS`, `macOS`, `tvOS`). 
+See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) to use `FFmpegKit` on `Apple` platforms
+(`iOS`, `macOS`, `tvOS`).
 
 ### 4. Build Scripts
 
@@ -30,21 +30,21 @@ All scripts support additional options to enable optional libraries and disable 
 
 ### 5. FFmpegKit Library
 
-`FFmpegKit` is a wrapper library that allows you to easily run `FFmpeg`/`FFprobe` commands in applications. It 
-provides additional features on top of `FFmpeg` to enable platform specific resources, control how commands are 
+`FFmpegKit` is a wrapper library that allows you to easily run `FFmpeg`/`FFprobe` commands in applications. It
+provides additional features on top of `FFmpeg` to enable platform specific resources, control how commands are
 executed and how the results are handled.
 
-`Android` library has a `Java` API and `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C` API, 
+`Android` library has a `Java` API and `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C` API,
 which are identical in terms of features and capabilities.
 
 ### 6. Binary Packages
 
-There are eight different `ffmpeg-kit` packages distributed on 
-[Github](https://github.com/tanersener/ffmpeg-kit/releases), 
-[Maven Central](https://search.maven.org) and [CocoaPods](https://cocoapods.org). 
-Below you can see which system libraries and external libraries are enabled in each one of them. 
+There are eight different `ffmpeg-kit` packages distributed on
+[Github](https://github.com/tanersener/ffmpeg-kit/releases),
+[Maven Central](https://search.maven.org) and [CocoaPods](https://cocoapods.org).
+Below you can see which external libraries are enabled in each one of them.
 
-Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `ffmpeg-kit` packages 
+Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `ffmpeg-kit` packages
 include them.
 
 <table>
@@ -73,33 +73,16 @@ include them.
 <td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup></td>
 <td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>vo-amrwbenc</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 </tr>
-<tr>
-<td align="center"><sup>android system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
-</tr>
-<tr>
-<td align="center"><sup>ios system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
-</tr>
-<tr>
-<tr>
-<td align="center"><sup>macos system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>Core Image</sup><br><sup>iconv</sup><br><sup>OpenCL</sup><br><sup>OpenGL</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
-</tr>
-<tr>
-<td align="center"><sup>tvos system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
-</tr>
 </tbody>
 </table>
 
- - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
+- `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
 
 ### 7. Versions
 
 `FFmpegKit` binaries generated use the same major and minor version numbers as the upstream `FFmpeg` project. The exact
-version number is obtained using `git describe --tags`. `dev` part in `FFmpeg` version number indicates that `FFmpeg` 
-source is cloned from the `FFmpeg` `master` branch. 
+version number is obtained using `git describe --tags`. `dev` part in `FFmpeg` version number indicates that `FFmpeg`
+source is cloned from the `FFmpeg` `master` branch.
 
 |  FFmpegKit Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
@@ -108,7 +91,7 @@ source is cloned from the `FFmpeg` `master` branch.
 
 ### 8. LTS Releases
 
-`FFmpegKit` binaries are published in two release variants: `Main Release` and `LTS Release`. 
+`FFmpegKit` binaries are published in two release variants: `Main Release` and `LTS Release`.
 
 - Main releases include complete functionality of the library and support the latest SDK/API features.
 
@@ -133,7 +116,7 @@ This table shows the differences between two variants.
 
 ### 9. Test Applications
 
-You can see how `FFmpegKit` is used inside an application by running test applications created under 
+You can see how `FFmpegKit` is used inside an application by running test applications created under
 [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
 
 All applications are identical and supports command execution, video encoding, accessing https urls, encoding audio,
@@ -157,9 +140,9 @@ distribute that library, then you are subject to pay MPEG LA licensing fees. Ref
 
 ### 12. Contributing
 
-Feel free to submit issues or pull requests. 
+Feel free to submit issues or pull requests.
 
-Please note that `main` includes only the latest released source code. Changes planned for the next release are 
+Please note that `main` includes only the latest released source code. Changes planned for the next release are
 developed under the `development` branch. Therefore, if you want to create a pull request, please open it against
 the `development`.
 
