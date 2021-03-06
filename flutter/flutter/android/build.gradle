@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.2'
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 30
+        versionCode 450
+        versionName "4.5.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    lintOptions {
+        disable 'GradleCompatible'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    google()
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'com.arthenica:ffmpeg-kit-https:4.5'
+}
+
