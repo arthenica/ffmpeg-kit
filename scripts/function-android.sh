@@ -929,9 +929,7 @@ android_ndk_cmake() {
   ASM_OPTIONS=""
   case ${ARCH} in
   arm-v7a-neon)
-    ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi)"
-    # @TODO TEST THIS
-    #ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi) -DANDROID_ARM_NEON=TRUE"
+    ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi) -DANDROID_ARM_NEON=TRUE"
     ;;
   *)
     ASM_OPTIONS="-DANDROID_ABI=$(get_android_cmake_ndk_abi)"

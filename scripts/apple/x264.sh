@@ -27,11 +27,6 @@ fi
 overwrite_file "${FFMPEG_KIT_TMPDIR}"/source/config/config.guess "${BASEDIR}"/src/"${LIB_NAME}"/config.guess || return 1
 overwrite_file "${FFMPEG_KIT_TMPDIR}"/source/config/config.sub "${BASEDIR}"/src/"${LIB_NAME}"/config.sub || return 1
 
-# WORKAROUND DISABLE INLINE -arch DEFINITIONS
-# @TODO TEST THESE
-# ${SED_INLINE} 's/CFLAGS=\"\$CFLAGS \-arch x86_64/CFLAGS=\"\$CFLAGS/g' configure
-# ${SED_INLINE} 's/LDFLAGS=\"\$LDFLAGS \-arch x86_64/LDFLAGS=\"\$CFLAGS/g' configure
-
 ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
   --enable-pic \
