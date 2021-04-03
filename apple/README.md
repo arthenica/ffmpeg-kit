@@ -301,7 +301,7 @@ All libraries created can be found under the `prebuilt` directory.
 11. Register system fonts and custom font directories.
 
     ```
-    [FFmpegKitConfig setFontDirectoryList:<array of folders with fonts> with:nil];
+    [FFmpegKitConfig setFontDirectoryList:[NSArray arrayWithObjects:@"/System/Library/Fonts", @"<folder with fonts>", nil] with:nil];
     ```
 
 ### 4. Test Application
