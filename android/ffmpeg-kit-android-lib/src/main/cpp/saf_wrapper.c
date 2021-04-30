@@ -91,12 +91,12 @@ static AVIOContext *create_fd_avio_context(const char *filename, int flags) {
 
 static void close_fd_avio_context(AVIOContext *ctx) {
     if (ctx) {
-        if (fd_seek(ctx->opaque, 0, AVSEEK_SIZE) >= 0) {
-            int *fd = ctx->opaque;
+        int *fd = ctx->opaque;
+        if (fd_seek((void*)fd, 0, AVSEEK_SIZE) >= 0) {
             closeParcelFileDescriptor(*fd);
             av_freep(&fd);
+            ctx->opaque = NULL;
         }
-        ctx->opaque = NULL;
     }
 }
 
