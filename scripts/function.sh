@@ -584,6 +584,9 @@ display_help_options() {
   if [ -n "$2" ]; then
     echo -e "$2"
   fi
+  if [ -n "$3" ]; then
+    echo -e "$3"
+  fi
   echo -e ""
 }
 

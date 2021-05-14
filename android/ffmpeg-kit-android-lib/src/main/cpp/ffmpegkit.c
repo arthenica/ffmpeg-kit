@@ -25,6 +25,7 @@
 #include "config.h"
 #include "libavcodec/jni.h"
 #include "libavutil/bprint.h"
+#include "libavutil/file.h"
 #include "fftools_ffmpeg.h"
 #include "ffmpegkit.h"
 #include "ffprobekit.h"
@@ -560,12 +561,13 @@ void *callbackThreadFunction() {
 }
 
 /**
- * Used by saf_wrapper; is expected to be called from a Java thread, therefore we don't need attach/detach
+ * Used by fd and saf protocols; is expected to be called from a Java thread, therefore we don't need attach/detach
  */
-void closeParcelFileDescriptor(int fd) {
+int close_parcel_file_descriptor(int fd) {
     JNIEnv *env = NULL;
     (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
     (*env)->CallStaticVoidMethod(env, configClass, closeParcelFileDescriptorMethod, fd);
+    return 0;
 }
 
 /**
@@ -642,6 +644,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     monitorInit();
 
     redirectionEnabled = 0;
+
+    av_set_fd_close(close_parcel_file_descriptor);
 
     return JNI_VERSION_1_6;
 }

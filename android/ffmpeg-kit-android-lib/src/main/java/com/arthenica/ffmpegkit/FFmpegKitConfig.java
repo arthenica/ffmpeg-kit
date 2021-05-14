@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -831,6 +832,20 @@ public class FFmpegKitConfig {
         }
     }
 
+    static String extractExtensionFromSafDisplayName(final String safDisplayName) {
+        String rawExtension = safDisplayName;
+        if (safDisplayName.lastIndexOf(".") >= 0) {
+            rawExtension = safDisplayName.substring(safDisplayName.lastIndexOf("."));
+        }
+        try {
+            // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
+            return new StringTokenizer(rawExtension, " .").nextToken();
+        } catch (final Exception e) {
+            android.util.Log.w(TAG, String.format("Failed to extract extension from saf display name: %s.%s", safDisplayName, Exceptions.getStackTraceString(e)));
+            return "raw";
+        }
+    }
+
     /**
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
      * input/output url that can be used in FFmpeg and FFprobe commands.
@@ -863,14 +878,7 @@ public class FFmpegKitConfig {
             android.util.Log.e(TAG, String.format("Failed to obtain %s parcelFileDescriptor for %s.%s", openMode, uri.toString(), Exceptions.getStackTraceString(t)));
         }
 
-        // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
-        if (displayName.lastIndexOf('.') > 0 && displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
-            String extension = displayName.substring(displayName.lastIndexOf('.'), displayName.lastIndexOf(' '));
-            displayName += extension;
-        }
-        // spaces can break argument list parsing, see https://github.com/alexcohn/mobile-ffmpeg/pull/1#issuecomment-688643836
-        final char NBSP = (char) 0xa0;
-        return "saf:" + fd + "/" + displayName.replace(' ', NBSP);
+        return "saf:" + fd + "." + FFmpegKitConfig.extractExtensionFromSafDisplayName(displayName);
     }
 
     /**
@@ -880,7 +888,7 @@ public class FFmpegKitConfig {
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri saf uri
+     * @param uri     saf uri
      * @return input url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForRead(final Context context, final Uri uri) {
@@ -894,7 +902,7 @@ public class FFmpegKitConfig {
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri saf uri
+     * @param uri     saf uri
      * @return output url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForWrite(final Context context, final Uri uri) {

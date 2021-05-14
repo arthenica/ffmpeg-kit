@@ -31,7 +31,7 @@ under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level [${API}]"
+  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level" "      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (fd, saf)"
   display_help_licensing
 
   echo -e "Architectures:"

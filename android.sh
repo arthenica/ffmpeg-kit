@@ -121,6 +121,9 @@ while [ ! $# -eq 0 ]; do
 
     export API=${API_LEVEL}
     ;;
+  --no-ffmpeg-kit-protocols)
+    export NO_FFMPEG_KIT_PROTOCOLS="1"
+    ;;
   *)
     print_unknown_option "$1"
     ;;
