@@ -235,7 +235,7 @@ void show_help_options(const OptionDef *options, const char *msg, int req_flags,
 void show_help_children(const AVClass *class, int flags);
 
 /**
- * Per-fftool specific help handlers. Implemented in each
+ * Per-fftool specific help handler. Implemented in each
  * fftool, called by show_help().
  */
 void show_help_default_ffmpeg(const char *opt, const char *arg);
@@ -402,7 +402,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec);
  * @return a pointer to the created dictionary
  */
 AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
-                                AVFormatContext *s, AVStream *st, AVCodec *codec);
+                                AVFormatContext *s, AVStream *st, const AVCodec *codec);
 
 /**
  * Setup AVCodecContext options for avformat_find_stream_info().

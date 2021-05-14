@@ -28,14 +28,14 @@ get_library_source() {
     ;;
   expat)
     SOURCE_REPO_URL="https://github.com/tanersener/libexpat"
-    SOURCE_ID="R_2_2_10"
+    SOURCE_ID="R_2_3_0"
     SOURCE_TYPE="TAG"
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
-    SOURCE_ID="8f1580c31a3cfb9994bda7b3914a97e09b9f1d48"
+    SOURCE_ID="c9a79532e5ec4ea265d3a82f185fca6e196088c2"
     SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.4-dev-3468-g8f1580c31a" # git describe --tags
+    SOURCE_GIT_DESCRIBE="n4.5-dev-899-gc9a79532e5" # git describe --tags
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
@@ -69,12 +69,12 @@ get_library_source() {
     ;;
   harfbuzz)
     SOURCE_REPO_URL="https://github.com/tanersener/harfbuzz"
-    SOURCE_ID="2.7.4"
+    SOURCE_ID="2.8.1"
     SOURCE_TYPE="TAG"
     ;;
   jpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/libjpeg-turbo"
-    SOURCE_ID="2.0.6"
+    SOURCE_ID="2.1.0"
     SOURCE_TYPE="TAG"
     ;;
   kvazaar)
@@ -94,7 +94,7 @@ get_library_source() {
     ;;
   libaom)
     SOURCE_REPO_URL="https://github.com/tanersener/libaom"
-    SOURCE_ID="v2.0.1"
+    SOURCE_ID="v3.1.0"
     SOURCE_TYPE="TAG"
     ;;
   libass)
@@ -129,7 +129,7 @@ get_library_source() {
     ;;
   libsndfile)
     SOURCE_REPO_URL="https://github.com/tanersener/libsndfile"
-    SOURCE_ID="v1.0.30"
+    SOURCE_ID="1.0.31"
     SOURCE_TYPE="TAG"
     ;;
   libtheora)
@@ -154,22 +154,22 @@ get_library_source() {
     ;;
   libvpx)
     SOURCE_REPO_URL="https://github.com/tanersener/libvpx"
-    SOURCE_ID="v1.9.0"
+    SOURCE_ID="v1.10.0"
     SOURCE_TYPE="TAG"
     ;;
   libwebp)
     SOURCE_REPO_URL="https://github.com/tanersener/libwebp"
-    SOURCE_ID="v1.1.0"
+    SOURCE_ID="v1.2.0"
     SOURCE_TYPE="TAG"
     ;;
   libxml2)
     SOURCE_REPO_URL="https://github.com/tanersener/libxml2"
-    SOURCE_ID="v2.9.10"
+    SOURCE_ID="v2.9.12"
     SOURCE_TYPE="TAG"
     ;;
   nettle)
     SOURCE_REPO_URL="https://github.com/tanersener/nettle"
-    SOURCE_ID="nettle_3.7_release_20210104"
+    SOURCE_ID="nettle_3.7.2_release_20210321"
     SOURCE_TYPE="TAG"
     ;;
   opencore-amr)
@@ -239,7 +239,7 @@ get_library_source() {
     ;;
   x264)
     SOURCE_REPO_URL="https://github.com/tanersener/x264"
-    SOURCE_ID="d198931a63049db1f2c92d96c34904c69fde8117"
+    SOURCE_ID="55d517bc4569272a2c9a367a4106c234aba2ffbc"
     SOURCE_TYPE="COMMIT" # COMMIT -> r3027
     ;;
   x265)

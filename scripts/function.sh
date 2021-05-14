@@ -825,7 +825,6 @@ set_library() {
     ;;
   harfbuzz)
     ENABLED_LIBRARIES[LIBRARY_HARFBUZZ]=$2
-    set_library "fontconfig" $2
     set_library "freetype" $2
     ;;
   kvazaar)
@@ -1063,7 +1062,6 @@ check_if_dependency_rebuilt() {
     ;;
   fontconfig)
     set_dependency_rebuilt_flag "libass"
-    set_dependency_rebuilt_flag "harfbuzz"
     ;;
   freetype)
     set_dependency_rebuilt_flag "fontconfig"

@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# DISABLE x86-64 ASM WORKAROUNDS BEFORE APPLYING THEM AGAIN
-${SED_INLINE} 's/define   aom_clear_system_state()/define aom_clear_system_state() aom_reset_mmx_state()/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/system_state.h
-${SED_INLINE} 's/#add_asm_library("aom_ports/ add_asm_library("aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
-${SED_INLINE} 's/#target_sources(aom_ports/ target_sources(aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
+# DISABLE ASM WORKAROUNDS BEFORE APPLYING THEM AGAIN
+git checkout ${BASEDIR}/src/${LIB_NAME}/aom_ports 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET BUILD OPTIONS
 ASM_OPTIONS=""

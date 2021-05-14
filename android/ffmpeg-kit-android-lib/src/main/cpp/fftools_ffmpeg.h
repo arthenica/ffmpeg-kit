@@ -330,9 +330,10 @@ typedef struct InputStream {
 #define DECODING_FOR_FILTER 2
 
     AVCodecContext *dec_ctx;
-    AVCodec *dec;
+    const AVCodec *dec;
     AVFrame *decoded_frame;
     AVFrame *filter_frame; /* a ref of decoded_frame, to be sent to filters */
+    AVPacket *pkt;
 
     int64_t       start;     /* time when read started */
     /* predicted dts of the next packet read for this stream or (when there are
@@ -441,6 +442,8 @@ typedef struct InputFile {
     int rate_emu;
     int accurate_seek;
 
+    AVPacket *pkt;
+
 #if HAVE_THREADS
     AVThreadMessageQueue *in_thread_queue;
     pthread_t thread;           /* thread reading from this file */
@@ -493,10 +496,11 @@ typedef struct OutputStream {
 
     AVCodecContext *enc_ctx;
     AVCodecParameters *ref_par; /* associated input codec parameters with encoders options applied */
-    AVCodec *enc;
+    const AVCodec *enc;
     int64_t max_frames;
     AVFrame *filtered_frame;
     AVFrame *last_frame;
+    AVPacket *pkt;
     int last_dropped;
     int last_nb0_frames[3];
 
@@ -757,8 +761,8 @@ void init_options(OptionsContext *o);
 AVDictionary *strip_specifiers(AVDictionary *dict);
 void parse_meta_type(char *arg, char *type, int *index, const char **stream_spec);
 int fftools_copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o);
-AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
-AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
+const AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
+const AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
 int open_input_file(OptionsContext *o, const char *filename);
 int get_preset_file_2(const char *preset_name, const char *codec_name, AVIOContext **s);
 int choose_encoder(OptionsContext *o, AVFormatContext *s, OutputStream *ost);
