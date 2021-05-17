@@ -1,7 +1,6 @@
-/build
-/local.properties
-/.idea/
-/.gradle/
-/libs/
-/obj/
-/ffmpeg-kit-android-lib/build/
+build
+local.properties
+.idea/
+.gradle/
+libs/
+obj/
