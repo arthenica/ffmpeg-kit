@@ -191,7 +191,7 @@ export ORIGINAL_API=${API}
 # BUILD ENABLED LIBRARIES ON ENABLED ARCHITECTURES
 for run_arch in {0..12}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${ORIGINAL_API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
