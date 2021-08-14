@@ -45,6 +45,7 @@
 #include "libavformat/avformat.h"
 
 #include "libavcodec/avcodec.h"
+#include "libavcodec/bsf.h"
 
 #include "libavfilter/avfilter.h"
 
@@ -155,9 +156,6 @@ const HWAccel hwaccels[] = {
 #if CONFIG_VIDEOTOOLBOX
     { "videotoolbox", videotoolbox_init, HWACCEL_VIDEOTOOLBOX, AV_PIX_FMT_VIDEOTOOLBOX },
 #endif
-#if CONFIG_LIBMFX
-    { "qsv",   qsv_init,   HWACCEL_QSV,   AV_PIX_FMT_QSV },
-#endif
     { 0 },
 };
 __thread HWDevice *filter_hw_device;
@@ -204,6 +202,7 @@ __thread int input_sync;
 __thread int input_stream_potentially_available = 0;
 __thread int ignore_unknown_streams = 0;
 __thread int copy_unknown_streams = 0;
+__thread static int recast_media = 0;
 __thread int find_stream_info = 1;
 
 extern __thread OptionDef *ffmpeg_options;
@@ -589,6 +588,23 @@ int opt_vaapi_device(void *optctx, const char *opt, const char *arg)
 }
 #endif
 
+#if CONFIG_QSV
+static int opt_qsv_device(void *optctx, const char *opt, const char *arg)
+{
+    const char *prefix = "qsv=__qsv_device:hw_any,child_device=";
+    int err;
+    char *tmp = av_asprintf("%s%s", prefix, arg);
+
+    if (!tmp)
+        return AVERROR(ENOMEM);
+
+    err = hw_device_init_from_string(tmp, NULL);
+    av_free(tmp);
+
+    return err;
+}
+#endif
+
 int opt_init_hw_device(void *optctx, const char *opt, const char *arg)
 {
     if (!strcmp(arg, "list")) {
@@ -779,7 +795,7 @@ const AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int en
         av_log(NULL, AV_LOG_FATAL, "Unknown %s '%s'\n", codec_string, name);
         exit_program(1);
     }
-    if (codec->type != type) {
+    if (codec->type != type && !recast_media) {
         av_log(NULL, AV_LOG_FATAL, "Invalid %s type '%s'\n", codec_string, name);
         exit_program(1);
     }
@@ -794,6 +810,8 @@ const AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *s
     if (codec_name) {
         const AVCodec *codec = find_codec_or_die(codec_name, st->codecpar->codec_type, 0);
         st->codecpar->codec_id = codec->id;
+        if (recast_media && st->codecpar->codec_type != codec->type)
+            st->codecpar->codec_type = codec->type;
         return codec;
     } else
         return avcodec_find_decoder(st->codecpar->codec_id);
@@ -829,6 +847,7 @@ void add_input_streams(OptionsContext *o, AVFormatContext *ic)
         ist->discard = 1;
         st->discard  = AVDISCARD_ALL;
         ist->nb_samples = 0;
+        ist->first_dts = AV_NOPTS_VALUE;
         ist->min_pts = INT64_MAX;
         ist->max_pts = INT64_MIN;
 
@@ -913,6 +932,12 @@ void add_input_streams(OptionsContext *o, AVFormatContext *ic)
                     "with old commandlines. This behaviour is DEPRECATED and will be removed "
                     "in the future. Please explicitly set \"-hwaccel_output_format cuda\".\n");
                 ist->hwaccel_output_format = AV_PIX_FMT_CUDA;
+            } else if (!hwaccel_output_format && hwaccel && !strcmp(hwaccel, "qsv")) {
+                av_log(NULL, AV_LOG_WARNING,
+                    "WARNING: defaulting hwaccel_output_format to qsv for compatibility "
+                    "with old commandlines. This behaviour is DEPRECATED and will be removed "
+                    "in the future. Please explicitly set \"-hwaccel_output_format qsv\".\n");
+                ist->hwaccel_output_format = AV_PIX_FMT_QSV;
             } else if (hwaccel_output_format) {
                 ist->hwaccel_output_format = av_get_pix_fmt(hwaccel_output_format);
                 if (ist->hwaccel_output_format == AV_PIX_FMT_NONE) {
@@ -1302,6 +1327,17 @@ int open_input_file(OptionsContext *o, const char *filename)
     f->loop = o->loop;
     f->duration = 0;
     f->time_base = (AVRational){ 1, 1 };
+
+    f->readrate = o->readrate ? o->readrate : 0.0;
+    if (f->readrate < 0.0f) {
+        av_log(NULL, AV_LOG_ERROR, "Option -readrate for Input #%d is %0.3f; it must be non-negative.\n", nb_input_files, f->readrate);
+        exit_program(1);
+    }
+    if (f->readrate && f->rate_emu) {
+        av_log(NULL, AV_LOG_WARNING, "Both -readrate and -re set for Input #%d. Using -readrate %0.3f.\n", nb_input_files, f->readrate);
+        f->rate_emu = 0;
+    }
+
     f->pkt = av_packet_alloc();
     if (!f->pkt)
         exit_program(1);
@@ -2264,22 +2300,34 @@ int open_output_file(OptionsContext *o, const char *filename)
         if (!o->video_disable && av_guess_codec(oc->oformat, NULL, filename, NULL, AVMEDIA_TYPE_VIDEO) != AV_CODEC_ID_NONE) {
             int best_score = 0, idx = -1;
             int qcr = avformat_query_codec(oc->oformat, oc->oformat->video_codec, 0);
-            for (i = 0; i < nb_input_streams; i++) {
-                int score;
-                ist = input_streams[i];
-                score = ist->st->codecpar->width * ist->st->codecpar->height
+            for (j = 0; j < nb_input_files; j++) {
+                InputFile *ifile = input_files[j];
+                int file_best_score = 0, file_best_idx = -1;
+                for (i = 0; i < ifile->nb_streams; i++) {
+                    int score;
+                    ist = input_streams[ifile->ist_index + i];
+                    score = ist->st->codecpar->width * ist->st->codecpar->height
                            + 100000000 * !!(ist->st->event_flags & AVSTREAM_EVENT_FLAG_NEW_PACKETS)
                            + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
-                if (ist->user_set_discard == AVDISCARD_ALL)
-                    continue;
-                if((qcr!=MKTAG('A', 'P', 'I', 'C')) && (ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC))
-                    score = 1;
-                if (ist->st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
-                    score > best_score) {
-                    if((qcr==MKTAG('A', 'P', 'I', 'C')) && !(ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC))
+                    if (ist->user_set_discard == AVDISCARD_ALL)
                         continue;
-                    best_score = score;
-                    idx = i;
+                    if((qcr!=MKTAG('A', 'P', 'I', 'C')) && (ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC))
+                        score = 1;
+                    if (ist->st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
+                            score > file_best_score) {
+                        if((qcr==MKTAG('A', 'P', 'I', 'C')) && !(ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC))
+                            continue;
+                        file_best_score = score;
+                        file_best_idx = ifile->ist_index + i;
+                    }
+                }
+                if (file_best_idx >= 0) {
+                    if((qcr == MKTAG('A', 'P', 'I', 'C')) || !(ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC))
+                        file_best_score -= 5000000*!!(input_streams[file_best_idx]->st->disposition & AV_DISPOSITION_DEFAULT);
+                    if (file_best_score > best_score) {
+                        best_score = file_best_score;
+                        idx = file_best_idx;
+                    }
                 }
             }
             if (idx >= 0)
@@ -2289,18 +2337,29 @@ int open_output_file(OptionsContext *o, const char *filename)
         /* audio: most channels */
         if (!o->audio_disable && av_guess_codec(oc->oformat, NULL, filename, NULL, AVMEDIA_TYPE_AUDIO) != AV_CODEC_ID_NONE) {
             int best_score = 0, idx = -1;
-            for (i = 0; i < nb_input_streams; i++) {
+            for (j = 0; j < nb_input_files; j++) {
+                InputFile *ifile = input_files[j];
+                int file_best_score = 0, file_best_idx = -1;
+                for (i = 0; i < ifile->nb_streams; i++) {
                 int score;
-                ist = input_streams[i];
+                    ist = input_streams[ifile->ist_index + i];
                 score = ist->st->codecpar->channels
                         + 100000000 * !!(ist->st->event_flags & AVSTREAM_EVENT_FLAG_NEW_PACKETS)
                         + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
                 if (ist->user_set_discard == AVDISCARD_ALL)
                     continue;
                 if (ist->st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
-                    score > best_score) {
-                    best_score = score;
-                    idx = i;
+                        score > file_best_score) {
+                        file_best_score = score;
+                        file_best_idx = ifile->ist_index + i;
+                    }
+                }
+                if (file_best_idx >= 0) {
+                    file_best_score -= 5000000*!!(input_streams[file_best_idx]->st->disposition & AV_DISPOSITION_DEFAULT);
+                    if (file_best_score > best_score) {
+                        best_score = file_best_score;
+                        idx = file_best_idx;
+                    }
                 }
             }
             if (idx >= 0)

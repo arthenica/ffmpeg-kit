@@ -8,7 +8,7 @@ get_library_source() {
   case $1 in
   config)
     SOURCE_REPO_URL="https://github.com/tanersener/gnu-config"
-    SOURCE_ID="v20201222"
+    SOURCE_ID="v20210814"
     SOURCE_TYPE="TAG"
     ;;
   chromaprint)
@@ -33,9 +33,9 @@ get_library_source() {
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
-    SOURCE_ID="c9a79532e5ec4ea265d3a82f185fca6e196088c2"
+    SOURCE_ID="acd3c101ef4b84aac9c608bfe6ab22431529c48f"
     SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.5-dev-899-gc9a79532e5" # git describe --tags
+    SOURCE_GIT_DESCRIBE="n4.5-dev-1598-gacd3c101ef" # git describe --tags
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
