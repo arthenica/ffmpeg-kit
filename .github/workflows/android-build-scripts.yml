@@ -1,0 +1,145 @@
+name: android build scripts
+
+on: [ push, pull_request ]
+
+jobs:
+  build-main-on-linux:
+    name: android main
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        ndk-version: [ 'r22-linux-x86_64', 'r22b-linux-x86_64', 'r23-linux' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up adopt jdk 8
+        uses: actions/setup-java@v2.2.0
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: set up android ndk
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk.dir
+          DIR=$(ls .ndk.dir)
+          mv .ndk.dir/$DIR ~/.ndk
+        env:
+          ANDROID_NDK_ROOT: ~/.ndk
+      - name: run the build script
+        run: ./android.sh -d --disable-arm-v7a --disable-arm-v7a-neon --disable-arm64-v8a
+      - name: print success logs
+        if: ${{ success() }}
+        run: cat build.log
+      - name: print failure logs
+        if: ${{ failure() }}
+        run: |
+          tail -50 build.log
+          tail -50 ./src/ffmpeg/ffbuild/config.log
+  build-lts-on-linux:
+    name: android lts
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        ndk-version: [ 'r22-linux-x86_64', 'r22b-linux-x86_64', 'r23-linux' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up adopt jdk 8
+        uses: actions/setup-java@v2.2.0
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: set up android ndk
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk.dir
+          DIR=$(ls .ndk.dir)
+          mv .ndk.dir/$DIR ~/.ndk
+        env:
+          ANDROID_NDK_ROOT: ~/.ndk
+      - name: run the build script
+        run: ./android.sh -d -l --disable-arm-v7a --disable-arm-v7a-neon --disable-arm64-v8a
+      - name: print success logs
+        if: ${{ success() }}
+        run: cat build.log
+      - name: print failure logs
+        if: ${{ failure() }}
+        run: |
+          tail -50 build.log
+          tail -50 ./src/ffmpeg/ffbuild/config.log
+  build-main-on-macos:
+    name: android main
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-10.15 ]
+        ndk-url: [ 'r22-darwin-x86_64', 'r22b-darwin-x86_64', 'r23-darwin' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up adopt jdk 8
+        uses: actions/setup-java@v2.2.0
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: set up android ndk
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk.dir
+          DIR=$(ls .ndk.dir)
+          mv .ndk.dir/$DIR ~/.ndk
+        env:
+          ANDROID_NDK_ROOT: ~/.ndk
+      - name: run the build script
+        run: ./android.sh -d --disable-arm-v7a --disable-arm-v7a-neon --disable-arm64-v8a
+      - name: print success logs
+        if: ${{ success() }}
+        run: cat build.log
+      - name: print failure logs
+        if: ${{ failure() }}
+        run: |
+          tail -50 build.log
+          tail -50 ./src/ffmpeg/ffbuild/config.log
+  build-lts-on-macos:
+    name: android lts
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-10.15 ]
+        ndk-url: [ 'r22-darwin-x86_64', 'r22b-darwin-x86_64', 'r23-darwin' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up adopt jdk 8
+        uses: actions/setup-java@v2.2.0
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: set up android ndk
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk.dir
+          DIR=$(ls .ndk.dir)
+          mv .ndk.dir/$DIR ~/.ndk
+        env:
+          ANDROID_NDK_ROOT: ~/.ndk
+      - name: run the build script
+        run: ./android.sh -d -l --disable-arm-v7a --disable-arm-v7a-neon --disable-arm64-v8a
+      - name: print success logs
+        if: ${{ success() }}
+        run: cat build.log
+      - name: print failure logs
+        if: ${{ failure() }}
+        run: |
+          tail -50 build.log
+          tail -50 ./src/ffmpeg/ffbuild/config.log
