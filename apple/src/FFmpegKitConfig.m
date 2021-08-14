@@ -54,7 +54,7 @@ static NSMutableArray* sessionHistoryList;
 static NSRecursiveLock* sessionHistoryLock;
 
 /** Session control variables */
-const int SESSION_MAP_SIZE = 1000;
+#define SESSION_MAP_SIZE 1000
 static atomic_short sessionMap[SESSION_MAP_SIZE];
 static atomic_int sessionInTransitMessageCountMap[SESSION_MAP_SIZE];
 

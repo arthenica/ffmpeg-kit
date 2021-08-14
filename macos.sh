@@ -28,7 +28,7 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT MACOS SDK VERSION
-DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>"${BASEDIR}"/build.log)"
+DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>${BASEDIR}/build.log)"
 echo -e "\nINFO: Using SDK ${DETECTED_MACOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -129,14 +129,6 @@ while [ ! $# -eq 0 ]; do
   esac
   shift
 done
-
-# VALIDATE THAT LTS RELEASES ARE BUILT USING THE CORRECT VERSION
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ "${DETECTED_MACOS_SDK_VERSION}" != "${MACOS_MIN_VERSION}" ]]; then
-  if [[ -z ${BUILD_FORCE} ]]; then
-    echo -e "\n(*) LTS packages should be built using SDK ${MACOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_MACOS_SDK_VERSION}\n"
-    exit 1
-  fi
-fi
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then

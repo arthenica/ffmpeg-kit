@@ -1781,3 +1781,11 @@ overwrite_file() {
   rm -f "$2"
   cp "$1" "$2"
 }
+
+#
+# 1. destination file
+#
+create_file() {
+  rm -f "$1"
+  echo "" > "$1" 1>>"${BASEDIR}"/build.log 2>&1
+}

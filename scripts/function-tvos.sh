@@ -47,7 +47,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
 }
 
 enable_main_build() {
-  export TVOS_MIN_VERSION=10.2
+  export TVOS_MIN_VERSION=11.0
 }
 
 enable_lts_build() {

@@ -65,8 +65,8 @@ enable_main_build() {
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  # XCODE 7.3 HAS IOS SDK 9.3
-  export IOS_MIN_VERSION=9.3
+  # XCODE 9.0 HAS IOS SDK 11.0
+  export IOS_MIN_VERSION=11.0
 }
 
 get_common_includes() {

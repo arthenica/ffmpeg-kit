@@ -22,7 +22,7 @@ enable_default_android_libraries
 enable_main_build
 
 # DETECT ANDROID NDK VERSION
-DETECTED_NDK_VERSION=$(grep -Eo "Revision.*" "${ANDROID_NDK_ROOT}"/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
+export DETECTED_NDK_VERSION=$(grep -Eo "Revision.*" "${ANDROID_NDK_ROOT}"/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -231,13 +231,11 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]] || [[ ${ENABLED_ARCHITECTU
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  cat >"${BASEDIR}"/android/build/.armv7 <<EOF
-EOF
+  create_file "${BASEDIR}"/android/build/.armv7
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  cat >"${BASEDIR}"/android/build/.armv7neon <<EOF
-EOF
+  create_file "${BASEDIR}"/android/build/.armv7neon
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 2) "
@@ -249,8 +247,8 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_X86_64]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
 fi
 if [[ ! -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-  cat >"${BASEDIR}"/android/build/.lts <<EOF
-EOF
+  mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
+  create_file "${BASEDIR}"/android/build/.lts
 fi
 
 # BUILD FFMPEG-KIT

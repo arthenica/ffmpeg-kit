@@ -207,7 +207,14 @@ get_common_cflags() {
     local LTS_BUILD__FLAG="-DFFMPEG_KIT_LTS "
   fi
 
-  echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+  case ${DETECTED_NDK_VERSION} in
+    23*)
+      echo "-fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_MIN_SDK_VERSION__=${API}"
+      ;;
+    *)
+      echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+      ;;
+  esac
 }
 
 get_arch_specific_cflags() {
@@ -222,10 +229,24 @@ get_arch_specific_cflags() {
     echo "-march=armv8-a -DFFMPEG_KIT_ARM64_V8A"
     ;;
   x86)
-    echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
+    case ${DETECTED_NDK_VERSION} in
+      23*)
+        echo "-march=i686 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
+        ;;
+      *)
+        echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
+        ;;
+    esac
     ;;
   x86-64)
-    echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"
+    case ${DETECTED_NDK_VERSION} in
+      23*)
+        echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
+        ;;
+      *)
+        echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"
+        ;;
+    esac
     ;;
   esac
 }
@@ -294,7 +315,7 @@ get_app_specific_cflags() {
   rubberband)
     APP_FLAGS="-std=c99 -Wno-unused-function"
     ;;
-  shine)
+  libvpx | shine)
     APP_FLAGS="-Wno-unused-function"
     ;;
   soxr | snappy | libwebp)
@@ -814,9 +835,8 @@ Name: x265
 Description: H.265/HEVC video encoder
 Version: ${X265_VERSION}
 
-Requires:
 Libs: -L\${libdir} -lx265
-Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl -lc++_shared
+Libs.private: -lm -ldl -llog -lm -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }
@@ -953,7 +973,6 @@ set_toolchain_paths() {
 
   HOST=$(get_host)
 
-  export AR=${HOST}-ar
   export CC=$(get_clang_host)-clang
   export CXX=$(get_clang_host)-clang++
 
@@ -968,12 +987,22 @@ set_toolchain_paths() {
     export ac_cv_c_bigendian=no
     ;;
   esac
-
-  export LD=${HOST}-ld
-  export RANLIB=${HOST}-ranlib
-  export STRIP=${HOST}-strip
-  export NM=${HOST}-nm
-
+  case ${DETECTED_NDK_VERSION} in
+    23*)
+      export AR=llvm-ar
+      export LD=lld
+      export RANLIB=llvm-ranlib
+      export STRIP=llvm-strip
+      export NM=llvm-nm
+      ;;
+    *)
+      export AR=${HOST}-ar
+      export LD=${HOST}-ld
+      export RANLIB=${HOST}-ranlib
+      export STRIP=${HOST}-strip
+      export NM=${HOST}-nm
+    ;;
+  esac
   export INSTALL_PKG_CONFIG_DIR="${BASEDIR}"/prebuilt/$(get_build_directory)/pkgconfig
   export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
@@ -1006,6 +1035,6 @@ build_android_lts_support() {
   LDFLAGS=$(get_ldflags ${LIB_NAME})
 
   # BUILD
-  "$(get_clang_host)"-clang ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.c -o "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
-  "${HOST}"-ar rcs "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
+  "${CC}" ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.c -o "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
+  "${AR}" rcs "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
 }

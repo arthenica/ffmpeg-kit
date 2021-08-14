@@ -121,15 +121,19 @@ This table shows the differences between two variants.
 | Android API Level | 24 | 16 | 
 | Android Camera Access | Yes | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
-| Xcode Compatibility | 11.0 or later | 7.3.1 or later |
-| iOS SDK | 12.1 | 9.3 |
+| Xcode Compatibility | 11.0 or later | 9.0 or later |
+| iOS SDK | 12.1 | 11.0 |
 | iOS AVFoundation | Yes | - |
 | iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
+| iOS Bundle Format | XCFrameworks | Frameworks |
 | macOS SDK | 10.15 | 10.11 |
 | macOS AVFoundation | Yes | - |
 | macOS Architectures | arm64<br/>x86-64 | x86-64 |
-| tvOS SDK | 10.2 | 9.2 |
+| macOS Bundle Format | XCFrameworks | Frameworks |
+| tvOS SDK | 11.0 | 9.2 |
+| tvOS VideoToolbox | Yes | - |
 | tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator | arm64<br/>x86-64 |
+| tvOS Bundle Format | XCFrameworks | Frameworks |
 
 ### 9. Test Applications
 
