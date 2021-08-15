@@ -153,7 +153,7 @@ void init_dynload(void)
 #endif
 }
 
-static void (*program_exit)(int ret);
+static __thread void (*program_exit)(int ret);
 
 void register_exit(void (*cb)(int ret))
 {
