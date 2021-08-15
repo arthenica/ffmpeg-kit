@@ -14,20 +14,6 @@ get_ffmpeg_kit_version() {
   fi
 }
 
-# 1 - library index
-# 2 - output path
-copy_external_library_license() {
-  output_path_array=("$2")
-  for output_path in "${output_path_array[@]}"; do
-    $(cp $(get_external_library_license_path "$1") "${output_path}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1)
-    if [[ $? -ne 0 ]]; then
-      echo 1
-      return
-    fi
-  done
-  echo 0
-}
-
 get_external_library_version() {
   local library_version=$(grep Version "${BASEDIR}"/prebuilt/"$(get_build_directory)"/pkgconfig/"$1".pc 2>>"${BASEDIR}"/build.log | sed 's/Version://g;s/\ //g')
 

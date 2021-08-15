@@ -1306,11 +1306,36 @@ get_external_library_license_path() {
   26) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LGPL" ;;
   28 | 35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md " ;;
   30) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.txt" ;;
-  38 | 40) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYRIGHT" ;;
+  40) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYRIGHT" ;;
   43) echo "${BASEDIR}/src/$(get_library_name "$1")/leptonica-license.txt" ;;
-  4 | 10 | 13 | 21 | 27 | 31 | 32 | 37) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE" ;;
+  4 | 10 | 13 | 21 | 27 | 31 | 32 | 37 | 46) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE" ;;
   *) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING" ;;
   esac
+}
+
+# 1 - library index
+# 2 - output directory
+copy_external_library_license() {
+  output_path_array=("$2")
+  for output_path in "${output_path_array[@]}"; do
+    $(copy_external_library_license_file "$1" "${output_path}/LICENSE")
+    if [[ $? -ne 0 ]]; then
+      echo 1
+      return
+    fi
+  done
+  echo 0
+}
+
+# 1 - library index
+# 2 - output path
+copy_external_library_license_file() {
+  $(cp $(get_external_library_license_path "$1") "$2" 1>>"${BASEDIR}"/build.log 2>&1)
+  if [[ $? -ne 0 ]]; then
+    echo 1
+    return
+  fi
+  echo 0
 }
 
 get_cmake_build_directory() {
