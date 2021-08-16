@@ -29,6 +29,8 @@ int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit = 5000;
 
 static AtomicLong *sessionIdGenerator = nil;
 
+extern void addSessionToSessionHistory(id<Session> session);
+
 @implementation AbstractSession {
     long _sessionId;
     ExecuteCallback _executeCallback;
@@ -65,6 +67,8 @@ static AtomicLong *sessionIdGenerator = nil;
         _returnCode = nil;
         _failStackTrace = nil;
         _logRedirectionStrategy = logRedirectionStrategy;
+
+        addSessionToSessionHistory(self);
     }
 
     return self;

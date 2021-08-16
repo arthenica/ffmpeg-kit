@@ -139,6 +139,8 @@ public abstract class AbstractSession implements Session {
         this.returnCode = null;
         this.failStackTrace = null;
         this.logRedirectionStrategy = logRedirectionStrategy;
+
+        FFmpegKitConfig.addSession(this);
     }
 
     @Override
