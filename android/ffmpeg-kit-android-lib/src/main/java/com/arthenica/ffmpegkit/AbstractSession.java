@@ -191,7 +191,7 @@ public abstract class AbstractSession implements Session {
 
     @Override
     public String getCommand() {
-        return FFmpegKit.argumentsToString(arguments);
+        return FFmpegKitConfig.argumentsToString(arguments);
     }
 
     @Override

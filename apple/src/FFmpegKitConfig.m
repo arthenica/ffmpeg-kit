@@ -878,7 +878,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         [ffmpegSession complete:[[ReturnCode alloc] init:returnCode]];
     } @catch (NSException *exception) {
         [ffmpegSession fail:exception];
-        NSLog(@"FFmpeg execute failed: %@.%@", [FFmpegKit argumentsToString:[ffmpegSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
+        NSLog(@"FFmpeg execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[ffmpegSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
     }
 }
 
@@ -890,7 +890,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         [ffprobeSession complete:[[ReturnCode alloc] init:returnCode]];
     } @catch (NSException *exception) {
         [ffprobeSession fail:exception];
-        NSLog(@"FFprobe execute failed: %@.%@", [FFmpegKit argumentsToString:[ffprobeSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
+        NSLog(@"FFprobe execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[ffprobeSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
     }
 }
 
@@ -907,7 +907,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         }
     } @catch (NSException *exception) {
         [mediaInformationSession fail:exception];
-        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKit argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
+        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
     }
 }
 
@@ -1143,6 +1143,74 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         case SessionStateCompleted: return @"COMPLETED";
         default: return @"";
     }
+}
+
++ (NSArray*)parseArguments:(NSString*)command {
+    NSMutableArray *argumentArray = [[NSMutableArray alloc] init];
+    NSMutableString *currentArgument = [[NSMutableString alloc] init];
+
+    bool singleQuoteStarted = false;
+    bool doubleQuoteStarted = false;
+
+    for (int i = 0; i < command.length; i++) {
+        unichar previousChar;
+        if (i > 0) {
+            previousChar = [command characterAtIndex:(i - 1)];
+        } else {
+            previousChar = 0;
+        }
+        unichar currentChar = [command characterAtIndex:i];
+
+        if (currentChar == ' ') {
+            if (singleQuoteStarted || doubleQuoteStarted) {
+                [currentArgument appendFormat: @"%C", currentChar];
+            } else if ([currentArgument length] > 0) {
+                [argumentArray addObject: currentArgument];
+                currentArgument = [[NSMutableString alloc] init];
+            }
+        } else if (currentChar == '\'' && (previousChar == 0 || previousChar != '\\')) {
+            if (singleQuoteStarted) {
+                singleQuoteStarted = false;
+            } else if (doubleQuoteStarted) {
+                [currentArgument appendFormat: @"%C", currentChar];
+            } else {
+                singleQuoteStarted = true;
+            }
+        } else if (currentChar == '\"' && (previousChar == 0 || previousChar != '\\')) {
+            if (doubleQuoteStarted) {
+                doubleQuoteStarted = false;
+            } else if (singleQuoteStarted) {
+                [currentArgument appendFormat: @"%C", currentChar];
+            } else {
+                doubleQuoteStarted = true;
+            }
+        } else {
+            [currentArgument appendFormat: @"%C", currentChar];
+        }
+    }
+
+    if ([currentArgument length] > 0) {
+        [argumentArray addObject: currentArgument];
+    }
+
+    return argumentArray;
+}
+
++ (NSString*)argumentsToString:(NSArray*)arguments {
+    if (arguments == nil) {
+        return @"nil";
+    }
+
+    NSMutableString *string = [NSMutableString stringWithString:@""];
+    for (int i=0; i < [arguments count]; i++) {
+        NSString *argument = [arguments objectAtIndex:i];
+        if (i > 0) {
+            [string appendString:@" "];
+        }
+        [string appendString:argument];
+    }
+
+    return string;
 }
 
 @end

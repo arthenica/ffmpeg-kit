@@ -611,7 +611,7 @@ public class FFmpegKitConfig {
             ffmpegSession.complete(new ReturnCode(returnCode));
         } catch (final Exception e) {
             ffmpegSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFmpeg execute failed: %s.%s", FFmpegKit.argumentsToString(ffmpegSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFmpeg execute failed: %s.%s", FFmpegKitConfig.argumentsToString(ffmpegSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -628,7 +628,7 @@ public class FFmpegKitConfig {
             ffprobeSession.complete(new ReturnCode(returnCode));
         } catch (final Exception e) {
             ffprobeSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFprobe execute failed: %s.%s", FFmpegKit.argumentsToString(ffprobeSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFprobe execute failed: %s.%s", FFmpegKitConfig.argumentsToString(ffprobeSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -651,7 +651,7 @@ public class FFmpegKitConfig {
             }
         } catch (final Exception e) {
             mediaInformationSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("Get media information execute failed: %s.%s", FFmpegKit.argumentsToString(mediaInformationSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("Get media information execute failed: %s.%s", FFmpegKitConfig.argumentsToString(mediaInformationSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -1094,6 +1094,86 @@ public class FFmpegKitConfig {
      */
     public static void setLogRedirectionStrategy(final LogRedirectionStrategy logRedirectionStrategy) {
         FFmpegKitConfig.globalLogRedirectionStrategy = logRedirectionStrategy;
+    }
+
+    /**
+     * <p>Parses the given command into arguments. Uses space character to split the arguments.
+     * Supports single and double quote characters.
+     *
+     * @param command string command
+     * @return array of arguments
+     */
+    public static String[] parseArguments(final String command) {
+        final List<String> argumentList = new ArrayList<>();
+        StringBuilder currentArgument = new StringBuilder();
+
+        boolean singleQuoteStarted = false;
+        boolean doubleQuoteStarted = false;
+
+        for (int i = 0; i < command.length(); i++) {
+            final Character previousChar;
+            if (i > 0) {
+                previousChar = command.charAt(i - 1);
+            } else {
+                previousChar = null;
+            }
+            final char currentChar = command.charAt(i);
+
+            if (currentChar == ' ') {
+                if (singleQuoteStarted || doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else if (currentArgument.length() > 0) {
+                    argumentList.add(currentArgument.toString());
+                    currentArgument = new StringBuilder();
+                }
+            } else if (currentChar == '\'' && (previousChar == null || previousChar != '\\')) {
+                if (singleQuoteStarted) {
+                    singleQuoteStarted = false;
+                } else if (doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    singleQuoteStarted = true;
+                }
+            } else if (currentChar == '\"' && (previousChar == null || previousChar != '\\')) {
+                if (doubleQuoteStarted) {
+                    doubleQuoteStarted = false;
+                } else if (singleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    doubleQuoteStarted = true;
+                }
+            } else {
+                currentArgument.append(currentChar);
+            }
+        }
+
+        if (currentArgument.length() > 0) {
+            argumentList.add(currentArgument.toString());
+        }
+
+        return argumentList.toArray(new String[0]);
+    }
+
+    /**
+     * <p>Concatenates arguments into a string adding a space character between two arguments.
+     *
+     * @param arguments arguments
+     * @return concatenated string containing all arguments
+     */
+    public static String argumentsToString(final String[] arguments) {
+        if (arguments == null) {
+            return "null";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < arguments.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(" ");
+            }
+            stringBuilder.append(arguments[i]);
+        }
+
+        return stringBuilder.toString();
     }
 
     /**

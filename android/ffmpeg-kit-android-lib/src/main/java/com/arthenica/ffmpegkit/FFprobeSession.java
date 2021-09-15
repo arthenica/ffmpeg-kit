@@ -95,7 +95,7 @@ public class FFprobeSession extends AbstractSession implements Session {
         stringBuilder.append(", endTime=");
         stringBuilder.append(endTime);
         stringBuilder.append(", arguments=");
-        stringBuilder.append(FFmpegKit.argumentsToString(arguments));
+        stringBuilder.append(FFmpegKitConfig.argumentsToString(arguments));
         stringBuilder.append(", logs=");
         stringBuilder.append(getLogsAsString());
         stringBuilder.append(", state=");

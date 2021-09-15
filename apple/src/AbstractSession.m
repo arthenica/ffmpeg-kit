@@ -113,7 +113,7 @@ extern void addSessionToSessionHistory(id<Session> session);
 }
 
 - (NSString*)getCommand {
-    return [FFmpegKit argumentsToString:_arguments];
+    return [FFmpegKitConfig argumentsToString:_arguments];
 }
 
 - (void)waitForAsynchronousMessagesInTransmit:(int)timeout {

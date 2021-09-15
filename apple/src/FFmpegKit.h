@@ -176,23 +176,6 @@
  */
 + (NSArray*)listSessions;
 
-/**
- * <p>Parses the given command into arguments. Uses space character to split the arguments.
- * Supports single and double quote characters.
- *
- * @param command string command
- * @return array of arguments
- */
-+ (NSArray*)parseArguments:(NSString*)command;
-
-/**
- * <p>Concatenates arguments into a string adding a space character between two arguments.
- *
- * @param arguments arguments
- * @return concatenated string containing all arguments
- */
-+ (NSString*)argumentsToString:(NSArray*)arguments;
-
 @end
 
 #endif // FFMPEG_KIT_H
