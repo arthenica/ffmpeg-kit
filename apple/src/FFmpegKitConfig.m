@@ -85,7 +85,7 @@ volatile int handleSIGXCPU = 1;
 volatile int handleSIGPIPE = 1;
 
 /** Holds the id of the current execution */
-__thread volatile long _sessionId = 0;
+__thread volatile long globalSessionId = 0;
 
 /** Holds the default log level */
 int configuredLogLevel = LevelAVLogInfo;
@@ -254,7 +254,7 @@ void callbackNotify() {
  * @param logData log data
  */
 void logCallbackDataAdd(int level, NSString *logData) {
-    CallbackData* callbackData = [[CallbackData alloc] init:_sessionId logLevel:level data:logData];
+    CallbackData* callbackData = [[CallbackData alloc] init:globalSessionId logLevel:level data:logData];
     
     [lock lock];
     [callbackDataArray addObject:callbackData];
@@ -262,14 +262,14 @@ void logCallbackDataAdd(int level, NSString *logData) {
 
     callbackNotify();
 
-    atomic_fetch_add(&sessionInTransitMessageCountMap[_sessionId % SESSION_MAP_SIZE], 1);
+    atomic_fetch_add(&sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE], 1);
 }
 
 /**
  * Adds statistics data to the end of callback data list.
  */
 void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
-    CallbackData *callbackData = [[CallbackData alloc] init:_sessionId videoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
+    CallbackData *callbackData = [[CallbackData alloc] init:globalSessionId videoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
 
     [lock lock];
     [callbackDataArray addObject:callbackData];
@@ -277,7 +277,7 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 
     callbackNotify();
     
-    atomic_fetch_add(&sessionInTransitMessageCountMap[_sessionId % SESSION_MAP_SIZE], 1);
+    atomic_fetch_add(&sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE], 1);
 }
 
 /**
@@ -581,7 +581,7 @@ int executeFFmpeg(long sessionId, NSArray* arguments) {
     }
 
     // REGISTER THE ID BEFORE STARTING THE SESSION
-    _sessionId = sessionId;
+    globalSessionId = sessionId;
     registerSessionId(sessionId);
 
     resetMessagesInTransmit(sessionId);
@@ -621,7 +621,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
     }
 
     // REGISTER THE ID BEFORE STARTING THE SESSION
-    _sessionId = sessionId;
+    globalSessionId = sessionId;
     registerSessionId(sessionId);
 
     resetMessagesInTransmit(sessionId);

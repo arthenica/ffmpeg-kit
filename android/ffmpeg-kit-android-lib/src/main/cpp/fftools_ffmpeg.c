@@ -260,9 +260,9 @@ extern volatile int handleSIGTERM;
 extern volatile int handleSIGXCPU;
 extern volatile int handleSIGPIPE;
 
-extern __thread volatile long sessionId;
-extern void cancelSession(long id);
-extern int cancelRequested(long id);
+extern __thread volatile long globalSessionId;
+extern void cancelSession(long sessionId);
+extern int cancelRequested(long sessionId);
 
 /* sub2video hack:
    Convert subtitles to video with alpha to insert them in filter graphs.
@@ -772,7 +772,7 @@ static void ffmpeg_cleanup(int ret)
     if (received_sigterm) {
         av_log(NULL, AV_LOG_INFO, "Exiting normally, received signal %d.\n",
                (int) received_sigterm);
-    } else if (cancelRequested(sessionId)) {
+    } else if (cancelRequested(globalSessionId)) {
         av_log(NULL, AV_LOG_INFO, "Exiting normally, received cancel request.\n");
     } else if (ret && atomic_load(&transcode_init_done)) {
         av_log(NULL, AV_LOG_INFO, "Conversion failed!\n");
@@ -2438,7 +2438,7 @@ static int ifilter_send_eof(InputFilter *ifilter, int64_t pts)
     if (ifilter->filter) {
 
         /* THIS VALIDATION IS REQUIRED TO COMPLETE CANCELLATION */
-        if (!received_sigterm && !cancelRequested(sessionId)) {
+        if (!received_sigterm && !cancelRequested(globalSessionId)) {
             ret = av_buffersrc_close(ifilter->filter, pts, AV_BUFFERSRC_FLAG_PUSH);
         }
         if (ret < 0)
@@ -4989,7 +4989,7 @@ static int transcode(void)
         goto fail;
 #endif
 
-    while (!received_sigterm && !cancelRequested(sessionId)) {
+    while (!received_sigterm && !cancelRequested(globalSessionId)) {
         int64_t cur_time= av_gettime_relative();
 
         /* if 'q' pressed, exits */
@@ -5728,10 +5728,10 @@ int ffmpeg_execute(int argc, char **argv)
         if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
             exit_program(69);
 
-        exit_program((received_nb_signals || cancelRequested(sessionId))? 255 : main_ffmpeg_return_code);
+        exit_program((received_nb_signals || cancelRequested(globalSessionId))? 255 : main_ffmpeg_return_code);
 
     } else {
-        main_ffmpeg_return_code = (received_nb_signals || cancelRequested(sessionId)) ? 255 : longjmp_value;
+        main_ffmpeg_return_code = (received_nb_signals || cancelRequested(globalSessionId)) ? 255 : longjmp_value;
     }
 
     return main_ffmpeg_return_code;
