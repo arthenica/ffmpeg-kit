@@ -703,7 +703,7 @@ public class FFmpegKitTest {
         Assert.assertEquals(type, streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(bitrate, streamInformation.getBitrate());
     }
@@ -713,7 +713,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("audio", streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(sampleRate, streamInformation.getSampleRate());
         Assert.assertEquals(channelLayout, streamInformation.getChannelLayout());
@@ -726,7 +726,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("video", streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(format, streamInformation.getFormat());
 

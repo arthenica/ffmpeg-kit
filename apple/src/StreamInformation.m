@@ -68,7 +68,7 @@ NSString* const StreamKeyTags = @"tags";
     return [self getStringProperty:StreamKeyCodec];
 }
 
-- (NSString*)getFullCodec {
+- (NSString*)getCodecLong {
     return [self getStringProperty:StreamKeyCodecLong];
 }
 
