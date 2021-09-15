@@ -116,7 +116,7 @@
 
     [_statisticsLock lock];
     if ([_statistics count] > 0) {
-        lastStatistics = [_statistics objectAtIndex:0];
+        lastStatistics = [_statistics objectAtIndex:[_statistics count] - 1];
     }
     [_statisticsLock unlock];
 
