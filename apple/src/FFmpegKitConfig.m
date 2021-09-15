@@ -1072,6 +1072,14 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
     return sessionsCopy;
 }
 
++ (void)clearSessions {
+    [sessionHistoryLock lock];
+
+    [sessionHistoryList removeAllObjects];
+
+    [sessionHistoryLock unlock];
+}
+
 + (NSArray*)getFFmpegSessions {
     NSMutableArray* ffmpegSessions = [[NSMutableArray alloc] init];
 

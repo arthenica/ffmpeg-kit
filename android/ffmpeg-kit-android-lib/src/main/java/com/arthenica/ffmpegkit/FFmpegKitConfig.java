@@ -1021,6 +1021,16 @@ public class FFmpegKitConfig {
     }
 
     /**
+     * <p>Clears all, including ongoing, sessions in the session history.
+     * <p>Note that callbacks cannot be triggered for deleted sessions.
+     */
+    public static void clearSessions() {
+        synchronized (sessionHistoryLock) {
+            sessionHistoryList.clear();
+        }
+    }
+
+    /**
      * <p>Returns all FFmpeg sessions in the session history.
      *
      * @return all FFmpeg sessions in the session history

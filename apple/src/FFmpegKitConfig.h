@@ -330,6 +330,12 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (NSArray*)getSessions;
 
 /**
+ * <p>Clears all, including ongoing, sessions in the session history.
+ * <p>Note that callbacks cannot be triggered for deleted sessions.
+ */
++ (void)clearSessions;
+
+/**
  * <p>Returns all FFmpeg sessions in the session history.
  *
  * @return all FFmpeg sessions in the session history
