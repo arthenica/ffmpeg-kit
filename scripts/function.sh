@@ -1318,8 +1318,8 @@ get_external_library_license_path() {
 copy_external_library_license() {
   output_path_array=("$2")
   for output_path in "${output_path_array[@]}"; do
-    $(copy_external_library_license_file "$1" "${output_path}/LICENSE")
-    if [[ $? -ne 0 ]]; then
+    RESULT=$(copy_external_library_license_file "$1" "${output_path}/LICENSE")
+    if [[ ${RESULT} -ne 0 ]]; then
       echo 1
       return
     fi
@@ -1330,8 +1330,8 @@ copy_external_library_license() {
 # 1 - library index
 # 2 - output path
 copy_external_library_license_file() {
-  $(cp $(get_external_library_license_path "$1") "$2" 1>>"${BASEDIR}"/build.log 2>&1)
-  if [[ $? -ne 0 ]]; then
+  RESULT=$(cp $(get_external_library_license_path "$1") "$2" 1>>"${BASEDIR}"/build.log 2>&1)
+  if [[ ${RESULT} -ne 0 ]]; then
     echo 1
     return
   fi

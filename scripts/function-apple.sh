@@ -424,9 +424,9 @@ create_single_framework() {
 
   initialize_folder "${FRAMEWORK_PATH}"
 
-  local CAPITAL_CASE_LIBRARY_NAME=$(to_capital_case "${LIBRARY_NAME}")
+  local CAPITAL_CASE_FRAMEWORK_NAME=$(to_capital_case "${FRAMEWORK_NAME}")
 
-  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${LIBRARY_NAME}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_LIBRARY_NAME}" "${LIBRARY_VERSION}" "${LIBRARY_VERSION}"
+  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${LIBRARY_NAME}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FRAMEWORK_NAME}" "${LIBRARY_VERSION}" "${LIBRARY_VERSION}"
 
   cp "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")/${LIBRARY_NAME}/lib/${STATIC_LIBRARY_NAME}.a" "${FRAMEWORK_PATH}/${FRAMEWORK_NAME}" 1>>"${BASEDIR}/build.log" 2>&1
 
