@@ -299,7 +299,7 @@ get_ldflags() {
 
 set_toolchain_paths() {
   if [ ! -f "${FFMPEG_KIT_TMPDIR}/gas-preprocessor.pl" ]; then
-    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
+    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/v20210917/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
     if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
       exit 1
     fi
