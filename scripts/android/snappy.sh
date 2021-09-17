@@ -20,6 +20,7 @@ cmake -Wno-dev \
   -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AS" \
   -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
   -DSNAPPY_BUILD_TESTS=0 \
+  -DSNAPPY_BUILD_BENCHMARKS=0 \
   -DHAVE_LIBLZO2=0 \
   -DHAVE_LIBZ=1 \
   -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_system_processor) \
@@ -30,4 +31,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_snappy_package_config "1.1.8" || return 1
+create_snappy_package_config "1.1.9" || return 1

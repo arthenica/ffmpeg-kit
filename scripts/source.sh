@@ -23,19 +23,19 @@ get_library_source() {
     ;;
   dav1d)
     SOURCE_REPO_URL="https://github.com/tanersener/dav1d"
-    SOURCE_ID="0.8.2"
+    SOURCE_ID="0.9.2"
     SOURCE_TYPE="TAG"
     ;;
   expat)
     SOURCE_REPO_URL="https://github.com/tanersener/libexpat"
-    SOURCE_ID="R_2_3_0"
+    SOURCE_ID="R_2_4_1"
     SOURCE_TYPE="TAG"
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
-    SOURCE_ID="acd3c101ef4b84aac9c608bfe6ab22431529c48f"
+    SOURCE_ID="90da43557f7257d72e95504f63ae6504406d6eab"
     SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.5-dev-1598-gacd3c101ef" # git describe --tags
+    SOURCE_GIT_DESCRIBE="n4.5-dev-2008-g90da43557f" # git describe --tags
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
@@ -44,7 +44,7 @@ get_library_source() {
     ;;
   freetype)
     SOURCE_REPO_URL="https://github.com/tanersener/freetype2"
-    SOURCE_ID="VER-2-10-2"
+    SOURCE_ID="VER-2-11-0"
     SOURCE_TYPE="TAG"
     ;;
   fribidi)
@@ -69,12 +69,12 @@ get_library_source() {
     ;;
   harfbuzz)
     SOURCE_REPO_URL="https://github.com/tanersener/harfbuzz"
-    SOURCE_ID="2.8.1"
+    SOURCE_ID="2.9.1"
     SOURCE_TYPE="TAG"
     ;;
   jpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/libjpeg-turbo"
-    SOURCE_ID="2.1.0"
+    SOURCE_ID="2.1.1"
     SOURCE_TYPE="TAG"
     ;;
   kvazaar)
@@ -94,12 +94,12 @@ get_library_source() {
     ;;
   libaom)
     SOURCE_REPO_URL="https://github.com/tanersener/libaom"
-    SOURCE_ID="v3.1.0"
+    SOURCE_ID="v3.1.2"
     SOURCE_TYPE="TAG"
     ;;
   libass)
     SOURCE_REPO_URL="https://github.com/tanersener/libass"
-    SOURCE_ID="0.15.0"
+    SOURCE_ID="0.15.2"
     SOURCE_TYPE="TAG"
     ;;
   libiconv)
@@ -114,7 +114,7 @@ get_library_source() {
     ;;
   libogg)
     SOURCE_REPO_URL="https://github.com/tanersener/ogg"
-    SOURCE_ID="v1.3.4"
+    SOURCE_ID="v1.3.5"
     SOURCE_TYPE="TAG"
     ;;
   libpng)
@@ -124,7 +124,7 @@ get_library_source() {
     ;;
   libsamplerate)
     SOURCE_REPO_URL="https://github.com/tanersener/libsamplerate"
-    SOURCE_ID="v0.1.9"
+    SOURCE_ID="0.2.2"
     SOURCE_TYPE="TAG"
     ;;
   libsndfile)
@@ -159,7 +159,7 @@ get_library_source() {
     ;;
   libwebp)
     SOURCE_REPO_URL="https://github.com/tanersener/libwebp"
-    SOURCE_ID="v1.2.0"
+    SOURCE_ID="v1.2.1"
     SOURCE_TYPE="TAG"
     ;;
   libxml2)
@@ -169,7 +169,7 @@ get_library_source() {
     ;;
   nettle)
     SOURCE_REPO_URL="https://github.com/tanersener/nettle"
-    SOURCE_ID="nettle_3.7.2_release_20210321"
+    SOURCE_ID="nettle_3.7.3_release_20210606"
     SOURCE_TYPE="TAG"
     ;;
   opencore-amr)
@@ -204,7 +204,7 @@ get_library_source() {
     ;;
   snappy)
     SOURCE_REPO_URL="https://github.com/tanersener/snappy"
-    SOURCE_ID="1.1.8"
+    SOURCE_ID="1.1.9"
     SOURCE_TYPE="TAG"
     ;;
   soxr)

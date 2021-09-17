@@ -1299,7 +1299,7 @@ print_redownload_requested_libraries() {
 # 1 - library index
 get_external_library_license_path() {
   case $1 in
-  1) echo "${BASEDIR}/src/$(get_library_name "$1")/docs/LICENSE.TXT" ;;
+  1) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.TXT" ;;
   3 | 39) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
   5 | 41) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/COPYING" ;;
   19) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/LICENSE" ;;
@@ -1330,8 +1330,8 @@ copy_external_library_license() {
 # 1 - library index
 # 2 - output path
 copy_external_library_license_file() {
-  RESULT=$(cp $(get_external_library_license_path "$1") "$2" 1>>"${BASEDIR}"/build.log 2>&1)
-  if [[ ${RESULT} -ne 0 ]]; then
+  cp $(get_external_library_license_path "$1") "$2" 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ $? -ne 0 ]]; then
     echo 1
     return
   fi

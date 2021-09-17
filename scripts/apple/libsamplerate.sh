@@ -13,13 +13,15 @@ fi
   --with-pic \
   --with-sysroot="${SDK_PATH}" \
   --enable-static \
+  --disable-alsa \
   --disable-fftw \
   --disable-shared \
   --disable-fast-install \
   --host="${HOST}" || return 1
 
 # WORKAROUND TO DISABLE BUILDING OF EXAMPLES AND TESTS
-${SED_INLINE} 's/examples tests//g' "${BASEDIR}"/src/"${LIB_NAME}"/Makefile* || return 1
+${SED_INLINE} 's/^examples_/#examples_/g' "${BASEDIR}"/src/"${LIB_NAME}"/Makefile || return 1
+${SED_INLINE} 's/^tests_/#tests_/g' "${BASEDIR}"/src/"${LIB_NAME}"/Makefile || return 1
 
 make -j$(get_cpu_count) || return 1
 

@@ -32,7 +32,7 @@ fi
   ${ASM_OPTIONS} \
   --host="${HOST}" || return 1
 
-make -j$(get_cpu_count) || return 1
+make || return 1
 
 make install || return 1
 

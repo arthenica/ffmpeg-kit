@@ -33,6 +33,7 @@ overwrite_file "${FFMPEG_KIT_TMPDIR}"/source/config/config.sub "${BASEDIR}"/src/
   --enable-static \
   --disable-shared \
   --disable-video-opengl \
+  --disable-video-x11 \
   --disable-joystick \
   --disable-haptic \
   ${ASM_OPTIONS} \

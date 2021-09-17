@@ -158,14 +158,6 @@ disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_X86_64_MA
 disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_MAC_CATALYST}" "${DETECTED_IOS_SDK_VERSION}"
 disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}" "${DETECTED_IOS_SDK_VERSION}"
 
-# CHECK SOME RULES FOR .xcframework BUNDLES
-
-# 1. DO NOT ALLOW --lts AND --xcframework OPTIONS TOGETHER
-if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]] && [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-  echo -e "\n(*) LTS packages does not support xcframework bundles.\n"
-  exit 1
-fi
-
 # CHECK SOME RULES FOR .framework BUNDLES
 
 # 1. DISABLE arm64-mac-catalyst WHEN arm64 IS ENABLED IN framework BUNDLES
