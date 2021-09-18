@@ -114,17 +114,17 @@ All libraries created can be found under the `prebuilt` directory.
 
     - iOS
     ```
-    pod 'ffmpeg-kit-ios-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-ios-full', '~> 4.5'
     ```
 
     - macOS
     ```
-    pod 'ffmpeg-kit-macos-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-macos-full', '~> 4.5'
     ```
 
     - tvOS
     ```
-    pod 'ffmpeg-kit-tvos-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-tvos-full', '~> 4.5'
     ```
 
 2. Execute synchronous `FFmpeg` commands.

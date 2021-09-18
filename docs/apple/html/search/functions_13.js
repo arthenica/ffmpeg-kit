@@ -1,12 +1,8 @@
 var searchData=
 [
-  ['term_5fexit_2171',['term_exit',['../d7/d48/fftools__ffmpeg_8c.html#a19c97d7729be97389faaf4aaac8c3e88',1,'term_exit(void):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a19c97d7729be97389faaf4aaac8c3e88',1,'term_exit(void):&#160;fftools_ffmpeg.c']]],
-  ['term_5fexit_5fsigsafe_2172',['term_exit_sigsafe',['../d7/d48/fftools__ffmpeg_8c.html#a9ff329d05aff252a944b937bb80d16e1',1,'fftools_ffmpeg.c']]],
-  ['term_5finit_2173',['term_init',['../d7/d48/fftools__ffmpeg_8c.html#ac7072b9c76dd77ce9900197d0133b0ba',1,'term_init(void):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#ac7072b9c76dd77ce9900197d0133b0ba',1,'term_init(void):&#160;fftools_ffmpeg.c']]],
-  ['thereareasynchronousmessagesintransmit_2174',['thereAreAsynchronousMessagesInTransmit',['../d2/d81/protocol_session-p.html#a3959faf8a306cf4dc3624ea532671e44',1,'Session-p::thereAreAsynchronousMessagesInTransmit()'],['../db/de2/interface_abstract_session.html#ad56d1e970d591ea6898ff4fc09d75d71',1,'AbstractSession::thereAreAsynchronousMessagesInTransmit()']]],
-  ['transcode_2175',['transcode',['../d7/d48/fftools__ffmpeg_8c.html#a0bbbd61fe097505cf12be11e60f07ca8',1,'fftools_ffmpeg.c']]],
-  ['transcode_5ffrom_5ffilter_2176',['transcode_from_filter',['../d7/d48/fftools__ffmpeg_8c.html#a38de3252b4bb6ea13e22238efe42c015',1,'fftools_ffmpeg.c']]],
-  ['transcode_5finit_2177',['transcode_init',['../d7/d48/fftools__ffmpeg_8c.html#aa4af1fda1a5fc33ec74e4ae2c0dbc122',1,'fftools_ffmpeg.c']]],
-  ['transcode_5fstep_2178',['transcode_step',['../d7/d48/fftools__ffmpeg_8c.html#abd1ff9b1a508070a11a26c9c3f3f455b',1,'fftools_ffmpeg.c']]],
-  ['transcode_5fsubtitles_2179',['transcode_subtitles',['../d7/d48/fftools__ffmpeg_8c.html#a0c4f43b9ed5f99a30210c6ef7191a89e',1,'fftools_ffmpeg.c']]]
+  ['uninit_5foptions_0',['uninit_options',['../d7/db3/fftools__ffmpeg_8h.html#a02e475f4040b6a0cb4236447d9263e00',1,'uninit_options(OptionsContext *o):&#160;fftools_ffmpeg_opt.c'],['../da/d66/fftools__ffmpeg__opt_8c.html#a02e475f4040b6a0cb4236447d9263e00',1,'uninit_options(OptionsContext *o):&#160;fftools_ffmpeg_opt.c']]],
+  ['uninit_5fopts_1',['uninit_opts',['../d7/dcc/fftools__cmdutils_8c.html#ac58552bde3a215ae94a3bd114577cbee',1,'uninit_opts(void):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#ac58552bde3a215ae94a3bd114577cbee',1,'uninit_opts(void):&#160;fftools_cmdutils.c']]],
+  ['uninit_5fparse_5fcontext_2',['uninit_parse_context',['../d7/dcc/fftools__cmdutils_8c.html#a8bcd5cd3628e5864fa94431d8eb08fad',1,'uninit_parse_context(OptionParseContext *octx):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#a8bcd5cd3628e5864fa94431d8eb08fad',1,'uninit_parse_context(OptionParseContext *octx):&#160;fftools_cmdutils.c']]],
+  ['upcase_5fstring_3',['upcase_string',['../d8/d78/fftools__ffprobe_8c.html#ada1428b246d4b09b5c7596c9e926c26b',1,'fftools_ffprobe.c']]],
+  ['update_5fbenchmark_4',['update_benchmark',['../d7/d48/fftools__ffmpeg_8c.html#ab8ed239c7a9be61521f08c4adaa9d4f3',1,'fftools_ffmpeg.c']]]
 ];

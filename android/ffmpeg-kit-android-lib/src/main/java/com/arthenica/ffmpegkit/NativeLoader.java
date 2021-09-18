@@ -82,7 +82,7 @@ public class NativeLoader {
     }
 
     static String loadVersion() {
-        final String version = "4.4";
+        final String version = "4.5";
 
         if (isTestModeDisabled()) {
             return FFmpegKitConfig.getVersion();

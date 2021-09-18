@@ -1,4 +1,4 @@
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v4.4.LTS-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) [![Build Status](https://travis-ci.org/tanersener/ffmpeg-kit.svg?branch=master)](https://travis-ci.org/tanersener/ffmpeg-kit)
+# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v4.5-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min)
 
 FFmpeg Kit for applications.
 
@@ -8,7 +8,7 @@ FFmpeg Kit for applications.
 - Scripts to build FFmpeg libraries
 - `FFmpegKit` wrapper library to run `FFmpeg`/`FFprobe` commands in applications
 - Supports Android, iOS, macOS and tvOS
-- Based on FFmpeg `v4.4-dev` with optional system and external libraries
+- Based on FFmpeg `v4.5-dev` with optional system and external libraries
 - 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases), [Maven Central](https://search.maven.org) and [CocoaPods](https://cocoapods.org).
 - Licensed under `LGPL 3.0`, or `GPL v3.0` if GPL licensed libraries are enabled
 
@@ -93,16 +93,20 @@ include them.
 </tbody>
 </table>
 
- - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
+ - `AVFoundation` is not available on `tvOS`
+ - `VideoToolbox` is not available on LTS releases of `iOS` and `tvOS`
 
 ### 7. Versions
 
-`FFmpegKit` binaries generated use the same major and minor version numbers as the upstream `FFmpeg` project. The exact
-version number is obtained using `git describe --tags`. `dev` part in `FFmpeg` version number indicates that `FFmpeg` 
-source is cloned from the `FFmpeg` `master` branch. 
+`FFmpegKit` binaries generated use the same major and minor version numbers as the upstream `FFmpeg` project. 
+
+The exact version number of `FFmpeg` is obtained using `git describe --tags`. `dev` part in the version string 
+indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch. 
 
 |  FFmpegKit Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5) | 4.5-dev-2008 | Sep 18, 2021 |
+| [4.5.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.LTS) | 4.5-dev-2008 | Sep 18, 2021 |
 | [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4) | 4.4-dev-3015 | Mar 03, 2021 |
 | [4.4.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4.LTS) | 4.4-dev-3015 | Mar 03, 2021 |
 
@@ -121,34 +125,38 @@ This table shows the differences between two variants.
 | Android API Level | 24 | 16 | 
 | Android Camera Access | Yes | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
-| Xcode Compatibility | 11.0 or later | 9.0 or later |
-| iOS SDK | 12.1 | 11.0 |
+| iOS Min SDK | 12.1 | 9.3 |
+| iOS VideoToolbox | Yes | - |
 | iOS AVFoundation | Yes | - |
 | iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | iOS Bundle Format | XCFrameworks | Frameworks |
-| macOS SDK | 10.15 | 10.11 |
+| macOS Min SDK | 10.15 | 10.11 |
 | macOS AVFoundation | Yes | - |
 | macOS Architectures | arm64<br/>x86-64 | x86-64 |
 | macOS Bundle Format | XCFrameworks | Frameworks |
-| tvOS SDK | 11.0 | 9.2 |
+| tvOS Min SDK | 11.0 | 9.2 |
 | tvOS VideoToolbox | Yes | - |
 | tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator | arm64<br/>x86-64 |
 | tvOS Bundle Format | XCFrameworks | Frameworks |
 
-### 9. Test Applications
+### 9. Documentation
+
+A more detailed documentation is available under [Wiki](https://github.com/tanersener/ffmpeg-kit/wiki).
+
+### 10. Test Applications
 
 You can see how `FFmpegKit` is used inside an application by running test applications created under 
 [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
 
 All applications are identical and supports command execution, video encoding, accessing https urls, encoding audio,
-burning subtitles, video stabilisation, pipe operations, concurrent command execution.
+burning subtitles, video stabilisation, pipe operations and concurrent command execution.
 
-### 10. License
+### 11. License
 
 `FFmpegKit` is licensed under the `LGPL v3.0`. However, if source code is built using the optional `--enable-gpl` flag
 or prebuilt binaries with `-gpl` postfix are used, then `FFmpegKit` is subject to the `GPL v3.0` license.
 
-### 11. Patents
+### 12. Patents
 
 It is not clearly explained in their documentation, but it is believed that `FFmpeg`, `kvazaar`, `x264` and `x265`
 include algorithms which are subject to software patents. If you live in a country where software algorithms are
@@ -159,7 +167,7 @@ that you seek legal advice first. See [FFmpeg Patent Mini-FAQ](https://ffmpeg.or
 distribute that library, then you are subject to pay MPEG LA licensing fees. Refer to
 [OpenH264 FAQ](https://www.openh264.org/faq.html) page for the details.
 
-### 12. Contributing
+### 13. Contributing
 
 Feel free to submit issues or pull requests. 
 
@@ -167,7 +175,7 @@ Please note that `main` includes only the latest released source code. Changes p
 developed under the `development` branch. Therefore, if you want to create a pull request, please open it against
 the `development`.
 
-### 13. See Also
+### 14. See Also
 
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
 - [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)

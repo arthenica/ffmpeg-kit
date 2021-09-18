@@ -6,7 +6,7 @@ export ANDROID_MAIN_OPTIONS="--disable-arm-v7a --enable-android-media-codec --en
 export ANDROID_LTS_OPTIONS="--lts --enable-android-media-codec --enable-android-zlib"
 
 export IOS_MAIN_OPTIONS="--xcframework --disable-armv7 --disable-armv7s --disable-i386 --disable-arm64e --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib"
-export IOS_LTS_OPTIONS="--disable-armv7s --lts --enable-ios-audiotoolbox --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib"
+export IOS_LTS_OPTIONS="--disable-armv7s --lts --enable-ios-audiotoolbox --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-zlib"
 
 export TVOS_MAIN_OPTIONS="--xcframework --enable-tvos-bzip2 --enable-tvos-audiotoolbox --enable-tvos-libiconv --enable-tvos-videotoolbox --enable-tvos-zlib"
 export TVOS_LTS_OPTIONS="--disable-arm64-simulator --lts --enable-tvos-bzip2 --enable-tvos-audiotoolbox --enable-tvos-libiconv --enable-tvos-zlib"
