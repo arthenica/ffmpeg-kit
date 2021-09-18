@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -31,10 +31,6 @@ import java.util.List;
  * <p>Tests for {@link FFmpegKitConfig} class.
  */
 public class FFmpegKitConfigTest {
-
-    static {
-        System.setProperty("enable.ffmpeg.kit.test.mode", "true");
-    }
 
     private static final String externalLibrariesCommandOutput = "   configuration:\n" +
             "                          --cross-prefix=i686-linux-android-\n" +
