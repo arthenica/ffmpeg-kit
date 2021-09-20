@@ -27,6 +27,7 @@ create_package() {
     sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/DESCRIPTION/${PACKAGE_DESCRIPTION}/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/\,\'AVFoundation\'//g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
+    sed -i '' "s/\,\'VideoToolbox\'//g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
 
     mkdir -p "${ALL_UNIVERSAL_DIRECTORY}" || exit 1
     local CURRENT_UNIVERSAL_PACKAGE="${ALL_UNIVERSAL_DIRECTORY}/${PACKAGE_NAME}-universal"

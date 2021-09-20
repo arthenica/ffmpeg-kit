@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 30
-    ndkVersion "22.0.7026061"
+    ndkVersion "23.0.7599858"
 
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 160440
-        versionName "4.4.LTS"
+        versionCode 160450
+        versionName "4.5.LTS"
         project.archivesBaseName = "ffmpeg-kit"
         consumerProguardFiles 'proguard-rules.pro'
     }
@@ -28,6 +28,9 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            systemProperty 'enable.ffmpeg.kit.test.mode', 'true'
+        }
     }
 }
 

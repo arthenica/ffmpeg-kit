@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * <p>Helper class to extract binary package information.
  */
-class Packages {
+public class Packages {
 
     private static final List<String> supportedExternalLibraries;
 

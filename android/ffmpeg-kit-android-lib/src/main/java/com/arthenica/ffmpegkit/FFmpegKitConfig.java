@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -603,7 +604,6 @@ public class FFmpegKitConfig {
      * @param ffmpegSession FFmpeg session which includes command options/arguments
      */
     public static void ffmpegExecute(final FFmpegSession ffmpegSession) {
-        addSession(ffmpegSession);
         ffmpegSession.startRunning();
 
         try {
@@ -611,7 +611,7 @@ public class FFmpegKitConfig {
             ffmpegSession.complete(new ReturnCode(returnCode));
         } catch (final Exception e) {
             ffmpegSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFmpeg execute failed: %s.%s", FFmpegKit.argumentsToString(ffmpegSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFmpeg execute failed: %s.%s", FFmpegKitConfig.argumentsToString(ffmpegSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -621,7 +621,6 @@ public class FFmpegKitConfig {
      * @param ffprobeSession FFprobe session which includes command options/arguments
      */
     public static void ffprobeExecute(final FFprobeSession ffprobeSession) {
-        addSession(ffprobeSession);
         ffprobeSession.startRunning();
 
         try {
@@ -629,7 +628,7 @@ public class FFmpegKitConfig {
             ffprobeSession.complete(new ReturnCode(returnCode));
         } catch (final Exception e) {
             ffprobeSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFprobe execute failed: %s.%s", FFmpegKit.argumentsToString(ffprobeSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("FFprobe execute failed: %s.%s", FFmpegKitConfig.argumentsToString(ffprobeSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -640,7 +639,6 @@ public class FFmpegKitConfig {
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void getMediaInformationExecute(final MediaInformationSession mediaInformationSession, final int waitTimeout) {
-        addSession(mediaInformationSession);
         mediaInformationSession.startRunning();
 
         try {
@@ -653,7 +651,7 @@ public class FFmpegKitConfig {
             }
         } catch (final Exception e) {
             mediaInformationSession.fail(e);
-            android.util.Log.w(FFmpegKitConfig.TAG, String.format("Get media information execute failed: %s.%s", FFmpegKit.argumentsToString(mediaInformationSession.getArguments()), Exceptions.getStackTraceString(e)));
+            android.util.Log.w(FFmpegKitConfig.TAG, String.format("Get media information execute failed: %s.%s", FFmpegKitConfig.argumentsToString(mediaInformationSession.getArguments()), Exceptions.getStackTraceString(e)));
         }
     }
 
@@ -663,8 +661,6 @@ public class FFmpegKitConfig {
      * @param ffmpegSession FFmpeg session which includes command options/arguments
      */
     public static void asyncFFmpegExecute(final FFmpegSession ffmpegSession) {
-        addSession(ffmpegSession);
-
         AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(ffmpegSession);
         Future<?> future = asyncExecutorService.submit(asyncFFmpegExecuteTask);
         ffmpegSession.setFuture(future);
@@ -677,8 +673,6 @@ public class FFmpegKitConfig {
      * @param executorService executor service that will be used to run this asynchronous operation
      */
     public static void asyncFFmpegExecute(final FFmpegSession ffmpegSession, final ExecutorService executorService) {
-        addSession(ffmpegSession);
-
         AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(ffmpegSession);
         Future<?> future = executorService.submit(asyncFFmpegExecuteTask);
         ffmpegSession.setFuture(future);
@@ -690,8 +684,6 @@ public class FFmpegKitConfig {
      * @param ffprobeSession FFprobe session which includes command options/arguments
      */
     public static void asyncFFprobeExecute(final FFprobeSession ffprobeSession) {
-        addSession(ffprobeSession);
-
         AsyncFFprobeExecuteTask asyncFFmpegExecuteTask = new AsyncFFprobeExecuteTask(ffprobeSession);
         Future<?> future = asyncExecutorService.submit(asyncFFmpegExecuteTask);
         ffprobeSession.setFuture(future);
@@ -704,8 +696,6 @@ public class FFmpegKitConfig {
      * @param executorService executor service that will be used to run this asynchronous operation
      */
     public static void asyncFFprobeExecute(final FFprobeSession ffprobeSession, final ExecutorService executorService) {
-        addSession(ffprobeSession);
-
         AsyncFFprobeExecuteTask asyncFFmpegExecuteTask = new AsyncFFprobeExecuteTask(ffprobeSession);
         Future<?> future = executorService.submit(asyncFFmpegExecuteTask);
         ffprobeSession.setFuture(future);
@@ -718,8 +708,6 @@ public class FFmpegKitConfig {
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final int waitTimeout) {
-        addSession(mediaInformationSession);
-
         AsyncGetMediaInformationTask asyncGetMediaInformationTask = new AsyncGetMediaInformationTask(mediaInformationSession, waitTimeout);
         Future<?> future = asyncExecutorService.submit(asyncGetMediaInformationTask);
         mediaInformationSession.setFuture(future);
@@ -733,8 +721,6 @@ public class FFmpegKitConfig {
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final ExecutorService executorService, final int waitTimeout) {
-        addSession(mediaInformationSession);
-
         AsyncGetMediaInformationTask asyncGetMediaInformationTask = new AsyncGetMediaInformationTask(mediaInformationSession, waitTimeout);
         Future<?> future = executorService.submit(asyncGetMediaInformationTask);
         mediaInformationSession.setFuture(future);
@@ -831,6 +817,20 @@ public class FFmpegKitConfig {
         }
     }
 
+    static String extractExtensionFromSafDisplayName(final String safDisplayName) {
+        String rawExtension = safDisplayName;
+        if (safDisplayName.lastIndexOf(".") >= 0) {
+            rawExtension = safDisplayName.substring(safDisplayName.lastIndexOf("."));
+        }
+        try {
+            // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
+            return new StringTokenizer(rawExtension, " .").nextToken();
+        } catch (final Exception e) {
+            android.util.Log.w(TAG, String.format("Failed to extract extension from saf display name: %s.%s", safDisplayName, Exceptions.getStackTraceString(e)));
+            return "raw";
+        }
+    }
+
     /**
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
      * input/output url that can be used in FFmpeg and FFprobe commands.
@@ -863,14 +863,7 @@ public class FFmpegKitConfig {
             android.util.Log.e(TAG, String.format("Failed to obtain %s parcelFileDescriptor for %s.%s", openMode, uri.toString(), Exceptions.getStackTraceString(t)));
         }
 
-        // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
-        if (displayName.lastIndexOf('.') > 0 && displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
-            String extension = displayName.substring(displayName.lastIndexOf('.'), displayName.lastIndexOf(' '));
-            displayName += extension;
-        }
-        // spaces can break argument list parsing, see https://github.com/alexcohn/mobile-ffmpeg/pull/1#issuecomment-688643836
-        final char NBSP = (char) 0xa0;
-        return "saf:" + fd + "/" + displayName.replace(' ', NBSP);
+        return "saf:" + fd + "." + FFmpegKitConfig.extractExtensionFromSafDisplayName(displayName);
     }
 
     /**
@@ -880,7 +873,7 @@ public class FFmpegKitConfig {
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri saf uri
+     * @param uri     saf uri
      * @return input url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForRead(final Context context, final Uri uri) {
@@ -894,7 +887,7 @@ public class FFmpegKitConfig {
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri saf uri
+     * @param uri     saf uri
      * @return output url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForWrite(final Context context, final Uri uri) {
@@ -1028,6 +1021,16 @@ public class FFmpegKitConfig {
     }
 
     /**
+     * <p>Clears all, including ongoing, sessions in the session history.
+     * <p>Note that callbacks cannot be triggered for deleted sessions.
+     */
+    public static void clearSessions() {
+        synchronized (sessionHistoryLock) {
+            sessionHistoryList.clear();
+        }
+    }
+
+    /**
      * <p>Returns all FFmpeg sessions in the session history.
      *
      * @return all FFmpeg sessions in the session history
@@ -1101,6 +1104,86 @@ public class FFmpegKitConfig {
      */
     public static void setLogRedirectionStrategy(final LogRedirectionStrategy logRedirectionStrategy) {
         FFmpegKitConfig.globalLogRedirectionStrategy = logRedirectionStrategy;
+    }
+
+    /**
+     * <p>Parses the given command into arguments. Uses space character to split the arguments.
+     * Supports single and double quote characters.
+     *
+     * @param command string command
+     * @return array of arguments
+     */
+    public static String[] parseArguments(final String command) {
+        final List<String> argumentList = new ArrayList<>();
+        StringBuilder currentArgument = new StringBuilder();
+
+        boolean singleQuoteStarted = false;
+        boolean doubleQuoteStarted = false;
+
+        for (int i = 0; i < command.length(); i++) {
+            final Character previousChar;
+            if (i > 0) {
+                previousChar = command.charAt(i - 1);
+            } else {
+                previousChar = null;
+            }
+            final char currentChar = command.charAt(i);
+
+            if (currentChar == ' ') {
+                if (singleQuoteStarted || doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else if (currentArgument.length() > 0) {
+                    argumentList.add(currentArgument.toString());
+                    currentArgument = new StringBuilder();
+                }
+            } else if (currentChar == '\'' && (previousChar == null || previousChar != '\\')) {
+                if (singleQuoteStarted) {
+                    singleQuoteStarted = false;
+                } else if (doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    singleQuoteStarted = true;
+                }
+            } else if (currentChar == '\"' && (previousChar == null || previousChar != '\\')) {
+                if (doubleQuoteStarted) {
+                    doubleQuoteStarted = false;
+                } else if (singleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    doubleQuoteStarted = true;
+                }
+            } else {
+                currentArgument.append(currentChar);
+            }
+        }
+
+        if (currentArgument.length() > 0) {
+            argumentList.add(currentArgument.toString());
+        }
+
+        return argumentList.toArray(new String[0]);
+    }
+
+    /**
+     * <p>Concatenates arguments into a string adding a space character between two arguments.
+     *
+     * @param arguments arguments
+     * @return concatenated string containing all arguments
+     */
+    public static String argumentsToString(final String[] arguments) {
+        if (arguments == null) {
+            return "null";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < arguments.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(" ");
+            }
+            stringBuilder.append(arguments[i]);
+        }
+
+        return stringBuilder.toString();
     }
 
     /**

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# DISABLE ASM WORKAROUNDS BEFORE APPLYING THEM AGAIN
+git checkout ${BASEDIR}/src/${LIB_NAME}/aom_ports 1>>"${BASEDIR}"/build.log 2>&1
+
 # SET BUILD OPTIONS
 ASM_OPTIONS=""
 case ${ARCH} in
@@ -53,4 +56,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libaom_package_config "2.0.1" || return 1
+create_libaom_package_config "3.1.2" || return 1

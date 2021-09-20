@@ -22,7 +22,7 @@ enable_default_android_libraries
 enable_main_build
 
 # DETECT ANDROID NDK VERSION
-DETECTED_NDK_VERSION=$(grep -Eo "Revision.*" "${ANDROID_NDK_ROOT}"/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
+export DETECTED_NDK_VERSION=$(grep -Eo "Revision.*" "${ANDROID_NDK_ROOT}"/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -121,6 +121,9 @@ while [ ! $# -eq 0 ]; do
 
     export API=${API_LEVEL}
     ;;
+  --no-ffmpeg-kit-protocols)
+    export NO_FFMPEG_KIT_PROTOCOLS="1"
+    ;;
   *)
     print_unknown_option "$1"
     ;;
@@ -191,7 +194,7 @@ export ORIGINAL_API=${API}
 # BUILD ENABLED LIBRARIES ON ENABLED ARCHITECTURES
 for run_arch in {0..12}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${ORIGINAL_API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
@@ -228,13 +231,11 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]] || [[ ${ENABLED_ARCHITECTU
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  cat >"${BASEDIR}"/android/build/.armv7 <<EOF
-EOF
+  create_file "${BASEDIR}"/android/build/.armv7
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  cat >"${BASEDIR}"/android/build/.armv7neon <<EOF
-EOF
+  create_file "${BASEDIR}"/android/build/.armv7neon
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 2) "
@@ -246,8 +247,8 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_X86_64]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
 fi
 if [[ ! -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-  cat >"${BASEDIR}"/android/build/.lts <<EOF
-EOF
+  mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
+  create_file "${BASEDIR}"/android/build/.lts
 fi
 
 # BUILD FFMPEG-KIT
@@ -263,6 +264,35 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   rm -rf "${BASEDIR}"/android/obj 1>>"${BASEDIR}"/build.log 2>&1
 
   cd "${BASEDIR}"/android 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
+  # COPY LICENSES
+  LICENSE_BASEDIR="${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/res/raw
+  rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  for library in {0..46}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+      ENABLED_LIBRARY=$(get_library_name ${library} | sed 's/-/_/g')
+      LICENSE_FILE="${LICENSE_BASEDIR}/license_${ENABLED_LIBRARY}.txt"
+
+      RC=$(copy_external_library_license_file ${library} "${LICENSE_FILE}")
+
+      if [[ ${RC} -ne 0 ]]; then
+        echo -e "DEBUG: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
+        echo -e "failed\n\nSee build.log for details\n"
+        exit 1
+      fi
+
+      echo -e "DEBUG: Copied the license file of ${ENABLED_LIBRARY} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+    fi
+  done
+
+  # COPY LIBRARY LICENSES
+  if [[ ${GPL_ENABLED} == "yes" ]]; then
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+
+  echo -e "DEBUG: Copied the ffmpeg-kit license successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   # BUILD NATIVE LIBRARY
   if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
@@ -286,6 +316,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     echo -e -n "\nCreating Android archive under prebuilt: "
 
     # BUILD ANDROID ARCHIVE
+    rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar 1>>"${BASEDIR}"/build.log 2>&1
     ./gradlew ffmpeg-kit-android-lib:clean ffmpeg-kit-android-lib:assembleRelease ffmpeg-kit-android-lib:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
     if [ $? -ne 0 ]; then
       echo -e "failed\n"

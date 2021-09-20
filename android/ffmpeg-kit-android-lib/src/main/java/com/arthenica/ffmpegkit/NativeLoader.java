@@ -82,7 +82,7 @@ public class NativeLoader {
     }
 
     static String loadVersion() {
-        final String version = "4.4";
+        final String version = "4.5";
 
         if (isTestModeDisabled()) {
             return FFmpegKitConfig.getVersion();
@@ -199,11 +199,11 @@ public class NativeLoader {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             stringBuilder.append(", abis: ");
-            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_ABIS));
+            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_ABIS));
             stringBuilder.append(", 32bit abis: ");
-            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_32_BIT_ABIS));
+            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_32_BIT_ABIS));
             stringBuilder.append(", 64bit abis: ");
-            stringBuilder.append(FFmpegKit.argumentsToString(Build.SUPPORTED_64_BIT_ABIS));
+            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_64_BIT_ABIS));
         } else {
             stringBuilder.append(", cpu abis: ");
             stringBuilder.append(Build.CPU_ABI);

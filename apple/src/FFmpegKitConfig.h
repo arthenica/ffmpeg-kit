@@ -330,6 +330,12 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (NSArray*)getSessions;
 
 /**
+ * <p>Clears all, including ongoing, sessions in the session history.
+ * <p>Note that callbacks cannot be triggered for deleted sessions.
+ */
++ (void)clearSessions;
+
+/**
  * <p>Returns all FFmpeg sessions in the session history.
  *
  * @return all FFmpeg sessions in the session history
@@ -380,6 +386,23 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @return string value
  */
 + (NSString*)sessionStateToString:(SessionState)state;
+
+/**
+ * <p>Parses the given command into arguments. Uses space character to split the arguments.
+ * Supports single and double quote characters.
+ *
+ * @param command string command
+ * @return array of arguments
+ */
++ (NSArray*)parseArguments:(NSString*)command;
+
+/**
+ * <p>Concatenates arguments into a string adding a space character between two arguments.
+ *
+ * @param arguments arguments
+ * @return concatenated string containing all arguments
+ */
++ (NSString*)argumentsToString:(NSArray*)arguments;
 
 @end
 

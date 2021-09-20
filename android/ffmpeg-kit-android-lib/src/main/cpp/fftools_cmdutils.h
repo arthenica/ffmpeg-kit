@@ -51,8 +51,6 @@
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
 
-#include "saf_wrapper.h"
-
 #ifdef _WIN32
 #undef main /* We don't want SDL to override our main() */
 #endif
@@ -116,6 +114,11 @@ void log_callback_help(void* ptr, int level, const char* fmt, va_list vl);
  * Override the cpuflags.
  */
 int opt_cpuflags(void *optctx, const char *opt, const char *arg);
+
+/**
+ * Override the cpucount.
+ */
+int opt_cpucount(void *optctx, const char *opt, const char *arg);
 
 /**
  * Fallback for options that are not explicitly handled, these will be
@@ -237,7 +240,7 @@ void show_help_options(const OptionDef *options, const char *msg, int req_flags,
 void show_help_children(const AVClass *class, int flags);
 
 /**
- * Per-fftool specific help handlers. Implemented in each
+ * Per-fftool specific help handler. Implemented in each
  * fftool, called by show_help().
  */
 void show_help_default_ffmpeg(const char *opt, const char *arg);
@@ -404,7 +407,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec);
  * @return a pointer to the created dictionary
  */
 AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
-                                AVFormatContext *s, AVStream *st, AVCodec *codec);
+                                AVFormatContext *s, AVStream *st, const AVCodec *codec);
 
 /**
  * Setup AVCodecContext options for avformat_find_stream_info().

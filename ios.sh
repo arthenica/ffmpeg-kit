@@ -28,7 +28,7 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT IOS SDK VERSION
-DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
+DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>${BASEDIR}/build.log)"
 echo -e "\nINFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -130,14 +130,6 @@ while [ ! $# -eq 0 ]; do
   shift
 done
 
-# VALIDATE THAT LTS RELEASES ARE BUILT USING THE CORRECT VERSION
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ "${DETECTED_IOS_SDK_VERSION}" != "${IOS_MIN_VERSION}" ]]; then
-  if [[ -z ${BUILD_FORCE} ]]; then
-    echo -e "\n(*) LTS packages should be built using SDK ${IOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_IOS_SDK_VERSION}\n"
-    exit 1
-  fi
-fi
-
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
   for library in {0..58}; do
@@ -165,14 +157,6 @@ disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64E}" 
 disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_X86_64_MAC_CATALYST}" "${DETECTED_IOS_SDK_VERSION}"
 disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_MAC_CATALYST}" "${DETECTED_IOS_SDK_VERSION}"
 disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}" "${DETECTED_IOS_SDK_VERSION}"
-
-# CHECK SOME RULES FOR .xcframework BUNDLES
-
-# 1. DO NOT ALLOW --lts AND --xcframework OPTIONS TOGETHER
-if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]] && [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-  echo -e "\n(*) LTS packages does not support xcframework bundles.\n"
-  exit 1
-fi
 
 # CHECK SOME RULES FOR .framework BUNDLES
 

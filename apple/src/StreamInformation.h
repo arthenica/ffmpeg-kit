@@ -70,11 +70,11 @@ extern NSString* const StreamKeyTags;
 - (NSString*)getCodec;
 
 /**
- * Returns full stream codec.
+ * Returns stream codec in long format.
  *
  * @return stream codec with additional profile and mode information
  */
-- (NSString*)getFullCodec;
+- (NSString*)getCodecLong;
 
 /**
  * Returns stream format.

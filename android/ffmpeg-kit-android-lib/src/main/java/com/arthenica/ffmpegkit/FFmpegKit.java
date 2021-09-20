@@ -148,7 +148,7 @@ public class FFmpegKit {
      * @return FFmpeg session created for this execution
      */
     public static FFmpegSession execute(final String command) {
-        return execute(parseArguments(command));
+        return execute(FFmpegKitConfig.parseArguments(command));
     }
 
     /**
@@ -162,7 +162,7 @@ public class FFmpegKit {
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback) {
-        return executeAsync(parseArguments(command), executeCallback);
+        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
     }
 
     /**
@@ -180,7 +180,7 @@ public class FFmpegKit {
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback) {
-        return executeAsync(parseArguments(command), executeCallback, logCallback, statisticsCallback);
+        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
     }
 
     /**
@@ -196,7 +196,7 @@ public class FFmpegKit {
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(parseArguments(command), executeCallback);
+        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -220,7 +220,7 @@ public class FFmpegKit {
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(parseArguments(command), executeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -260,86 +260,6 @@ public class FFmpegKit {
      */
     public static List<FFmpegSession> listSessions() {
         return FFmpegKitConfig.getFFmpegSessions();
-    }
-
-    /**
-     * <p>Parses the given command into arguments. Uses space character to split the arguments.
-     * Supports single and double quote characters.
-     *
-     * @param command string command
-     * @return array of arguments
-     */
-    public static String[] parseArguments(final String command) {
-        final List<String> argumentList = new ArrayList<>();
-        StringBuilder currentArgument = new StringBuilder();
-
-        boolean singleQuoteStarted = false;
-        boolean doubleQuoteStarted = false;
-
-        for (int i = 0; i < command.length(); i++) {
-            final Character previousChar;
-            if (i > 0) {
-                previousChar = command.charAt(i - 1);
-            } else {
-                previousChar = null;
-            }
-            final char currentChar = command.charAt(i);
-
-            if (currentChar == ' ') {
-                if (singleQuoteStarted || doubleQuoteStarted) {
-                    currentArgument.append(currentChar);
-                } else if (currentArgument.length() > 0) {
-                    argumentList.add(currentArgument.toString());
-                    currentArgument = new StringBuilder();
-                }
-            } else if (currentChar == '\'' && (previousChar == null || previousChar != '\\')) {
-                if (singleQuoteStarted) {
-                    singleQuoteStarted = false;
-                } else if (doubleQuoteStarted) {
-                    currentArgument.append(currentChar);
-                } else {
-                    singleQuoteStarted = true;
-                }
-            } else if (currentChar == '\"' && (previousChar == null || previousChar != '\\')) {
-                if (doubleQuoteStarted) {
-                    doubleQuoteStarted = false;
-                } else if (singleQuoteStarted) {
-                    currentArgument.append(currentChar);
-                } else {
-                    doubleQuoteStarted = true;
-                }
-            } else {
-                currentArgument.append(currentChar);
-            }
-        }
-
-        if (currentArgument.length() > 0) {
-            argumentList.add(currentArgument.toString());
-        }
-
-        return argumentList.toArray(new String[0]);
-    }
-
-    /**
-     * <p>Concatenates arguments into a string adding a space character between two arguments.
-     *
-     * @param arguments arguments
-     * @return concatenated string containing all arguments
-     */
-    public static String argumentsToString(final String[] arguments) {
-        if (arguments == null) {
-            return "null";
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < arguments.length; i++) {
-            if (i > 0) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(arguments[i]);
-        }
-
-        return stringBuilder.toString();
     }
 
 }

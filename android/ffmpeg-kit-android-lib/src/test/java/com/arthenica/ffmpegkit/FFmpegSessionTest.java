@@ -26,10 +26,6 @@ import java.util.List;
 
 public class FFmpegSessionTest {
 
-    static {
-        System.setProperty("enable.ffmpeg.kit.test.mode", "true");
-    }
-
     private static final String[] TEST_ARGUMENTS = new String[]{"argument1", "argument2"};
 
     @Test

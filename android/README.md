@@ -77,7 +77,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     }
 
     dependencies {
-        implementation 'com.arthenica:ffmpeg-kit-full:4.4.LTS'
+        implementation 'com.arthenica:ffmpeg-kit-full:4.5'
     }
     ```
 
@@ -220,12 +220,21 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
         ```
 
 8. Convert Storage Access Framework (SAF) Uris into paths that can be read or written by `FFmpegKit`.
-
-    ```
-    Uri safUri = intent.getData();
-    String videoPath = FFmpegKitConfig.getSafParameterForWrite(requireContext(), safUri);
-    FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 " + videoPath);
-    ```
+   - Reading a file:
+  
+        ```
+        Uri safUri = intent.getData();
+        String inputVideoPath = FFmpegKitConfig.getSafParameterForRead(requireContext(), safUri);
+        FFmpegKit.execute("-i " + inputVideoPath + " -c:v mpeg4 file2.mp4");
+        ```
+    
+    - Writing to a file:
+  
+        ```
+        Uri safUri = intent.getData();
+        String outputVideoPath = FFmpegKitConfig.getSafParameterForWrite(requireContext(), safUri);
+        FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 " + outputVideoPath);
+        ```
 
 9. Get previous `FFmpeg` and `FFprobe` sessions from session history.
 

@@ -157,7 +157,7 @@ public class FFmpegSession extends AbstractSession implements Session {
     public Statistics getLastReceivedStatistics() {
         synchronized (statisticsLock) {
             if (statistics.size() > 0) {
-                return statistics.get(0);
+                return statistics.get(statistics.size() - 1);
             } else {
                 return null;
             }
@@ -199,7 +199,7 @@ public class FFmpegSession extends AbstractSession implements Session {
         stringBuilder.append(", endTime=");
         stringBuilder.append(endTime);
         stringBuilder.append(", arguments=");
-        stringBuilder.append(FFmpegKit.argumentsToString(arguments));
+        stringBuilder.append(FFmpegKitConfig.argumentsToString(arguments));
         stringBuilder.append(", logs=");
         stringBuilder.append(getLogsAsString());
         stringBuilder.append(", state=");

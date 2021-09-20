@@ -423,6 +423,9 @@ if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
 fi
 
 ########################### CUSTOMIZATIONS #######################
+git checkout libavformat/file.c 1>>"${BASEDIR}"/build.log 2>&1
+git checkout libavformat/protocols.c 1>>"${BASEDIR}"/build.log 2>&1
+git checkout libavutil 1>>"${BASEDIR}"/build.log 2>&1
 
 # 1. Workaround to prevent adding of -mdynamic-no-pic flag
 ${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1

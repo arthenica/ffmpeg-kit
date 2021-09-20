@@ -54,6 +54,7 @@
 #include "libavformat/avio.h"
 
 #include "libavcodec/avcodec.h"
+#include "libavcodec/bsf.h"
 
 #include "libavfilter/avfilter.h"
 
@@ -83,7 +84,6 @@ enum HWAccelID {
     HWACCEL_AUTO,
     HWACCEL_GENERIC,
     HWACCEL_VIDEOTOOLBOX,
-    HWACCEL_QSV,
 };
 
 typedef struct HWAccel {
@@ -142,6 +142,7 @@ typedef struct OptionsContext {
     int64_t input_ts_offset;
     int loop;
     int rate_emu;
+    float readrate;
     int accurate_seek;
     int thread_queue_size;
 
@@ -330,14 +331,16 @@ typedef struct InputStream {
 #define DECODING_FOR_FILTER 2
 
     AVCodecContext *dec_ctx;
-    AVCodec *dec;
+    const AVCodec *dec;
     AVFrame *decoded_frame;
     AVFrame *filter_frame; /* a ref of decoded_frame, to be sent to filters */
+    AVPacket *pkt;
 
     int64_t       start;     /* time when read started */
     /* predicted dts of the next packet read for this stream or (when there are
      * several frames in a packet) of the next frame in current packet (in AV_TIME_BASE units) */
     int64_t       next_dts;
+    int64_t first_dts;       ///< dts of the first packet read for this stream (in AV_TIME_BASE units)
     int64_t       dts;       ///< dts of the last packet read for this stream (in AV_TIME_BASE units)
 
     int64_t       next_pts;  ///< synthetic pts for the next decode frame (in AV_TIME_BASE units)
@@ -439,7 +442,10 @@ typedef struct InputFile {
                              from ctx.nb_streams if new streams appear during av_read_frame() */
     int nb_streams_warn;  /* number of streams that the user was warned of */
     int rate_emu;
+    float readrate;
     int accurate_seek;
+
+    AVPacket *pkt;
 
 #if HAVE_THREADS
     AVThreadMessageQueue *in_thread_queue;
@@ -493,10 +499,11 @@ typedef struct OutputStream {
 
     AVCodecContext *enc_ctx;
     AVCodecParameters *ref_par; /* associated input codec parameters with encoders options applied */
-    AVCodec *enc;
+    const AVCodec *enc;
     int64_t max_frames;
     AVFrame *filtered_frame;
     AVFrame *last_frame;
+    AVPacket *pkt;
     int last_dropped;
     int last_nb0_frames[3];
 
@@ -522,6 +529,7 @@ typedef struct OutputStream {
     char *forced_keyframes;
     AVExpr *forced_keyframes_pexpr;
     double forced_keyframes_expr_const_values[FKF_NB];
+    int dropped_keyframe;
 
     /* audio only */
     int *audio_channels_map;             /* list of the channels id to pick from the source stream */
@@ -757,8 +765,8 @@ void init_options(OptionsContext *o);
 AVDictionary *strip_specifiers(AVDictionary *dict);
 void parse_meta_type(char *arg, char *type, int *index, const char **stream_spec);
 int fftools_copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o);
-AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
-AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
+const AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
+const AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
 int open_input_file(OptionsContext *o, const char *filename);
 int get_preset_file_2(const char *preset_name, const char *codec_name, AVIOContext **s);
 int choose_encoder(OptionsContext *o, AVFormatContext *s, OutputStream *ost);

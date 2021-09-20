@@ -536,7 +536,7 @@ public class FFmpegKitTest {
 
     @Test
     public void parseSimpleCommand() {
-        final String[] argumentArray = FFmpegKit.parseArguments("-hide_banner -loop 1 -i file.jpg -filter_complex [0:v]setpts=PTS-STARTPTS[video] -map [video] -vsync 2 -async 1 video.mp4");
+        final String[] argumentArray = FFmpegKitConfig.parseArguments("-hide_banner -loop 1 -i file.jpg -filter_complex [0:v]setpts=PTS-STARTPTS[video] -map [video] -vsync 2 -async 1 video.mp4");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(14, argumentArray.length);
@@ -559,7 +559,7 @@ public class FFmpegKitTest {
 
     @Test
     public void parseSingleQuotesInCommand() {
-        String[] argumentArray = FFmpegKit.parseArguments("-loop 1 'file one.jpg'  -filter_complex  '[0:v]setpts=PTS-STARTPTS[video]'  -map  [video]  video.mp4 ");
+        String[] argumentArray = FFmpegKitConfig.parseArguments("-loop 1 'file one.jpg'  -filter_complex  '[0:v]setpts=PTS-STARTPTS[video]'  -map  [video]  video.mp4 ");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(8, argumentArray.length);
@@ -576,7 +576,7 @@ public class FFmpegKitTest {
 
     @Test
     public void parseDoubleQuotesInCommand() {
-        String[] argumentArray = FFmpegKit.parseArguments("-loop  1 \"file one.jpg\"   -filter_complex \"[0:v]setpts=PTS-STARTPTS[video]\"  -map  [video]  video.mp4 ");
+        String[] argumentArray = FFmpegKitConfig.parseArguments("-loop  1 \"file one.jpg\"   -filter_complex \"[0:v]setpts=PTS-STARTPTS[video]\"  -map  [video]  video.mp4 ");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(8, argumentArray.length);
@@ -590,7 +590,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("[video]", argumentArray[6]);
         Assert.assertEquals("video.mp4", argumentArray[7]);
 
-        argumentArray = FFmpegKit.parseArguments(" -i   file:///tmp/input.mp4 -vcodec libx264 -vf \"scale=1024:1024,pad=width=1024:height=1024:x=0:y=0:color=black\"  -acodec copy  -q:v 0  -q:a   0 video.mp4");
+        argumentArray = FFmpegKitConfig.parseArguments(" -i   file:///tmp/input.mp4 -vcodec libx264 -vf \"scale=1024:1024,pad=width=1024:height=1024:x=0:y=0:color=black\"  -acodec copy  -q:v 0  -q:a   0 video.mp4");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(13, argumentArray.length);
@@ -612,7 +612,7 @@ public class FFmpegKitTest {
 
     @Test
     public void parseDoubleQuotesAndEscapesInCommand() {
-        String[] argumentArray = FFmpegKit.parseArguments("  -i   file:///tmp/input.mp4 -vf \"subtitles=file:///tmp/subtitles.srt:force_style=\'FontSize=16,PrimaryColour=&HFFFFFF&\'\" -vcodec libx264   -acodec copy  -q:v 0 -q:a  0  video.mp4");
+        String[] argumentArray = FFmpegKitConfig.parseArguments("  -i   file:///tmp/input.mp4 -vf \"subtitles=file:///tmp/subtitles.srt:force_style=\'FontSize=16,PrimaryColour=&HFFFFFF&\'\" -vcodec libx264   -acodec copy  -q:v 0 -q:a  0  video.mp4");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(13, argumentArray.length);
@@ -631,7 +631,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("0", argumentArray[11]);
         Assert.assertEquals("video.mp4", argumentArray[12]);
 
-        argumentArray = FFmpegKit.parseArguments("  -i   file:///tmp/input.mp4 -vf \"subtitles=file:///tmp/subtitles.srt:force_style=\\\"FontSize=16,PrimaryColour=&HFFFFFF&\\\"\" -vcodec libx264   -acodec copy  -q:v 0 -q:a  0  video.mp4");
+        argumentArray = FFmpegKitConfig.parseArguments("  -i   file:///tmp/input.mp4 -vf \"subtitles=file:///tmp/subtitles.srt:force_style=\\\"FontSize=16,PrimaryColour=&HFFFFFF&\\\"\" -vcodec libx264   -acodec copy  -q:v 0 -q:a  0  video.mp4");
 
         Assert.assertNotNull(argumentArray);
         Assert.assertEquals(13, argumentArray.length);
@@ -658,7 +658,7 @@ public class FFmpegKitTest {
     }
 
     public String argumentsToString(final String[] arguments) {
-        return FFmpegKit.argumentsToString(arguments);
+        return FFmpegKitConfig.argumentsToString(arguments);
     }
 
     private void assertMediaInput(MediaInformation mediaInformation, String format, String filename) {
@@ -703,7 +703,7 @@ public class FFmpegKitTest {
         Assert.assertEquals(type, streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(bitrate, streamInformation.getBitrate());
     }
@@ -713,7 +713,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("audio", streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(sampleRate, streamInformation.getSampleRate());
         Assert.assertEquals(channelLayout, streamInformation.getChannelLayout());
@@ -726,7 +726,7 @@ public class FFmpegKitTest {
         Assert.assertEquals("video", streamInformation.getType());
 
         Assert.assertEquals(codec, streamInformation.getCodec());
-        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getCodecLong());
 
         Assert.assertEquals(format, streamInformation.getFormat());
 

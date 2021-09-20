@@ -14,20 +14,6 @@ get_ffmpeg_kit_version() {
   fi
 }
 
-# 1 - library index
-# 2 - output path
-copy_external_library_license() {
-  output_path_array=("$2")
-  for output_path in "${output_path_array[@]}"; do
-    $(cp $(get_external_library_license_path "$1") "${output_path}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1)
-    if [[ $? -ne 0 ]]; then
-      echo 1
-      return
-    fi
-  done
-  echo 0
-}
-
 get_external_library_version() {
   local library_version=$(grep Version "${BASEDIR}"/prebuilt/"$(get_build_directory)"/pkgconfig/"$1".pc 2>>"${BASEDIR}"/build.log | sed 's/Version://g;s/\ //g')
 
@@ -438,9 +424,9 @@ create_single_framework() {
 
   initialize_folder "${FRAMEWORK_PATH}"
 
-  local CAPITAL_CASE_LIBRARY_NAME=$(to_capital_case "${LIBRARY_NAME}")
+  local CAPITAL_CASE_FRAMEWORK_NAME=$(to_capital_case "${FRAMEWORK_NAME}")
 
-  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${LIBRARY_NAME}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_LIBRARY_NAME}" "${LIBRARY_VERSION}" "${LIBRARY_VERSION}"
+  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${LIBRARY_NAME}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FRAMEWORK_NAME}" "${LIBRARY_VERSION}" "${LIBRARY_VERSION}"
 
   cp "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")/${LIBRARY_NAME}/lib/${STATIC_LIBRARY_NAME}.a" "${FRAMEWORK_PATH}/${FRAMEWORK_NAME}" 1>>"${BASEDIR}/build.log" 2>&1
 

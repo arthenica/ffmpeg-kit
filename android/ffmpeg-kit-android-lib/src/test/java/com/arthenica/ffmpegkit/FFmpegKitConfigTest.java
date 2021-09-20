@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Taner Sener
+ * Copyright (c) 2018-2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -150,6 +150,21 @@ public class FFmpegKitConfigTest {
         Assert.assertEquals("audio", listToPackageName(Collections.singletonList("speex")));
         Assert.assertEquals("https", listToPackageName(Collections.singletonList("gnutls")));
         Assert.assertEquals("https-gpl", listToPackageName(Arrays.asList("gnutls", "xvidcore")));
+    }
+
+    @Test
+    public void extractExtensionFromSafDisplayName() {
+        String extension = FFmpegKitConfig.extractExtensionFromSafDisplayName("video.mp4 (2)");
+        Assert.assertEquals("mp4", extension);
+
+        extension = FFmpegKitConfig.extractExtensionFromSafDisplayName("video file name.mp3 (2)");
+        Assert.assertEquals("mp3", extension);
+
+        extension = FFmpegKitConfig.extractExtensionFromSafDisplayName("file.mp4");
+        Assert.assertEquals("mp4", extension);
+
+        extension = FFmpegKitConfig.extractExtensionFromSafDisplayName("file name.mp4");
+        Assert.assertEquals("mp4", extension);
     }
 
     private String listToPackageName(final List<String> externalLibraryList) {

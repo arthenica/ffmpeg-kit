@@ -83,11 +83,11 @@ public class StreamInformation {
     }
 
     /**
-     * Returns full stream codec.
+     * Returns stream codec in long format.
      *
      * @return stream codec with additional profile and mode information
      */
-    public String getFullCodec() {
+    public String getCodecLong() {
         return getStringProperty(KEY_CODEC_LONG);
     }
 

@@ -13,7 +13,6 @@ fi
   --with-pic \
   --with-sysroot="${ANDROID_SYSROOT}" \
   --with-glib=no \
-  --with-fontconfig=yes \
   --with-freetype=yes \
   --enable-static \
   --disable-shared \

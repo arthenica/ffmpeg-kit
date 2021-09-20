@@ -13,7 +13,6 @@ fi
   --with-pic \
   --with-sysroot="${SDK_PATH}" \
   --with-glib=no \
-  --with-fontconfig=yes \
   --with-freetype=yes \
   --enable-static \
   --disable-shared \

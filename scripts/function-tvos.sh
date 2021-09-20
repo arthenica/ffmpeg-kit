@@ -47,7 +47,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
 }
 
 enable_main_build() {
-  export TVOS_MIN_VERSION=10.2
+  export TVOS_MIN_VERSION=11.0
 }
 
 enable_lts_build() {
@@ -350,7 +350,7 @@ get_ldflags() {
 
 set_toolchain_paths() {
   if [ ! -f "${FFMPEG_KIT_TMPDIR}/gas-preprocessor.pl" ]; then
-    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
+    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/v20210917/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
     if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
       exit 1
     fi

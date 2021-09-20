@@ -67,6 +67,11 @@ enable_lts_build() {
 
   # XCODE 7.3 HAS IOS SDK 9.3
   export IOS_MIN_VERSION=9.3
+
+  # IOS SDK 9.3 SUPPORTS VIDEOTOOLBOX
+  # HOWEVER, THE LATEST FFMPEG VERSION USES SDK 11.0 APIS
+  # THEREFORE, VIDEOTOOLBOX IS DISABLED IN LTS RELEASES
+  ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=0
 }
 
 get_common_includes() {
@@ -378,7 +383,7 @@ get_ldflags() {
 
 set_toolchain_paths() {
   if [ ! -f "${FFMPEG_KIT_TMPDIR}/gas-preprocessor.pl" ]; then
-    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
+    DOWNLOAD_RESULT=$(download "https://github.com/tanersener/gas-preprocessor/raw/v20210917/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
     if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
       exit 1
     fi

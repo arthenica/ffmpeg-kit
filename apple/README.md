@@ -114,17 +114,17 @@ All libraries created can be found under the `prebuilt` directory.
 
     - iOS
     ```
-    pod 'ffmpeg-kit-ios-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-ios-full', '~> 4.5'
     ```
 
     - macOS
     ```
-    pod 'ffmpeg-kit-macos-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-macos-full', '~> 4.5'
     ```
 
     - tvOS
     ```
-    pod 'ffmpeg-kit-tvos-full', '~> 4.4.LTS'
+    pod 'ffmpeg-kit-tvos-full', '~> 4.5'
     ```
 
 2. Execute synchronous `FFmpeg` commands.
@@ -301,7 +301,7 @@ All libraries created can be found under the `prebuilt` directory.
 11. Register system fonts and custom font directories.
 
     ```
-    [FFmpegKitConfig setFontDirectoryList:<array of folders with fonts> with:nil];
+    [FFmpegKitConfig setFontDirectoryList:[NSArray arrayWithObjects:@"/System/Library/Fonts", @"<folder with fonts>", nil] with:nil];
     ```
 
 ### 4. Test Application
