@@ -7,9 +7,10 @@ FFmpeg Kit for applications.
 ### 1. Features
 - Scripts to build FFmpeg libraries
 - `FFmpegKit` wrapper library to run `FFmpeg`/`FFprobe` commands in applications
-- Supports Android, iOS, macOS and tvOS
+- Supports native platforms: Android, iOS, macOS and tvOS
+- Supports hybrid platforms: React Native
 - Based on FFmpeg `v4.5-dev` with optional system and external libraries
-- 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases), [Maven Central](https://search.maven.org) and [CocoaPods](https://cocoapods.org).
+- 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org) and [npm](https://www.npmjs.com)
 - Licensed under `LGPL 3.0`, or `GPL v3.0` if GPL licensed libraries are enabled
 
 ### 2. Android
@@ -22,27 +23,32 @@ See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android)
 See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) to use `FFmpegKit` on `Apple` platforms
 (`iOS`, `macOS`, `tvOS`).
 
-### 4. Build Scripts
+### 4. React Native
 
-Use `android.sh`, `ios.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each platform.
+See [React Native](https://github.com/tanersener/ffmpeg-kit/tree/main/react-native) to learn more about `FFmpegKit` for
+`React Native`.
+
+### 5. Build Scripts
+
+Use `android.sh`, `ios.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each native platform.
 
 All scripts support additional options to enable optional libraries and disable platform architectures.
 
-### 5. FFmpegKit Library
+### 6. FFmpegKit Library
 
 `FFmpegKit` is a wrapper library that allows you to easily run `FFmpeg`/`FFprobe` commands in applications. It
 provides additional features on top of `FFmpeg` to enable platform specific resources, control how commands are
 executed and how the results are handled.
 
-`Android` library has a `Java` API and `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C` API,
-which are identical in terms of features and capabilities.
+`Android` library of `FFmpegKit` has a `Java` API, `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C`
+API and `React Native` library provides a `JavaScript` API, which are identical in terms of features and capabilities.
 
-### 6. Binary Packages
+### 7. Packages
 
 There are eight different `ffmpeg-kit` packages distributed on
 [Github](https://github.com/tanersener/ffmpeg-kit/releases),
-[Maven Central](https://search.maven.org) and [CocoaPods](https://cocoapods.org).
-Below you can see which external libraries are enabled in each one of them.
+[Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org) and [npm](https://www.npmjs.com).
+Below you can see which system libraries and external libraries are enabled in each one of them.
 
 Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `ffmpeg-kit` packages
 include them.
@@ -79,21 +85,22 @@ include them.
 - `AVFoundation` is not available on `tvOS`
 - `VideoToolbox` is not available on LTS releases of `iOS` and `tvOS`
 
-### 7. Versions
+### 8. Versions
 
 `FFmpegKit` binaries generated use the same major and minor version numbers as the upstream `FFmpeg` project.
 
 The exact version number of `FFmpeg` is obtained using `git describe --tags`. `dev` part in the version string
 indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch.
 
-|  FFmpegKit Version | FFmpeg Version | Release Date |
-| :----: | :----: |:----: |
-| [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5) | 4.5-dev-2008 | Sep 18, 2021 |
-| [4.5.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.LTS) | 4.5-dev-2008 | Sep 18, 2021 |
-| [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4) | 4.4-dev-3015 | Mar 03, 2021 |
-| [4.4.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4.LTS) | 4.4-dev-3015 | Mar 03, 2021 |
+|  Platforms |  FFmpegKit Version | FFmpeg Version | Release Date |
+| :----: | :----: | :----: | :----: |
+| React Native | [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0) | 4.5-dev-2008 | Oct 01, 2021 |
+| Android<br>Apple | [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5) | 4.5-dev-2008 | Sep 18, 2021 |
+| Android<br>Apple | [4.5.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.LTS) | 4.5-dev-2008 | Sep 18, 2021 |
+| Android<br>Apple | [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4) | 4.4-dev-3015 | Mar 03, 2021 |
+| Android<br>Apple | [4.4.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4.LTS) | 4.4-dev-3015 | Mar 03, 2021 |
 
-### 8. LTS Releases
+### 9. LTS Releases
 
 `FFmpegKit` binaries are published in two release variants: `Main Release` and `LTS Release`.
 
@@ -122,11 +129,11 @@ This table shows the differences between two variants.
 | tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator | arm64<br/>x86-64 |
 | tvOS Bundle Format | XCFrameworks | Frameworks |
 
-### 9. Documentation
+### 10. Documentation
 
 A more detailed documentation is available under [Wiki](https://github.com/tanersener/ffmpeg-kit/wiki).
 
-### 10. Test Applications
+### 11. Test Applications
 
 You can see how `FFmpegKit` is used inside an application by running test applications created under
 [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
@@ -134,12 +141,12 @@ You can see how `FFmpegKit` is used inside an application by running test applic
 All applications are identical and supports command execution, video encoding, accessing https urls, encoding audio,
 burning subtitles, video stabilisation, pipe operations, concurrent command execution.
 
-### 11. License
+### 12. License
 
 `FFmpegKit` is licensed under the `LGPL v3.0`. However, if source code is built using the optional `--enable-gpl` flag
 or prebuilt binaries with `-gpl` postfix are used, then `FFmpegKit` is subject to the `GPL v3.0` license.
 
-### 12. Patents
+### 13. Patents
 
 It is not clearly explained in their documentation, but it is believed that `FFmpeg`, `kvazaar`, `x264` and `x265`
 include algorithms which are subject to software patents. If you live in a country where software algorithms are
@@ -150,15 +157,15 @@ that you seek legal advice first. See [FFmpeg Patent Mini-FAQ](https://ffmpeg.or
 distribute that library, then you are subject to pay MPEG LA licensing fees. Refer to
 [OpenH264 FAQ](https://www.openh264.org/faq.html) page for the details.
 
-### 13. Contributing
+### 14. Contributing
 
 Feel free to submit issues or pull requests.
 
 Please note that `main` includes only the latest released source code. Changes planned for the next release are
-developed under the `development` branch. Therefore, if you want to create a pull request, please open it against
-the `development`.
+developed under the `development` branches (`development` for native platforms, `development-react-native` for 
+`react-native`). Therefore, if you want to create a pull request, please open it against them.
 
-### 14. See Also
+### 15. See Also
 
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
 - [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
