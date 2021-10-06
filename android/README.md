@@ -71,7 +71,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
    `ffmpeg-kit-<package name>` pattern. Use one of the `FFmpegKit` package names given in the 
    project [README](https://github.com/tanersener/ffmpeg-kit).
 
-    ```
+    ```yaml
     repositories {
         mavenCentral()
     }
@@ -83,9 +83,8 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 2. Execute synchronous `FFmpeg` commands.
 
-    ```
+    ```java
     import com.arthenica.ffmpegkit.FFmpegKit;
-    import com.arthenica.ffmpegkit.ReturnCode;
 
     FFmpegSession session = FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
     if (ReturnCode.isSuccess(session.getReturnCode())) {
@@ -107,7 +106,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 3. Each `execute` call (sync or async) creates a new session. Access every detail about your execution from the 
    session created.
 
-    ```
+    ```java
     FFmpegSession session = FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
 
     // Unique session id created for this execution
@@ -144,7 +143,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 4. Execute asynchronous `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
 
-    ```
+    ```java
     FFmpegKit.executeAsync("-i file1.mp4 -c:v mpeg4 file2.mp4", new ExecuteCallback() {
 
         @Override
@@ -179,7 +178,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
     - Synchronous
 
-    ```
+    ```java
     FFprobeSession session = FFprobeKit.execute(ffprobeCommand);
 
     if (!ReturnCode.isSuccess(session.getReturnCode())) {
@@ -189,7 +188,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
     - Asynchronous
 
-    ```
+    ```java
     FFprobeKit.executeAsync(ffprobeCommand, new ExecuteCallback() {
    
         @Override
@@ -203,7 +202,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 6. Get media information for a file.
 
-    ```
+    ```java
     MediaInformationSession mediaInformation = FFprobeKit.getMediaInformation("<file path or uri>");
     mediaInformation.getMediaInformation();
     ```
@@ -211,18 +210,18 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 7. Stop ongoing `FFmpeg` operations.
 
     - Stop all executions
-        ```
+        ```java
         FFmpegKit.cancel();
         ```
     - Stop a specific session
-        ```
+        ```java
         FFmpegKit.cancel(sessionId);
         ```
 
 8. Convert Storage Access Framework (SAF) Uris into paths that can be read or written by `FFmpegKit`.
    - Reading a file:
   
-        ```
+        ```java
         Uri safUri = intent.getData();
         String inputVideoPath = FFmpegKitConfig.getSafParameterForRead(requireContext(), safUri);
         FFmpegKit.execute("-i " + inputVideoPath + " -c:v mpeg4 file2.mp4");
@@ -230,7 +229,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     
     - Writing to a file:
   
-        ```
+        ```java
         Uri safUri = intent.getData();
         String outputVideoPath = FFmpegKitConfig.getSafParameterForWrite(requireContext(), safUri);
         FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 " + outputVideoPath);
@@ -238,7 +237,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 9. Get previous `FFmpeg` and `FFprobe` sessions from session history.
 
-    ```
+    ```java
     List<Session> sessions = FFmpegKitConfig.getSessions();
     for (int i = 0; i < sessions.size(); i++) {
         Session session = sessions.get(i);
@@ -256,7 +255,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
     - Execute Callback, called when an async execution is ended
 
-        ```
+        ```java
         FFmpegKitConfig.enableExecuteCallback(new ExecuteCallback() {
 
             @Override
@@ -268,7 +267,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
     - Log Callback, called when a session generates logs
 
-        ```
+        ```java
         FFmpegKitConfig.enableLogCallback(new LogCallback() {
     
             @Override
@@ -280,7 +279,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
     - Statistics Callback, called when a session generates statistics
 
-        ```
+        ```java
         FFmpegKitConfig.enableStatisticsCallback(new StatisticsCallback() {
 
             @Override
@@ -292,13 +291,13 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 11. Ignore the handling of a signal. Required by `Mono` and frameworks that use `Mono`, e.g. `Unity` and `Xamarin`.
 
-    ```
+    ```java
     FFmpegKitConfig.ignoreSignal(Signal.SIGXCPU);
     ```
 
 12. Register system fonts and custom font directories.
 
-    ```
+    ```java
     FFmpegKitConfig.setFontDirectoryList(context, Arrays.asList("/system/fonts", "<folder with fonts>"), Collections.EMPTY_MAP);
     ```
 
