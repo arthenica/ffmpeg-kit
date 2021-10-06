@@ -1,15 +1,15 @@
 # FFmpegKit
 
+<img src="https://github.com/tanersener/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
+
 `FFmpegKit` is a collection of tools to use `FFmpeg` in `Android`, `iOS`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
 
-It includes scripts to build `FFmpeg` libraries natively, a wrapper library to run `FFmpeg`/`FFprobe` commands in
+It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
 applications and 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases),
 [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com).
 
-<img src="https://github.com/tanersener/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
-
 ### 1. Features
-- Scripts to build FFmpeg libraries
+- Scripts to build FFmpeg native libraries
 - `FFmpegKit` wrapper library to run `FFmpeg`/`FFprobe` commands in applications
 - Supports native platforms: Android, iOS, macOS and tvOS
 - Supports hybrid platforms: Flutter, React Native
@@ -41,7 +41,8 @@ See [React Native](https://github.com/tanersener/ffmpeg-kit/tree/main/react-nati
 
 Use `android.sh`, `ios.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each native platform.
 
-All scripts support additional options to enable optional libraries and disable platform architectures.
+All scripts support additional options to enable optional libraries and disable platform architectures. See
+[Building](https://github.com/tanersener/ffmpeg-kit/wiki/Building) wiki page for the details.
 
 ### 7. FFmpegKit Library
 

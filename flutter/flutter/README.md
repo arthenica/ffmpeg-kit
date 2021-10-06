@@ -67,7 +67,7 @@ In order to install the `LTS` variant, append `-LTS` to the version you have for
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: ^4.5.0-LTS
+  ffmpeg_kit_flutter: 4.5.0-LTS
 ```
 
 #### 2.4 LTS Releases
