@@ -1027,6 +1027,7 @@ public class FFmpegKitConfig {
     public static void clearSessions() {
         synchronized (sessionHistoryLock) {
             sessionHistoryList.clear();
+            sessionHistoryMap.clear();
         }
     }
 

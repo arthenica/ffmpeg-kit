@@ -1076,6 +1076,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
     [sessionHistoryLock lock];
 
     [sessionHistoryList removeAllObjects];
+    [sessionHistoryMap removeAllObjects];
 
     [sessionHistoryLock unlock];
 }
