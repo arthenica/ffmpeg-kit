@@ -18,7 +18,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.2+ devices"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.2+ devices" "      --target=tvos sdk version\toverride minimum deployment target"
   display_help_licensing
 
   echo -e "Architectures:"
