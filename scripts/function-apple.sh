@@ -31,16 +31,16 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   armv7 | armv7s | i386)
 
     # SUPPORTED UNTIL IOS SDK 10.3.1
-    if [[ $(echo "$2 > 10.4" | bc) -eq 1 ]]; then
-      local SUPPORTED=0
-    else
+    if [[ $(compare_versions "$2" "10.3.1") -le 0 ]]; then
       local SUPPORTED=1
+    else
+      local SUPPORTED=0
     fi
     ;;
   arm64e)
 
     # INTRODUCED IN IOS SDK 10.1
-    if [[ $(echo "$2 > 10" | bc) -eq 1 ]]; then
+    if [[ $(compare_versions "$2" "10.1") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -48,8 +48,8 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
     ;;
   x86-64-mac-catalyst)
 
-    # INTRODUCED IN IOS SDK 13
-    if [[ $(echo "$2 > 12.4" | bc) -eq 1 ]]; then
+    # INTRODUCED IN IOS SDK 13.0
+    if [[ $(compare_versions "$2" "13") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -57,8 +57,8 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
     ;;
   arm64-*)
 
-    # INTRODUCED IN IOS SDK 14
-    if [[ $(echo "$2 > 13.7" | bc) -eq 1 ]]; then
+    # INTRODUCED IN IOS SDK 14.0
+    if [[ $(compare_versions "$2" "14") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -87,8 +87,8 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
   case ${ARCH_NAME} in
   arm64-simulator)
 
-    # INTRODUCED IN TVOS SDK 14
-    if [[ $(echo "$2 > 13.4" | bc) -eq 1 ]]; then
+    # INTRODUCED IN TVOS SDK 14.0
+    if [[ $(compare_versions "$2" "14") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -117,8 +117,8 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
   case ${ARCH_NAME} in
   arm64)
 
-    # INTRODUCED IN MACOS SDK 11
-    if [[ $(echo "$2 > 10.16" | bc) -eq 1 ]]; then
+    # INTRODUCED IN MACOS SDK 11.0
+    if [[ $(compare_versions "$2" "11") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -1235,7 +1235,7 @@ get_min_version_cflags() {
 get_min_sdk_version() {
   case ${ARCH} in
   *-mac-catalyst)
-    echo "13.0"
+    echo "${MAC_CATALYST_MIN_VERSION}"
     ;;
   *)
     case ${FFMPEG_KIT_BUILD_TYPE} in

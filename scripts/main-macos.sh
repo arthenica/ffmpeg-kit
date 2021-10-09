@@ -23,8 +23,8 @@ fi
 # ENABLE COMMON FUNCTIONS
 source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-echo -e "\nBuilding ${ARCH} platform\n"
-echo -e "\nINFO: Starting new build for ${ARCH} at $(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "\nBuilding ${ARCH} platform targeting macOS SDK ${MACOS_MIN_VERSION}\n"
+echo -e "\nINFO: Starting new build for ${ARCH} targeting macOS SDK ${MACOS_MIN_VERSION} at $(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET BASE INSTALLATION DIRECTORY FOR THIS ARCHITECTURE
 export LIB_INSTALL_BASE="${BASEDIR}/prebuilt/$(get_build_directory)"
