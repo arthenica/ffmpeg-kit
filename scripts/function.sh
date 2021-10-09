@@ -587,6 +587,9 @@ display_help_options() {
   if [ -n "$3" ]; then
     echo -e "$3"
   fi
+  if [ -n "$4" ]; then
+    echo -e "$4"
+  fi
   echo -e ""
 }
 
@@ -1813,4 +1816,32 @@ overwrite_file() {
 create_file() {
   rm -f "$1"
   echo "" > "$1" 1>>"${BASEDIR}"/build.log 2>&1
+}
+
+compare_versions() {
+  VERSION_PARTS_1=($(echo $1 | tr "." " "))
+  VERSION_PARTS_2=($(echo $2 | tr "." " "))
+
+  for((i=0;(i<${#VERSION_PARTS_1[@]})&&(i<${#VERSION_PARTS_2[@]});i++))
+  do
+
+    if [[ ${VERSION_PARTS_1[$i]} -gt ${VERSION_PARTS_2[$i]} ]]; then
+      echo "1"
+      return;
+    elif [[ ${VERSION_PARTS_1[$i]} -lt ${VERSION_PARTS_2[$i]} ]]; then
+      echo "-1"
+      return;
+    fi
+  done
+
+  if [[ ${#VERSION_PARTS_1[@]} -gt ${#VERSION_PARTS_2[@]} ]]; then
+    echo "1"
+    return;
+  elif [[ ${#VERSION_PARTS_1[@]} -lt ${#VERSION_PARTS_2[@]} ]]; then
+    echo "-1"
+    return;
+  else
+    echo "0"
+    return;
+  fi
 }

@@ -123,6 +123,16 @@ while [ ! $# -eq 0 ]; do
 
     disable_arch "${DISABLED_ARCH}"
     ;;
+  --target=*)
+    TARGET=$(echo $1 | sed -e 's/^--[A-Za-z]*=//g')
+
+    export IOS_MIN_VERSION=${TARGET}
+    ;;
+  --mac-catalyst-target=*)
+    TARGET=$(echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*=//g')
+
+    export MAC_CATALYST_MIN_VERSION=${TARGET}
+    ;;
   *)
     print_unknown_option "$1"
     ;;
