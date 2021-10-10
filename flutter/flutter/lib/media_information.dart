@@ -17,6 +17,7 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'chapter.dart';
 import 'stream_information.dart';
 
 /// Media information class.
@@ -84,6 +85,31 @@ class MediaInformation {
       createStreamInformation(stream as Map<dynamic, dynamic>);
     });
 
+    return list;
+  }
+
+  /// Returns all chapters
+  List<Chapter>? getChapters() {
+    final List<Chapter> list = List<Chapter>.empty(growable: true);
+    List<Chapter> chapters = List.empty(growable: true);
+    if (_allProperties!["chapters"] != null) {
+      chapters = <Chapter>[];
+      _allProperties!['chapters'].forEach((Map<String, dynamic> chapter) {
+        final int id = chapter['id'];
+        final String timeBase = chapter['time_base'];
+        final int start = chapter['start'];
+        final int end = chapter['end'];
+        final String startTime = chapter['start_time'];
+        final String endTime = chapter['end_time'];
+        Tags? tags = null;
+        if (chapter['tags'] != null) {
+          tags = Tags(chapter['tags']['title'] ?? "");
+        }
+        chapters.add(
+            new Chapter(id, timeBase, start, end, startTime, endTime, tags));
+      });
+    }
+    list.addAll(chapters);
     return list;
   }
 
