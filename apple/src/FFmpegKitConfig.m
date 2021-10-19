@@ -21,6 +21,7 @@
 #import <sys/types.h>
 #import <sys/stat.h>
 #import "libavutil/ffversion.h"
+#import "libavutil/bprint.h"
 #import "fftools_ffmpeg.h"
 #import "ArchDetect.h"
 #import "AtomicLong.h"
@@ -138,7 +139,7 @@ void addSessionToSessionHistory(id<Session> session) {
     long _sessionId;                    // session id
 
     int _logLevel;                      // log level
-    NSString* _logData;                 // log data
+    AVBPrint _logData;                  // log data
 
     int _statisticsFrameNumber;         // statistics frame number
     float _statisticsFps;               // statistics fps
@@ -149,13 +150,14 @@ void addSessionToSessionHistory(id<Session> session) {
     double _statisticsSpeed;            // statistics speed
 }
 
- - (instancetype)init:(long)sessionId logLevel:(int)logLevel data:(NSString*)logData {
+ - (instancetype)init:(long)sessionId logLevel:(int)logLevel data:(AVBPrint*)data {
     self = [super init];
     if (self) {
         _type = LogType;
         _sessionId = sessionId;
         _logLevel = logLevel;
-        _logData = logData;
+        av_bprint_init(&_logData, 0, AV_BPRINT_SIZE_UNLIMITED);
+        av_bprintf(&_logData, "%s", data->str);
     }
 
     return self;
@@ -197,8 +199,8 @@ void addSessionToSessionHistory(id<Session> session) {
     return _logLevel;
 }
 
-- (NSString*)getLogData {
-    return _logData;
+- (AVBPrint*)getLogData {
+    return &_logData;
 }
 
 - (int)getStatisticsFrameNumber {
@@ -247,15 +249,80 @@ void callbackNotify() {
     dispatch_semaphore_signal(semaphore);
 }
 
+static const char *avutil_log_get_level_str(int level) {
+    switch (level) {
+    case AV_LOG_STDERR:
+        return "stderr";
+    case AV_LOG_QUIET:
+        return "quiet";
+    case AV_LOG_DEBUG:
+        return "debug";
+    case AV_LOG_VERBOSE:
+        return "verbose";
+    case AV_LOG_INFO:
+        return "info";
+    case AV_LOG_WARNING:
+        return "warning";
+    case AV_LOG_ERROR:
+        return "error";
+    case AV_LOG_FATAL:
+        return "fatal";
+    case AV_LOG_PANIC:
+        return "panic";
+    default:
+        return "";
+    }
+}
+
+static void avutil_log_format_line(void *avcl, int level, const char *fmt, va_list vl, AVBPrint part[4], int *print_prefix) {
+    int flags = av_log_get_flags();
+    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
+    av_bprint_init(part+0, 0, 1);
+    av_bprint_init(part+1, 0, 1);
+    av_bprint_init(part+2, 0, 1);
+    av_bprint_init(part+3, 0, 65536);
+
+    if (*print_prefix && avc) {
+        if (avc->parent_log_context_offset) {
+            AVClass** parent = *(AVClass ***) (((uint8_t *) avcl) +
+                                   avc->parent_log_context_offset);
+            if (parent && *parent) {
+                av_bprintf(part+0, "[%s @ %p] ",
+                         (*parent)->item_name(parent), parent);
+            }
+        }
+        av_bprintf(part+1, "[%s @ %p] ",
+                 avc->item_name(avcl), avcl);
+    }
+
+    if (*print_prefix && (level > AV_LOG_QUIET) && (flags & AV_LOG_PRINT_LEVEL))
+        av_bprintf(part+2, "[%s] ", avutil_log_get_level_str(level));
+
+    av_vbprintf(part+3, fmt, vl);
+
+    if(*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
+        char lastc = part[3].len && part[3].len <= part[3].size ? part[3].str[part[3].len - 1] : 0;
+        *print_prefix = lastc == '\n' || lastc == '\r';
+    }
+}
+
+static void avutil_log_sanitize(uint8_t *line) {
+    while(*line){
+        if(*line < 0x08 || (*line > 0x0D && *line < 0x20))
+            *line='?';
+        line++;
+    }
+}
+
 /**
  * Adds log data to the end of callback data list.
  *
  * @param level log level
- * @param logData log data
+ * @param data log data
  */
-void logCallbackDataAdd(int level, NSString *logData) {
-    CallbackData* callbackData = [[CallbackData alloc] init:globalSessionId logLevel:level data:logData];
-    
+void logCallbackDataAdd(int level, AVBPrint *data) {
+    CallbackData* callbackData = [[CallbackData alloc] init:globalSessionId logLevel:level data:data];
+
     [lock lock];
     [callbackDataArray addObject:callbackData];
     [lock unlock];
@@ -361,6 +428,9 @@ void resetMessagesInTransmit(long sessionId) {
  * @param vargs arguments
  */
 void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
+    AVBPrint fullLine;
+    AVBPrint part[4];
+    int print_prefix = 1;
 
     // DO NOT PROCESS UNWANTED LOGS
     if (level >= 0) {
@@ -373,11 +443,26 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
         return;
     }
 
-    NSString *logData = [[NSString alloc] initWithFormat:[NSString stringWithCString:format encoding:NSUTF8StringEncoding] arguments:vargs];
+    av_bprint_init(&fullLine, 0, AV_BPRINT_SIZE_UNLIMITED);
 
-    if (logData.length > 0) {
-        logCallbackDataAdd(level, logData);
+    avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
+    avutil_log_sanitize(part[0].str);
+    avutil_log_sanitize(part[1].str);
+    avutil_log_sanitize(part[2].str);
+    avutil_log_sanitize(part[3].str);
+
+    // COMBINE ALL 4 LOG PARTS
+    av_bprintf(&fullLine, "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+
+    if (fullLine.len > 0) {
+        logCallbackDataAdd(level, &fullLine);
     }
+
+    av_bprint_finalize(part, NULL);
+    av_bprint_finalize(part+1, NULL);
+    av_bprint_finalize(part+2, NULL);
+    av_bprint_finalize(part+3, NULL);
+    av_bprint_finalize(&fullLine, NULL);
 }
 
 /**
@@ -395,9 +480,9 @@ void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float qu
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
-void process_log(long sessionId, int levelValue, NSString* logMessage) {
+void process_log(long sessionId, int levelValue, AVBPrint* logMessage) {
     int activeLogLevel = av_log_get_level();
-    Log* log = [[Log alloc] init:sessionId:levelValue:logMessage];
+    Log* log = [[Log alloc] init:sessionId:levelValue:[NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding]];
     BOOL globalCallbackDefined = false;
     BOOL sessionCallbackDefined = false;
     LogRedirectionStrategy activeLogRedirectionStrategy = globalLogRedirectionStrategy;
@@ -472,7 +557,7 @@ void process_log(long sessionId, int levelValue, NSString* logMessage) {
             break;
         default:
             // WRITE TO NSLOG
-            NSLog(@"%@: %@", [FFmpegKitConfig logLevelToString:levelValue], logMessage);
+            NSLog(@"%@: %@", [FFmpegKitConfig logLevelToString:levelValue], [NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding]);
             break;
     }
 }
@@ -526,6 +611,7 @@ void callbackBlockFunction() {
 
                     if ([callbackData getType] == LogType) {
                         process_log([callbackData getSessionId], [callbackData getLogLevel], [callbackData getLogData]);
+                        av_bprint_finalize([callbackData getLogData], NULL);
                     } else {
                         process_statistics([callbackData getSessionId],
                                            [callbackData getStatisticsFrameNumber],
