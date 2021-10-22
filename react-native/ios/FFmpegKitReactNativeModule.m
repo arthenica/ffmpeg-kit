@@ -86,6 +86,8 @@ RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
     return self;
 }
 
+
+
 - (NSArray<NSString*>*)supportedEvents {
     NSMutableArray *array = [NSMutableArray array];
 
@@ -626,6 +628,10 @@ RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve rejecter:
 
 - (void)disableStatistics {
     statisticsEnabled = false;
+}
+
++ (BOOL)requiresMainQueueSetup {
+  return NO;
 }
 
 + (NSDictionary*)toSessionDictionary:(id<Session>) session {
