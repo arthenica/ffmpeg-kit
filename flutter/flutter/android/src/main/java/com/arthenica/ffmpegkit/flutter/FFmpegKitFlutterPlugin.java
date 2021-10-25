@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -57,12 +58,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -249,72 +249,72 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        final Optional<Integer> sessionIdOptional = Optional.ofNullable(call.argument(ARGUMENT_SESSION_ID));
+        final Integer sessionId = call.argument(ARGUMENT_SESSION_ID);
         final Integer waitTimeout = call.argument(ARGUMENT_WAIT_TIMEOUT);
-        final Optional<List<String>> argumentsOptional = Optional.ofNullable(call.argument(ARGUMENT_ARGUMENTS));
-        final Optional<String> ffprobeJsonOutputOptional = Optional.ofNullable(call.argument(ARGUMENT_FFPROBE_JSON_OUTPUT));
-        final Optional<Boolean> writableOptional = Optional.ofNullable(call.argument(ARGUMENT_WRITABLE));
+        final List<String> arguments = call.argument(ARGUMENT_ARGUMENTS);
+        final String ffprobeJsonOutput = call.argument(ARGUMENT_FFPROBE_JSON_OUTPUT);
+        final Boolean writable = call.argument(ARGUMENT_WRITABLE);
 
         switch (call.method) {
             case "abstractSessionGetEndTime":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetEndTime(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetEndTime(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetDuration":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetDuration(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetDuration(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetAllLogs":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetAllLogs(sessionIdOptional.get(), waitTimeout, result);
+                if (sessionId != null) {
+                    abstractSessionGetAllLogs(sessionId, waitTimeout, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetLogs":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetLogs(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetLogs(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetAllLogsAsString":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetAllLogsAsString(sessionIdOptional.get(), waitTimeout, result);
+                if (sessionId != null) {
+                    abstractSessionGetAllLogsAsString(sessionId, waitTimeout, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetState":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetState(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetState(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetReturnCode":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetReturnCode(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetReturnCode(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "abstractSessionGetFailStackTrace":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionGetFailStackTrace(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionGetFailStackTrace(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "thereAreAsynchronousMessagesInTransmit":
-                if (sessionIdOptional.isPresent()) {
-                    abstractSessionThereAreAsynchronousMessagesInTransmit(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    abstractSessionThereAreAsynchronousMessagesInTransmit(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
@@ -323,50 +323,50 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getArch(result);
                 break;
             case "ffmpegSession":
-                if (argumentsOptional.isPresent()) {
-                    ffmpegSession(argumentsOptional.get(), result);
+                if (arguments != null) {
+                    ffmpegSession(arguments, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_ARGUMENTS", "Invalid arguments array.");
                 }
                 break;
             case "ffmpegSessionGetAllStatistics":
-                if (sessionIdOptional.isPresent()) {
-                    ffmpegSessionGetAllStatistics(sessionIdOptional.get(), waitTimeout, result);
+                if (sessionId != null) {
+                    ffmpegSessionGetAllStatistics(sessionId, waitTimeout, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "ffmpegSessionGetStatistics":
-                if (sessionIdOptional.isPresent()) {
-                    ffmpegSessionGetStatistics(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    ffmpegSessionGetStatistics(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "ffprobeSession":
-                if (argumentsOptional.isPresent()) {
-                    ffprobeSession(argumentsOptional.get(), result);
+                if (arguments != null) {
+                    ffprobeSession(arguments, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_ARGUMENTS", "Invalid arguments array.");
                 }
                 break;
             case "mediaInformationSession":
-                if (argumentsOptional.isPresent()) {
-                    mediaInformationSession(argumentsOptional.get(), result);
+                if (arguments != null) {
+                    mediaInformationSession(arguments, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_ARGUMENTS", "Invalid arguments array.");
                 }
                 break;
             case "mediaInformationJsonParserFrom":
-                if (ffprobeJsonOutputOptional.isPresent()) {
-                    mediaInformationJsonParserFrom(ffprobeJsonOutputOptional.get(), result);
+                if (ffprobeJsonOutput != null) {
+                    mediaInformationJsonParserFrom(ffprobeJsonOutput, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_FFPROBE_JSON_OUTPUT", "Invalid ffprobe json output.");
                 }
                 break;
             case "mediaInformationJsonParserFromWithError":
-                if (ffprobeJsonOutputOptional.isPresent()) {
-                    mediaInformationJsonParserFromWithError(ffprobeJsonOutputOptional.get(), result);
+                if (ffprobeJsonOutput != null) {
+                    mediaInformationJsonParserFromWithError(ffprobeJsonOutput, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_FFPROBE_JSON_OUTPUT", "Invalid ffprobe json output.");
                 }
@@ -390,28 +390,28 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 disableStatistics(result);
                 break;
             case "setFontconfigConfigurationPath":
-                final Optional<String> pathOptional = Optional.ofNullable(call.argument("path"));
-                if (pathOptional.isPresent()) {
-                    setFontconfigConfigurationPath(pathOptional.get(), result);
+                final String path = call.argument("path");
+                if (path != null) {
+                    setFontconfigConfigurationPath(path, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_PATH", "Invalid path.");
                 }
                 break;
             case "setFontDirectory": {
-                final Optional<String> fontDirectoryOptional = Optional.ofNullable(call.argument("fontDirectory"));
+                final String fontDirectory = call.argument("fontDirectory");
                 final Map<String, String> fontNameMap = call.argument("fontNameMap");
-                if (fontDirectoryOptional.isPresent()) {
-                    setFontDirectory(fontDirectoryOptional.get(), fontNameMap, result);
+                if (fontDirectory != null) {
+                    setFontDirectory(fontDirectory, fontNameMap, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_FONT_DIRECTORY", "Invalid font directory.");
                 }
                 break;
             }
             case "setFontDirectoryList": {
-                final Optional<List<String>> fontDirectoryListOptional = Optional.ofNullable(call.argument("fontDirectoryList"));
+                final List<String> fontDirectoryList = call.argument("fontDirectoryList");
                 final Map<String, String> fontNameMap = call.argument("fontNameMap");
-                if (fontDirectoryListOptional.isPresent()) {
-                    setFontDirectoryList(fontDirectoryListOptional.get(), fontNameMap, result);
+                if (fontDirectoryList != null) {
+                    setFontDirectoryList(fontDirectoryList, fontNameMap, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_FONT_DIRECTORY_LIST", "Invalid font directory list.");
                 }
@@ -421,9 +421,9 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 registerNewFFmpegPipe(result);
                 break;
             case "closeFFmpegPipe":
-                final Optional<String> ffmpegPipePathOptional = Optional.ofNullable(call.argument("ffmpegPipePath"));
-                if (ffmpegPipePathOptional.isPresent()) {
-                    closeFFmpegPipe(ffmpegPipePathOptional.get(), result);
+                final String ffmpegPipePath = call.argument("ffmpegPipePath");
+                if (ffmpegPipePath != null) {
+                    closeFFmpegPipe(ffmpegPipePath, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_PIPE_PATH", "Invalid ffmpeg pipe path.");
                 }
@@ -438,42 +438,42 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getBuildDate(result);
                 break;
             case "setEnvironmentVariable":
-                final Optional<String> variableNameOptional = Optional.ofNullable(call.argument("variableName"));
-                final Optional<String> variableValueOptional = Optional.ofNullable(call.argument("variableValue"));
+                final String variableName = call.argument("variableName");
+                final String variableValue = call.argument("variableValue");
 
-                if (variableNameOptional.isPresent() && variableValueOptional.isPresent()) {
-                    setEnvironmentVariable(variableNameOptional.get(), variableValueOptional.get(), result);
-                } else if (variableValueOptional.isPresent()) {
+                if (variableName != null && variableValue != null) {
+                    setEnvironmentVariable(variableName, variableValue, result);
+                } else if (variableValue != null) {
                     resultHandler.errorAsync(result, "INVALID_NAME", "Invalid environment variable name.");
                 } else {
                     resultHandler.errorAsync(result, "INVALID_VALUE", "Invalid environment variable value.");
                 }
                 break;
             case "ignoreSignal":
-                final Optional<Integer> signalOptional = Optional.ofNullable(call.argument("signal"));
-                if (signalOptional.isPresent()) {
-                    ignoreSignal(signalOptional.get(), result);
+                final Integer signal = call.argument("signal");
+                if (signal != null) {
+                    ignoreSignal(signal, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SIGNAL", "Invalid signal value.");
                 }
                 break;
             case "asyncFFmpegSessionExecute":
-                if (sessionIdOptional.isPresent()) {
-                    asyncFFmpegSessionExecute(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    asyncFFmpegSessionExecute(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "asyncFFprobeSessionExecute":
-                if (sessionIdOptional.isPresent()) {
-                    asyncFFprobeSessionExecute(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    asyncFFprobeSessionExecute(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "asyncMediaInformationSessionExecute":
-                if (sessionIdOptional.isPresent()) {
-                    asyncMediaInformationSessionExecute(sessionIdOptional.get(), waitTimeout, result);
+                if (sessionId != null) {
+                    asyncMediaInformationSessionExecute(sessionId, waitTimeout, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
@@ -482,9 +482,9 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getLogLevel(result);
                 break;
             case "setLogLevel":
-                final Optional<Integer> levelOptional = Optional.ofNullable(call.argument("level"));
-                if (levelOptional.isPresent()) {
-                    setLogLevel(levelOptional.get(), result);
+                final Integer level = call.argument("level");
+                if (level != null) {
+                    setLogLevel(level, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_LEVEL", "Invalid level value.");
                 }
@@ -493,16 +493,16 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getSessionHistorySize(result);
                 break;
             case "setSessionHistorySize":
-                final Optional<Integer> sessionHistorySizeOptional = Optional.ofNullable(call.argument("sessionHistorySize"));
-                if (sessionHistorySizeOptional.isPresent()) {
-                    setSessionHistorySize(sessionHistorySizeOptional.get(), result);
+                final Integer sessionHistorySize = call.argument("sessionHistorySize");
+                if (sessionHistorySize != null) {
+                    setSessionHistorySize(sessionHistorySize, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SIZE", "Invalid session history size value.");
                 }
                 break;
             case "getSession":
-                if (sessionIdOptional.isPresent()) {
-                    getSession(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    getSession(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
@@ -520,9 +520,9 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 clearSessions(result);
                 break;
             case "getSessionsByState":
-                final Optional<Integer> stateOptional = Optional.ofNullable(call.argument("state"));
-                if (stateOptional.isPresent()) {
-                    getSessionsByState(stateOptional.get(), result);
+                final Integer state = call.argument("state");
+                if (state != null) {
+                    getSessionsByState(state, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION_STATE", "Invalid session state value.");
                 }
@@ -531,16 +531,16 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getLogRedirectionStrategy(result);
                 break;
             case "setLogRedirectionStrategy":
-                final Optional<Integer> strategyOptional = Optional.ofNullable(call.argument("strategy"));
-                if (strategyOptional.isPresent()) {
-                    setLogRedirectionStrategy(strategyOptional.get(), result);
+                final Integer strategy = call.argument("strategy");
+                if (strategy != null) {
+                    setLogRedirectionStrategy(strategy, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_LOG_REDIRECTION_STRATEGY", "Invalid log redirection strategy value.");
                 }
                 break;
             case "messagesInTransmit":
-                if (sessionIdOptional.isPresent()) {
-                    messagesInTransmit(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    messagesInTransmit(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
@@ -549,11 +549,11 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 getPlatform(result);
                 break;
             case "writeToPipe":
-                final Optional<String> inputOptional = Optional.ofNullable(call.argument("input"));
-                final Optional<String> pipeOptional = Optional.ofNullable(call.argument("pipe"));
-                if (inputOptional.isPresent() && pipeOptional.isPresent()) {
-                    writeToPipe(inputOptional.get(), pipeOptional.get(), result);
-                } else if (pipeOptional.isPresent()) {
+                final String input = call.argument("input");
+                final String pipe = call.argument("pipe");
+                if (input != null && pipe != null) {
+                    writeToPipe(input, pipe, result);
+                } else if (pipe != null) {
                     resultHandler.errorAsync(result, "INVALID_INPUT", "Invalid input value.");
                 } else {
                     resultHandler.errorAsync(result, "INVALID_PIPE", "Invalid pipe value.");
@@ -562,19 +562,24 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
             case "selectDocument":
                 final String title = call.argument("title");
                 final String type = call.argument("type");
-                final Optional<List<String>> extraTypesOptional = Optional.ofNullable(call.argument("extraTypes"));
-                final String[] extraTypesArray = extraTypesOptional.map(strings -> strings.toArray(new String[0])).orElse(null);
-                if (writableOptional.isPresent()) {
-                    selectDocument(writableOptional.get(), title, type, extraTypesArray, result);
+                final List<String> extraTypes = call.argument("extraTypes");
+                final String[] extraTypesArray;
+                if (extraTypes != null) {
+                    extraTypesArray = extraTypes.toArray(new String[0]);
+                } else {
+                    extraTypesArray = null;
+                }
+                if (writable != null) {
+                    selectDocument(writable, title, type, extraTypesArray, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_WRITABLE", "Invalid writable value.");
                 }
                 break;
             case "getSafParameter":
-                final Optional<String> uriOptional = Optional.ofNullable(call.argument("uri"));
-                if (writableOptional.isPresent() && uriOptional.isPresent()) {
-                    getSafParameter(writableOptional.get(), uriOptional.get(), result);
-                } else if (uriOptional.isPresent()) {
+                final String uri = call.argument("uri");
+                if (writable != null && uri != null) {
+                    getSafParameter(writable, uri, result);
+                } else if (uri != null) {
                     resultHandler.errorAsync(result, "INVALID_WRITABLE", "Invalid writable value.");
                 } else {
                     resultHandler.errorAsync(result, "INVALID_URI", "Invalid uri value.");
@@ -584,8 +589,8 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 cancel(result);
                 break;
             case "cancelSession":
-                if (sessionIdOptional.isPresent()) {
-                    cancelSession(sessionIdOptional.get(), result);
+                if (sessionId != null) {
+                    cancelSession(sessionId, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
@@ -711,7 +716,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
             }
             final List<com.arthenica.ffmpegkit.Log> allLogs = session.getAllLogs(timeout);
-            resultHandler.successAsync(result, allLogs.stream().map(FFmpegKitFlutterPlugin::toMap).collect(Collectors.toList()));
+            resultHandler.successAsync(result, toLogMapList(allLogs));
         }
     }
 
@@ -721,7 +726,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
             final List<com.arthenica.ffmpegkit.Log> allLogs = session.getLogs();
-            resultHandler.successAsync(result, allLogs.stream().map(FFmpegKitFlutterPlugin::toMap).collect(Collectors.toList()));
+            resultHandler.successAsync(result, toLogMapList(allLogs));
         }
     }
 
@@ -808,7 +813,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                     timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
                 }
                 final List<Statistics> allStatistics = ((FFmpegSession) session).getAllStatistics(timeout);
-                resultHandler.successAsync(result, allStatistics.stream().map(FFmpegKitFlutterPlugin::toMap).collect(Collectors.toList()));
+                resultHandler.successAsync(result, toStatisticsMapList(allStatistics));
             } else {
                 resultHandler.errorAsync(result, "NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
             }
@@ -822,7 +827,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         } else {
             if (session instanceof FFmpegSession) {
                 final List<Statistics> statistics = ((FFmpegSession) session).getStatistics();
-                resultHandler.successAsync(result, statistics.stream().map(FFmpegKitFlutterPlugin::toMap).collect(Collectors.toList()));
+                resultHandler.successAsync(result, toStatisticsMapList(statistics));
             } else {
                 resultHandler.errorAsync(result, "NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
             }
@@ -1074,7 +1079,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void getSessions(@NonNull final Result result) {
-        resultHandler.successAsync(result, toSessionArray(FFmpegKitConfig.getSessions()));
+        resultHandler.successAsync(result, toSessionMapList(FFmpegKitConfig.getSessions()));
     }
 
     protected void clearSessions(@NonNull final Result result) {
@@ -1083,7 +1088,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void getSessionsByState(@NonNull final Integer sessionState, @NonNull final Result result) {
-        resultHandler.successAsync(result, toSessionArray(FFmpegKitConfig.getSessionsByState(toSessionState(sessionState))));
+        resultHandler.successAsync(result, toSessionMapList(FFmpegKitConfig.getSessionsByState(toSessionState(sessionState))));
     }
 
     protected void getLogRedirectionStrategy(@NonNull final Result result) {
@@ -1109,6 +1114,12 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void selectDocument(@NonNull final Boolean writable, @Nullable final String title, @Nullable final String type, @Nullable final String[] extraTypes, @NonNull final Result result) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            android.util.Log.i(LIBRARY_NAME, String.format(Locale.getDefault(), "selectDocument is not supported on API Level %d", Build.VERSION.SDK_INT));
+            resultHandler.errorAsync(result, "SELECT_FAILED", String.format(Locale.getDefault(), "selectDocument is not supported on API Level %d", Build.VERSION.SDK_INT));
+            return;
+        }
+
         final Intent intent;
         if (writable) {
             intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -1153,6 +1164,12 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void getSafParameter(@NonNull final Boolean writable, @NonNull final String uriString, @NonNull final Result result) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            android.util.Log.i(LIBRARY_NAME, String.format(Locale.getDefault(), "getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
+            resultHandler.errorAsync(result, "SELECT_FAILED", String.format(Locale.getDefault(), "getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
+            return;
+        }
+
         if (context != null) {
             final Uri uri = Uri.parse(uriString);
             if (uri == null) {
@@ -1189,13 +1206,13 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void getFFmpegSessions(@NonNull final Result result) {
-        resultHandler.successAsync(result, toSessionArray(FFmpegKit.listSessions()));
+        resultHandler.successAsync(result, toSessionMapList(FFmpegKit.listSessions()));
     }
 
     // FFprobeKit
 
     protected void getFFprobeSessions(@NonNull final Result result) {
-        resultHandler.successAsync(result, toSessionArray(FFprobeKit.listSessions()));
+        resultHandler.successAsync(result, toSessionMapList(FFprobeKit.listSessions()));
     }
 
     // Packages
@@ -1339,16 +1356,6 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         return statisticsMap;
     }
 
-    protected static List<Map<String, Object>> toSessionArray(final List<? extends Session> sessions) {
-        final List<Map<String, Object>> sessionArray = new ArrayList<>();
-
-        for (int i = 0; i < sessions.size(); i++) {
-            sessionArray.add(toMap(sessions.get(i)));
-        }
-
-        return sessionArray;
-    }
-
     protected static Map<String, Object> toMap(final MediaInformation mediaInformation) {
         Map<String, Object> map = new HashMap<>();
 
@@ -1399,6 +1406,36 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 }
                 list.add(value);
             }
+        }
+
+        return list;
+    }
+
+    protected static List<Map<String, Object>> toSessionMapList(final List<? extends Session> sessionList) {
+        final List<Map<String, Object>> list = new ArrayList<>();
+
+        for (int i = 0; i < sessionList.size(); i++) {
+            list.add(toMap(sessionList.get(i)));
+        }
+
+        return list;
+    }
+
+    protected static List<Map<String, Object>> toLogMapList(final List<com.arthenica.ffmpegkit.Log> logList) {
+        final List<Map<String, Object>> list = new ArrayList<>();
+
+        for (int i = 0; i < logList.size(); i++) {
+            list.add(toMap(logList.get(i)));
+        }
+
+        return list;
+    }
+
+    protected static List<Map<String, Object>> toStatisticsMapList(final List<com.arthenica.ffmpegkit.Statistics> statisticsList) {
+        final List<Map<String, Object>> list = new ArrayList<>();
+
+        for (int i = 0; i < statisticsList.size(); i++) {
+            list.add(toMap(statisticsList.get(i)));
         }
 
         return list;
