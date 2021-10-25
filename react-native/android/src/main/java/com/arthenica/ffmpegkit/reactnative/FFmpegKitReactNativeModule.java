@@ -74,7 +74,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
 public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
@@ -235,7 +234,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
           timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
         }
         final List<com.arthenica.ffmpegkit.Log> allLogs = session.getAllLogs(timeout);
-        promise.resolve(toArray(allLogs.stream().map(FFmpegKitReactNativeModule::toMap)));
+        promise.resolve(toLogArray(allLogs));
       }
     } else {
       promise.reject("INVALID_SESSION", "Invalid session id.");
@@ -250,7 +249,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
         final List<com.arthenica.ffmpegkit.Log> allLogs = session.getLogs();
-        promise.resolve(toArray(allLogs.stream().map(FFmpegKitReactNativeModule::toMap)));
+        promise.resolve(toLogArray(allLogs));
       }
     } else {
       promise.reject("INVALID_SESSION", "Invalid session id.");
@@ -368,7 +367,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
             timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
           }
           final List<Statistics> allStatistics = ((FFmpegSession) session).getAllStatistics(timeout);
-          promise.resolve(toArray(allStatistics.stream().map(FFmpegKitReactNativeModule::toMap)));
+          promise.resolve(toStatisticsArray(allStatistics));
         } else {
           promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
         }
@@ -387,7 +386,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       } else {
         if (session instanceof FFmpegSession) {
           final List<Statistics> statistics = ((FFmpegSession) session).getStatistics();
-          promise.resolve(toArray(statistics.stream().map(FFmpegKitReactNativeModule::toMap)));
+          promise.resolve(toStatisticsArray(statistics));
         } else {
           promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
         }
@@ -1046,16 +1045,6 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     return statisticsMap;
   }
 
-  protected static WritableArray toSessionArray(final List<? extends Session> sessions) {
-    final WritableArray sessionArray = Arguments.createArray();
-
-    for (int i = 0; i < sessions.size(); i++) {
-      sessionArray.pushMap(toMap(sessions.get(i)));
-    }
-
-    return sessionArray;
-  }
-
   protected static WritableMap toMap(final MediaInformation mediaInformation) {
     WritableMap map = Arguments.createMap();
 
@@ -1102,14 +1091,6 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     return map;
   }
 
-  protected static WritableArray toArray(final Stream<WritableMap> stream) {
-    final WritableArray list = Arguments.createArray();
-
-    stream.forEachOrdered(list::pushMap);
-
-    return list;
-  }
-
   protected static WritableArray toList(final JSONArray array) {
     final WritableArray list = Arguments.createArray();
 
@@ -1150,6 +1131,36 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     }
 
     return arguments.toArray(new String[0]);
+  }
+
+  protected static WritableArray toSessionArray(final List<? extends Session> sessionList) {
+    final WritableArray sessionArray = Arguments.createArray();
+
+    for (int i = 0; i < sessionList.size(); i++) {
+      sessionArray.pushMap(toMap(sessionList.get(i)));
+    }
+
+    return sessionArray;
+  }
+
+  protected static WritableArray toLogArray(final List<com.arthenica.ffmpegkit.Log> logList) {
+    final WritableArray logArray = Arguments.createArray();
+
+    for (int i = 0; i < logList.size(); i++) {
+      logArray.pushMap(toMap(logList.get(i)));
+    }
+
+    return logArray;
+  }
+
+  protected static WritableArray toStatisticsArray(final List<com.arthenica.ffmpegkit.Statistics> statisticsList) {
+    final WritableArray statisticsArray = Arguments.createArray();
+
+    for (int i = 0; i < statisticsList.size(); i++) {
+      statisticsArray.pushMap(toMap(statisticsList.get(i)));
+    }
+
+    return statisticsArray;
   }
 
   protected static boolean isValidPositiveNumber(final Double value) {
