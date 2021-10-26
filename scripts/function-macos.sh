@@ -70,7 +70,7 @@ get_common_cflags() {
 
   case ${ARCH} in
   arm64)
-    echo "-fstrict-aliasing -fembed-bitcode -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
     ;;
   *)
     echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
@@ -209,7 +209,7 @@ get_cxxflags() {
     local OPTIMIZATION_FLAGS="${FFMPEG_KIT_DEBUG}"
   fi
 
-  local BITCODE_FLAGS="-fembed-bitcode"
+  local BITCODE_FLAGS=""
 
   case $1 in
   x265)
@@ -262,7 +262,7 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
   case ${ARCH} in
   arm64)
-    echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target)"
+    echo "-arch arm64 -march=armv8-a+crc+crypto -target $(get_target)"
     ;;
   x86-64)
     echo "-arch x86_64 -march=x86-64 -target $(get_target)"
@@ -284,7 +284,7 @@ get_ldflags() {
   ffmpeg-kit)
     case ${ARCH} in
     arm64)
-      echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
+      echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
       ;;
     x86-64)
       echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
