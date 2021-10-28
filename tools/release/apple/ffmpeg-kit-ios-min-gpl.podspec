@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-ios-min-gpl"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit iOS Min GPL Static Framework"
+    s.summary           = "FFmpeg Kit iOS Min GPL Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC

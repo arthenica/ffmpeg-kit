@@ -59,7 +59,9 @@ arm64)
   TARGET_CPU="armv8"
   TARGET_ARCH="aarch64"
   ASM_OPTIONS=" --enable-neon --enable-asm"
-  BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
+  if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
+    BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
+  fi
   ;;
 arm64-mac-catalyst)
   TARGET_CPU="armv8"
@@ -317,12 +319,16 @@ for library in {1..59}; do
         ;;
       *-bzip2)
         CONFIGURE_POSTFIX+=" --enable-bzlib"
+        FFMPEG_CFLAGS+=" $(pkg-config --cflags bzip2 2>>"${BASEDIR}"/build.log)"
+        FFMPEG_LDFLAGS+=" $(pkg-config --libs bzip2 2>>"${BASEDIR}"/build.log)"
         ;;
       *-coreimage)
         CONFIGURE_POSTFIX+=" --enable-coreimage --enable-appkit"
         ;;
       *-libiconv)
         CONFIGURE_POSTFIX+=" --enable-iconv"
+        FFMPEG_CFLAGS+=" $(pkg-config --cflags libiconv 2>>"${BASEDIR}"/build.log)"
+        FFMPEG_LDFLAGS+=" $(pkg-config --libs libiconv 2>>"${BASEDIR}"/build.log)"
         ;;
       *-opencl)
         CONFIGURE_POSTFIX+=" --enable-opencl"
@@ -335,6 +341,8 @@ for library in {1..59}; do
         ;;
       *-zlib)
         CONFIGURE_POSTFIX+=" --enable-zlib"
+        FFMPEG_CFLAGS+=" $(pkg-config --cflags zlib 2>>"${BASEDIR}"/build.log)"
+        FFMPEG_LDFLAGS+=" $(pkg-config --libs zlib 2>>"${BASEDIR}"/build.log)"
         ;;
       esac
       ;;
@@ -367,8 +375,8 @@ for library in {1..59}; do
   fi
 done
 
-# ALWAYS BUILD STATIC LIBRARIES
-BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared"
+# ALWAYS BUILD SHARED LIBRARIES
+BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static --install-name-dir=@rpath"
 
 # OPTIMIZE FOR SPEED INSTEAD OF SIZE
 if [[ -z ${FFMPEG_KIT_OPTIMIZED_FOR_SPEED} ]]; then
@@ -420,6 +428,9 @@ if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
   # WORKAROUND TO MANUALLY DELETE UNCLEANED FILES
   rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavfilter/opencl/*.o 1>>"${BASEDIR}"/build.log 2>&1
   rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavcodec/neon/*.o 1>>"${BASEDIR}"/build.log 2>&1
+
+  # DELETE SHARED FRAMEWORK WORKAROUNDS
+  git checkout "${BASEDIR}/src/ffmpeg/ffbuild" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
 ########################### CUSTOMIZATIONS #######################
@@ -512,35 +523,83 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
-  make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
+build_ffmpeg() {
+  if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
+    make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
+
+    if [[ $? -ne 0 ]]; then
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+  else
+    echo -e "started\n"
+    make -j$(get_cpu_count)
+
+    if [[ $? -ne 0 ]]; then
+      echo -n -e "\n${LIB_NAME}: failed\n\nSee build.log for details\n"
+      exit 1
+    else
+      echo -n -e "\n${LIB_NAME}: "
+    fi
+  fi
+}
+
+install_ffmpeg() {
+
+  if [[ -n $1 ]]; then
+
+    # DELETE THE PREVIOUS BUILD
+    if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
+      rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    fi
+  else
+
+    # LEAVE EVERYTHING EXCEPT frameworks
+    rm -rf "${FFMPEG_LIBRARY_PATH}/include" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/share" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  fi
+  make install 1>>"${BASEDIR}"/build.log 2>&1
 
   if [[ $? -ne 0 ]]; then
     echo -e "failed\n\nSee build.log for details\n"
     exit 1
   fi
-else
-  echo -e "started\n"
-  make -j$(get_cpu_count)
+}
 
-  if [[ $? -ne 0 ]]; then
-    echo -n -e "\n${LIB_NAME}: failed\n\nSee build.log for details\n"
-    exit 1
-  else
-    echo -n -e "\n${LIB_NAME}: "
-  fi
-fi
+${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-# DELETE THE PREVIOUS BUILD OF THE LIBRARY BEFORE INSTALLING
-if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
-  rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-fi
-make install 1>>"${BASEDIR}"/build.log 2>&1
+# BUILD DYNAMIC LIBRARIES WITH DEFAULT OPTIONS
+build_ffmpeg
+install_ffmpeg "true"
 
-if [[ $? -ne 0 ]]; then
-  echo -e "failed\n\nSee build.log for details\n"
-  exit 1
-fi
+# CLEAN THE OUTPUT OF FIRST BUILD
+find . -name "*.dylib" -delete 1>>"${BASEDIR}"/build.log 2>&1
+
+echo -e "\nShared libraries built successfully. Building frameworks.\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+create_temporary_framework() {
+  local FRAMEWORK_NAME="$1"
+  mkdir -p "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  cp "${FFMPEG_LIBRARY_PATH}/lib/${FRAMEWORK_NAME}.dylib" "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+}
+
+create_temporary_framework "libavcodec"
+create_temporary_framework "libavdevice"
+create_temporary_framework "libavfilter"
+create_temporary_framework "libavformat"
+create_temporary_framework "libavutil"
+create_temporary_framework "libswresample"
+create_temporary_framework "libswscale"
+
+${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} "s|^ALLFFLIBS = .*|ALLFFLIBS = ${FFMPEG_LIBRARY_PATH}/framework|g" ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's|$(LD_LIB)|-framework lib% |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's|$(LD_PATH)lib|-F |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
+# BUILD FRAMEWORKS AS DYNAMIC LIBRARIES
+build_ffmpeg
+install_ffmpeg
 
 # MANUALLY ADD REQUIRED HEADERS
 mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86 1>>"${BASEDIR}"/build.log 2>&1

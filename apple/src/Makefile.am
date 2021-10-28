@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libffmpegkit.la
 
-libffmpegkit_la_LIBADD = @FFMPEG_LIBS@
+libffmpegkit_la_LIBADD = @FFMPEG_FRAMEWORKS@
 
 libffmpegkit_la_SOURCES = \
     AbstractSession.m \

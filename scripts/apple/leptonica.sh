@@ -17,7 +17,7 @@ export LIBTIFF_CFLAGS="$(pkg-config --cflags libtiff-4)"
 export LIBTIFF_LIBS="$(pkg-config --libs --static libtiff-4)"
 
 export ZLIB_CFLAGS="$(pkg-config --cflags zlib)"
-export ZLIB_LIBS="$(pkg-config --libs --static zlib)"
+export ZLIB_LIBS="$(pkg-config --libs zlib)"
 
 export JPEG_CFLAGS="$(pkg-config --cflags libjpeg)"
 export JPEG_LIBS="$(pkg-config --libs --static libjpeg)"

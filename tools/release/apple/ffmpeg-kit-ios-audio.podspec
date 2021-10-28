@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-ios-audio"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit iOS Audio Static Framework"
+    s.summary           = "FFmpeg Kit iOS Audio Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC

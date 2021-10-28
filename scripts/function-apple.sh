@@ -185,109 +185,6 @@ initialize_folder() {
 }
 
 #
-# 1. library index
-# 2. static library name
-# 3. universal library directory
-# 4. target architectures array
-#
-# DEPENDS TARGET_ARCH_LIST VARIABLE
-#
-create_single_universal_library() {
-  local LIBRARY_INDEX="$1"
-  local STATIC_LIBRARY_NAME="$2"
-  local UNIVERSAL_DIRECTORY_PATH="$3"
-  local TARGET_ARCHITECTURES=("$4")
-  local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-  local LIPO="$(xcrun --sdk "$(get_default_sdk_name)" -f lipo)"
-
-  local LIPO_COMMAND="${LIPO} -create"
-
-  for ARCH in "${TARGET_ARCH_LIST[@]}"; do
-    if [[ " ${TARGET_ARCHITECTURES[*]} " == *" ${ARCH} "* ]]; then
-      local FULL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_build_directory)/${LIBRARY_NAME}/lib/${STATIC_LIBRARY_NAME}"
-      LIPO_COMMAND+=" ${FULL_LIBRARY_PATH}"
-    fi
-  done
-
-  LIPO_COMMAND+=" -output ${UNIVERSAL_DIRECTORY_PATH}/lib/${STATIC_LIBRARY_NAME}"
-
-  mkdir -p "${UNIVERSAL_DIRECTORY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1
-
-  ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
-
-  if [[ $? -ne 0 ]]; then
-    echo -e "\nINFO: Failed to build universal ${LIBRARY_NAME} library\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-
-  RC=$(copy_external_library_license "$LIBRARY_INDEX" "${UNIVERSAL_DIRECTORY_PATH}")
-
-  if [[ ${RC} -ne 0 ]]; then
-    echo -e "\nINFO: Failed to build universal ${LIBRARY_NAME} library\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-}
-
-#
-# 1. library index
-# 2. architecture variant
-#
-# DEPENDS TARGET_ARCH_LIST VARIABLE
-#
-create_universal_library() {
-  local LIBRARY_INDEX="$1"
-  local ARCHITECTURE_VARIANT="$2"
-  local TARGET_ARCHITECTURES=("$(get_apple_architectures_for_variant "${ARCHITECTURE_VARIANT}")")
-  local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-  local UNIVERSAL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
-
-  if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
-
-    # THERE ARE NO ARCHITECTURES ENABLED FOR THIS LIBRARY TYPE
-    return
-  fi
-
-  initialize_folder "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}"
-
-  if [[ ${LIBRARY_LIBTHEORA} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_universal_library "${LIBRARY_INDEX}" "libtheora.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libtheoraenc.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libtheoradec.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  elif [[ ${LIBRARY_LIBVORBIS} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_universal_library "${LIBRARY_INDEX}" "libvorbisfile.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libvorbisenc.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libvorbis.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  elif [[ ${LIBRARY_LIBWEBP} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_universal_library "${LIBRARY_INDEX}" "libwebpmux.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libwebpdemux.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libwebp.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  elif [[ ${LIBRARY_OPENCOREAMR} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_universal_library "${LIBRARY_INDEX}" "libopencore-amrnb.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  elif [[ ${LIBRARY_NETTLE} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_universal_library "${LIBRARY_INDEX}" "libnettle.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-    create_single_universal_library "${LIBRARY_INDEX}" "libhogweed.a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  else
-
-    create_single_universal_library "${LIBRARY_INDEX}" "$(get_static_archive_name "${LIBRARY_INDEX}").a" "${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}" "${TARGET_ARCHITECTURES[@]}"
-
-  fi
-
-  echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
-}
-
-#
 # 1. architecture variant
 #
 # DEPENDS TARGET_ARCH_LIST VARIABLE
@@ -296,8 +193,8 @@ create_ffmpeg_universal_library() {
   local ARCHITECTURE_VARIANT="$1"
   local TARGET_ARCHITECTURES=("$(get_apple_architectures_for_variant "${ARCHITECTURE_VARIANT}")")
   local LIBRARY_NAME="ffmpeg"
-  local UNIVERSAL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
-  local FFMPEG_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
   local LIPO="$(xcrun --sdk "$(get_default_sdk_name)" -f lipo)"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
@@ -307,43 +204,52 @@ create_ffmpeg_universal_library() {
   fi
 
   # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
-  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_PATH}"
-  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include"
-  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib"
+  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"
+  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}/include"
+  initialize_folder "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}/lib"
 
   local FFMPEG_DEFAULT_BUILD_PATH="${BASEDIR}/prebuilt/$(get_default_build_directory)/ffmpeg"
 
   # COPY HEADER FILES
-  cp -r "${FFMPEG_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_UNIVERSAL_LIBRARY_PATH}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  cp "${FFMPEG_DEFAULT_BUILD_PATH}"/include/config.h "${FFMPEG_UNIVERSAL_LIBRARY_PATH}"/include 1>>"${BASEDIR}"/build.log 2>&1
+  cp -r "${FFMPEG_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
+  cp "${FFMPEG_DEFAULT_BUILD_PATH}"/include/config.h "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
 
   for FFMPEG_LIB in "${FFMPEG_LIBS[@]}"; do
+    local FFMPEG_LIB_UNIVERSAL_LIBRARY_PATH="${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}/lib/${FFMPEG_LIB}.dylib"
+
     LIPO_COMMAND="${LIPO} -create"
 
     for ARCH in "${TARGET_ARCH_LIST[@]}"; do
       if [[ " ${TARGET_ARCHITECTURES[*]} " == *" ${ARCH} "* ]]; then
-        local FULL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_build_directory)/${LIBRARY_NAME}/lib/${FFMPEG_LIB}.a"
+        local FULL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_build_directory)/${LIBRARY_NAME}/lib/${FFMPEG_LIB}.$(get_ffmpeg_library_version ${FFMPEG_LIB}).dylib"
         LIPO_COMMAND+=" ${FULL_LIBRARY_PATH}"
       fi
     done
 
-    LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.a"
+    LIPO_COMMAND+=" -output ${FFMPEG_LIB_UNIVERSAL_LIBRARY_PATH}"
 
     ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
 
-    if [[ $? -ne 0 ]]; then
-      echo -e "\nINFO: Failed to build universal ${LIBRARY_NAME} library\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
-      exit 1
-    fi
+    [[ $? -ne 0 ]] && exit_universal_library "${FFMPEG_LIB}"
+
   done
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   fi
+  for library in {0..46}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+        local ENABLED_LIBRARY_NAME="$(get_library_name ${library})"
+        local ENABLED_LIBRARY_NAME_UPPERCASE=$(echo "${ENABLED_LIBRARY_NAME}" | tr '[a-z]' '[A-Z]')
+
+        RC=$(copy_external_library_license "${library}" "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE.${ENABLED_LIBRARY_NAME_UPPERCASE})
+
+        [[ ${RC} -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
+    fi
+  done
 
   echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
@@ -357,8 +263,8 @@ create_ffmpeg_kit_universal_library() {
   local ARCHITECTURE_VARIANT="$1"
   local TARGET_ARCHITECTURES=("$(get_apple_architectures_for_variant "${ARCHITECTURE_VARIANT}")")
   local LIBRARY_NAME="ffmpeg-kit"
-  local UNIVERSAL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
-  local FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
   local LIPO="$(xcrun --sdk "$(get_default_sdk_name)" -f lipo)"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
@@ -368,141 +274,40 @@ create_ffmpeg_kit_universal_library() {
   fi
 
   # INITIALIZE UNIVERSAL LIBRARY DIRECTORY
-  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"
-  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}/include"
-  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}/lib"
+  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"
+  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/include"
+  initialize_folder "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib"
 
   local FFMPEG_KIT_DEFAULT_BUILD_PATH="${BASEDIR}/prebuilt/$(get_default_build_directory)/ffmpeg-kit"
 
   # COPY HEADER FILES
-  cp -r "${FFMPEG_KIT_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"/include 1>>"${BASEDIR}"/build.log 2>&1
+  cp -r "${FFMPEG_KIT_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
+
+  local FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH="${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib"
 
   LIPO_COMMAND="${LIPO} -create"
 
   for ARCH in "${TARGET_ARCH_LIST[@]}"; do
     if [[ " ${TARGET_ARCHITECTURES[*]} " == *" ${ARCH} "* ]]; then
-      local FULL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_build_directory)/${LIBRARY_NAME}/lib/libffmpegkit.a"
+      local FULL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_build_directory)/${LIBRARY_NAME}/lib/libffmpegkit.dylib"
       LIPO_COMMAND+=" ${FULL_LIBRARY_PATH}"
     fi
   done
 
-  LIPO_COMMAND+=" -output ${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}/lib/libffmpegkit.a"
+  LIPO_COMMAND+=" -output ${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"
 
   ${LIPO_COMMAND} 1>>"${BASEDIR}"/build.log 2>&1
 
-  if [[ $? -ne 0 ]]; then
-    echo -e "\nINFO: Failed to build universal ${LIBRARY_NAME} library\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
+  [[ $? -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
   fi
 
   echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
-}
-
-#
-# 1. library index
-# 2. library version
-# 3. static library name
-# 4. framework name
-# 5. architecture variant
-#
-create_single_framework() {
-  local LIBRARY_INDEX="$1"
-  local LIBRARY_VERSION="$2"
-  local STATIC_LIBRARY_NAME="$3"
-  local FRAMEWORK_NAME="$4"
-  local ARCHITECTURE_VARIANT="$5"
-  local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-  local FRAMEWORK_PATH=${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/${FRAMEWORK_NAME}.framework
-
-  initialize_folder "${FRAMEWORK_PATH}"
-
-  local CAPITAL_CASE_FRAMEWORK_NAME=$(to_capital_case "${FRAMEWORK_NAME}")
-
-  build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${LIBRARY_NAME}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FRAMEWORK_NAME}" "${LIBRARY_VERSION}" "${LIBRARY_VERSION}"
-
-  cp "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")/${LIBRARY_NAME}/lib/${STATIC_LIBRARY_NAME}.a" "${FRAMEWORK_PATH}/${FRAMEWORK_NAME}" 1>>"${BASEDIR}/build.log" 2>&1
-
-  if [[ $? -ne 0 ]]; then
-    echo -e "\nINFO: Failed to build ${LIBRARY_NAME} framework\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-
-  RC=$(copy_external_library_license "$LIBRARY_INDEX" "${FRAMEWORK_PATH}")
-
-  if [[ ${RC} -ne 0 ]]; then
-    echo -e "\nINFO: Failed to build ${LIBRARY_NAME} framework\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-}
-
-#
-# 1. library index
-# 2. architecture variant
-#
-create_framework() {
-  local LIBRARY_INDEX="$1"
-  local ARCHITECTURE_VARIANT="$2"
-  local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-  local PACKAGE_CONFIG_FILE_NAME=$(get_package_config_file_name "${LIBRARY_INDEX}")
-
-  if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
-
-    # THERE ARE NO ARCHITECTURES ENABLED FOR THIS LIBRARY TYPE
-    return
-  fi
-
-  # EACH ENABLED LIBRARY HAS TO HAVE A .pc FILE AND A VERSION
-  local LIBRARY_VERSION=$(get_external_library_version "${PACKAGE_CONFIG_FILE_NAME}")
-  if [[ -z ${LIBRARY_VERSION} ]]; then
-    echo -e "Failed to detect the version off ${LIBRARY_NAME} from ${PACKAGE_CONFIG_FILE_NAME}.pc\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-
-  if [[ ${LIBRARY_LIBTHEORA} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheora" "libtheora" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoraenc" "libtheoraenc" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libtheoradec" "libtheoradec" "${ARCHITECTURE_VARIANT}"
-
-  elif [[ ${LIBRARY_LIBVORBIS} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisfile" "libvorbisfile" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbisenc" "libvorbisenc" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libvorbis" "libvorbis" "${ARCHITECTURE_VARIANT}"
-
-  elif [[ ${LIBRARY_LIBWEBP} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpmux" "libwebpmux" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebpdemux" "libwebpdemux" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libwebp" "libwebp" "${ARCHITECTURE_VARIANT}"
-
-  elif [[ ${LIBRARY_OPENCOREAMR} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libopencore-amrnb" "libopencore-amrnb" "${ARCHITECTURE_VARIANT}"
-
-  elif [[ ${LIBRARY_NETTLE} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libnettle" "libnettle" "${ARCHITECTURE_VARIANT}"
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "libhogweed" "libhogweed" "${ARCHITECTURE_VARIANT}"
-
-  else
-
-    create_single_framework "${LIBRARY_INDEX}" "${LIBRARY_VERSION}" "$(get_static_archive_name "${LIBRARY_INDEX}")" "${LIBRARY_NAME}" "${ARCHITECTURE_VARIANT}"
-
-  fi
-
-  echo -e "DEBUG: ${LIBRARY_NAME} framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 #
@@ -511,8 +316,8 @@ create_framework() {
 create_ffmpeg_framework() {
   local ARCHITECTURE_VARIANT="$1"
   local LIBRARY_NAME="ffmpeg"
-  local UNIVERSAL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
-  local FFMPEG_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local FFMPEG_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
 
@@ -525,10 +330,7 @@ create_ffmpeg_framework() {
     local CAPITAL_CASE_FFMPEG_LIB_NAME=$(to_capital_case "${FFMPEG_LIB}")
 
     # EXTRACT FFMPEG VERSION
-    local FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}/version.h" | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
-    local FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}/version.h" | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
-    local FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}/version.h" | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
-    local FFMPEG_LIB_VERSION="${FFMPEG_LIB_MAJOR}.${FFMPEG_LIB_MINOR}.${FFMPEG_LIB_MICRO}"
+    local FFMPEG_LIB_VERSION="$(get_ffmpeg_library_version $FFMPEG_LIB)"
 
     # INITIALIZE FRAMEWORK DIRECTORY
     local FFMPEG_LIB_FRAMEWORK_PATH="${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/${FFMPEG_LIB}.framework"
@@ -539,7 +341,7 @@ create_ffmpeg_framework() {
     cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
 
     # COPY LIBRARY FILE
-    cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.a" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
 
     # COPY FRAMEWORK LICENSES
     if [[ "${GPL_ENABLED}" == "yes" ]]; then
@@ -552,6 +354,17 @@ create_ffmpeg_framework() {
 
     echo -e "DEBUG: ${FFMPEG_LIB} framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
   done
+
+  for library in {0..46}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+        local ENABLED_LIBRARY_NAME="$(get_library_name ${library})"
+        local ENABLED_LIBRARY_NAME_UPPERCASE=$(echo "${ENABLED_LIBRARY_NAME}" | tr '[a-z]' '[A-Z]')
+
+        RC=$(copy_external_library_license "${library}" ${BASEDIR}/prebuilt/$(get_framework_directory ${ARCHITECTURE_VARIANT})/libavcodec.framework/LICENSE.${ENABLED_LIBRARY_NAME_UPPERCASE})
+
+        [[ ${RC} -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
+    fi
+  done
 }
 
 #
@@ -560,8 +373,8 @@ create_ffmpeg_framework() {
 create_ffmpeg_kit_framework() {
   local ARCHITECTURE_VARIANT="$1"
   local LIBRARY_NAME="ffmpeg-kit"
-  local UNIVERSAL_LIBRARY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
-  local FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_PATH}/${LIBRARY_NAME}"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
 
@@ -578,10 +391,10 @@ create_ffmpeg_kit_framework() {
   initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules"
 
   # COPY HEADER FILES
-  cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+  cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
 
   # COPY LIBRARY FILE
-  cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH}/lib/libffmpegkit.a" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
+  cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
 
   # COPY FRAMEWORK LICENSES
   if [[ "${GPL_ENABLED}" == "yes" ]]; then
@@ -594,88 +407,6 @@ create_ffmpeg_kit_framework() {
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
 
   echo -e "DEBUG: ffmpeg-kit framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
-}
-
-#
-# 1. framework name
-#
-create_single_xcframework() {
-  local FRAMEWORK_NAME="$1"
-  local XCFRAMEWORK_PATH=${BASEDIR}/prebuilt/$(get_xcframework_directory)/${FRAMEWORK_NAME}.xcframework
-
-  initialize_folder "${XCFRAMEWORK_PATH}"
-
-  local BUILD_COMMAND="xcodebuild -create-xcframework "
-
-  for ARCHITECTURE_VARIANT in "${ARCHITECTURE_VARIANT_ARRAY[@]}"; do
-    if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 1 ]]; then
-      local FRAMEWORK_PATH=${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/${FRAMEWORK_NAME}.framework
-      BUILD_COMMAND+=" -framework ${FRAMEWORK_PATH}"
-    fi
-  done
-
-  BUILD_COMMAND+=" -output ${XCFRAMEWORK_PATH}"
-
-  # EXECUTE CREATE FRAMEWORK COMMAND
-  COMMAND_OUTPUT=$(${BUILD_COMMAND} 2>&1)
-  RC=$?
-  echo -e "DEBUG: ${COMMAND_OUTPUT}\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-  if [[ ${RC} -ne 0 ]]; then
-    echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-
-  # DO NOT ALLOW EMPTY FRAMEWORKS
-  if [[ ${COMMAND_OUTPUT} == *"is empty in library"* ]]; then
-    echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
-  fi
-}
-
-#
-# 1. library index
-#
-create_xcframework() {
-  local LIBRARY_INDEX="$1"
-  local LIBRARY_NAME=$(get_library_name "${LIBRARY_INDEX}")
-
-  if [[ ${LIBRARY_LIBTHEORA} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_xcframework "libtheora"
-    create_single_xcframework "libtheoraenc"
-    create_single_xcframework "libtheoradec"
-
-  elif [[ ${LIBRARY_LIBVORBIS} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_xcframework "libvorbisfile"
-    create_single_xcframework "libvorbisenc"
-    create_single_xcframework "libvorbis"
-
-  elif [[ ${LIBRARY_LIBWEBP} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_xcframework "libwebpmux"
-    create_single_xcframework "libwebpdemux"
-    create_single_xcframework "libwebp"
-
-  elif [[ ${LIBRARY_OPENCOREAMR} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_xcframework "libopencore-amrnb"
-
-  elif [[ ${LIBRARY_NETTLE} == "${LIBRARY_INDEX}" ]]; then
-
-    create_single_xcframework "libnettle"
-    create_single_xcframework "libhogweed"
-
-  else
-
-    create_single_xcframework "${LIBRARY_NAME}"
-
-  fi
-
-  echo -e "DEBUG: xcframework for ${LIBRARY_NAME} built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 create_ffmpeg_xcframework() {
@@ -704,16 +435,12 @@ create_ffmpeg_xcframework() {
     echo -e "DEBUG: ${COMMAND_OUTPUT}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ ${RC} -ne 0 ]]; then
-      echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
-      exit 1
+      exit_xcframework "${FRAMEWORK_NAME}"
     fi
 
     # DO NOT ALLOW EMPTY FRAMEWORKS
     if [[ ${COMMAND_OUTPUT} == *"is empty in library"* ]]; then
-      echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
-      exit 1
+      exit_xcframework "${FRAMEWORK_NAME}"
     fi
 
     echo -e "DEBUG: xcframework for ${FFMPEG_LIB} built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -744,16 +471,12 @@ create_ffmpeg_kit_xcframework() {
   echo -e "DEBUG: ${COMMAND_OUTPUT}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   if [[ ${RC} -ne 0 ]]; then
-    echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
+    exit_xcframework "${FRAMEWORK_NAME}"
   fi
 
   # DO NOT ALLOW EMPTY FRAMEWORKS
   if [[ ${COMMAND_OUTPUT} == *"is empty in library"* ]]; then
-    echo -e "INFO: Building ${FRAMEWORK_NAME} xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "failed\n\nSee build.log for details\n"
-    exit 1
+    exit_xcframework "${FRAMEWORK_NAME}"
   fi
 
   echo -e "DEBUG: xcframework for ffmpeg-kit built successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -1255,6 +978,33 @@ get_min_sdk_version() {
 
 get_sdk_path() {
   echo "$(xcrun --sdk "$(get_sdk_name)" --show-sdk-path 2>>"${BASEDIR}"/build.log)"
+}
+
+#
+# 1. XCFRAMEWORK NAME
+#
+exit_xcframework() {
+  echo -e "INFO: Building $1 xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo -e "failed\n\nSee build.log for details\n"
+  exit 1
+}
+
+#
+# 1. FRAMEWORK NAME
+#
+exit_framework() {
+  echo -e "INFO: Building $1 framework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo -e "failed\n\nSee build.log for details\n"
+  exit 1
+}
+
+#
+# 1. UNIVERSAL LIBRARY NAME
+#
+exit_universal_library() {
+  echo -e "\nINFO: Failed to build universal $1 library\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo -e "failed\n\nSee build.log for details\n"
+  exit 1
 }
 
 create_mason_cross_file() {

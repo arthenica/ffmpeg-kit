@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-macos-full"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit macOS Full Static Framework"
+    s.summary           = "FFmpeg Kit macOS Full Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC

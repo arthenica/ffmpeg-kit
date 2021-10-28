@@ -123,7 +123,7 @@ get_arch_specific_cflags() {
     echo "-arch arm64e -target $(get_target) -march=armv8.3-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64E"
     ;;
   i386)
-    echo "-arch i386 -target $(get_target) -march=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
+    echo "-arch i386 -target $(get_target) -march=i386 -mtune=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
     ;;
   x86-64)
     echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
@@ -329,22 +329,22 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
   case ${ARCH} in
   armv7)
-    echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target)"
+    echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -target $(get_target)"
     ;;
   armv7s)
-    echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target)"
+    echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -target $(get_target)"
     ;;
   arm64)
-    echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target)"
+    echo "-arch arm64 -march=armv8-a+crc+crypto -target $(get_target)"
     ;;
   arm64-mac-catalyst)
-    echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target) -isysroot ${SDK_PATH} -L${SDK_PATH}/System/iOSSupport/usr/lib -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
+    echo "-arch arm64 -march=armv8-a+crc+crypto -target $(get_target) -isysroot ${SDK_PATH} -L${SDK_PATH}/System/iOSSupport/usr/lib -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
     ;;
   arm64-simulator)
     echo "-arch arm64 -march=armv8-a+crc+crypto -target $(get_target)"
     ;;
   arm64e)
-    echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode -target $(get_target)"
+    echo "-arch arm64e -march=armv8.3-a+crc+crypto -target $(get_target)"
     ;;
   i386)
     echo "-arch i386 -march=i386 -target $(get_target)"
@@ -380,6 +380,7 @@ get_ldflags() {
     esac
     ;;
   *)
+    # NOTE THAT ffmpeg ALSO NEEDS BITCODE, IT IS ENABLED IN ffmpeg.sh
     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   esac
@@ -510,12 +511,6 @@ create_universal_libraries_for_ios_default_frameworks() {
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" "${ARCH_VAR_IOS}"
-    fi
-  done
-
   create_ffmpeg_universal_library "${ARCH_VAR_IOS}"
 
   create_ffmpeg_kit_universal_library "${ARCH_VAR_IOS}"
@@ -526,12 +521,6 @@ create_universal_libraries_for_ios_default_frameworks() {
 create_ios_default_frameworks() {
   echo -e "INFO: Building default frameworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" "${ARCH_VAR_IOS}"
-    fi
-  done
-
   create_ffmpeg_framework "${ARCH_VAR_IOS}"
 
   create_ffmpeg_kit_framework "${ARCH_VAR_IOS}"
@@ -541,14 +530,6 @@ create_ios_default_frameworks() {
 
 create_universal_libraries_for_ios_xcframeworks() {
   echo -e "INFO: Building universal libraries for xcframeworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" "${ARCH_VAR_IPHONEOS}"
-      create_universal_library "${library}" "${ARCH_VAR_IPHONESIMULATOR}"
-      create_universal_library "${library}" "${ARCH_VAR_MAC_CATALYST}"
-    fi
-  done
 
   create_ffmpeg_universal_library "${ARCH_VAR_IPHONEOS}"
   create_ffmpeg_universal_library "${ARCH_VAR_IPHONESIMULATOR}"
@@ -564,14 +545,6 @@ create_universal_libraries_for_ios_xcframeworks() {
 create_frameworks_for_ios_xcframeworks() {
   echo -e "INFO: Building frameworks for xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" "${ARCH_VAR_IPHONEOS}"
-      create_framework "${library}" "${ARCH_VAR_IPHONESIMULATOR}"
-      create_framework "${library}" "${ARCH_VAR_MAC_CATALYST}"
-    fi
-  done
-
   create_ffmpeg_framework "${ARCH_VAR_IPHONEOS}"
   create_ffmpeg_framework "${ARCH_VAR_IPHONESIMULATOR}"
   create_ffmpeg_framework "${ARCH_VAR_MAC_CATALYST}"
@@ -586,12 +559,6 @@ create_frameworks_for_ios_xcframeworks() {
 create_ios_xcframeworks() {
   export ARCHITECTURE_VARIANT_ARRAY=("${ARCH_VAR_IPHONEOS}" "${ARCH_VAR_IPHONESIMULATOR}" "${ARCH_VAR_MAC_CATALYST}")
   echo -e "INFO: Building xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_xcframework "${library}"
-    fi
-  done
 
   create_ffmpeg_xcframework
 

@@ -157,7 +157,7 @@ fi
 # DISABLE NOT SUPPORTED ARCHITECTURES
 disable_macos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64}" "${DETECTED_MACOS_SDK_VERSION}"
 
-echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}static library for macOS\n"
+echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}shared library for macOS\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}for macOS: " 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "$(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 

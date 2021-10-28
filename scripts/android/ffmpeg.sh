@@ -341,6 +341,13 @@ echo -n -e "\n${LIB_NAME}: "
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
   echo -e "INFO: Cleaning workspace for ${LIB_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
   make distclean 2>/dev/null 1>/dev/null
+
+  # WORKAROUND TO MANUALLY DELETE UNCLEANED FILES
+  rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavfilter/opencl/*.o 1>>"${BASEDIR}"/build.log 2>&1
+  rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavcodec/neon/*.o 1>>"${BASEDIR}"/build.log 2>&1
+
+  # DELETE SHARED FRAMEWORK WORKAROUNDS
+  git checkout "${BASEDIR}/src/ffmpeg/ffbuild" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
 # UPDATE BUILD FLAGS

@@ -194,7 +194,7 @@ if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64}
   disable_arch "x86-64-mac-catalyst"
 fi
 
-echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}static library for iOS\n"
+echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}shared library for iOS\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}for iOS: " 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "$(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 

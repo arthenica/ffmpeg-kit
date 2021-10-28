@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ../prebuilt/bundle-apple-universal-macos || exit 1
-find . -name "*.a" -not -path "./ffmpeg-kit/*" -exec cp {} ./ffmpeg-kit/lib \; || exit 1
+find . -name "*.dylib" -not -path "./ffmpeg-kit/*" -exec cp {} ./ffmpeg-kit/lib \; || exit 1
 cp -r ffmpeg/include/* ffmpeg-kit/include || exit 1
 
 # COPY LICENSE FILE OF EACH LIBRARY

@@ -343,6 +343,7 @@ get_ldflags() {
     esac
     ;;
   *)
+    # NOTE THAT ffmpeg ALSO NEEDS BITCODE, IT IS ENABLED IN ffmpeg.sh
     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   esac
@@ -462,12 +463,6 @@ create_universal_libraries_for_tvos_default_frameworks() {
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" "${ARCH_VAR_TVOS}"
-    fi
-  done
-
   create_ffmpeg_universal_library "${ARCH_VAR_TVOS}"
 
   create_ffmpeg_kit_universal_library "${ARCH_VAR_TVOS}"
@@ -478,12 +473,6 @@ create_universal_libraries_for_tvos_default_frameworks() {
 create_tvos_default_frameworks() {
   echo -e "INFO: Building default frameworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" "${ARCH_VAR_TVOS}"
-    fi
-  done
-
   create_ffmpeg_framework "${ARCH_VAR_TVOS}"
 
   create_ffmpeg_kit_framework "${ARCH_VAR_TVOS}"
@@ -493,13 +482,6 @@ create_tvos_default_frameworks() {
 
 create_universal_libraries_for_tvos_xcframeworks() {
   echo -e "INFO: Building universal libraries for xcframeworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_universal_library "${library}" "${ARCH_VAR_APPLETVOS}"
-      create_universal_library "${library}" "${ARCH_VAR_APPLETVSIMULATOR}"
-    fi
-  done
 
   create_ffmpeg_universal_library "${ARCH_VAR_APPLETVOS}"
   create_ffmpeg_universal_library "${ARCH_VAR_APPLETVSIMULATOR}"
@@ -513,13 +495,6 @@ create_universal_libraries_for_tvos_xcframeworks() {
 create_frameworks_for_tvos_xcframeworks() {
   echo -e "INFO: Building frameworks for xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_framework "${library}" "${ARCH_VAR_APPLETVOS}"
-      create_framework "${library}" "${ARCH_VAR_APPLETVSIMULATOR}"
-    fi
-  done
-
   create_ffmpeg_framework "${ARCH_VAR_APPLETVOS}"
   create_ffmpeg_framework "${ARCH_VAR_APPLETVSIMULATOR}"
 
@@ -532,12 +507,6 @@ create_frameworks_for_tvos_xcframeworks() {
 create_tvos_xcframeworks() {
   export ARCHITECTURE_VARIANT_ARRAY=("${ARCH_VAR_APPLETVOS}" "${ARCH_VAR_APPLETVSIMULATOR}")
   echo -e "INFO: Building xcframeworks\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      create_xcframework "${library}"
-    fi
-  done
 
   create_ffmpeg_xcframework
 

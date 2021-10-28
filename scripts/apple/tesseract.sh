@@ -26,8 +26,13 @@ fi
   --disable-largefile \
   --host="${HOST}" || return 1
 
-# WORKAROUND TO REMOVE -bind_at_load FLAG WHICH CAN NOT BE USED WHEN BITCODE IS ENABLED
-${SED_INLINE} 's/$wl-bind_at_load//g' ${BASEDIR}/src/${LIB_NAME}/libtool
+# WORKAROUNDS
+git checkout ${BASEDIR}/src/${LIB_NAME}/libtool 1>>"${BASEDIR}"/build.log 2>&1
+if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
+
+  # WORKAROUND TO REMOVE -bind_at_load FLAG WHICH CAN NOT BE USED WHEN BITCODE IS ENABLED
+  ${SED_INLINE} 's/$wl-bind_at_load//g' ${BASEDIR}/src/${LIB_NAME}/libtool
+fi
 
 # WORKAROUND TO DISABLE LINKING TO rt
 ${SED_INLINE} 's/-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile

@@ -35,7 +35,7 @@ create_package() {
     mkdir -p "${CURRENT_UNIVERSAL_PACKAGE}"/lib || exit 1
 
     cd "${SOURCE_UNIVERSAL_PACKAGE}" || exit 1
-    find . -name "*.a" -exec cp {} "${CURRENT_UNIVERSAL_PACKAGE}"/lib \;  || exit 1
+    find . -name "*.dylib" -exec cp {} "${CURRENT_UNIVERSAL_PACKAGE}"/lib \;  || exit 1
 
     # COPY LICENSE FILE OF EACH LIBRARY
     LICENSE_FILES=$(find . -name LICENSE | grep -vi ffmpeg)
