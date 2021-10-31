@@ -1981,23 +1981,26 @@ compare_versions() {
   for((i=0;(i<${#VERSION_PARTS_1[@]})&&(i<${#VERSION_PARTS_2[@]});i++))
   do
 
-    if [[ ${VERSION_PARTS_1[$i]} -gt ${VERSION_PARTS_2[$i]} ]]; then
+    local CURRENT_PART_1=${VERSION_PARTS_1[$i]}
+    local CURRENT_PART_2=${VERSION_PARTS_2[$i]}
+
+    if [[ -z ${CURRENT_PART_1} ]]; then
+      CURRENT_PART_1=0
+    fi
+
+    if [[ -z ${CURRENT_PART_2} ]]; then
+      CURRENT_PART_2=0
+    fi
+
+    if [[ CURRENT_PART_1 -gt CURRENT_PART_2 ]]; then
       echo "1"
       return;
-    elif [[ ${VERSION_PARTS_1[$i]} -lt ${VERSION_PARTS_2[$i]} ]]; then
+    elif [[ CURRENT_PART_1 -lt CURRENT_PART_2 ]]; then
       echo "-1"
       return;
     fi
   done
 
-  if [[ ${#VERSION_PARTS_1[@]} -gt ${#VERSION_PARTS_2[@]} ]]; then
-    echo "1"
-    return;
-  elif [[ ${#VERSION_PARTS_1[@]} -lt ${#VERSION_PARTS_2[@]} ]]; then
-    echo "-1"
-    return;
-  else
-    echo "0"
-    return;
-  fi
+  echo "0"
+  return;
 }

@@ -160,13 +160,9 @@ if [[ -n ${DISPLAY_HELP} ]]; then
 fi
 
 # DISABLE NOT SUPPORTED ARCHITECTURES
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARMV7}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARMV7S}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_I386}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64E}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_X86_64_MAC_CATALYST}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_MAC_CATALYST}" "${DETECTED_IOS_SDK_VERSION}"
-disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}" "${DETECTED_IOS_SDK_VERSION}"
+disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARMV7}"
+disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARMV7S}"
+disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_I386}"
 
 # CHECK SOME RULES FOR .framework BUNDLES
 

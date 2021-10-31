@@ -22,7 +22,6 @@ get_external_library_version() {
 
 #
 # 1. architecture index
-# 2. detected sdk version
 #
 disable_ios_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
@@ -31,7 +30,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   armv7 | armv7s | i386)
 
     # SUPPORTED UNTIL IOS SDK 10.3.1
-    if [[ $(compare_versions "$2" "10.3.1") -le 0 ]]; then
+    if [[ $(compare_versions "$IOS_MIN_VERSION" "10.3.1") -le 0 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -40,7 +39,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   arm64e)
 
     # INTRODUCED IN IOS SDK 10.1
-    if [[ $(compare_versions "$2" "10.1") -ge 1 ]]; then
+    if [[ $(compare_versions "$IOS_MIN_VERSION" "10.1") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -49,16 +48,25 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   x86-64-mac-catalyst)
 
     # INTRODUCED IN IOS SDK 13.0
-    if [[ $(compare_versions "$2" "13") -ge 1 ]]; then
+    if [[ $(compare_versions "$MAC_CATALYST_MIN_VERSION" "13.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
     fi
     ;;
-  arm64-*)
+  arm64-mac-catalyst)
 
     # INTRODUCED IN IOS SDK 14.0
-    if [[ $(compare_versions "$2" "14") -ge 1 ]]; then
+    if [[ $(compare_versions "$MAC_CATALYST_MIN_VERSION" "14.0") -ge 1 ]]; then
+      local SUPPORTED=1
+    else
+      local SUPPORTED=0
+    fi
+    ;;
+  arm64-simulator)
+
+    # INTRODUCED IN IOS SDK 14.0
+    if [[ $(compare_versions "$IOS_MIN_VERSION" "14.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -71,7 +79,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on SDK $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on iOS SDK $IOS_MIN_VERSION and Mac Catalyst $MAC_CATALYST_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
@@ -79,7 +87,6 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
 
 #
 # 1. architecture index
-# 2. detected sdk version
 #
 disable_tvos_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
@@ -88,7 +95,7 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
   arm64-simulator)
 
     # INTRODUCED IN TVOS SDK 14.0
-    if [[ $(compare_versions "$2" "14") -ge 1 ]]; then
+    if [[ $(compare_versions "$TVOS_MIN_VERSION" "14.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -101,7 +108,7 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on SDK $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on tvOS SDK $TVOS_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
@@ -109,7 +116,6 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
 
 #
 # 1. architecture index
-# 2. detected sdk version
 #
 disable_macos_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
@@ -118,7 +124,7 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
   arm64)
 
     # INTRODUCED IN MACOS SDK 11.0
-    if [[ $(compare_versions "$2" "11") -ge 1 ]]; then
+    if [[ $(compare_versions "$MACOS_MIN_VERSION" "11.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -131,7 +137,7 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on SDK $2\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on macOS SDK $MACOS_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
