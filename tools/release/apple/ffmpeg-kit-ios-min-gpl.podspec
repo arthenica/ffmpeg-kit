@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = '9.3'
     s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
-    s.ios.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'libvidstab.framework', 'x264.framework', 'x265.framework', 'xvidcore.framework'
+    s.ios.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

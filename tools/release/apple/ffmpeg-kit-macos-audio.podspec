@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
 
     s.osx.deployment_target = '10.11'
     s.osx.frameworks    = 'AudioToolbox','AVFoundation','CoreAudio','CoreImage','CoreMedia','OpenCL','OpenGL','VideoToolbox'
-    s.osx.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'lame.framework', 'libilbc.framework', 'libogg.framework', 'libopencore-amrnb.framework', 'libsndfile.framework', 'libvorbis.framework', 'libvorbisenc.framework', 'libvorbisfile.framework', 'opus.framework', 'shine.framework', 'soxr.framework', 'speex.framework', 'twolame.framework', 'vo-amrwbenc.framework'
+    s.osx.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

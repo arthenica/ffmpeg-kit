@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
 
     s.tvos.deployment_target = '9.2'
     s.tvos.frameworks   = 'AudioToolbox','VideoToolbox','CoreMedia'
-    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libhogweed.framework', 'libnettle.framework'
+    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

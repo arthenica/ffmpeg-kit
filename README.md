@@ -177,6 +177,8 @@ burning subtitles, video stabilisation, pipe operations and concurrent command e
 `FFmpegKit` is licensed under the `LGPL v3.0`. However, if source code is built using the optional `--enable-gpl` flag
 or prebuilt binaries with `-gpl` postfix are used, then `FFmpegKit` is subject to the `GPL v3.0` license.
 
+See the [License](https://github.com/tanersener/ffmpeg-kit/wiki/License) wiki page for the details.
+
 ### 14. Patents
 
 It is not clearly explained in their documentation, but it is believed that `FFmpeg`, `kvazaar`, `x264` and `x265`

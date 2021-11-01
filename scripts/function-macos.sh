@@ -47,14 +47,23 @@ When compilation ends, libraries are created under the prebuilt folder.\n"
 }
 
 enable_main_build() {
-  export MACOS_MIN_VERSION=10.15
+  if [[ $(compare_versions "$DETECTED_MACOS_SDK_VERSION" "10.15") -le 0 ]]; then
+    export MACOS_MIN_VERSION=$DETECTED_MACOS_SDK_VERSION
+  else
+    export MACOS_MIN_VERSION=10.15
+  fi
 }
 
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  # XCODE 7.3 HAS MACOS SDK 10.11
-  export MACOS_MIN_VERSION=10.11
+  if [[ $(compare_versions "$DETECTED_MACOS_SDK_VERSION" "10.11") -le 0 ]]; then
+    export MACOS_MIN_VERSION=$DETECTED_MACOS_SDK_VERSION
+  else
+
+    # XCODE 7.3 HAS MACOS SDK 10.11
+    export MACOS_MIN_VERSION=10.11
+  fi
 }
 
 get_common_includes() {
@@ -241,7 +250,7 @@ get_common_linked_libraries() {
 }
 
 get_common_ldflags() {
-  echo "-isysroot ${SDK_PATH}"
+  echo "-isysroot ${SDK_PATH} $(get_min_version_cflags)"
 }
 
 get_size_optimization_ldflags() {
@@ -376,7 +385,7 @@ initialize_prebuilt_macos_folders() {
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MACOS}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")"
     fi
 
@@ -386,10 +395,10 @@ initialize_prebuilt_macos_folders() {
     initialize_folder "${BASEDIR}/prebuilt/$(get_xcframework_directory)"
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
+    initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_MACOS}")"
 
     echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MACOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -401,7 +410,7 @@ initialize_prebuilt_macos_folders() {
 # DEPENDS TARGET_ARCH_LIST VARIABLE
 #
 create_universal_libraries_for_macos_default_frameworks() {
-  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory 1)"
+  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/.tmp/$(get_universal_library_directory 1)"
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 

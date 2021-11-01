@@ -16,7 +16,7 @@ create_package() {
     rm -rf "${CURRENT_PACKAGE}"
     mkdir -p "${CURRENT_PACKAGE}" || exit 1
 
-    cp -r "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
+    cp -R "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
     cd "${CURRENT_PACKAGE}" || exit 1
     zip -r "../ffmpeg-kit-$1-${PACKAGE_VERSION}-tvos-xcframework.zip" * || exit 1
 

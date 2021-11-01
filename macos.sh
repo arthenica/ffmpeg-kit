@@ -19,7 +19,6 @@ source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
 # SET DEFAULTS SETTINGS
 enable_default_macos_architectures
-enable_main_build
 
 # SELECT XCODE VERSION USED FOR BUILDING
 XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh 2>>"${BASEDIR}"/build.log)
@@ -28,7 +27,7 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT MACOS SDK VERSION
-DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>${BASEDIR}/build.log)"
+export DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>${BASEDIR}/build.log)"
 echo -e "\nINFO: Using SDK ${DETECTED_MACOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -44,6 +43,9 @@ if [[ -z ${BUILD_VERSION} ]]; then
   echo -e "\n(*): Can not run git commands in this folder. See build.log.\n"
   exit 1
 fi
+
+# MAIN BUILDS ENABLED BY DEFAULT
+enable_main_build
 
 # PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
 for argument in "$@"; do
@@ -153,6 +155,9 @@ if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
 fi
+
+# DISABLE NOT SUPPORTED ARCHITECTURES
+disable_macos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64}"
 
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}shared library for macOS\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}for macOS: " 1>>"${BASEDIR}"/build.log 2>&1

@@ -18,7 +18,7 @@ create_package() {
     rm -rf "${CURRENT_PACKAGE}"
     mkdir -p "${CURRENT_PACKAGE}" || exit 1
 
-    cp -r "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
+    cp -R "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
     cd "${CURRENT_PACKAGE}" || exit 1
     zip -r "../ffmpeg-kit-$1-${PACKAGE_VERSION}-ios-framework.zip" * || exit 1
 
@@ -47,8 +47,8 @@ create_package() {
         cp "${LICENSE_FILE}" "${CURRENT_UNIVERSAL_PACKAGE}"/LICENSE."${LIBRARY_NAME}" || exit 1
     done
 
-    cp -r "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg-kit/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
-    cp -r "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
+    cp -R "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg-kit/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
+    cp -R "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
     cp "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/LICENSE "${CURRENT_UNIVERSAL_PACKAGE}"/LICENSE || exit 1
 
     cd "${ALL_UNIVERSAL_DIRECTORY}" || exit 1

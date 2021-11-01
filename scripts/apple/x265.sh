@@ -30,6 +30,18 @@ ${SED_INLINE} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockco
 ${SED_INLINE} 's/function x265_/function _x265_/g' ${BASEDIR}/src/x265/source/common/arm/*.S
 ${SED_INLINE} 's/ x265_/ _x265_/g' ${BASEDIR}/src/x265/source/common/arm/pixel-util.S
 
+# fixing relocation errors
+${SED_INLINE} 's/sad12_mask:/sad12_mask_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
+${SED_INLINE} 's/g_lumaFilter:/g_lumaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
+${SED_INLINE} 's/g_chromaFilter:/g_chromaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
+${SED_INLINE} 's/\.text/.equ sad12_mask, .-sad12_mask_bytes\
+\
+.text/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
+${SED_INLINE} 's/\.text/.equ g_lumaFilter, .-g_lumaFilter_bytes\
+.equ g_chromaFilter, .-g_chromaFilter_bytes\
+\
+.text/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
+
 # WORKAROUND TO USE A CUSTOM BUILD FILE
 overwrite_file "${BASEDIR}"/tools/patch/cmake/x265/CMakeLists.txt "${BASEDIR}"/src/"${LIB_NAME}"/source/CMakeLists.txt || return 1
 

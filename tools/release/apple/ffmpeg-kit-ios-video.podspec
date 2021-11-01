@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = '9.3'
     s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
-    s.ios.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'dav1d.framework', 'expat.framework', 'fontconfig.framework', 'freetype.framework', 'fribidi.framework', 'giflib.framework', 'harfbuzz.framework', 'jpeg.framework', 'kvazaar.framework', 'libass.framework', 'libogg.framework', 'libpng.framework', 'libtheora.framework', 'libtheoradec.framework', 'libtheoraenc.framework', 'libvorbis.framework', 'libvorbisenc.framework', 'libvorbisfile.framework', 'libvpx.framework', 'libwebp.framework', 'libwebpmux.framework', 'libwebpdemux.framework', 'snappy.framework', 'tiff.framework'
+    s.ios.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

@@ -476,6 +476,7 @@ ${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffb
   --ranlib="${RANLIB}" \
   --strip="${STRIP}" \
   --nm="${NM}" \
+  --extra-ldflags="$(get_min_version_cflags)" \
   --disable-autodetect \
   --enable-cross-compile \
   --enable-pic \

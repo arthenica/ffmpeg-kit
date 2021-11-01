@@ -5,7 +5,7 @@ source "${BASEDIR}/scripts/function.sh"
 export FFMPEG_LIBS=("libavcodec" "libavdevice" "libavfilter" "libavformat" "libavutil" "libswresample" "libswscale")
 
 get_ffmpeg_kit_version() {
-  local FFMPEG_KIT_VERSION=$(grep 'const FFMPEG_KIT_VERSION' "${BASEDIR}"/apple/src/FFmpegKit.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
+  local FFMPEG_KIT_VERSION=$(grep 'const FFmpegKitVersion' "${BASEDIR}"/apple/src/FFmpegKitConfig.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
   if [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
     echo "${FFMPEG_KIT_VERSION}"
@@ -48,7 +48,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   x86-64-mac-catalyst)
 
     # INTRODUCED IN IOS SDK 13.0
-    if [[ $(compare_versions "$MAC_CATALYST_MIN_VERSION" "13.0") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "13.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -57,7 +57,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   arm64-mac-catalyst)
 
     # INTRODUCED IN IOS SDK 14.0
-    if [[ $(compare_versions "$MAC_CATALYST_MIN_VERSION" "14.0") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "14.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -66,7 +66,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   arm64-simulator)
 
     # INTRODUCED IN IOS SDK 14.0
-    if [[ $(compare_versions "$IOS_MIN_VERSION" "14.0") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "14.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -79,7 +79,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on iOS SDK $IOS_MIN_VERSION and Mac Catalyst $MAC_CATALYST_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported with Min iOS Target $IOS_MIN_VERSION and Min Mac Catalyst Target $MAC_CATALYST_MIN_VERSION on iOS SDK $DETECTED_IOS_SDK_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
@@ -95,7 +95,7 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
   arm64-simulator)
 
     # INTRODUCED IN TVOS SDK 14.0
-    if [[ $(compare_versions "$TVOS_MIN_VERSION" "14.0") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "14.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -108,7 +108,7 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on tvOS SDK $TVOS_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on tvOS SDK $DETECTED_TVOS_SDK_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
@@ -124,7 +124,7 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
   arm64)
 
     # INTRODUCED IN MACOS SDK 11.0
-    if [[ $(compare_versions "$MACOS_MIN_VERSION" "11.0") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_MACOS_SDK_VERSION" "11.0") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
@@ -137,7 +137,7 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
 
   if [[ ${SUPPORTED} -ne 1 ]]; then
     if [[ -z ${BUILD_FORCE} ]]; then
-      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on macOS SDK $MACOS_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on macOS SDK $DETECTED_MACOS_SDK_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
       disable_arch "${ARCH_NAME}"
     fi
   fi
@@ -199,7 +199,7 @@ create_ffmpeg_universal_library() {
   local ARCHITECTURE_VARIANT="$1"
   local TARGET_ARCHITECTURES=("$(get_apple_architectures_for_variant "${ARCHITECTURE_VARIANT}")")
   local LIBRARY_NAME="ffmpeg"
-  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
   local FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
   local LIPO="$(xcrun --sdk "$(get_default_sdk_name)" -f lipo)"
 
@@ -269,7 +269,7 @@ create_ffmpeg_kit_universal_library() {
   local ARCHITECTURE_VARIANT="$1"
   local TARGET_ARCHITECTURES=("$(get_apple_architectures_for_variant "${ARCHITECTURE_VARIANT}")")
   local LIBRARY_NAME="ffmpeg-kit"
-  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
   local FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
   local LIPO="$(xcrun --sdk "$(get_default_sdk_name)" -f lipo)"
 
@@ -322,7 +322,7 @@ create_ffmpeg_kit_universal_library() {
 create_ffmpeg_framework() {
   local ARCHITECTURE_VARIANT="$1"
   local LIBRARY_NAME="ffmpeg"
-  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
   local FFMPEG_UNIVERSAL_LIBRARY_PATH="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
@@ -341,35 +341,68 @@ create_ffmpeg_framework() {
     # INITIALIZE FRAMEWORK DIRECTORY
     local FFMPEG_LIB_FRAMEWORK_PATH="${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/${FFMPEG_LIB}.framework"
     initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}"
-    initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers"
 
-    # COPY HEADER FILES
-    cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+    if [[ ${ARCHITECTURE_VARIANT} -eq ${ARCH_VAR_MAC_CATALYST} ]] || [[ ${ARCHITECTURE_VARIANT} -eq ${ARCH_VAR_MACOS} ]]; then
 
-    # COPY LIBRARY FILE
-    cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+      # VERSIONED FRAMEWORK
+
+      local FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH="${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Resources"
+
+      initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Headers"
+      initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Resources"
+
+      # LINK CURRENT VERSION
+      ln -s "A" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1
+      ln -s "Versions/Current/Headers" "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+      ln -s "Versions/Current/Resources" "${FFMPEG_LIB_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1
+      ln -s "Versions/Current/${FFMPEG_LIB}" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+
+      # COPY HEADER FILES
+      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+
+      # COPY LIBRARY FILE
+      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    else
+
+      # DEFAULT FRAMEWORK
+
+      local FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH="${FFMPEG_LIB_FRAMEWORK_PATH}"
+
+      initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers"
+
+      # COPY HEADER FILES
+      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+
+      # COPY LIBRARY FILE
+      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    fi
 
     # COPY FRAMEWORK LICENSES
     if [[ "${GPL_ENABLED}" == "yes" ]]; then
-      cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
     else
-      cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
     fi
 
-    build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FFMPEG_LIB_NAME}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
+    # COPY EXTERNAL LIBRARY LICENSES
+    if [[ "${FFMPEG_LIB}" == "libavcodec" ]]; then
+      for library in {0..46}; do
+        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+            local ENABLED_LIBRARY_NAME="$(get_library_name ${library})"
+            local ENABLED_LIBRARY_NAME_UPPERCASE=$(echo "${ENABLED_LIBRARY_NAME}" | tr '[a-z]' '[A-Z]')
+
+            RC=$(copy_external_library_license "${library}" ${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE.${ENABLED_LIBRARY_NAME_UPPERCASE})
+
+            [[ ${RC} -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
+        fi
+      done
+    fi
+
+    build_info_plist "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FFMPEG_LIB_NAME}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
 
     echo -e "DEBUG: ${FFMPEG_LIB} framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
-  done
-
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-        local ENABLED_LIBRARY_NAME="$(get_library_name ${library})"
-        local ENABLED_LIBRARY_NAME_UPPERCASE=$(echo "${ENABLED_LIBRARY_NAME}" | tr '[a-z]' '[A-Z]')
-
-        RC=$(copy_external_library_license "${library}" ${BASEDIR}/prebuilt/$(get_framework_directory ${ARCHITECTURE_VARIANT})/libavcodec.framework/LICENSE.${ENABLED_LIBRARY_NAME_UPPERCASE})
-
-        [[ ${RC} -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
-    fi
   done
 }
 
@@ -379,7 +412,7 @@ create_ffmpeg_framework() {
 create_ffmpeg_kit_framework() {
   local ARCHITECTURE_VARIANT="$1"
   local LIBRARY_NAME="ffmpeg-kit"
-  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
+  local UNIVERSAL_LIBRARY_DIRECTORY="${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCHITECTURE_VARIANT}")"
   local FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY="${UNIVERSAL_LIBRARY_DIRECTORY}/${LIBRARY_NAME}"
 
   if [[ $(is_apple_architecture_variant_supported "${ARCHITECTURE_VARIANT}") -eq 0 ]]; then
@@ -393,23 +426,58 @@ create_ffmpeg_kit_framework() {
   # INITIALIZE FRAMEWORK DIRECTORY
   local FFMPEG_KIT_FRAMEWORK_PATH="${BASEDIR}/prebuilt/$(get_framework_directory "${ARCHITECTURE_VARIANT}")/ffmpegkit.framework"
   initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}"
-  initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers"
-  initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules"
 
-  # COPY HEADER FILES
-  cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ ${ARCHITECTURE_VARIANT} -eq ${ARCH_VAR_MAC_CATALYST} ]] || [[ ${ARCHITECTURE_VARIANT} -eq ${ARCH_VAR_MACOS} ]]; then
 
-  # COPY LIBRARY FILE
-  cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
+    # VERSIONED FRAMEWORK
+
+    local FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH="${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Resources"
+
+    initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Headers"
+    initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Modules"
+    initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Resources"
+
+    # LINK CURRENT VERSION
+    ln -s "A" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1
+    ln -s "Versions/Current/Headers" "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+    ln -s "Versions/Current/Modules" "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules" 1>>"${BASEDIR}"/build.log 2>&1
+    ln -s "Versions/Current/Resources" "${FFMPEG_KIT_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1
+    ln -s "Versions/Current/ffmpegkit" "${FFMPEG_KIT_FRAMEWORK_PATH}/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1
+
+    # COPY HEADER FILES
+    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+
+    # COPY LIBRARY FILE
+    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1
+
+  else
+
+    # DEFAULT FRAMEWORK
+
+    local FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH="${FFMPEG_KIT_FRAMEWORK_PATH}"
+
+    initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers"
+    initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules"
+
+    # COPY HEADER FILES
+    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+
+    # COPY LIBRARY FILE
+    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
+
+  fi
 
   # COPY FRAMEWORK LICENSES
   if [[ "${GPL_ENABLED}" == "yes" ]]; then
-    cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_KIT_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
   else
-    cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 
-  build_info_plist "${FFMPEG_KIT_FRAMEWORK_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}"
+  # COPYING STRIP SCRIPT FOR SHARED LIBRARY
+  cp ${BASEDIR}/tools/release/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1
+
+  build_info_plist "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}"
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
 
   echo -e "DEBUG: ffmpeg-kit framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -1124,6 +1192,7 @@ EOF
 
 create_gnutls_package_config() {
   local GNUTLS_VERSION="$1"
+  local EXTRA_LIBS="$2"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" <<EOF
 prefix=${BASEDIR}/prebuilt/$(get_build_directory)/gnutls
@@ -1137,7 +1206,7 @@ Description: GNU TLS Implementation
 Version: ${GNUTLS_VERSION}
 Requires: nettle, hogweed
 Cflags: -I\${includedir}
-Libs: -L\${libdir} -lgnutls
+Libs: -L\${libdir} -lgnutls ${EXTRA_LIBS}
 Libs.private: -lgmp
 EOF
 }

@@ -47,14 +47,23 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
 }
 
 enable_main_build() {
-  export TVOS_MIN_VERSION=11.0
+  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "11.0") -le 0 ]]; then
+    export TVOS_MIN_VERSION=$DETECTED_TVOS_SDK_VERSION
+  else
+    export TVOS_MIN_VERSION=11.0
+  fi
 }
 
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  # XCODE 7.3 HAS TVOS SDK 9.2
-  export TVOS_MIN_VERSION=9.2
+  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "9.2") -le 0 ]]; then
+    export TVOS_MIN_VERSION=$DETECTED_TVOS_SDK_VERSION
+  else
+
+    # XCODE 7.3 HAS TVOS SDK 9.2
+    export TVOS_MIN_VERSION=9.2
+  fi
 
   # TVOS SDK 9.2 DOES NOT INCLUDE VIDEOTOOLBOX
   ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=0
@@ -279,7 +288,7 @@ get_common_linked_libraries() {
 }
 
 get_common_ldflags() {
-  echo "-isysroot ${SDK_PATH}"
+  echo "-isysroot ${SDK_PATH} $(get_min_version_cflags)"
 }
 
 get_size_optimization_ldflags() {
@@ -430,11 +439,11 @@ initialize_prebuilt_tvos_folders() {
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_APPLETVOS}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_APPLETVOS}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_APPLETVOS}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_APPLETVOS}")"
     fi
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_APPLETVSIMULATOR}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_APPLETVSIMULATOR}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_APPLETVSIMULATOR}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_APPLETVSIMULATOR}")"
     fi
 
@@ -444,10 +453,10 @@ initialize_prebuilt_tvos_folders() {
     initialize_folder "${BASEDIR}/prebuilt/$(get_xcframework_directory)"
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_TVOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")"
+    initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_TVOS}")"
 
     echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_TVOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -459,7 +468,7 @@ initialize_prebuilt_tvos_folders() {
 # DEPENDS TARGET_ARCH_LIST VARIABLE
 #
 create_universal_libraries_for_tvos_default_frameworks() {
-  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_TVOS}")"
+  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_TVOS}")"
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 

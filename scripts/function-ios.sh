@@ -59,18 +59,37 @@ libraries are created under the prebuilt folder.\n"
 }
 
 enable_main_build() {
-  export IOS_MIN_VERSION=12.1
-  export MAC_CATALYST_MIN_VERSION=14.0
+  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "12.1") -le 0 ]]; then
+    export IOS_MIN_VERSION=$DETECTED_IOS_SDK_VERSION
+  else
+    export IOS_MIN_VERSION=12.1
+  fi
+
+  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "14.0") -le 0 ]]; then
+    export MAC_CATALYST_MIN_VERSION=$DETECTED_IOS_SDK_VERSION
+  else
+    export MAC_CATALYST_MIN_VERSION=14.0
+  fi
 }
 
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  # XCODE 7.3 HAS IOS SDK 9.3
-  export IOS_MIN_VERSION=9.3
+  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "9.3") -le 0 ]]; then
+    export IOS_MIN_VERSION=$DETECTED_IOS_SDK_VERSION
+  else
 
-  # MAC CATALYST IS INTRODUCED IN 13.0
-  export MAC_CATALYST_MIN_VERSION=13.0
+    # XCODE 7.3 HAS IOS SDK 9.3
+    export IOS_MIN_VERSION=9.3
+  fi
+
+  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "13.0") -le 0 ]]; then
+    export MAC_CATALYST_MIN_VERSION=$DETECTED_IOS_SDK_VERSION
+  else
+
+    # MAC CATALYST IS INTRODUCED IN 13.0
+    export MAC_CATALYST_MIN_VERSION=13.0
+  fi
 
   # IOS SDK 9.3 SUPPORTS VIDEOTOOLBOX
   # HOWEVER, THE LATEST FFMPEG VERSION USES SDK 11.0 APIS
@@ -123,7 +142,8 @@ get_arch_specific_cflags() {
     echo "-arch arm64e -target $(get_target) -march=armv8.3-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64E"
     ;;
   i386)
-    echo "-arch i386 -target $(get_target) -march=i386 -mtune=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
+    # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
+    echo "-arch i386 -target $(get_target) -march=i386 -mtune=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386 -D__thread= "
     ;;
   x86-64)
     echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
@@ -298,7 +318,7 @@ get_common_linked_libraries() {
 }
 
 get_common_ldflags() {
-  echo "-isysroot ${SDK_PATH}"
+  echo "-isysroot ${SDK_PATH} $(get_min_version_cflags)"
 }
 
 get_size_optimization_ldflags() {
@@ -474,15 +494,15 @@ initialize_prebuilt_ios_folders() {
     echo -e "DEBUG: Initializing universal directories and frameworks for xcf builds\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONEOS}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONEOS}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_IPHONEOS}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONEOS}")"
     fi
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_IPHONESIMULATOR}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IPHONESIMULATOR}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_IPHONESIMULATOR}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IPHONESIMULATOR}")"
     fi
     if [[ $(is_apple_architecture_variant_supported "${ARCH_VAR_MAC_CATALYST}") -eq 1 ]]; then
-      initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_MAC_CATALYST}")"
+      initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_MAC_CATALYST}")"
       initialize_folder "${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_MAC_CATALYST}")"
     fi
 
@@ -492,10 +512,10 @@ initialize_prebuilt_ios_folders() {
     initialize_folder "${BASEDIR}/prebuilt/$(get_xcframework_directory)"
   else
 
-    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "DEBUG: Initializing default universal directory at ${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
     # DEFAULT BUILDS GENERATE UNIVERSAL LIBRARIES AND FRAMEWORKS
-    initialize_folder "${BASEDIR}/prebuilt/$(get_universal_library_directory "${ARCH_VAR_IOS}")"
+    initialize_folder "${BASEDIR}/.tmp/$(get_universal_library_directory "${ARCH_VAR_IOS}")"
 
     echo -e "DEBUG: Initializing framework directory at ${BASEDIR}/prebuilt/$(get_framework_directory "${ARCH_VAR_IOS}")\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -507,7 +527,7 @@ initialize_prebuilt_ios_folders() {
 # DEPENDS TARGET_ARCH_LIST VARIABLE
 #
 create_universal_libraries_for_ios_default_frameworks() {
-  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/prebuilt/$(get_universal_library_directory 1)"
+  local ROOT_UNIVERSAL_DIRECTORY_PATH="${BASEDIR}/.tmp/$(get_universal_library_directory 1)"
 
   echo -e "INFO: Building universal libraries in ${ROOT_UNIVERSAL_DIRECTORY_PATH} for default frameworks using ${TARGET_ARCH_LIST[@]}\n" 1>>"${BASEDIR}"/build.log 2>&1
 

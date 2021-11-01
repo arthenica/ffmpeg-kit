@@ -19,7 +19,6 @@ source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
 # SET DEFAULTS SETTINGS
 enable_default_tvos_architectures
-enable_main_build
 
 # SELECT XCODE VERSION USED FOR BUILDING
 XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh 2>>"${BASEDIR}"/build.log)
@@ -28,7 +27,7 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT TVOS SDK VERSION
-DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>${BASEDIR}/build.log)"
+export DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>${BASEDIR}/build.log)"
 echo -e "\nINFO: Using SDK ${DETECTED_TVOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -44,6 +43,9 @@ if [[ -z ${BUILD_VERSION} ]]; then
   echo -e "\n(*): Can not run git commands in this folder. See build.log.\n"
   exit 1
 fi
+
+# MAIN BUILDS ENABLED BY DEFAULT
+enable_main_build
 
 # PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
 for argument in "$@"; do
@@ -154,11 +156,14 @@ if [[ -n ${DISPLAY_HELP} ]]; then
   exit 0
 fi
 
+# DISABLE NOT SUPPORTED ARCHITECTURES
+disable_tvos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}"
+
 # CHECK SOME RULES FOR .framework BUNDLES
 
 # 1. DISABLE arm64-simulator WHEN arm64 IS ENABLED IN framework BUNDLES
 if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
-  echo -e "INFO: Disabled arm64-simulator architecture which can not co-exist with arm64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo -e "INFO: Disabled arm64-simulator architecture which cannot co-exist with arm64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "arm64-simulator"
 fi
 

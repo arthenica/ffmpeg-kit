@@ -56,4 +56,8 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.15.1" || return 1
+if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+  create_gnutls_package_config "3.6.15.1" "-framework Security" || return 1
+else
+  create_gnutls_package_config "3.6.15.1" || return 1
+fi
