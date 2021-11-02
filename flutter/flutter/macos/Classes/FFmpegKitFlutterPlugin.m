@@ -81,7 +81,7 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
     statisticsEnabled = false;
     asyncWriteToPipeDispatchQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-    [self registerGlobalCallbacks];
+    NSLog(@"FFmpegKitFlutterPlugin %p created.\n", self);
   }
 
   return self;
@@ -89,6 +89,8 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 
 - (FlutterError *)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
   _eventSink = eventSink;
+  NSLog(@"FFmpegKitFlutterPlugin %p started listening to events on %p.\n", self, eventSink);
+  [self registerGlobalCallbacks];
   return nil;
 }
 
