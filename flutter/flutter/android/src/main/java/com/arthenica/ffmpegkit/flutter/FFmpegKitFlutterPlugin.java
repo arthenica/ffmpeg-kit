@@ -655,7 +655,6 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 
         this.context = null;
         this.activity = null;
-        this.flutterPluginBinding = null;
         this.activityPluginBinding = null;
 
         Log.d(LIBRARY_NAME, "FFmpegKitFlutterPlugin uninitialized.");
