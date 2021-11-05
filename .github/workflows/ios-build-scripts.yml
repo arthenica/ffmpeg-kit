@@ -1,6 +1,13 @@
 name: ios build scripts
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches:
+      - development
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-main-on-macos:
