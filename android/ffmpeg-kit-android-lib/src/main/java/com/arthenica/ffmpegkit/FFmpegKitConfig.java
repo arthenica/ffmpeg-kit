@@ -1186,6 +1186,16 @@ public class FFmpegKitConfig {
     }
 
     /**
+     * Converts session state to string.
+     *
+     * @param state session state
+     * @return string value
+     */
+    public static String sessionStateToString(final SessionState state) {
+        return state.toString();
+    }
+
+    /**
      * <p>Parses the given command into arguments. Uses space character to split the arguments.
      * Supports single and double quote characters.
      *
