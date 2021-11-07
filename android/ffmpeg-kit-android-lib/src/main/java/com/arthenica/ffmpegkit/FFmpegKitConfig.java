@@ -852,15 +852,17 @@ public class FFmpegKitConfig {
             }
         } catch (final Throwable t) {
             android.util.Log.e(TAG, String.format("Failed to get %s column for %s.%s", DocumentsContract.Document.COLUMN_DISPLAY_NAME, uri.toString(), Exceptions.getStackTraceString(t)));
+            throw t;
         }
 
-        int fd = -1;
+        final int fd;
         try {
             ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, openMode);
             fd = parcelFileDescriptor.getFd();
             pfdMap.put(fd, parcelFileDescriptor);
         } catch (final Throwable t) {
             android.util.Log.e(TAG, String.format("Failed to obtain %s parcelFileDescriptor for %s.%s", openMode, uri.toString(), Exceptions.getStackTraceString(t)));
+            throw new IllegalArgumentException(String.format("Failed to obtain %s parcelFileDescriptor for %s.", openMode, uri.toString()), t);
         }
 
         return "saf:" + fd + "." + FFmpegKitConfig.extractExtensionFromSafDisplayName(displayName);
