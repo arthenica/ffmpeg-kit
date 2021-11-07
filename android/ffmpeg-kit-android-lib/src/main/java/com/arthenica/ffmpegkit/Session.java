@@ -199,6 +199,9 @@ public interface Session {
     /**
      * Adds a new log entry for this session.
      *
+     * It is invoked internally by <code>FFmpegKit</code> library methods. Must not be used by user
+     * applications.
+     *
      * @param log log entry
      */
     void addLog(final Log log);
