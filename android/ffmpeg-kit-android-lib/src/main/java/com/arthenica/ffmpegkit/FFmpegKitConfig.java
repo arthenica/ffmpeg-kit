@@ -19,6 +19,8 @@
 
 package com.arthenica.ffmpegkit;
 
+import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -44,13 +46,52 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * <p>Configuration class of <code>FFmpegKit</code> library.
  */
 public class FFmpegKitConfig {
+
+    static class SAFProtocolUrl {
+        private final Integer safId;
+        private final Uri uri;
+        private final String openMode;
+        private final ContentResolver contentResolver;
+        private ParcelFileDescriptor parcelFileDescriptor;
+
+        public SAFProtocolUrl(final Integer safId, final Uri uri, final String openMode, final ContentResolver contentResolver) {
+            this.safId = safId;
+            this.uri = uri;
+            this.openMode = openMode;
+            this.contentResolver = contentResolver;
+        }
+
+        public Integer getSafId() {
+            return safId;
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+
+        public String getOpenMode() {
+            return openMode;
+        }
+
+        public ContentResolver getContentResolver() {
+            return contentResolver;
+        }
+
+        public void setParcelFileDescriptor(final ParcelFileDescriptor parcelFileDescriptor) {
+            this.parcelFileDescriptor = parcelFileDescriptor;
+        }
+
+        public ParcelFileDescriptor getParcelFileDescriptor() {
+            return parcelFileDescriptor;
+        }
+    }
 
     /**
      * The tag used for logging.
@@ -63,9 +104,9 @@ public class FFmpegKitConfig {
     static final String FFMPEG_KIT_NAMED_PIPE_PREFIX = "fk_pipe_";
 
     /**
-     * Generates ids for named ffmpeg kit pipes.
+     * Generates ids for named ffmpeg kit pipes and saf protocol urls.
      */
-    private static final AtomicLong pipeIndexGenerator;
+    private static final AtomicInteger uniqueIdGenerator;
 
     private static Level activeLogLevel;
 
@@ -82,7 +123,8 @@ public class FFmpegKitConfig {
     private static LogCallback globalLogCallbackFunction;
     private static StatisticsCallback globalStatisticsCallbackFunction;
     private static ExecuteCallback globalExecuteCallbackFunction;
-    private static final SparseArray<ParcelFileDescriptor> pfdMap;
+    private static final SparseArray<SAFProtocolUrl> safIdMap;
+    private static final SparseArray<SAFProtocolUrl> safFileDescriptorMap;
     private static LogRedirectionStrategy globalLogRedirectionStrategy;
 
     static {
@@ -102,7 +144,7 @@ public class FFmpegKitConfig {
 
         android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadBuildDate()));
 
-        pipeIndexGenerator = new AtomicLong(1);
+        uniqueIdGenerator = new AtomicInteger(1);
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(NativeLoader.loadLogLevel());
@@ -125,7 +167,8 @@ public class FFmpegKitConfig {
         globalStatisticsCallbackFunction = null;
         globalExecuteCallbackFunction = null;
 
-        pfdMap = new SparseArray<>();
+        safIdMap = new SparseArray<>();
+        safFileDescriptorMap = new SparseArray<>();
         globalLogRedirectionStrategy = LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED;
 
         NativeLoader.enableRedirection();
@@ -458,7 +501,7 @@ public class FFmpegKitConfig {
             }
         }
 
-        final String newFFmpegPipePath = MessageFormat.format("{0}{1}{2}{3}", pipesDir, File.separator, FFMPEG_KIT_NAMED_PIPE_PREFIX, pipeIndexGenerator.getAndIncrement());
+        final String newFFmpegPipePath = MessageFormat.format("{0}{1}{2}{3}", pipesDir, File.separator, FFMPEG_KIT_NAMED_PIPE_PREFIX, uniqueIdGenerator.getAndIncrement());
 
         // FIRST CLOSE OLD PIPES WITH THE SAME NAME
         closeFFmpegPipe(newFFmpegPipePath);
@@ -833,13 +876,16 @@ public class FFmpegKitConfig {
 
     /**
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
-     * input/output url that can be used in FFmpeg and FFprobe commands.
+     * SAF protocol url that can be used in FFmpeg and FFprobe commands.
      *
      * <p>Requires API Level >= 19. On older API levels it returns an empty url.
      *
+     * @param context  application context
+     * @param uri      SAF uri
+     * @param openMode file mode to use as defined in {@link ContentProvider#openFile ContentProvider.openFile}
      * @return input/output url that can be passed to FFmpegKit or FFprobeKit
      */
-    private static String getSafParameter(final Context context, final Uri uri, final String openMode) {
+    public static String getSafParameter(final Context context, final Uri uri, final String openMode) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             android.util.Log.i(TAG, String.format("getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
             return "";
@@ -855,27 +901,20 @@ public class FFmpegKitConfig {
             throw t;
         }
 
-        final int fd;
-        try {
-            ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, openMode);
-            fd = parcelFileDescriptor.getFd();
-            pfdMap.put(fd, parcelFileDescriptor);
-        } catch (final Throwable t) {
-            android.util.Log.e(TAG, String.format("Failed to obtain %s parcelFileDescriptor for %s.%s", openMode, uri.toString(), Exceptions.getStackTraceString(t)));
-            throw new IllegalArgumentException(String.format("Failed to obtain %s parcelFileDescriptor for %s.", openMode, uri.toString()), t);
-        }
+        final int safId = uniqueIdGenerator.getAndIncrement();
+        safIdMap.put(safId, new SAFProtocolUrl(safId, uri, openMode, context.getContentResolver()));
 
-        return "saf:" + fd + "." + FFmpegKitConfig.extractExtensionFromSafDisplayName(displayName);
+        return "saf:" + safId + "." + FFmpegKitConfig.extractExtensionFromSafDisplayName(displayName);
     }
 
     /**
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
-     * input url that can be used in FFmpeg and FFprobe commands.
+     * SAF protocol url that can be used in FFmpeg and FFprobe commands.
      *
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri     saf uri
+     * @param uri     SAF uri
      * @return input url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForRead(final Context context, final Uri uri) {
@@ -884,12 +923,12 @@ public class FFmpegKitConfig {
 
     /**
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
-     * output url that can be used in FFmpeg and FFprobe commands.
+     * SAF protocol url that can be used in FFmpeg and FFprobe commands.
      *
      * <p>Requires API Level &ge; 19. On older API levels it returns an empty url.
      *
      * @param context application context
-     * @param uri     saf uri
+     * @param uri     SAF uri
      * @return output url that can be passed to FFmpegKit or FFprobeKit
      */
     public static String getSafParameterForWrite(final Context context, final Uri uri) {
@@ -897,20 +936,57 @@ public class FFmpegKitConfig {
     }
 
     /**
-     * Called by saf_wrapper from native library to close a parcel file descriptor.
+     * Called from native library to open an SAF protocol url.
      *
-     * @param fd parcel file descriptor created for a saf uri
+     * @param safId SAF id part of an SAF protocol url
+     * @return file descriptor created for this SAF id or 0 if an error occurs
      */
-    private static void closeParcelFileDescriptor(final int fd) {
+    private static int safOpen(final int safId) {
         try {
-            ParcelFileDescriptor pfd = pfdMap.get(fd);
-            if (pfd != null) {
-                pfd.close();
-                pfdMap.delete(fd);
+            SAFProtocolUrl safUrl = safIdMap.get(safId);
+            if (safUrl != null) {
+                final ParcelFileDescriptor parcelFileDescriptor = safUrl.getContentResolver().openFileDescriptor(safUrl.getUri(), safUrl.getOpenMode());
+                safUrl.setParcelFileDescriptor(parcelFileDescriptor);
+                final int fd = parcelFileDescriptor.getFd();
+                safFileDescriptorMap.put(fd, safUrl);
+                return fd;
+            } else {
+                android.util.Log.e(TAG, String.format("SAF id %d not found.", safId));
             }
         } catch (final Throwable t) {
-            android.util.Log.e(TAG, String.format("Failed to close file descriptor: %d.%s", fd, Exceptions.getStackTraceString(t)));
+            android.util.Log.e(TAG, String.format("Failed to open SAF id: %d.%s", safId, Exceptions.getStackTraceString(t)));
         }
+
+        return 0;
+    }
+
+    /**
+     * Called from native library to close a file descriptor created for a SAF protocol url.
+     *
+     * @param fileDescriptor file descriptor that belongs to a SAF protocol url
+     * @return 1 if the given file descriptor is closed successfully, 0 if an error occurs
+     */
+    private static int safClose(final int fileDescriptor) {
+        try {
+            final SAFProtocolUrl safProtocolUrl = safFileDescriptorMap.get(fileDescriptor);
+            if (safProtocolUrl != null) {
+                ParcelFileDescriptor parcelFileDescriptor = safProtocolUrl.getParcelFileDescriptor();
+                if (parcelFileDescriptor != null) {
+                    safFileDescriptorMap.delete(fileDescriptor);
+                    safIdMap.delete(safProtocolUrl.getSafId());
+                    parcelFileDescriptor.close();
+                    return 1;
+                } else {
+                    android.util.Log.e(TAG, String.format("ParcelFileDescriptor for SAF fd %d not found.", fileDescriptor));
+                }
+            } else {
+                android.util.Log.e(TAG, String.format("SAF fd %d not found.", fileDescriptor));
+            }
+        } catch (final Throwable t) {
+            android.util.Log.e(TAG, String.format("Failed to close SAF fd: %d.%s", fileDescriptor, Exceptions.getStackTraceString(t)));
+        }
+
+        return 0;
     }
 
     /**

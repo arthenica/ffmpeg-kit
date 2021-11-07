@@ -20,10 +20,16 @@
 #ifndef AVUTIL_FILE_FFMPEG_KIT_PROTOCOLS_H
 #define AVUTIL_FILE_FFMPEG_KIT_PROTOCOLS_H
 
-typedef int (*fd_close_function)(int);
+typedef int (*saf_open_function)(int);
 
-fd_close_function av_get_fd_close(void);
+typedef int (*saf_close_function)(int);
 
-void av_set_fd_close(fd_close_function);
+saf_open_function av_get_saf_open(void);
+
+saf_close_function av_get_saf_close(void);
+
+void av_set_saf_open(saf_open_function);
+
+void av_set_saf_close(saf_close_function);
 
 #endif /* AVUTIL_FILE_FFMPEG_KIT_PROTOCOLS_H */

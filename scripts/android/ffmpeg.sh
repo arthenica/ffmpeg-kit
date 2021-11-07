@@ -380,7 +380,7 @@ else
   cat ../../tools/protocols/libavutil_file.h >> libavutil/file.h
   cat ../../tools/protocols/libavutil_file.c >> libavutil/file.c
   awk '{gsub(/ff_file_protocol;/,"ff_file_protocol;\nextern const URLProtocol ff_saf_protocol;")}1' libavformat/protocols.c > libavformat/protocols.c.tmp
-  awk '{gsub(/ff_file_protocol;/,"ff_file_protocol;\nextern const URLProtocol ff_fd_protocol;")}1' libavformat/protocols.c.tmp > libavformat/protocols.c
+  cat libavformat/protocols.c.tmp > libavformat/protocols.c
   echo -e "\nINFO: Enabled custom ffmpeg-kit protocols\n" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
