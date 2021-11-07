@@ -400,7 +400,7 @@ create_ffmpeg_framework() {
       done
     fi
 
-    build_info_plist "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FFMPEG_LIB_NAME}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
+    build_info_plist "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.ffmpegkit.${CAPITAL_CASE_FFMPEG_LIB_NAME}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}" "${ARCHITECTURE_VARIANT}"
 
     echo -e "DEBUG: ${FFMPEG_LIB} framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
   done
@@ -477,7 +477,7 @@ create_ffmpeg_kit_framework() {
   # COPYING STRIP SCRIPT FOR SHARED LIBRARY
   cp ${BASEDIR}/tools/release/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1
 
-  build_info_plist "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}"
+  build_info_plist "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}" "${ARCHITECTURE_VARIANT}"
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
 
   echo -e "DEBUG: ffmpeg-kit framework built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -864,16 +864,29 @@ build_info_plist() {
   local FRAMEWORK_ID="$3"
   local FRAMEWORK_SHORT_VERSION="$4"
   local FRAMEWORK_VERSION="$5"
+  local ARCHITECTURE_VARIANT="$6"
+
   case ${FFMPEG_KIT_BUILD_TYPE} in
   ios)
+    case ${ARCHITECTURE_VARIANT} in
+    "${ARCH_VAR_MAC_CATALYST}")
+      local MINIMUM_VERSION_KEY="LSMinimumSystemVersion"
+      ;;
+    *)
+      local MINIMUM_VERSION_KEY="MinimumOSVersion"
+      ;;
+    esac
+
     local MINIMUM_OS_VERSION="${IOS_MIN_VERSION}"
     local SUPPORTED_PLATFORMS="iPhoneOS"
     ;;
   tvos)
+    local MINIMUM_VERSION_KEY="MinimumOSVersion"
     local MINIMUM_OS_VERSION="${TVOS_MIN_VERSION}"
     local SUPPORTED_PLATFORMS="AppleTVOS"
     ;;
   macos)
+    local MINIMUM_VERSION_KEY="LSMinimumSystemVersion"
     local MINIMUM_OS_VERSION="${MACOS_MIN_VERSION}"
     local SUPPORTED_PLATFORMS="MacOSX"
     ;;
@@ -902,7 +915,7 @@ build_info_plist() {
 	<string>${FRAMEWORK_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>MinimumOSVersion</key>
+	<key>${MINIMUM_VERSION_KEY}</key>
 	<string>${MINIMUM_OS_VERSION}</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
