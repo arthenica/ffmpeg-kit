@@ -19,6 +19,8 @@
 
 package com.arthenica.ffmpegkit;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 /**
  * <p>Executes an FFprobe session asynchronously.
  */
@@ -35,13 +37,23 @@ public class AsyncFFprobeExecuteTask implements Runnable {
     public void run() {
         FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(ffprobeSession);
+        if (executeCallback != null) {
+            try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                executeCallback.apply(ffprobeSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+            }
         }
 
-        if (executeCallback != null) {
-            executeCallback.apply(ffprobeSession);
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
+        if (globalExecuteCallbackFunction != null) {
+            try {
+                // NOTIFY GLOBAL CALLBACK DEFINED
+                globalExecuteCallbackFunction.apply(ffprobeSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+            }
         }
     }
 

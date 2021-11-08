@@ -990,7 +990,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         int returnCodeValue = executeFFprobe([mediaInformationSession getSessionId], [mediaInformationSession getArguments]);
         ReturnCode* returnCode = [[ReturnCode alloc] init:returnCodeValue];
         [mediaInformationSession complete:returnCode];
-        if ([returnCode isSuccess]) {
+        if ([returnCode isValueSuccess]) {
             MediaInformation* mediaInformation = [MediaInformationJsonParser from:[mediaInformationSession getAllLogsAsStringWithTimeout:waitTimeout]];
             [mediaInformationSession setMediaInformation:mediaInformation];
         }
@@ -1007,14 +1007,27 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue {
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffmpegExecute:ffmpegSession];
-        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
-        if (globalExecuteCallback != nil) {
-            globalExecuteCallback(ffmpegSession);
-        }
-        
+
         ExecuteCallback sessionExecuteCallback = [ffmpegSession getExecuteCallback];
         if (sessionExecuteCallback != nil) {
-            sessionExecuteCallback(ffmpegSession);
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                sessionExecuteCallback(ffmpegSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
+        }
+
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                globalExecuteCallback(ffmpegSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
         }
     });
 }
@@ -1026,14 +1039,27 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue {
     dispatch_async(queue, ^{
         [FFmpegKitConfig ffprobeExecute:ffprobeSession];
-        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
-        if (globalExecuteCallback != nil) {
-            globalExecuteCallback(ffprobeSession);
-        }
-        
+
         ExecuteCallback sessionExecuteCallback = [ffprobeSession getExecuteCallback];
         if (sessionExecuteCallback != nil) {
-            sessionExecuteCallback(ffprobeSession);
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                sessionExecuteCallback(ffprobeSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
+        }
+
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                globalExecuteCallback(ffprobeSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
         }
     });
 }
@@ -1045,14 +1071,27 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
 + (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
     dispatch_async(queue, ^{
         [FFmpegKitConfig getMediaInformationExecute:mediaInformationSession withTimeout:waitTimeout];
-        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
-        if (globalExecuteCallback != nil) {
-            globalExecuteCallback(mediaInformationSession);
-        }
-        
+
         ExecuteCallback sessionExecuteCallback = [mediaInformationSession getExecuteCallback];
         if (sessionExecuteCallback != nil) {
-            sessionExecuteCallback(mediaInformationSession);
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                sessionExecuteCallback(mediaInformationSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
+        }
+
+        ExecuteCallback globalExecuteCallback = [FFmpegKitConfig getExecuteCallback];
+        if (globalExecuteCallback != nil) {
+            @try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                globalExecuteCallback(mediaInformationSession);
+            }
+            @catch(NSException* exception) {
+                NSLog(@"Exception thrown inside session ExecuteCallback block. %@", [exception callStackSymbols]);
+            }
         }
     });
 }

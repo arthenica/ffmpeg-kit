@@ -19,6 +19,8 @@
 
 package com.arthenica.ffmpegkit;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 /**
  * <p>Executes a MediaInformation session asynchronously.
  */
@@ -41,13 +43,23 @@ public class AsyncGetMediaInformationTask implements Runnable {
     public void run() {
         FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession, waitTimeout);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(mediaInformationSession);
+        if (executeCallback != null) {
+            try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                executeCallback.apply(mediaInformationSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+            }
         }
 
-        if (executeCallback != null) {
-            executeCallback.apply(mediaInformationSession);
+        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
+        if (globalExecuteCallbackFunction != null) {
+            try {
+                // NOTIFY GLOBAL CALLBACK DEFINEDs
+                globalExecuteCallbackFunction.apply(mediaInformationSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+            }
         }
     }
 
