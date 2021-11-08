@@ -541,13 +541,16 @@ void process_log(long sessionId, int levelValue, AVBPrint* logMessage) {
                 return;
             }
         }
+        break;
         case LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined: {
             if (globalCallbackDefined || sessionCallbackDefined) {
                 return;
             }
         }
+        break;
         case LogRedirectionStrategyAlwaysPrintLogs: {
         }
+        break;
     }
 
     // PRINT LOGS

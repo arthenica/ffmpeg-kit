@@ -272,13 +272,16 @@ public class FFmpegKitConfig {
                     return;
                 }
             }
+            break;
             case PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED: {
                 if (globalCallbackDefined || sessionCallbackDefined) {
                     return;
                 }
             }
+            break;
             case ALWAYS_PRINT_LOGS: {
             }
+            break;
         }
 
         // PRINT LOGS
