@@ -688,7 +688,7 @@ public class FFmpegKitConfig {
             final int returnCodeValue = nativeFFprobeExecute(mediaInformationSession.getSessionId(), mediaInformationSession.getArguments());
             final ReturnCode returnCode = new ReturnCode(returnCodeValue);
             mediaInformationSession.complete(returnCode);
-            if (returnCode.isSuccess()) {
+            if (returnCode.isValueSuccess()) {
                 MediaInformation mediaInformation = MediaInformationJsonParser.fromWithError(mediaInformationSession.getAllLogsAsString(waitTimeout));
                 mediaInformationSession.setMediaInformation(mediaInformation);
             }
