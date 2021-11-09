@@ -29,8 +29,8 @@
 #import "StatisticsCallback.h"
 
 /**
- * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both
- * synchronously and asynchronously.
+ * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both synchronously and
+ * asynchronously.
  * <pre>
  * FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v libxvid file1.avi"];
  *
@@ -52,7 +52,10 @@
 + (FFmpegSession*)executeWithArguments:(NSArray*)arguments;
 
 /**
- * <p>Asynchronously executes FFmpeg with arguments provided.
+ * <p>Starts an asynchronous FFmpeg execution with arguments provided.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param arguments       FFmpeg command options/arguments as string array
  * @param executeCallback callback that will be called when the execution is completed
@@ -61,7 +64,10 @@
 + (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
- * <p>Asynchronously executes FFmpeg with arguments provided.
+ * <p>Starts an asynchronous FFmpeg execution with arguments provided.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param arguments          FFmpeg command options/arguments as string array
  * @param executeCallback    callback that will be called when the execution is completed
@@ -72,7 +78,10 @@
 + (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
- * <p>Asynchronously executes FFmpeg with arguments provided.
+ * <p>Starts an asynchronous FFmpeg execution with arguments provided.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param arguments       FFmpeg command options/arguments as string array
  * @param executeCallback callback that will be called when the execution is completed
@@ -82,7 +91,10 @@
 + (FFmpegSession*)executeWithArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * <p>Asynchronously executes FFmpeg with arguments provided.
+ * <p>Starts an asynchronous FFmpeg execution with arguments provided.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param arguments          FFmpeg command options/arguments as string array
  * @param executeCallback    callback that will be called when the execution is completed
@@ -104,9 +116,11 @@
 + (FFmpegSession*)execute:(NSString*)command;
 
 /**
- * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
- * into arguments. You can use single or double quote characters to specify arguments inside
- * your command.
+ * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+ * into arguments. You can use single or double quote characters to specify arguments inside your command.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param command         FFmpeg command
  * @param executeCallback callback that will be called when the execution is completed
@@ -115,9 +129,11 @@
 + (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback;
 
 /**
- * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
- * into arguments. You can use single or double quote characters to specify arguments inside
- * your command.
+ * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+ * into arguments. You can use single or double quote characters to specify arguments inside your command.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param command            FFmpeg command
  * @param executeCallback    callback that will be called when the execution is completed
@@ -128,9 +144,11 @@
 + (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
- * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
- * into arguments. You can use single or double quote characters to specify arguments inside
- * your command.
+ * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+ * into arguments. You can use single or double quote characters to specify arguments inside your command.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param command         FFmpeg command
  * @param executeCallback callback that will be called when the execution is completed
@@ -140,9 +158,11 @@
 + (FFmpegSession*)executeAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
- * into arguments. You can use single or double quote characters to specify arguments inside
- * your command.
+ * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+ * into arguments. You can use single or double quote characters to specify arguments inside your command.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param command            FFmpeg command
  * @param executeCallback    callback that will be called when the execution is completed
