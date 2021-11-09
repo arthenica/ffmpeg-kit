@@ -45,18 +45,103 @@ of those packages and external libraries included in each of them.
 
 ##### 2.1.1 Package Names
 
-The following table shows all package names defined for `ffmpeg-kit-react-native`.
+The following table shows all package names and their respective API levels, iOS deployment targets defined in
+`ffmpeg-kit-react-native`.
 
-| Package | Main Release | LTS Release |
-| :----: | :----: | :----: |
-| min | min  | min-lts |
-| min-gpl | min-gpl | min-gpl-lts |
-| https | https | https-lts |
-| https-gpl | https-gpl | https-gpl-lts |
-| audio | audio | audio-lts |
-| video | video | video-lts |
-| full | full | full-lts |
-| full-gpl | full-gpl | full-gpl-lts |
+<table>
+<thead>
+<tr>
+<th align="center">Package</th>
+<th align="center" colspan="3">Main Release</th>
+<th align="center" colspan="3">LTS Release</th>
+</tr>
+<tr>
+<th align="center"></th>
+<th align="center">Name</th>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
+<th align="center">Name</th>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">min</td>
+<td align="center">min</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">min-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">min-gpl</td>
+<td align="center">min-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">min-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">https</td>
+<td align="center">(*) https</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">https-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">https-gpl</td>
+<td align="center">https-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">https-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">audio</td>
+<td align="center">audio</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">audio-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">video</td>
+<td align="center">video</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">video-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">full</td>
+<td align="center">full</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">full-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+<tr>
+<td align="center">full-gpl</td>
+<td align="center">full-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">full-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+</tbody>
+</table>
+
+(*) - Main `https` package is the default package
 
 #### 2.2 Enabling Packages
 

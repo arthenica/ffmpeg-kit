@@ -710,7 +710,11 @@ export class ArchDetect {
 export class FFmpegKit {
 
   /**
-   * <p>Asynchronously executes FFmpeg with command provided.
+   * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param command            FFmpeg command
    * @param executeCallback    callback that will be called when the execution is completed
@@ -723,7 +727,10 @@ export class FFmpegKit {
   }
 
   /**
-   * <p>Asynchronously executes FFmpeg with arguments provided.
+   * <p>Starts an asynchronous FFmpeg execution with arguments provided.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param commandArguments   FFmpeg command options/arguments as string array
    * @param executeCallback    callback that will be called when the execution is completed
@@ -951,7 +958,10 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Asynchronously executes the FFmpeg session provided.
+   * <p>Starts an asynchronous FFmpeg execution for the given session.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param ffmpegSession FFmpeg session which includes command options/arguments
    */
@@ -962,7 +972,10 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Asynchronously executes the FFprobe session provided.
+   * <p>Starts an asynchronous FFprobe execution for the given session.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param ffprobeSession FFprobe session which includes command options/arguments
    */
@@ -973,7 +986,10 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Asynchronously executes the media information session provided.
+   * <p>Starts an asynchronous FFprobe execution for the given media information session.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param mediaInformationSession media information session which includes command options/arguments
    * @param waitTimeout             max time to wait until media information is transmitted
@@ -1812,7 +1828,11 @@ export class FFmpegSession extends AbstractSession {
 export class FFprobeKit {
 
   /**
-   * <p>Asynchronously executes FFprobe with arguments provided.
+   * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param command FFprobe command
    * @param executeCallback callback that will be called when the execution is completed
@@ -1824,7 +1844,10 @@ export class FFprobeKit {
   }
 
   /**
-   * <p>Asynchronously executes FFprobe with arguments provided.
+   * <p>Starts an asynchronous FFprobe execution with arguments provided.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param commandArguments FFprobe command options/arguments as string array
    * @param executeCallback callback that will be called when the execution is completed
@@ -1840,7 +1863,10 @@ export class FFprobeKit {
   }
 
   /**
-   * <p>Extracts the media information for the specified file asynchronously.
+   * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param path            path or uri of a media file
    * @param executeCallback callback that will be notified when execution is completed
@@ -1854,7 +1880,11 @@ export class FFprobeKit {
   }
 
   /**
-   * <p>Extracts media information using the command provided asynchronously.
+   * <p>Starts an asynchronous FFprobe execution to extract media information using a command. The command passed to
+   * this method must generate the output in JSON format in order to successfully extract media information from it.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param command         FFprobe command that prints media information for a file in JSON format
    * @param executeCallback callback that will be notified when execution is completed
@@ -1867,7 +1897,12 @@ export class FFprobeKit {
   }
 
   /**
-   * <p>Extracts media information using the command arguments provided asynchronously.
+   * <p>Starts an asynchronous FFprobe execution to extract media information using command arguments. The command
+   * passed to this method must generate the output in JSON format in order to successfully extract media information
+   * from it.
+   *
+   * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+   * ExecuteCallback if you want to be notified about the result.
    *
    * @param commandArguments FFprobe command arguments that prints media information for a file in JSON format
    * @param executeCallback callback that will be notified when execution is completed

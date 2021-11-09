@@ -215,7 +215,10 @@ class FFmpegKitConfig {
     }
   }
 
-  /// Asynchronously executes the [ffmpegSession] provided.
+  /// Starts an asynchronous FFmpeg execution for the given session.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<void> asyncFFmpegExecute(FFmpegSession ffmpegSession) async {
     try {
       await init();
@@ -227,7 +230,10 @@ class FFmpegKitConfig {
     }
   }
 
-  /// Asynchronously executes the [ffprobeSession] provided.
+  /// Starts an asynchronous FFprobe execution for the given session.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<void> asyncFFprobeExecute(FFprobeSession ffprobeSession) async {
     try {
       await init();
@@ -239,7 +245,10 @@ class FFmpegKitConfig {
     }
   }
 
-  /// Asynchronously executes the [mediaInformationSession] provided.
+  /// Starts an asynchronous FFprobe execution for the given media information session.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<void> asyncGetMediaInformationExecute(
       MediaInformationSession mediaInformationSession,
       [int? waitTimeout = null]) async {

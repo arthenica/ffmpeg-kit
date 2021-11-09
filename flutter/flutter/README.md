@@ -77,6 +77,33 @@ same source code but is built with different settings (Architectures, API Level,
 [LTS Releases](https://github.com/tanersener/ffmpeg-kit#10-lts-releases) section of the project README to see how they
 compare to each other.
 
+#### 2.5 Android and iOS Support
+
+The following table shows the Android API level and iOS deployment target required in `ffmpeg_kit_flutter` releases.
+
+<table>
+<thead>
+<tr>
+<th align="center" colspan="2">Main Release</th>
+<th align="center" colspan="2">LTS Release</th>
+</tr>
+<tr>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">16</td>
+<td align="center">9.3</td>
+</tr>
+</tbody>
+</table>
+
 ### 3. Using
 
 1. Execute FFmpeg commands.
