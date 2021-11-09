@@ -189,14 +189,20 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)getMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
 
 /**
- * <p>Asynchronously executes the FFmpeg session provided.
+ * <p>Starts an asynchronous FFmpeg execution for the given session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param ffmpegSession FFmpeg session which includes command options/arguments
  */
 + (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession;
 
 /**
- * <p>Asynchronously executes the FFmpeg session provided.
+ * <p>Starts an asynchronous FFmpeg execution for the given session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param ffmpegSession   FFmpeg session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation
@@ -204,14 +210,20 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * <p>Asynchronously executes the FFprobe session provided.
+ * <p>Starts an asynchronous FFprobe execution for the given session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param ffprobeSession FFprobe session which includes command options/arguments
  */
 + (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession;
 
 /**
- * <p>Asynchronously executes the FFprobe session provided.
+ * <p>Starts an asynchronous FFprobe execution for the given session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param ffprobeSession  FFprobe session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation
@@ -219,7 +231,10 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * <p>Asynchronously executes the media information session provided.
+ * <p>Starts an asynchronous FFprobe execution for the given media information session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param mediaInformationSession media information session which includes command options/arguments
  * @param waitTimeout             max time to wait until media information is transmitted
@@ -227,7 +242,10 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
 
 /**
- * <p>Asynchronously executes the media information session provided.
+ * <p>Starts an asynchronous FFprobe execution for the given media information session.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
  *
  * @param mediaInformationSession media information session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation

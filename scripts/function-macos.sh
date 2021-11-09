@@ -17,7 +17,7 @@ When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10.11+ devices"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10.11+ devices" "      --target=macos sdk version\toverride minimum deployment target"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -84,7 +84,7 @@ get_arch_specific_cflags() {
     echo "-arch arm64 -target $(get_target) -march=armv8-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64"
     ;;
   x86-64)
-    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"
+    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
     ;;
   esac
 }

@@ -25,7 +25,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.3+ devices"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.3+ devices" "      --target=ios sdk version\t\t\toverride minimum deployment target" "      --mac-catalyst-target=ios sdk version\toverride minimum deployment target for mac catalyst"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -60,6 +60,7 @@ libraries are created under the prebuilt folder.\n"
 
 enable_main_build() {
   export IOS_MIN_VERSION=12.1
+  export MAC_CATALYST_MIN_VERSION=14.0
 }
 
 enable_lts_build() {
@@ -67,6 +68,9 @@ enable_lts_build() {
 
   # XCODE 7.3 HAS IOS SDK 9.3
   export IOS_MIN_VERSION=9.3
+
+  # MAC CATALYST IS INTRODUCED IN 13.0
+  export MAC_CATALYST_MIN_VERSION=13.0
 
   # IOS SDK 9.3 SUPPORTS VIDEOTOOLBOX
   # HOWEVER, THE LATEST FFMPEG VERSION USES SDK 11.0 APIS
@@ -119,13 +123,13 @@ get_arch_specific_cflags() {
     echo "-arch arm64e -target $(get_target) -march=armv8.3-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64E"
     ;;
   i386)
-    echo "-arch i386 -target $(get_target) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
+    echo "-arch i386 -target $(get_target) -march=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
     ;;
   x86-64)
-    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"
+    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
     ;;
   x86-64-mac-catalyst)
-    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64_MAC_CATALYST -isysroot ${SDK_PATH} -isystem ${SDK_PATH}/System/iOSSupport/usr/include -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
+    echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64_MAC_CATALYST -isysroot ${SDK_PATH} -isystem ${SDK_PATH}/System/iOSSupport/usr/include -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
     ;;
   esac
 }
