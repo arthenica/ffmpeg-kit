@@ -113,23 +113,23 @@ All libraries created can be found under the `prebuilt` directory.
    `FFmpegKit` package names given in the project [README](https://github.com/tanersener/ffmpeg-kit).
 
     - iOS
-    ```
+    ```yaml
     pod 'ffmpeg-kit-ios-full', '~> 4.5'
     ```
 
     - macOS
-    ```
+    ```yaml
     pod 'ffmpeg-kit-macos-full', '~> 4.5'
     ```
 
     - tvOS
-    ```
+    ```yaml
     pod 'ffmpeg-kit-tvos-full', '~> 4.5'
     ```
 
 2. Execute synchronous `FFmpeg` commands.
 
-    ```
+    ```objectivec
     #include <ffmpegkit/FFmpegKit.h>
 
     FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v mpeg4 file2.mp4"];
@@ -153,7 +153,7 @@ All libraries created can be found under the `prebuilt` directory.
 3. Each `execute` call (sync or async) creates a new session. Access every detail about your execution from the
    session created.
 
-    ```
+    ```objectivec
     FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v mpeg4 file2.mp4"];
 
     // Unique session id created for this execution
@@ -190,7 +190,7 @@ All libraries created can be found under the `prebuilt` directory.
 
 4. Execute asynchronous `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
 
-    ```
+    ```objectivec
     id<Session> session = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withExecuteCallback:^(id<Session> session){
         SessionState state = [session getState];
         ReturnCode *returnCode = [session getReturnCode];
@@ -214,7 +214,7 @@ All libraries created can be found under the `prebuilt` directory.
 
     - Synchronous
 
-    ```
+    ```objectivec
     FFprobeSession *session = [FFprobeKit execute:ffprobeCommand];
 
     if ([ReturnCode isSuccess:[session getReturnCode]]) {
@@ -224,7 +224,7 @@ All libraries created can be found under the `prebuilt` directory.
 
    - Asynchronous
 
-    ```
+    ```objectivec
     [FFprobeKit executeAsync:ffmpegCommand withExecuteCallback:^(id<Session> session) {
 
         CALLED WHEN SESSION IS EXECUTED
@@ -234,7 +234,7 @@ All libraries created can be found under the `prebuilt` directory.
 
 6. Get media information for a file.
 
-    ```
+    ```objectivec
     MediaInformationSession *mediaInformation = [FFprobeKit getMediaInformation:"<file path or uri>"];
     MediaInformation *mediaInformation =[mediaInformation getMediaInformation];
     ```
@@ -242,17 +242,17 @@ All libraries created can be found under the `prebuilt` directory.
 7. Stop ongoing `FFmpeg` operations.
 
    - Stop all executions
-       ```
+       ```objectivec
        [FFmpegKit cancel];
        ```
    - Stop a specific session
-       ```
+       ```objectivec
        [FFmpegKit cancel:sessionId];
        ```
 
 8. Get previous `FFmpeg` and `FFprobe` sessions from session history.
 
-    ```
+    ```objectivec
     NSArray* sessions = [FFmpegKitConfig getSessions];
     for (int i = 0; i < [sessions count]; i++) {
         id<Session> session = [sessions objectAtIndex:i];
@@ -270,7 +270,7 @@ All libraries created can be found under the `prebuilt` directory.
 
     - Execute Callback, called when an async execution is ended
 
-        ```
+        ```objectivec
         [FFmpegKitConfig enableExecuteCallback:^(id<Session> session) {
             ...
         }];
@@ -278,7 +278,7 @@ All libraries created can be found under the `prebuilt` directory.
 
     - Log Callback, called when a session generates logs
 
-        ```
+        ```objectivec
         [FFmpegKitConfig enableLogCallback:^(Log *log) {
             ...
         }];
@@ -286,7 +286,7 @@ All libraries created can be found under the `prebuilt` directory.
 
     - Statistics Callback, called when a session generates statistics
 
-        ```
+        ```objectivec
         [FFmpegKitConfig enableStatisticsCallback:^(Statistics *statistics) {
             ...
         }];
@@ -294,13 +294,13 @@ All libraries created can be found under the `prebuilt` directory.
 
 10. Ignore the handling of a signal. Required by `Mono` and frameworks that use `Mono`, e.g. `Unity` and `Xamarin`.
 
-    ```
+    ```objectivec
     [FFmpegKitConfig ignoreSignal:SIGXCPU];
     ```
 
 11. Register system fonts and custom font directories.
 
-    ```
+    ```objectivec
     [FFmpegKitConfig setFontDirectoryList:[NSArray arrayWithObjects:@"/System/Library/Fonts", @"<folder with fonts>", nil] with:nil];
     ```
 

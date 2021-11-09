@@ -123,6 +123,11 @@ while [ ! $# -eq 0 ]; do
 
     disable_arch "${DISABLED_ARCH}"
     ;;
+  --target=*)
+    TARGET=$(echo $1 | sed -e 's/^--[A-Za-z]*=//g')
+
+    export TVOS_MIN_VERSION=${TARGET}
+    ;;
   *)
     print_unknown_option "$1"
     ;;

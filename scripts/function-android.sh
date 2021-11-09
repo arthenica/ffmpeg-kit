@@ -109,6 +109,17 @@ get_clang_host() {
   esac
 }
 
+is_darwin_arm64() {
+  HOST_OS=$(uname -s)
+  HOST_ARCH=$(uname -m)
+
+  if [ "${HOST_OS}" == "Darwin" ] && [ "${HOST_ARCH}" == "arm64" ]; then
+    echo "1"
+  else
+    echo "0"
+  fi
+}
+
 get_toolchain() {
   HOST_OS=$(uname -s)
   case ${HOST_OS} in
@@ -123,6 +134,12 @@ get_toolchain() {
   i?86) HOST_ARCH=x86 ;;
   x86_64 | amd64) HOST_ARCH=x86_64 ;;
   esac
+
+  if [ "$(is_darwin_arm64)" == "1" ]; then
+    # NDK DOESNT HAVE AN ARM64 TOOLCHAIN ON DARWIN
+    # WE USE x86-64 WITH ROSETTA INSTEAD
+    HOST_ARCH=x86_64
+  fi
 
   echo "${HOST_OS}-${HOST_ARCH}"
 }
