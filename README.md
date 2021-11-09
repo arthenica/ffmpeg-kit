@@ -19,23 +19,19 @@ It includes scripts to build `FFmpeg` native libraries, a wrapper library to run
 
 ### 2. Android
 
-See [Android](https://github.com/tanersener/ffmpeg-kit/tree/main/android) to learn more about `FFmpegKit` for 
-`Android`. 
+See [Android](android) to learn more about `FFmpegKit` for `Android`.
 
 ### 3. iOS, macOS, tvOS
 
-See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/main/apple) to use `FFmpegKit` on `Apple` platforms 
-(`iOS`, `macOS`, `tvOS`). 
+See [Apple](apple) to use `FFmpegKit` on `Apple` platforms (`iOS`, `macOS`, `tvOS`).
 
 ### 4. Flutter
 
-See [Flutter](https://github.com/tanersener/ffmpeg-kit/tree/main/flutter/flutter) to learn more about `FFmpegKit` for
-`Flutter`.
+See [Flutter](flutter/flutter) to learn more about `FFmpegKit` for `Flutter`.
 
 ### 5. React Native
 
-See [React Native](https://github.com/tanersener/ffmpeg-kit/tree/main/react-native) to learn more about `FFmpegKit` for
-`React Native`.
+See [React Native](react-native) to learn more about `FFmpegKit` for `React Native`.
 
 ### 6. Build Scripts
 

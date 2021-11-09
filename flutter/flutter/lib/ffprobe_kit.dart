@@ -31,7 +31,11 @@ import 'src/ffmpeg_kit_factory.dart';
 class FFprobeKit {
   static FFmpegKitPlatform _platform = FFmpegKitPlatform.instance;
 
-  /// Asynchronously executes FFprobe with [command] provided.
+  /// Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
+  /// into arguments. You can use single or double quote characters to specify arguments inside your command.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<FFprobeSession> executeAsync(String command,
           [ExecuteCallback? executeCallback = null,
           LogCallback? logCallback = null]) async =>
@@ -40,7 +44,10 @@ class FFprobeKit {
           executeCallback,
           logCallback);
 
-  /// Asynchronously executes FFprobe with [commandArguments] provided.
+  /// Starts an asynchronous FFprobe execution with arguments provided.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<FFprobeSession> executeWithArgumentsAsync(
       List<String> commandArguments,
       [ExecuteCallback? executeCallback = null,
@@ -53,7 +60,10 @@ class FFprobeKit {
     return session;
   }
 
-  /// Extracts the media information for the file at [path] asynchronously.
+  /// Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<MediaInformationSession> getMediaInformationAsync(String path,
       [ExecuteCallback? executeCallback = null,
       LogCallback? logCallback = null,
@@ -73,7 +83,11 @@ class FFprobeKit {
         commandArguments, executeCallback, logCallback, waitTimeout);
   }
 
-  /// Extracts media information using the [command] provided asynchronously.
+  /// Starts an asynchronous FFprobe execution to extract media information using a command. The command passed to
+  /// this method must generate the output in JSON format in order to successfully extract media information from it.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<MediaInformationSession> getMediaInformationFromCommandAsync(
           String command,
           [ExecuteCallback? executeCallback = null,
@@ -85,8 +99,12 @@ class FFprobeKit {
           logCallback,
           waitTimeout);
 
-  /// Extracts media information using the [commandArguments] provided
-  /// asynchronously.
+  /// Starts an asynchronous FFprobe execution to extract media information using command arguments. The command
+  /// passed to this method must generate the output in JSON format in order to successfully extract media information
+  /// from it.
+  ///
+  /// Note that this method returns immediately and does not wait the execution to complete. You must use an
+  /// [ExecuteCallback] if you want to be notified about the result.
   static Future<MediaInformationSession>
       getMediaInformationFromCommandArgumentsAsync(
           List<String> commandArguments,
