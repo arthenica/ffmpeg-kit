@@ -147,6 +147,7 @@ This table shows the differences between two variants.
 | iOS AVFoundation | Yes | - |
 | iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | iOS Bundle Format | XCFrameworks | Frameworks |
+| Mac Catalyst Min Version | 14.0 | - |
 | macOS Min SDK | 10.15 | 10.11 |
 | macOS AVFoundation | Yes | - |
 | macOS Architectures | arm64<br/>x86-64 | x86-64 |
