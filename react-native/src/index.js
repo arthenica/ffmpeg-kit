@@ -1710,8 +1710,9 @@ class FFmpegKitInitializer {
     const arch = await ArchDetect.getArch();
     const packageName = await Packages.getPackageName();
     await FFmpegKitConfig.enableRedirection();
+    const isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
 
-    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}.`);
+    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
   }
 
 }
