@@ -76,8 +76,8 @@ public class FFprobeKit {
      * @param executeCallback callback that will be called when the execution is completed
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback) {
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final ExecuteCallback executeCallback) {
         final FFprobeSession session = new FFprobeSession(arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session);
@@ -96,9 +96,9 @@ public class FFprobeKit {
      * @param logCallback     callback that will receive logs
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final LogCallback logCallback) {
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final ExecuteCallback executeCallback,
+                                                           final LogCallback logCallback) {
         final FFprobeSession session = new FFprobeSession(arguments, executeCallback, logCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session);
@@ -117,9 +117,9 @@ public class FFprobeKit {
      * @param executorService executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final ExecutorService executorService) {
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final ExecuteCallback executeCallback,
+                                                           final ExecutorService executorService) {
         final FFprobeSession session = new FFprobeSession(arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
@@ -139,10 +139,10 @@ public class FFprobeKit {
      * @param executorService executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final LogCallback logCallback,
-                                              final ExecutorService executorService) {
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final ExecuteCallback executeCallback,
+                                                           final LogCallback logCallback,
+                                                           final ExecutorService executorService) {
         final FFprobeSession session = new FFprobeSession(arguments, executeCallback, logCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
@@ -175,7 +175,7 @@ public class FFprobeKit {
      */
     public static FFprobeSession executeAsync(final String command,
                                               final ExecuteCallback executeCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
     }
 
     /**
@@ -193,7 +193,7 @@ public class FFprobeKit {
     public static FFprobeSession executeAsync(final String command,
                                               final ExecuteCallback executeCallback,
                                               final LogCallback logCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
     }
 
     /**

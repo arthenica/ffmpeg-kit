@@ -19,7 +19,6 @@
 
 package com.arthenica.ffmpegkit;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -73,8 +72,8 @@ public class FFmpegKit {
      * @param executeCallback callback that will be called when the execution is completed
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
-                                             final ExecuteCallback executeCallback) {
+    public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
+                                                          final ExecuteCallback executeCallback) {
         final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
@@ -94,10 +93,10 @@ public class FFmpegKit {
      * @param statisticsCallback callback that will receive statistics
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
-                                             final ExecuteCallback executeCallback,
-                                             final LogCallback logCallback,
-                                             final StatisticsCallback statisticsCallback) {
+    public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
+                                                          final ExecuteCallback executeCallback,
+                                                          final LogCallback logCallback,
+                                                          final StatisticsCallback statisticsCallback) {
         final FFmpegSession session = new FFmpegSession(arguments, executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
@@ -116,9 +115,9 @@ public class FFmpegKit {
      * @param executorService executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
-                                             final ExecuteCallback executeCallback,
-                                             final ExecutorService executorService) {
+    public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
+                                                          final ExecuteCallback executeCallback,
+                                                          final ExecutorService executorService) {
         final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
@@ -139,11 +138,11 @@ public class FFmpegKit {
      * @param executorService    executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
-                                             final ExecuteCallback executeCallback,
-                                             final LogCallback logCallback,
-                                             final StatisticsCallback statisticsCallback,
-                                             final ExecutorService executorService) {
+    public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
+                                                          final ExecuteCallback executeCallback,
+                                                          final LogCallback logCallback,
+                                                          final StatisticsCallback statisticsCallback,
+                                                          final ExecutorService executorService) {
         final FFmpegSession session = new FFmpegSession(arguments, executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
@@ -176,7 +175,7 @@ public class FFmpegKit {
      */
     public static FFmpegSession executeAsync(final String command,
                                              final ExecuteCallback executeCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
     }
 
     /**
@@ -196,7 +195,7 @@ public class FFmpegKit {
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
     }
 
     /**
