@@ -267,6 +267,23 @@
 + (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
 
 /**
+ * <p>Starts an asynchronous FFprobe execution to extract media information using command arguments. The command
+ * passed to this method must generate the output in JSON format in order to successfully extract media information
+ * from it.
+ *
+ * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+ * ExecuteCallback if you want to be notified about the result.
+ *
+ * @param command         FFprobe command that prints media information for a file in JSON format
+ * @param executeCallback callback that will be notified when execution is completed
+ * @param logCallback     callback that will receive logs
+ * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @param waitTimeout     max time to wait until media information is transmitted
+ * @return media information session created for this execution
+ */
++ (MediaInformationSession*)getMediaInformationFromCommandArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
+
+/**
  * <p>Lists all FFprobe sessions in the session history.
  *
  * @return all FFprobe sessions in the session history

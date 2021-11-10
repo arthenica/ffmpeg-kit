@@ -136,7 +136,13 @@
     return session;
 }
 
-+ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
++ (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSString*)command withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:[FFmpegKitConfig parseArguments:command] withExecuteCallback:executeCallback withLogCallback:logCallback];
+    [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
+    return session;
+}
+
++ (MediaInformationSession*)getMediaInformationFromCommandArgumentsAsync:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
