@@ -831,6 +831,7 @@ framework module ffmpegkit {
   header "AbstractSession.h"
   header "ArchDetect.h"
   header "AtomicLong.h"
+  header "Chapter.h"
   header "ExecuteCallback.h"
   header "FFmpegKit.h"
   header "FFmpegKitConfig.h"

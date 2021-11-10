@@ -6,6 +6,7 @@ libffmpegkit_la_SOURCES = \
     AbstractSession.m \
     ArchDetect.m \
     AtomicLong.m \
+    Chapter.m \
     FFmpegKit.m \
     FFmpegKitConfig.m \
     FFmpegSession.m \
@@ -35,6 +36,7 @@ include_HEADERS = \
     AbstractSession.h \
     ArchDetect.h \
     AtomicLong.h \
+    Chapter.h \
     ExecuteCallback.h \
     FFmpegKit.h \
     FFmpegKitConfig.h \

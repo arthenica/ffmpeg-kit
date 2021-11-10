@@ -28,6 +28,10 @@
     [FFmpegKitConfig class];
 }
 
++ (NSArray*)defaultGetMediaInformationCommandArguments:(NSString*)path {
+    return [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-show_chapters", @"-i", path, nil];
+}
+
 + (FFprobeSession*)executeWithArguments:(NSArray*)arguments {
     FFprobeSession* session = [[FFprobeSession alloc] init:arguments];
     [FFmpegKitConfig ffprobeExecute:session];
@@ -89,42 +93,42 @@
 }
 
 + (MediaInformationSession*)getMediaInformation:(NSString*)path {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
     [FFmpegKitConfig getMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformation:(NSString*)path withTimeout:(int)waitTimeout {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
     [FFmpegKitConfig getMediaInformationExecute:session withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withTimeout:(int)waitTimeout {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback onDispatchQueue:(dispatch_queue_t)queue {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
-    NSArray* arguments = [[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil];
+    NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
     MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:executeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;

@@ -41,13 +41,19 @@ NSString* const MediaKeyTags = @"tags";
      */
     NSArray *streamArray;
 
+    /**
+     * Stores chapters.
+     */
+    NSArray *chapterArray;
+
 }
 
-- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams{
+- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams withChapters:(NSArray*)chapters{
     self = [super init];
     if (self) {
         dictionary = mediaDictionary;
         streamArray = streams;
+        chapterArray = chapters;
     }
 
     return self;
@@ -87,6 +93,10 @@ NSString* const MediaKeyTags = @"tags";
 
 - (NSArray*)getStreams {
     return streamArray;
+}
+
+- (NSArray*)getChapters {
+    return chapterArray;
 }
 
 - (NSString*)getStringProperty:(NSString*)key {

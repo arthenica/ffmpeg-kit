@@ -53,6 +53,16 @@ public class FFprobeKit {
     }
 
     /**
+     * <p>Builds the default command used to get media information for a file.
+     *
+     * @param path file path to use in the command
+     * @return default command arguments to get media information
+     */
+    private static String[] defaultGetMediaInformationCommandArguments(final String path) {
+        return new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path};
+    }
+
+    /**
      * <p>Synchronously executes FFprobe with arguments provided.
      *
      * @param arguments FFprobe command options/arguments as string array
@@ -249,7 +259,7 @@ public class FFprobeKit {
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformation(final String path) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path});
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path));
 
         FFmpegKitConfig.getMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -265,7 +275,7 @@ public class FFprobeKit {
      */
     public static MediaInformationSession getMediaInformation(final String path,
                                                               final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path});
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path));
 
         FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
 
@@ -284,7 +294,7 @@ public class FFprobeKit {
      */
     public static MediaInformationSession getMediaInformationAsync(final String path,
                                                                    final ExecuteCallback executeCallback) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), executeCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -307,7 +317,7 @@ public class FFprobeKit {
                                                                    final ExecuteCallback executeCallback,
                                                                    final LogCallback logCallback,
                                                                    final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback, logCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), executeCallback, logCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
 
@@ -328,7 +338,7 @@ public class FFprobeKit {
     public static MediaInformationSession getMediaInformationAsync(final String path,
                                                                    final ExecuteCallback executeCallback,
                                                                    final ExecutorService executorService) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), executeCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, executorService, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -353,7 +363,7 @@ public class FFprobeKit {
                                                                    final LogCallback logCallback,
                                                                    final ExecutorService executorService,
                                                                    final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback, logCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), executeCallback, logCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, executorService, waitTimeout);
 

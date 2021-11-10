@@ -134,18 +134,18 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libffmpegkit_la_DEPENDENCIES =
 am__libffmpegkit_la_SOURCES_DIST = AbstractSession.m ArchDetect.m \
-	AtomicLong.m FFmpegKit.m FFmpegKitConfig.m FFmpegSession.m \
-	FFprobeKit.m FFprobeSession.m Log.m MediaInformation.m \
-	MediaInformationJsonParser.m MediaInformationSession.m \
-	Packages.m ReturnCode.m Statistics.m StreamInformation.m \
-	ffmpegkit_exception.m fftools_cmdutils.c fftools_ffmpeg.c \
-	fftools_ffmpeg_filter.c fftools_ffmpeg_hw.c \
+	AtomicLong.m Chapter.m FFmpegKit.m FFmpegKitConfig.m \
+	FFmpegSession.m FFprobeKit.m FFprobeSession.m Log.m \
+	MediaInformation.m MediaInformationJsonParser.m \
+	MediaInformationSession.m Packages.m ReturnCode.m Statistics.m \
+	StreamInformation.m ffmpegkit_exception.m fftools_cmdutils.c \
+	fftools_ffmpeg.c fftools_ffmpeg_filter.c fftools_ffmpeg_hw.c \
 	fftools_ffmpeg_opt.c fftools_ffprobe.c \
 	fftools_ffmpeg_videotoolbox.c
 @FFMPEGKIT_VIDEOTOOLBOX_TRUE@am__objects_1 = libffmpegkit_la-fftools_ffmpeg_videotoolbox.lo
 am_libffmpegkit_la_OBJECTS = libffmpegkit_la-AbstractSession.lo \
 	libffmpegkit_la-ArchDetect.lo libffmpegkit_la-AtomicLong.lo \
-	libffmpegkit_la-FFmpegKit.lo \
+	libffmpegkit_la-Chapter.lo libffmpegkit_la-FFmpegKit.lo \
 	libffmpegkit_la-FFmpegKitConfig.lo \
 	libffmpegkit_la-FFmpegSession.lo libffmpegkit_la-FFprobeKit.lo \
 	libffmpegkit_la-FFprobeSession.lo libffmpegkit_la-Log.lo \
@@ -189,6 +189,7 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libffmpegkit_la-AbstractSession.Plo \
 	./$(DEPDIR)/libffmpegkit_la-ArchDetect.Plo \
 	./$(DEPDIR)/libffmpegkit_la-AtomicLong.Plo \
+	./$(DEPDIR)/libffmpegkit_la-Chapter.Plo \
 	./$(DEPDIR)/libffmpegkit_la-FFmpegKit.Plo \
 	./$(DEPDIR)/libffmpegkit_la-FFmpegKitConfig.Plo \
 	./$(DEPDIR)/libffmpegkit_la-FFmpegSession.Plo \
@@ -401,8 +402,8 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libffmpegkit.la
 libffmpegkit_la_LIBADD = @FFMPEG_FRAMEWORKS@
 libffmpegkit_la_SOURCES = AbstractSession.m ArchDetect.m AtomicLong.m \
-	FFmpegKit.m FFmpegKitConfig.m FFmpegSession.m FFprobeKit.m \
-	FFprobeSession.m Log.m MediaInformation.m \
+	Chapter.m FFmpegKit.m FFmpegKitConfig.m FFmpegSession.m \
+	FFprobeKit.m FFprobeSession.m Log.m MediaInformation.m \
 	MediaInformationJsonParser.m MediaInformationSession.m \
 	Packages.m ReturnCode.m Statistics.m StreamInformation.m \
 	ffmpegkit_exception.m fftools_cmdutils.c fftools_ffmpeg.c \
@@ -412,6 +413,7 @@ include_HEADERS = \
     AbstractSession.h \
     ArchDetect.h \
     AtomicLong.h \
+    Chapter.h \
     ExecuteCallback.h \
     FFmpegKit.h \
     FFmpegKitConfig.h \
@@ -521,6 +523,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-AbstractSession.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-ArchDetect.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-AtomicLong.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-Chapter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-FFmpegKit.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-FFmpegKitConfig.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-FFmpegSession.Plo@am__quote@ # am--include-marker
@@ -666,6 +669,13 @@ libffmpegkit_la-AtomicLong.lo: AtomicLong.m
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='AtomicLong.m' object='libffmpegkit_la-AtomicLong.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libffmpegkit_la-AtomicLong.lo `test -f 'AtomicLong.m' || echo '$(srcdir)/'`AtomicLong.m
+
+libffmpegkit_la-Chapter.lo: Chapter.m
+@am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_OBJCFLAGS) $(OBJCFLAGS) -MT libffmpegkit_la-Chapter.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-Chapter.Tpo -c -o libffmpegkit_la-Chapter.lo `test -f 'Chapter.m' || echo '$(srcdir)/'`Chapter.m
+@am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-Chapter.Tpo $(DEPDIR)/libffmpegkit_la-Chapter.Plo
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='Chapter.m' object='libffmpegkit_la-Chapter.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libffmpegkit_la-Chapter.lo `test -f 'Chapter.m' || echo '$(srcdir)/'`Chapter.m
 
 libffmpegkit_la-FFmpegKit.lo: FFmpegKit.m
 @am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_OBJCFLAGS) $(OBJCFLAGS) -MT libffmpegkit_la-FFmpegKit.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-FFmpegKit.Tpo -c -o libffmpegkit_la-FFmpegKit.lo `test -f 'FFmpegKit.m' || echo '$(srcdir)/'`FFmpegKit.m
@@ -922,6 +932,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libffmpegkit_la-AbstractSession.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-ArchDetect.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-AtomicLong.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-Chapter.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegKit.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegKitConfig.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegSession.Plo
@@ -991,6 +1002,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libffmpegkit_la-AbstractSession.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-ArchDetect.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-AtomicLong.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-Chapter.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegKit.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegKitConfig.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-FFmpegSession.Plo
