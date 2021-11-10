@@ -2394,7 +2394,9 @@ export class Packages {
    *
    * @return predicted FFmpegKit ReactNative binary package name
    */
-  static getPackageName() {
+  static async getPackageName() {
+    await FFmpegKitConfig.init();
+
     return FFmpegKitReactNativeModule.getPackageName();
   }
 
@@ -2403,7 +2405,9 @@ export class Packages {
    *
    * @return enabled external libraries
    */
-  static getExternalLibraries() {
+  static async getExternalLibraries() {
+    await FFmpegKitConfig.init();
+
     return FFmpegKitReactNativeModule.getExternalLibraries();
   }
 
