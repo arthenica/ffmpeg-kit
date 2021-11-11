@@ -194,7 +194,7 @@ compare to each other.
 1. Execute FFmpeg commands.
 
     ```js
-    import { FFmpegKit } from 'ffmpeg-kit-react-native';
+    import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 
     FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', async (session) => {
       const returnCode = await session.getReturnCode();
