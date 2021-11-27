@@ -267,7 +267,7 @@ is_library_supported_on_platform() {
 
   # ONLY IOS, MACOS AND TVOS MAIN
   52)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-videotoolbox" ]] && [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-videotoolbox" ]]; then
       echo "0"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] && [[ $1 == "macos-videotoolbox" ]]; then
       echo "0"

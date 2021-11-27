@@ -444,6 +444,13 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR
 FFMPEG_VERSION="v$(get_user_friendly_ffmpeg_version)"
 ${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
+# 5. Add iOS/tvOS availability checks for videotoolbox
+${SED_INLINE} -E \
+  -e 's/__builtin_available\(macOS 10\.11, \*\)/__builtin_available(macOS 10.11, iOS 9.0, tvOS 9.0, *)/g' \
+  -e 's/__builtin_available\(macOS 10\.12, \*\)/__builtin_available(macOS 10.12, iOS 10.0, tvOS 10.0, *)/g' \
+  -e 's/__builtin_available\(macOS 10\.13, \*\)/__builtin_available(macOS 10.13, iOS 11.0, tvOS 11.0, *)/g' \
+  "${BASEDIR}"/src/${LIB_NAME}/libavutil/hwcontext_videotoolbox.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
 ###################################################################
 
 ./configure \
