@@ -28,15 +28,6 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
 
   case ${ARCH_NAME} in
-  armv7 | armv7s | i386)
-
-    # SUPPORTED UNTIL IOS SDK 10.3.1
-    if [[ $(compare_versions "$2" "10.3.1") -le 0 ]]; then
-      local SUPPORTED=1
-    else
-      local SUPPORTED=0
-    fi
-    ;;
   arm64e)
 
     # INTRODUCED IN IOS SDK 10.1
