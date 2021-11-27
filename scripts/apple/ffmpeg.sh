@@ -438,7 +438,9 @@ else
 fi
 
 # 3. Use thread local log levels
-${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+if [[ ${ARCH} != i386 ]]; then
+  ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+fi
 
 # 4. Set friendly ffmpeg version
 FFMPEG_VERSION="v$(get_user_friendly_ffmpeg_version)"
