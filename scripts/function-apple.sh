@@ -39,7 +39,7 @@ disable_ios_architecture_not_supported_on_detected_sdk_version() {
   arm64e)
 
     # INTRODUCED IN IOS SDK 10.1
-    if [[ $(compare_versions "$IOS_MIN_VERSION" "10.1") -ge 1 ]]; then
+    if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "10.1") -ge 1 ]]; then
       local SUPPORTED=1
     else
       local SUPPORTED=0
