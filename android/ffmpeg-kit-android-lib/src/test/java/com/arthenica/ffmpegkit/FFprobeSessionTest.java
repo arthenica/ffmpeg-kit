@@ -27,6 +27,7 @@ import java.util.List;
 public class FFprobeSessionTest {
 
     private static final String[] TEST_ARGUMENTS = new String[]{"argument1", "argument2"};
+    private static final long TEST_SESSION_ID = 120;
 
     @Test
     public void constructorTest() {
@@ -97,7 +98,7 @@ public class FFprobeSessionTest {
             }
         };
 
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, executeCallback);
+        FFprobeSession ffprobeSession = new FFprobeSession(FFprobeSession.AUTO_GENERATED_ID, TEST_ARGUMENTS, executeCallback);
 
         // 1. getExecuteCallback
         Assert.assertEquals(ffprobeSession.getExecuteCallback(), executeCallback);
@@ -171,7 +172,7 @@ public class FFprobeSessionTest {
             }
         };
 
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, executeCallback, logCallback);
+        FFprobeSession ffprobeSession = new FFprobeSession(FFprobeSession.AUTO_GENERATED_ID, TEST_ARGUMENTS, executeCallback, logCallback);
 
         // 1. getExecuteCallback
         Assert.assertEquals(ffprobeSession.getExecuteCallback(), executeCallback);
@@ -227,6 +228,13 @@ public class FFprobeSessionTest {
 
         // 16. getFuture
         Assert.assertNull(ffprobeSession.getFuture());
+    }
+
+    @Test
+    public void providedSessionIdTest() {
+        FFprobeSession providedSession = new FFprobeSession(TEST_SESSION_ID, TEST_ARGUMENTS);
+
+        Assert.assertEquals(TEST_SESSION_ID, providedSession.sessionId);
     }
 
     @Test

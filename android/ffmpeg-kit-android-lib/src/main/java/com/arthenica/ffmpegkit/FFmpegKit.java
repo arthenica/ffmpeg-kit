@@ -19,7 +19,6 @@
 
 package com.arthenica.ffmpegkit;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -64,18 +63,35 @@ public class FFmpegKit {
     }
 
     /**
+     * <p>Synchronously executes FFmpeg with arguments provided.
+     *
+     * @param sessionId Provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
+     * @param arguments FFmpeg command options/arguments as string array
+     * @return FFmpeg session created for this execution
+     */
+    public static FFmpegSession execute(final long sessionId, final String[] arguments) {
+        final FFmpegSession session = new FFmpegSession(sessionId, arguments);
+
+        FFmpegKitConfig.ffmpegExecute(session);
+
+        return session;
+    }
+
+    /**
      * <p>Starts an asynchronous FFmpeg execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId       Provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param arguments       FFmpeg command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
+    public static FFmpegSession executeAsync(final long sessionId,
+                                             final String[] arguments,
                                              final ExecuteCallback executeCallback) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -88,17 +104,18 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId          Provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param arguments          FFmpeg command options/arguments as string array
      * @param executeCallback    callback that will be called when the execution is completed
      * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
+    public static FFmpegSession executeAsync(final long sessionId, final String[] arguments,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, arguments, executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -111,15 +128,16 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId       Provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param arguments       FFmpeg command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
      * @param executorService executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
+    public static FFmpegSession executeAsync(final long sessionId, final String[] arguments,
                                              final ExecuteCallback executeCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, arguments, executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -132,6 +150,7 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId          Provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param arguments          FFmpeg command options/arguments as string array
      * @param executeCallback    callback that will be called when the execution is completed
      * @param logCallback        callback that will receive logs
@@ -139,12 +158,12 @@ public class FFmpegKit {
      * @param executorService    executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String[] arguments,
+    public static FFmpegSession executeAsync(final long sessionId, final String[] arguments,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(arguments, executeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, arguments, executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -164,19 +183,16 @@ public class FFmpegKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
-     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
+     * into arguments. You can use single or double quote characters to specify arguments inside
+     * your command.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
-     *
-     * @param command         FFmpeg command
-     * @param executeCallback callback that will be called when the execution is completed
+     * @param sessionId provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
+     * @param command   FFmpeg command
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String command,
-                                             final ExecuteCallback executeCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
+    public static FFmpegSession execute(final long sessionId, final String command) {
+        return execute(sessionId, FFmpegKitConfig.parseArguments(command));
     }
 
     /**
@@ -186,17 +202,35 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId       provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
+     * @param command         FFmpeg command
+     * @param executeCallback callback that will be called when the execution is completed
+     * @return FFmpeg session created for this execution
+     */
+    public static FFmpegSession executeAsync(final long sessionId, final String command,
+                                             final ExecuteCallback executeCallback) {
+        return executeAsync(sessionId, FFmpegKitConfig.parseArguments(command), executeCallback);
+    }
+
+    /**
+     * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
+     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     *
+     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
+     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     *
+     * @param sessionId          provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param command            FFmpeg command
      * @param executeCallback    callback that will be called when the execution is completed
      * @param logCallback        callback that will receive logs
      * @param statisticsCallback callback that will receive statistics
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String command,
+    public static FFmpegSession executeAsync(final long sessionId, final String command,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
+        return executeAsync(sessionId, FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
     }
 
     /**
@@ -206,15 +240,16 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId       provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param command         FFmpeg command
      * @param executeCallback callback that will be called when the execution is completed
      * @param executorService executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String command,
+    public static FFmpegSession executeAsync(final long sessionId, final String command,
                                              final ExecuteCallback executeCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), executeCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, FFmpegKitConfig.parseArguments(command), executeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -228,6 +263,7 @@ public class FFmpegKit {
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
      * {@jlink ExecuteCallback} if you want to be notified about the result.
      *
+     * @param sessionId          provide session id or {@link FFmpegSession#AUTO_GENERATED_ID}
      * @param command            FFmpeg command
      * @param executeCallback    callback that will be called when the execution is completed
      * @param logCallback        callback that will receive logs
@@ -235,12 +271,12 @@ public class FFmpegKit {
      * @param executorService    executor service that will be used to run this asynchronous operation
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession executeAsync(final String command,
+    public static FFmpegSession executeAsync(final long sessionId, final String command,
                                              final ExecuteCallback executeCallback,
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = new FFmpegSession(sessionId, FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 

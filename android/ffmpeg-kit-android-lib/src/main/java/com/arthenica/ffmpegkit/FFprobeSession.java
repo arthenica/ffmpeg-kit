@@ -30,7 +30,16 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param arguments command arguments
      */
     public FFprobeSession(final String[] arguments) {
-        this(arguments, null);
+        this(-1, arguments);
+    }
+
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments command arguments
+     */
+    public FFprobeSession(final long sessionId, final String[] arguments) {
+        this(sessionId, arguments, null);
     }
 
     /**
@@ -39,36 +48,38 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param arguments       command arguments
      * @param executeCallback session specific execute callback function
      */
-    public FFprobeSession(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(arguments, executeCallback, null);
+    public FFprobeSession(final long sessionId, final String[] arguments, final ExecuteCallback executeCallback) {
+        this(sessionId, arguments, executeCallback, null);
     }
 
     /**
-     * Builds a new FFprobe session.
+     * Builds a new FFprobe session with provided session id.
      *
+     * @param sessionId       provide session id or {@link #AUTO_GENERATED_ID}
      * @param arguments       command arguments
      * @param executeCallback session specific execute callback function
      * @param logCallback     session specific log callback function
      */
-    public FFprobeSession(final String[] arguments,
+    public FFprobeSession(final long sessionId, final String[] arguments,
                           final ExecuteCallback executeCallback,
                           final LogCallback logCallback) {
-        this(arguments, executeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+        this(sessionId, arguments, executeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
     /**
      * Builds a new FFprobe session.
      *
+     * @param sessionId              provide session id or {@link #AUTO_GENERATED_ID}
      * @param arguments              command arguments
      * @param executeCallback        session specific execute callback function
      * @param logCallback            session specific log callback function
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    public FFprobeSession(final String[] arguments,
+    public FFprobeSession(final long sessionId, final String[] arguments,
                           final ExecuteCallback executeCallback,
                           final LogCallback logCallback,
                           final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, executeCallback, logCallback, logRedirectionStrategy);
+        super(sessionId, arguments, executeCallback, logCallback, logRedirectionStrategy);
     }
 
     @Override

@@ -5,10 +5,10 @@ android {
     ndkVersion "23.0.7599858"
 
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 16
         targetSdkVersion 30
-        versionCode 240450
-        versionName "4.5"
+        versionCode 160450
+        versionName "4.5.LTS"
         project.archivesBaseName = "ffmpeg-kit"
         consumerProguardFiles 'proguard-rules.pro'
     }

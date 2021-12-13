@@ -36,7 +36,16 @@ public class MediaInformationSession extends FFprobeSession implements Session {
      * @param arguments command arguments
      */
     public MediaInformationSession(final String[] arguments) {
-        this(arguments, null);
+        this(-1, arguments);
+    }
+
+    /**
+     * Creates a new media information session.
+     *
+     * @param arguments command arguments
+     */
+    public MediaInformationSession(final long sessionId, final String[] arguments) {
+        this(sessionId, arguments, null);
     }
 
     /**
@@ -45,8 +54,8 @@ public class MediaInformationSession extends FFprobeSession implements Session {
      * @param arguments       command arguments
      * @param executeCallback session specific execute callback function
      */
-    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(arguments, executeCallback, null);
+    public MediaInformationSession(final long sessionId, final String[] arguments, final ExecuteCallback executeCallback) {
+        this(sessionId, arguments, executeCallback, null);
     }
 
     /**
@@ -56,8 +65,8 @@ public class MediaInformationSession extends FFprobeSession implements Session {
      * @param executeCallback session specific execute callback function
      * @param logCallback     session specific log callback function
      */
-    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback, final LogCallback logCallback) {
-        super(arguments, executeCallback, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+    public MediaInformationSession(final long sessionId, final String[] arguments, final ExecuteCallback executeCallback, final LogCallback logCallback) {
+        super(sessionId, arguments, executeCallback, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
     }
 
     /**

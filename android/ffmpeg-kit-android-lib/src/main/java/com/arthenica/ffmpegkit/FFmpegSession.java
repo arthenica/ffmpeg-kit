@@ -48,49 +48,64 @@ public class FFmpegSession extends AbstractSession implements Session {
      * @param arguments command arguments
      */
     public FFmpegSession(final String[] arguments) {
-        this(arguments, null);
+        this(-1, arguments);
     }
 
     /**
-     * Builds a new FFmpeg session.
+     * Builds a new FFmpeg session with provide session id.
      *
+     * @param sessionId provide session id
+     * @param arguments command arguments
+     */
+    public FFmpegSession(final long sessionId, final String[] arguments) {
+        this(sessionId, arguments, null);
+    }
+
+    /**
+     * Builds a new FFmpeg session with provided session id.
+     *
+     * @param sessionId       provide session id
      * @param arguments       command arguments
      * @param executeCallback session specific execute callback function
      */
-    public FFmpegSession(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(arguments, executeCallback, null, null);
+    public FFmpegSession(final long sessionId, final String[] arguments, final ExecuteCallback executeCallback) {
+        this(sessionId, arguments, executeCallback, null, null);
     }
 
     /**
      * Builds a new FFmpeg session.
      *
+     * @param sessionId          provide session id
      * @param arguments          command arguments
      * @param executeCallback    session specific execute callback function
      * @param logCallback        session specific log callback function
      * @param statisticsCallback session specific statistics callback function
      */
-    public FFmpegSession(final String[] arguments,
+    public FFmpegSession(final long sessionId,
+                         final String[] arguments,
                          final ExecuteCallback executeCallback,
                          final LogCallback logCallback,
                          final StatisticsCallback statisticsCallback) {
-        this(arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+        this(sessionId, arguments, executeCallback, logCallback, statisticsCallback, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
     /**
      * Builds a new FFmpeg session.
      *
+     * @param sessionId              provide session id
      * @param arguments              command arguments
      * @param executeCallback        session specific execute callback function
      * @param logCallback            session specific log callback function
      * @param statisticsCallback     session specific statistics callback function
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    public FFmpegSession(final String[] arguments,
+    public FFmpegSession(final long sessionId,
+                         final String[] arguments,
                          final ExecuteCallback executeCallback,
                          final LogCallback logCallback,
                          final StatisticsCallback statisticsCallback,
                          final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, executeCallback, logCallback, logRedirectionStrategy);
+        super(sessionId, arguments, executeCallback, logCallback, logRedirectionStrategy);
 
         this.statisticsCallback = statisticsCallback;
 

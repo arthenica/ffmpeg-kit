@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractSession implements Session {
 
+    public static final long AUTO_GENERATED_ID = -1;
+
     /**
      * Generates unique ids for sessions.
      */
@@ -116,16 +118,22 @@ public abstract class AbstractSession implements Session {
     /**
      * Creates a new abstract session.
      *
+     * @param sessionId              provide your own session id or -1 to generate session id
      * @param arguments              command arguments
      * @param executeCallback        session specific execute callback function
      * @param logCallback            session specific log callback function
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    public AbstractSession(final String[] arguments,
+    public AbstractSession(final long sessionId,
+                           final String[] arguments,
                            final ExecuteCallback executeCallback,
                            final LogCallback logCallback,
                            final LogRedirectionStrategy logRedirectionStrategy) {
-        this.sessionId = sessionIdGenerator.getAndIncrement();
+        if(sessionId > 0){
+            this.sessionId = sessionId;
+        } else {
+            this.sessionId = sessionIdGenerator.getAndIncrement();
+        }
         this.executeCallback = executeCallback;
         this.logCallback = logCallback;
         this.createTime = new Date();

@@ -27,6 +27,7 @@ import java.util.List;
 public class FFmpegSessionTest {
 
     private static final String[] TEST_ARGUMENTS = new String[]{"argument1", "argument2"};
+    private static final long TEST_SESSION_ID = 120;
 
     @Test
     public void constructorTest() {
@@ -100,7 +101,7 @@ public class FFmpegSessionTest {
             }
         };
 
-        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, executeCallback);
+        FFmpegSession ffmpegSession = new FFmpegSession(FFmpegSession.AUTO_GENERATED_ID, TEST_ARGUMENTS, executeCallback);
 
         // 1. getExecuteCallback
         Assert.assertEquals(ffmpegSession.getExecuteCallback(), executeCallback);
@@ -184,7 +185,7 @@ public class FFmpegSessionTest {
             }
         };
 
-        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, executeCallback, logCallback, statisticsCallback);
+        FFmpegSession ffmpegSession = new FFmpegSession(FFmpegSession.AUTO_GENERATED_ID, TEST_ARGUMENTS, executeCallback, logCallback, statisticsCallback);
 
         // 1. getExecuteCallback
         Assert.assertEquals(ffmpegSession.getExecuteCallback(), executeCallback);
@@ -243,6 +244,13 @@ public class FFmpegSessionTest {
 
         // 17. getFuture
         Assert.assertNull(ffmpegSession.getFuture());
+    }
+
+    @Test
+    public void providedSessionIdTest() {
+        FFmpegSession providedSession = new FFmpegSession(TEST_SESSION_ID, TEST_ARGUMENTS);
+
+        Assert.assertEquals(TEST_SESSION_ID, providedSession.sessionId);
     }
 
     @Test
