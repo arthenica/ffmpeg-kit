@@ -20,18 +20,11 @@ export const LogRedirectionStrategy = {
 }
 
 export const SessionState = {
-  CREATED: 0,
-  RUNNING: 1,
-  FAILED: 2,
-  COMPLETED: 3
+  CREATED: 0, RUNNING: 1, FAILED: 2, COMPLETED: 3
 }
 
 export const Signal = {
-  SIGINT: 2,
-  SIGQUIT: 3,
-  SIGPIPE: 13,
-  SIGTERM: 15,
-  SIGXCPU: 24
+  SIGINT: 2, SIGQUIT: 3, SIGPIPE: 13, SIGTERM: 15, SIGXCPU: 24
 }
 
 class FFmpegKitReactNativeEventEmitter extends NativeEventEmitter {
@@ -1424,16 +1417,7 @@ class FFmpegKitFactory {
 
   static mapToStatistics(statisticsMap) {
     if (statisticsMap !== undefined) {
-      return new Statistics(
-        statisticsMap.sessionId,
-        statisticsMap.videoFrameNumber,
-        statisticsMap.videoFps,
-        statisticsMap.videoQuality,
-        statisticsMap.size,
-        statisticsMap.time,
-        statisticsMap.bitrate,
-        statisticsMap.speed
-      );
+      return new Statistics(statisticsMap.sessionId, statisticsMap.videoFrameNumber, statisticsMap.videoFps, statisticsMap.videoQuality, statisticsMap.size, statisticsMap.time, statisticsMap.bitrate, statisticsMap.speed);
     } else {
       return undefined;
     }
@@ -1571,99 +1555,96 @@ class FFmpegKitInitializer {
       return;
     }
 
-    FFmpegKitConfig.getSession(sessionId).then(session => {
-      activeLogRedirectionStrategy = session.getLogRedirectionStrategy();
+    if (FFmpegKitFactory.getLogRedirectionStrategy(sessionId) !== undefined) {
+      activeLogRedirectionStrategy = FFmpegKitFactory.getLogRedirectionStrategy(sessionId);
+    }
+    let activeLogCallback = FFmpegKitFactory.getLogCallback(sessionId);
+    if (activeLogCallback !== undefined) {
+      sessionCallbackDefined = true;
 
-      if (session.getLogCallback() !== undefined) {
-        sessionCallbackDefined = true;
-
-        try {
-          // NOTIFY SESSION CALLBACK DEFINED
-          session.getLogCallback()(log);
-        } catch (err) {
-          console.log("Exception thrown inside session LogCallback block.", err.stack);
-        }
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        activeLogCallback(log);
+      } catch (err) {
+        console.log("Exception thrown inside session LogCallback block.", err.stack);
       }
+    }
 
-      let globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
-      if (globalLogCallbackFunction !== undefined) {
-        globalCallbackDefined = true;
+    let globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
+    if (globalLogCallbackFunction !== undefined) {
+      globalCallbackDefined = true;
 
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalLogCallbackFunction(log);
-        } catch (err) {
-          console.log("Exception thrown inside global LogCallback block.", err.stack);
-        }
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalLogCallbackFunction(log);
+      } catch (err) {
+        console.log("Exception thrown inside global LogCallback block.", err.stack);
       }
+    }
 
-      // EXECUTE THE LOG STRATEGY
-      switch (activeLogRedirectionStrategy) {
-        case LogRedirectionStrategy.NEVER_PRINT_LOGS: {
+    // EXECUTE THE LOG STRATEGY
+    switch (activeLogRedirectionStrategy) {
+      case LogRedirectionStrategy.NEVER_PRINT_LOGS: {
+        return;
+      }
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_GLOBAL_CALLBACK_NOT_DEFINED: {
+        if (globalCallbackDefined) {
           return;
         }
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_GLOBAL_CALLBACK_NOT_DEFINED: {
-          if (globalCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_SESSION_CALLBACK_NOT_DEFINED: {
-          if (sessionCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED: {
-          if (globalCallbackDefined || sessionCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.ALWAYS_PRINT_LOGS: {
-        }
-          break;
       }
+        break;
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_SESSION_CALLBACK_NOT_DEFINED: {
+        if (sessionCallbackDefined) {
+          return;
+        }
+      }
+        break;
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED: {
+        if (globalCallbackDefined || sessionCallbackDefined) {
+          return;
+        }
+      }
+        break;
+      case LogRedirectionStrategy.ALWAYS_PRINT_LOGS: {
+      }
+        break;
+    }
 
-      // PRINT LOGS
-      switch (level) {
-        case Level.AV_LOG_QUIET: {
-          // PRINT NO OUTPUT
-        }
-          break;
-        default: {
-          console.log(text);
-        }
+    // PRINT LOGS
+    switch (level) {
+      case Level.AV_LOG_QUIET: {
+        // PRINT NO OUTPUT
       }
-    });
+        break;
+      default: {
+        console.log(text);
+      }
+    }
   }
 
   static processStatisticsCallbackEvent(event) {
     let statistics = FFmpegKitFactory.mapToStatistics(event);
     let sessionId = event.sessionId;
 
-    FFmpegKitConfig.getSession(sessionId).then(session => {
-      if (session.isFFmpeg()) {
-        if (session.getStatisticsCallback() !== undefined) {
-          try {
-            // NOTIFY SESSION CALLBACK DEFINED
-            session.getStatisticsCallback()(statistics);
-          } catch (err) {
-            console.log("Exception thrown inside session StatisticsCallback block.", err.stack);
-          }
-        }
+    let activeStatisticsCallback = FFmpegKitFactory.getStatisticsCallback(sessionId);
+    if (activeStatisticsCallback !== undefined) {
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        activeStatisticsCallback(statistics);
+      } catch (err) {
+        console.log("Exception thrown inside session StatisticsCallback block.", err.stack);
       }
+    }
 
-      let globalStatisticsCallbackFunction = FFmpegKitFactory.getGlobalStatisticsCallback();
-      if (globalStatisticsCallbackFunction !== undefined) {
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalStatisticsCallbackFunction(statistics);
-        } catch (err) {
-          console.log("Exception thrown inside global StatisticsCallback block.", err.stack);
-        }
+    let globalStatisticsCallbackFunction = FFmpegKitFactory.getGlobalStatisticsCallback();
+    if (globalStatisticsCallbackFunction !== undefined) {
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalStatisticsCallbackFunction(statistics);
+      } catch (err) {
+        console.log("Exception thrown inside global StatisticsCallback block.", err.stack);
       }
-    });
+    }
   }
 
   static processExecuteCallbackEvent(event) {
