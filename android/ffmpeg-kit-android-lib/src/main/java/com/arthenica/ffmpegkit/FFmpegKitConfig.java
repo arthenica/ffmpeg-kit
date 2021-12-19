@@ -705,7 +705,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFmpeg execution for the given session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param ffmpegSession FFmpeg session which includes command options/arguments
      */
@@ -719,7 +719,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFmpeg execution for the given session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param ffmpegSession   FFmpeg session which includes command options/arguments
      * @param executorService executor service that will be used to run this asynchronous operation
@@ -734,7 +734,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFprobe execution for the given session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param ffprobeSession FFprobe session which includes command options/arguments
      */
@@ -748,7 +748,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFprobe execution for the given session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param ffprobeSession  FFprobe session which includes command options/arguments
      * @param executorService executor service that will be used to run this asynchronous operation
@@ -763,7 +763,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFprobe execution for the given media information session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param mediaInformationSession media information session which includes command options/arguments
      * @param waitTimeout             max time to wait until media information is transmitted
@@ -778,7 +778,7 @@ public class FFmpegKitConfig {
      * <p>Starts an asynchronous FFprobe execution for the given media information session.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param mediaInformationSession media information session which includes command options/arguments
      * @param executorService         executor service that will be used to run this asynchronous operation

@@ -80,7 +80,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFprobe command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
@@ -99,7 +99,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFprobe command options/arguments as string array
      * @param executeCallback callback that will be notified when execution is completed
@@ -120,7 +120,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFprobe command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
@@ -141,7 +141,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFprobe command options/arguments as string array
      * @param executeCallback callback that will be notified when execution is completed
@@ -177,7 +177,7 @@ public class FFprobeKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFprobe command
      * @param executeCallback callback that will be called when the execution is completed
@@ -193,7 +193,7 @@ public class FFprobeKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFprobe command
      * @param executeCallback callback that will be notified when execution is completed
@@ -211,7 +211,7 @@ public class FFprobeKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFprobe command
      * @param executeCallback callback that will be called when the execution is completed
@@ -233,7 +233,7 @@ public class FFprobeKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFprobe command
      * @param executeCallback callback that will be called when the execution is completed
@@ -286,7 +286,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param path            path or uri of a media file
      * @param executeCallback callback that will be called when the execution is completed
@@ -305,7 +305,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param path            path or uri of a media file
      * @param executeCallback callback that will be notified when execution is completed
@@ -328,7 +328,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param path            path or uri of a media file
      * @param executeCallback callback that will be called when the execution is completed
@@ -349,7 +349,7 @@ public class FFprobeKit {
      * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param path            path or uri of a media file
      * @param executeCallback callback that will be notified when execution is completed
@@ -389,7 +389,7 @@ public class FFprobeKit {
      * this method must generate the output in JSON format in order to successfully extract media information from it.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFprobe command that prints media information for a file in JSON format
      * @param executeCallback callback that will be notified when execution is completed
@@ -410,7 +410,7 @@ public class FFprobeKit {
      * from it.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFprobe command arguments that print media information for a file in JSON format
      * @param executeCallback callback that will be notified when execution is completed

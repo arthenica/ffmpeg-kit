@@ -66,7 +66,7 @@ public class FFmpegKit {
      * <p>Starts an asynchronous FFmpeg execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFmpeg command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
@@ -85,7 +85,7 @@ public class FFmpegKit {
      * <p>Starts an asynchronous FFmpeg execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments          FFmpeg command options/arguments as string array
      * @param executeCallback    callback that will be called when the execution is completed
@@ -108,7 +108,7 @@ public class FFmpegKit {
      * <p>Starts an asynchronous FFmpeg execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments       FFmpeg command options/arguments as string array
      * @param executeCallback callback that will be called when the execution is completed
@@ -129,7 +129,7 @@ public class FFmpegKit {
      * <p>Starts an asynchronous FFmpeg execution with arguments provided.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param arguments          FFmpeg command options/arguments as string array
      * @param executeCallback    callback that will be called when the execution is completed
@@ -167,7 +167,7 @@ public class FFmpegKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFmpeg command
      * @param executeCallback callback that will be called when the execution is completed
@@ -183,7 +183,7 @@ public class FFmpegKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command            FFmpeg command
      * @param executeCallback    callback that will be called when the execution is completed
@@ -203,7 +203,7 @@ public class FFmpegKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command         FFmpeg command
      * @param executeCallback callback that will be called when the execution is completed
@@ -225,7 +225,7 @@ public class FFmpegKit {
      * into arguments. You can use single or double quote characters to specify arguments inside your command.
      *
      * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * {@link ExecuteCallback} if you want to be notified about the result.
      *
      * @param command            FFmpeg command
      * @param executeCallback    callback that will be called when the execution is completed
