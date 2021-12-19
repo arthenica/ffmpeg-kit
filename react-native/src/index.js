@@ -1876,7 +1876,7 @@ export class FFprobeKit {
    * @return media information session created for this execution
    */
   static async getMediaInformationAsync(path, executeCallback, logCallback, waitTimeout) {
-    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path];
+    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path];
     return FFprobeKit.getMediaInformationFromCommandArgumentsAsync(commandArguments, executeCallback, logCallback, waitTimeout);
   }
 
@@ -2215,6 +2215,28 @@ export class MediaInformation {
     if (streamList !== undefined) {
       streamList.forEach((stream) => {
         list.push(new StreamInformation(stream));
+      });
+    }
+
+    return list;
+  }
+
+  /**
+   * Returns the chapters found as array.
+   *
+   * @returns Chapter array
+   */
+  getChapters() {
+    let list = [];
+    let chapterList;
+
+    if (this.#allProperties !== undefined) {
+      chapterList = this.#allProperties.chapters;
+    }
+
+    if (chapterList !== undefined) {
+      chapterList.forEach((chapter) => {
+        list.push(new Chapter(chapter));
       });
     }
 
@@ -2770,6 +2792,140 @@ export class StreamInformation {
    *
    * @param key properties key
    * @return stream properties as an object or undefined if the key is not found
+   */
+  getProperties(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns all properties found.
+   *
+   * @returns an object in which properties can be accessed by property names
+   */
+  getAllProperties() {
+    return this.#allProperties;
+  }
+}
+
+/**
+ * Chapter class.
+ */
+export class Chapter {
+
+  static KEY_ID = "id";
+  static KEY_TIME_BASE = "time_base";
+  static KEY_START = "start";
+  static KEY_START_TIME = "start_time";
+  static KEY_END = "end";
+  static KEY_END_TIME = "end_time";
+  static KEY_TAGS = "tags";
+
+  #allProperties;
+
+  constructor(properties) {
+    this.#allProperties = properties;
+  }
+
+  /**
+   * Returns id.
+   *
+   * @return id
+   */
+  getId() {
+    return this.getNumberProperty(Chapter.KEY_ID);
+  }
+
+  /**
+   * Returns time base.
+   *
+   * @return time base
+   */
+  getTimeBase() {
+    return this.getStringProperty(Chapter.KEY_TIME_BASE);
+  }
+
+  /**
+   * Returns start.
+   *
+   * @return start
+   */
+  getStart() {
+    return this.getNumberProperty(Chapter.KEY_START);
+  }
+
+  /**
+   * Returns start time.
+   *
+   * @return start time
+   */
+  getStartTime() {
+    return this.getStringProperty(Chapter.KEY_START_TIME);
+  }
+
+  /**
+   * Returns end.
+   *
+   * @return end
+   */
+  getEnd() {
+    return this.getNumberProperty(Chapter.KEY_END);
+  }
+
+  /**
+   * Returns end time.
+   *
+   * @return end time
+   */
+  getEndTime() {
+    return this.getStringProperty(Chapter.KEY_END_TIME);
+  }
+
+  /**
+   * Returns all tags.
+   *
+   * @return tags object
+   */
+  getTags() {
+    return this.getProperties(StreamInformation.KEY_TAGS);
+  }
+
+  /**
+   * Returns the chapter property associated with the key.
+   *
+   * @param key property key
+   * @return chapter property as string or undefined if the key is not found
+   */
+  getStringProperty(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the chapter property associated with the key.
+   *
+   * @param key property key
+   * @return chapter property as number or undefined if the key is not found
+   */
+  getNumberProperty(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the chapter properties associated with the key.
+   *
+   * @param key properties key
+   * @return chapter properties as an object or undefined if the key is not found
    */
   getProperties(key) {
     if (this.#allProperties !== undefined) {

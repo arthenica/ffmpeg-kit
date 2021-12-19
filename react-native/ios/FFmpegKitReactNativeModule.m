@@ -86,8 +86,6 @@ RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
     return self;
 }
 
-
-
 - (NSArray<NSString*>*)supportedEvents {
     NSMutableArray *array = [NSMutableArray array];
 

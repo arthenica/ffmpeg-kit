@@ -299,6 +299,8 @@ declare module 'ffmpeg-kit-react-native' {
 
     getStreams(): Array<StreamInformation>;
 
+    getChapters(): Array<Chapter>;
+
     getStringProperty(key: string): string;
 
     getNumberProperty(key: string): number;
@@ -522,6 +524,42 @@ declare module 'ffmpeg-kit-react-native' {
     getTimeBase(): string;
 
     getCodecTimeBase(): string;
+
+    getTags(): Record<string, any>;
+
+    getStringProperty(key): string;
+
+    getNumberProperty(key): number;
+
+    getProperties(key): Record<string, any>;
+
+    getAllProperties(): Record<string, any>;
+
+  }
+
+  export class Chapter {
+
+    static readonly KEY_ID: string;
+    static readonly KEY_TIME_BASE: string;
+    static readonly KEY_START: string;
+    static readonly KEY_START_TIME: string;
+    static readonly KEY_END: string;
+    static readonly KEY_END_TIME: string;
+    static readonly KEY_TAGS: string;
+
+    constructor(properties: Record<string, any>);
+
+    getId(): number;
+
+    getTimeBase(): string;
+
+    getStart(): number;
+
+    getStartTime(): string;
+
+    getEnd(): number;
+
+    getEndTime(): string;
 
     getTags(): Record<string, any>;
 
