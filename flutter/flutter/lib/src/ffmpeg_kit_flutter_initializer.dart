@@ -98,117 +98,109 @@ class FFmpegKitInitializer {
       return;
     }
 
-    FFmpegKitConfig.getSession(sessionId).then((Session? session) {
-      activeLogRedirectionStrategy =
-          session?.getLogRedirectionStrategy() ?? activeLogRedirectionStrategy;
-      final LogCallback? logCallback = session?.getLogCallback();
+    activeLogRedirectionStrategy =
+        FFmpegKitFactory.getLogRedirectionStrategy(sessionId) ??
+            activeLogRedirectionStrategy;
+    final LogCallback? logCallback = FFmpegKitFactory.getLogCallback(sessionId);
 
-      if (logCallback != null) {
-        sessionCallbackDefined = true;
+    if (logCallback != null) {
+      sessionCallbackDefined = true;
 
-        try {
-          // NOTIFY SESSION CALLBACK DEFINED
-          logCallback(log);
-        } on Exception catch (e, stack) {
-          print("Exception thrown inside session LogCallback block. $e");
-          print(stack);
-        }
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        logCallback(log);
+      } on Exception catch (e, stack) {
+        print("Exception thrown inside session LogCallback block. $e");
+        print(stack);
       }
+    }
 
-      final globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
-      if (globalLogCallbackFunction != null) {
-        globalCallbackDefined = true;
+    final globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
+    if (globalLogCallbackFunction != null) {
+      globalCallbackDefined = true;
 
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalLogCallbackFunction(log);
-        } on Exception catch (e, stack) {
-          print("Exception thrown inside global LogCallback block. $e");
-          print(stack);
-        }
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalLogCallbackFunction(log);
+      } on Exception catch (e, stack) {
+        print("Exception thrown inside global LogCallback block. $e");
+        print(stack);
       }
+    }
 
-      // EXECUTE THE LOG STRATEGY
-      switch (activeLogRedirectionStrategy) {
-        case LogRedirectionStrategy.neverPrintLogs:
-          {
+    // EXECUTE THE LOG STRATEGY
+    switch (activeLogRedirectionStrategy) {
+      case LogRedirectionStrategy.neverPrintLogs:
+        {
+          return;
+        }
+      case LogRedirectionStrategy.printLogsWhenGlobalCallbackNotDefined:
+        {
+          if (globalCallbackDefined) {
             return;
           }
-        case LogRedirectionStrategy.printLogsWhenGlobalCallbackNotDefined:
-          {
-            if (globalCallbackDefined) {
-              return;
-            }
+        }
+        break;
+      case LogRedirectionStrategy.printLogsWhenSessionCallbackNotDefined:
+        {
+          if (sessionCallbackDefined) {
+            return;
           }
-          break;
-        case LogRedirectionStrategy.printLogsWhenSessionCallbackNotDefined:
-          {
-            if (sessionCallbackDefined) {
-              return;
-            }
+        }
+        break;
+      case LogRedirectionStrategy.printLogsWhenNoCallbacksDefined:
+        {
+          if (globalCallbackDefined || sessionCallbackDefined) {
+            return;
           }
-          break;
-        case LogRedirectionStrategy.printLogsWhenNoCallbacksDefined:
-          {
-            if (globalCallbackDefined || sessionCallbackDefined) {
-              return;
-            }
-          }
-          break;
-        case LogRedirectionStrategy.alwaysPrintLogs:
-          {}
-          break;
-      }
+        }
+        break;
+      case LogRedirectionStrategy.alwaysPrintLogs:
+        {}
+        break;
+    }
 
-      // PRINT LOGS
-      switch (level) {
-        case Level.avLogQuiet:
-          {
-            // PRINT NO OUTPUT
-          }
-          break;
-        default:
-          {
-            stdout.write(text);
-          }
-      }
-    });
+    // PRINT LOGS
+    switch (level) {
+      case Level.avLogQuiet:
+        {
+          // PRINT NO OUTPUT
+        }
+        break;
+      default:
+        {
+          stdout.write(text);
+        }
+    }
   }
 
   void _processStatisticsCallbackEvent(Map<dynamic, dynamic> event) {
     final Statistics statistics = FFmpegKitFactory.mapToStatistics(event);
     final int sessionId = event["sessionId"];
 
-    FFmpegKitConfig.getSession(sessionId).then((Session? session) {
-      if (session != null && session.isFFmpeg()) {
-        final FFmpegSession ffmpegSession = session as FFmpegSession;
-        final StatisticsCallback? statisticsCallback =
-            ffmpegSession.getStatisticsCallback();
-
-        if (statisticsCallback != null) {
-          try {
-            // NOTIFY SESSION CALLBACK DEFINED
-            statisticsCallback(statistics);
-          } on Exception catch (e, stack) {
-            print(
-                "Exception thrown inside session StatisticsCallback block. $e");
-            print(stack);
-          }
-        }
+    final StatisticsCallback? statisticsCallback =
+        FFmpegKitFactory.getStatisticsCallback(sessionId);
+    if (statisticsCallback != null) {
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        statisticsCallback(statistics);
+      } on Exception catch (e, stack) {
+        print("Exception thrown inside session StatisticsCallback block. $e");
+        print(stack);
       }
+    }
 
-      final globalStatisticsCallbackFunction =
-          FFmpegKitFactory.getGlobalStatisticsCallback();
-      if (globalStatisticsCallbackFunction != null) {
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalStatisticsCallbackFunction(statistics);
-        } on Exception catch (e, stack) {
-          print("Exception thrown inside global StatisticsCallback block. $e");
-          print(stack);
-        }
+    final globalStatisticsCallbackFunction =
+        FFmpegKitFactory.getGlobalStatisticsCallback();
+    if (globalStatisticsCallbackFunction != null) {
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalStatisticsCallbackFunction(statistics);
+      } on Exception catch (e, stack) {
+        print("Exception thrown inside global StatisticsCallback block. $e");
+        print(stack);
       }
-    });
+    }
   }
 
   void _processExecuteCallbackEvent(Map<dynamic, dynamic> event) {
