@@ -152,7 +152,7 @@ packages using the instructions below.
 
 - Edit `android/build.gradle` file and add the package name in `ext.ffmpegKitPackage` variable.
 
-    ```
+    ```gradle
     ext {
         ffmpegKitPackage = "<package name>"
     }
@@ -163,7 +163,7 @@ packages using the instructions below.
 
 - Edit `ios/Podfile` file and add the package name as `subspec`. After that run `pod install` again.
 
-    ```
+    ```ruby
     pod 'ffmpeg-kit-react-native', :subspecs => ['<package name>'], :podspec => '../node_modules/ffmpeg-kit-react-native/ffmpeg-kit-react-native.podspec'
     ```
 
