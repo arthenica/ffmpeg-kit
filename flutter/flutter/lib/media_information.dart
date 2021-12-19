@@ -88,25 +88,17 @@ class MediaInformation {
     return list;
   }
 
-  /// Returns all chapters
+  /// Returns all chapters found as a list.
   List<Chapter> getChapters() {
     final List<Chapter> list = List<Chapter>.empty(growable: true);
-    List<Chapter> chapters = List.empty(growable: true);
-    if (_allProperties?["chapters"] != null) {
-      chapters = <Chapter>[];
-      _allProperties!['chapters'].forEach((dynamic chapter) {
-        final int id = chapter['id'];
-        final String timeBase = chapter['time_base'];
-        final int start = chapter['start'];
-        final int end = chapter['end'];
-        final String startTime = chapter['start_time'];
-        final String endTime = chapter['end_time'];
-        final Tags tags = Tags(chapter['tags']['title'] ?? "");
-        chapters.add(
-            new Chapter(id, timeBase, start, end, startTime, endTime, tags));
-      });
-    }
-    list.addAll(chapters);
+
+    dynamic createChapter(Map<dynamic, dynamic> chapterProperties) =>
+        list.add(new Chapter(chapterProperties));
+
+    this._allProperties?["chapters"]?.forEach((Object? chapter) {
+      createChapter(chapter as Map<dynamic, dynamic>);
+    });
+
     return list;
   }
 

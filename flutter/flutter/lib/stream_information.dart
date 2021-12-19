@@ -119,6 +119,6 @@ class StreamInformation {
   /// Returns the stream properties associated with the key.
   dynamic getProperties(String key) => this._allProperties?[key];
 
-  /// Returns all properties found.d
+  /// Returns all properties found.
   Map<dynamic, dynamic>? getAllProperties() => this._allProperties;
 }

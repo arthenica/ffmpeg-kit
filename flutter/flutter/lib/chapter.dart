@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -17,21 +17,51 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// Chapter class.
 class Chapter {
-  int id;
-  String timeBase;
-  int start;
-  int end;
-  String startTime;
-  String endTime;
-  Tags tags;
+  static const keyId = "id";
+  static const keyTimeBase = "time_base";
+  static const keyStart = "start";
+  static const keyStartTime = "start_time";
+  static const keyEnd = "end";
+  static const keyEndTime = "end_time";
+  static const keyTags = "tags";
 
-  Chapter(this.id, this.timeBase, this.start, this.end, this.startTime,
-      this.endTime, this.tags);
-}
+  Map<dynamic, dynamic>? _allProperties;
 
-class Tags {
-  String title;
+  /// Creates a new [Chapter] instance
+  Chapter(this._allProperties);
 
-  Tags(this.title);
+  /// Returns id.
+  int? getId() => this.getNumberProperty(Chapter.keyId)?.toInt();
+
+  /// Returns time base.
+  String? getTimeBase() => this.getStringProperty(Chapter.keyTimeBase);
+
+  /// Returns start.
+  int? getStart() => this.getNumberProperty(Chapter.keyStart)?.toInt();
+
+  /// Returns start time.
+  String? getStartTime() => this.getStringProperty(Chapter.keyStartTime);
+
+  /// Returns end.
+  int? getEnd() => this.getNumberProperty(Chapter.keyEnd)?.toInt();
+
+  /// Returns end time.
+  String? getEndTime() => this.getStringProperty(Chapter.keyEndTime);
+
+  /// Returns all tags.
+  Map<dynamic, dynamic>? getTags() => this.getProperties(Chapter.keyTags);
+
+  /// Returns the chapter property associated with the key.
+  String? getStringProperty(String key) => this._allProperties?[key];
+
+  /// Returns the chapter property associated with the key.
+  num? getNumberProperty(String key) => this._allProperties?[key];
+
+  /// Returns the chapter properties associated with the key.
+  dynamic getProperties(String key) => this._allProperties?[key];
+
+  /// Returns all properties found.
+  Map<dynamic, dynamic>? getAllProperties() => this._allProperties;
 }

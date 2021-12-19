@@ -76,6 +76,7 @@ class FFprobeKit {
       "json",
       "-show_format",
       "-show_streams",
+      "-show_chapters",
       "-i",
       path
     ];
