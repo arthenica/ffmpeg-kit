@@ -173,19 +173,19 @@ disable_ios_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIM
 # CHECK SOME RULES FOR .framework BUNDLES
 
 # 1. DISABLE arm64-mac-catalyst IN framework BUNDLES
-if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_MAC_CATALYST}]} -eq 1 ]]; then
+if [[ ${NO_FRAMEWORK} -ne 1 ]] && [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_MAC_CATALYST}]} -eq 1 ]]; then
   echo -e "INFO: Disabled arm64-mac-catalyst architecture which cannot exist in a framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "arm64-mac-catalyst"
 fi
 
 # 2. DISABLE x86-64-mac-catalyst IN framework BUNDLES
-if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
+if [[ ${NO_FRAMEWORK} -ne 1 ]] && [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
   echo -e "INFO: Disabled x86-64-mac-catalyst architecture which cannot exist in a framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "x86-64-mac-catalyst"
 fi
 
 # 3. DISABLE arm64-simulator WHEN arm64 IS ENABLED IN framework BUNDLES
-if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
+if [[ ${NO_FRAMEWORK} -ne 1 ]] && [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
   echo -e "INFO: Disabled arm64-simulator architecture which cannot co-exist with arm64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "arm64-simulator"
 fi
