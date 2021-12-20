@@ -1788,7 +1788,7 @@ export class FFmpegSession extends AbstractSession {
     let statistics = await this.getStatistics();
 
     if (statistics.length > 0) {
-      return statistics[0];
+      return statistics[statistics.length - 1];
     } else {
       return undefined;
     }
