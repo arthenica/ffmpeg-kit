@@ -143,6 +143,15 @@ disable_macos_architecture_not_supported_on_detected_sdk_version() {
   fi
 }
 
+disable_tvos_videotoolbox_on_not_supported_sdk_version() {
+
+  # INTRODUCED IN TVOS SDK 10.2
+  if [[ $(compare_versions "$TVOS_MIN_VERSION" "10.2") -lt 0 ]]; then
+    set_library "tvos-videotoolbox" 0
+    echo -e "INFO: Disabled tvos-videotoolbox which is not supported on tvOS SDK $TVOS_MIN_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
 build_apple_architecture_variant_strings() {
   export ALL_IOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IOS}")"
   export IPHONEOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_IPHONEOS}")"

@@ -265,19 +265,6 @@ is_library_supported_on_platform() {
     fi
     ;;
 
-  # ONLY IOS, MACOS AND TVOS MAIN
-  52)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-videotoolbox" ]] && [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-      echo "0"
-    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] && [[ $1 == "macos-videotoolbox" ]]; then
-      echo "0"
-    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] && [[ $1 == "tvos-videotoolbox" ]] && [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-      echo "0"
-    else
-      echo "1"
-    fi
-    ;;
-
   # ONLY IOS AND MACOS
   53)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] && [[ $1 == "ios-avfoundation" ]]; then
@@ -290,7 +277,7 @@ is_library_supported_on_platform() {
     ;;
 
   # IOS, MACOS AND TVOS
-  49 | 50 | 51 | 54 | 55)
+  49 | 50 | 51 | 52 | 54 | 55)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "0"
     else

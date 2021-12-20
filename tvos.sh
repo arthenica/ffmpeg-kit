@@ -159,6 +159,9 @@ fi
 # DISABLE NOT SUPPORTED ARCHITECTURES
 disable_tvos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}"
 
+# DISABLE NOT SUPPORTED LIBRARIES
+disable_tvos_videotoolbox_on_not_supported_sdk_version
+
 # CHECK SOME RULES FOR .framework BUNDLES
 
 # 1. DISABLE arm64-simulator WHEN arm64 IS ENABLED IN framework BUNDLES

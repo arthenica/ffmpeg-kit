@@ -64,9 +64,6 @@ enable_lts_build() {
     # XCODE 7.3 HAS TVOS SDK 9.2
     export TVOS_MIN_VERSION=9.2
   fi
-
-  # TVOS SDK 9.2 DOES NOT INCLUDE VIDEOTOOLBOX
-  ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=0
 }
 
 get_common_includes() {
