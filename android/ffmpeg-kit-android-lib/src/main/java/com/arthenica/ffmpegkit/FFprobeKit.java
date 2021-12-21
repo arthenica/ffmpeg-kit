@@ -68,7 +68,7 @@ public class FFprobeKit {
      * @param arguments FFprobe command options/arguments as string array
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession execute(final String[] arguments) {
+    public static FFprobeSession executeWithArguments(final String[] arguments) {
         final FFprobeSession session = new FFprobeSession(arguments);
 
         FFmpegKitConfig.ffprobeExecute(session);
@@ -169,7 +169,7 @@ public class FFprobeKit {
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession execute(final String command) {
-        return execute(FFmpegKitConfig.parseArguments(command));
+        return executeWithArguments(FFmpegKitConfig.parseArguments(command));
     }
 
     /**

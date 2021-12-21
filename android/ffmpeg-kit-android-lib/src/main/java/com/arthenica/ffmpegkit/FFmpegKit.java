@@ -54,7 +54,7 @@ public class FFmpegKit {
      * @param arguments FFmpeg command options/arguments as string array
      * @return FFmpeg session created for this execution
      */
-    public static FFmpegSession execute(final String[] arguments) {
+    public static FFmpegSession executeWithArguments(final String[] arguments) {
         final FFmpegSession session = new FFmpegSession(arguments);
 
         FFmpegKitConfig.ffmpegExecute(session);
@@ -159,7 +159,7 @@ public class FFmpegKit {
      * @return FFmpeg session created for this execution
      */
     public static FFmpegSession execute(final String command) {
-        return execute(FFmpegKitConfig.parseArguments(command));
+        return executeWithArguments(FFmpegKitConfig.parseArguments(command));
     }
 
     /**
