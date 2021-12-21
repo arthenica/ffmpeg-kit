@@ -155,6 +155,10 @@ if [[ -n ${DISPLAY_HELP} ]]; then
   exit 0
 fi
 
+# SET API LEVEL IN build.gradle
+${SED_INLINE} "s/minSdkVersion .*/minSdkVersion ${API}/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
+${SED_INLINE} "s/versionCode ..0/versionCode ${API}0/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
+
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "$(date)\n" 1>>"${BASEDIR}"/build.log 2>&1

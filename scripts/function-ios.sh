@@ -2,6 +2,8 @@
 
 source "${BASEDIR}/scripts/function-apple.sh"
 
+prepare_inline_sed
+
 enable_default_ios_architectures() {
   ENABLED_ARCHITECTURES[ARCH_ARMV7]=1
   ENABLED_ARCHITECTURES[ARCH_ARMV7S]=1
@@ -479,8 +481,6 @@ set_toolchain_paths() {
   if [ ! -f "${LIB_UUID_PACKAGE_CONFIG_PATH}" ]; then
     create_libuuid_system_package_config
   fi
-
-  prepare_inline_sed
 }
 
 initialize_prebuilt_ios_folders() {

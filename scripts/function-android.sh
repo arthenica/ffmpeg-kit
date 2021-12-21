@@ -2,6 +2,8 @@
 
 source "${BASEDIR}/scripts/function.sh"
 
+prepare_inline_sed
+
 enable_default_android_architectures() {
   ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=1
   ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]=1
@@ -1033,8 +1035,6 @@ set_toolchain_paths() {
   if [ ! -f "${ZLIB_PACKAGE_CONFIG_PATH}" ]; then
     create_zlib_system_package_config 1>>"${BASEDIR}"/build.log 2>&1
   fi
-
-  prepare_inline_sed
 }
 
 build_android_lts_support() {
