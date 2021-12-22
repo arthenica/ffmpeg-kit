@@ -180,6 +180,22 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       _channel.invokeMethod<void>('ignoreSignal', {'signal': signal});
 
   @override
+  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async =>
+      _channel.invokeMethod<void>(
+          'ffmpegSessionExecute', {'sessionId': sessionId});
+
+  @override
+  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async =>
+      _channel.invokeMethod<void>(
+          'ffprobeSessionExecute', {'sessionId': sessionId});
+
+  @override
+  Future<void> ffmpegKitConfigGetMediaInformationExecute(
+          int? sessionId, int? waitTimeout) async =>
+      _channel.invokeMethod<void>('mediaInformationSessionExecute',
+          {'sessionId': sessionId, 'waitTimeout': waitTimeout});
+
+  @override
   Future<void> ffmpegKitConfigAsyncFFmpegExecute(int? sessionId) async =>
       _channel.invokeMethod<void>(
           'asyncFFmpegSessionExecute', {'sessionId': sessionId});

@@ -215,6 +215,44 @@ class FFmpegKitConfig {
     }
   }
 
+  /// Synchronously executes the FFmpeg session provided.
+  static Future<void> ffmpegExecute(FFmpegSession ffmpegSession) async {
+    try {
+      await init();
+      return _platform
+          .ffmpegKitConfigFFmpegExecute(ffmpegSession.getSessionId());
+    } on PlatformException catch (e, stack) {
+      print("Plugin ffmpegExecute error: ${e.message}");
+      return Future.error("ffmpegExecute failed.", stack);
+    }
+  }
+
+  /// Synchronously executes the FFprobe session provided.
+  static Future<void> ffprobeExecute(FFprobeSession ffprobeSession) async {
+    try {
+      await init();
+      return _platform
+          .ffmpegKitConfigFFprobeExecute(ffprobeSession.getSessionId());
+    } on PlatformException catch (e, stack) {
+      print("Plugin ffprobeExecute error: ${e.message}");
+      return Future.error("ffprobeExecute failed.", stack);
+    }
+  }
+
+  /// Synchronously executes the media information session provided.
+  static Future<void> getMediaInformationExecute(
+      MediaInformationSession mediaInformationSession,
+      [int? waitTimeout = null]) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetMediaInformationExecute(
+          mediaInformationSession.getSessionId(), waitTimeout);
+    } on PlatformException catch (e, stack) {
+      print("Plugin getMediaInformationExecute error: ${e.message}");
+      return Future.error("getMediaInformationExecute failed.", stack);
+    }
+  }
+
   /// Starts an asynchronous FFmpeg execution for the given session.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an

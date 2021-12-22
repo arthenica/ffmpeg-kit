@@ -218,6 +218,22 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
         ' has not been implemented!');
   }
 
+  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async {
+    throw UnimplementedError(
+        'ffmpegKitConfigFFmpegExecute() has not been implemented!');
+  }
+
+  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async {
+    throw UnimplementedError(
+        'ffmpegKitConfigFFprobeExecute() has not been implemented!');
+  }
+
+  Future<void> ffmpegKitConfigGetMediaInformationExecute(
+      int? sessionId, int? waitTimeout) async {
+    throw UnimplementedError('ffmpegKitConfigGetMediaInformationExecute()'
+        ' has not been implemented!');
+  }
+
   Future<void> ffmpegKitConfigSetLogLevel(int logLevel) async {
     throw UnimplementedError(
         'ffmpegKitConfigSetLogLevel() has not been implemented!');

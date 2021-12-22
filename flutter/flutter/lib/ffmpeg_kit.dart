@@ -31,6 +31,33 @@ import 'statistics_callback.dart';
 class FFmpegKit {
   static FFmpegKitPlatform _platform = FFmpegKitPlatform.instance;
 
+  /// Synchronously executes FFmpeg command provided. Space character is used
+  /// to split command into arguments. You can use single or double quote
+  /// characters to specify arguments inside your command.
+  static Future<FFmpegSession> execute(String command,
+          [ExecuteCallback? executeCallback = null,
+          LogCallback? logCallback = null,
+          StatisticsCallback? statisticsCallback = null]) async =>
+      FFmpegKit.executeWithArguments(
+          FFmpegKitConfig.parseArguments(command),
+          executeCallback,
+          logCallback,
+          statisticsCallback);
+
+  /// Synchronously executes FFmpeg with arguments provided.
+  static Future<FFmpegSession> executeWithArguments(
+      List<String> commandArguments,
+      [ExecuteCallback? executeCallback = null,
+      LogCallback? logCallback = null,
+      StatisticsCallback? statisticsCallback = null]) async {
+    final session = await FFmpegSession.create(commandArguments,
+        executeCallback, logCallback, statisticsCallback, null);
+
+    await FFmpegKitConfig.ffmpegExecute(session);
+
+    return session;
+  }
+
   /// Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
   /// into arguments. You can use single or double quote characters to specify arguments inside your command.
   ///

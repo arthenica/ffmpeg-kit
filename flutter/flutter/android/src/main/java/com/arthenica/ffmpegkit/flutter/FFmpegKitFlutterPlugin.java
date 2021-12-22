@@ -127,11 +127,11 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     public static final String ARGUMENT_FFPROBE_JSON_OUTPUT = "ffprobeJsonOutput";
     public static final String ARGUMENT_WRITABLE = "writable";
 
-    private static final int asyncWriteToPipeConcurrencyLimit = 10;
+    private static final int asyncConcurrencyLimit = 10;
 
     private final AtomicBoolean logsEnabled;
     private final AtomicBoolean statisticsEnabled;
-    private final ExecutorService asyncWriteToPipeExecutorService;
+    private final ExecutorService asyncExecutorService;
 
     private MethodChannel methodChannel;
     private EventChannel eventChannel;
@@ -147,7 +147,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     public FFmpegKitFlutterPlugin() {
         this.logsEnabled = new AtomicBoolean(false);
         this.statisticsEnabled = new AtomicBoolean(false);
-        this.asyncWriteToPipeExecutorService = Executors.newFixedThreadPool(asyncWriteToPipeConcurrencyLimit);
+        this.asyncExecutorService = Executors.newFixedThreadPool(asyncConcurrencyLimit);
         this.resultHandler = new FFmpegKitFlutterMethodResultHandler();
 
         Log.d(LIBRARY_NAME, String.format("FFmpegKitFlutterPlugin created %s.", this));
@@ -455,6 +455,27 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                     ignoreSignal(signal, result);
                 } else {
                     resultHandler.errorAsync(result, "INVALID_SIGNAL", "Invalid signal value.");
+                }
+                break;
+            case "ffmpegSessionExecute":
+                if (sessionId != null) {
+                    ffmpegSessionExecute(sessionId, result);
+                } else {
+                    resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
+                }
+                break;
+            case "ffprobeSessionExecute":
+                if (sessionId != null) {
+                    ffprobeSessionExecute(sessionId, result);
+                } else {
+                    resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
+                }
+                break;
+            case "mediaInformationSessionExecute":
+                if (sessionId != null) {
+                    mediaInformationSessionExecute(sessionId, waitTimeout, result);
+                } else {
+                    resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
                 }
                 break;
             case "asyncFFmpegSessionExecute":
@@ -994,6 +1015,54 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         }
     }
 
+    protected void ffmpegSessionExecute(@NonNull final Integer sessionId, @NonNull final Result result) {
+        final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+        if (session == null) {
+            resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
+        } else {
+            if (session instanceof FFmpegSession) {
+                final FFmpegSessionExecuteTask ffmpegSessionExecuteTask = new FFmpegSessionExecuteTask((FFmpegSession) session, resultHandler, result);
+                asyncExecutorService.submit(ffmpegSessionExecuteTask);
+            } else {
+                resultHandler.errorAsync(result, "NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
+            }
+        }
+    }
+
+    protected void ffprobeSessionExecute(@NonNull final Integer sessionId, @NonNull final Result result) {
+        final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+        if (session == null) {
+            resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
+        } else {
+            if (session instanceof FFprobeSession) {
+                final FFprobeSessionExecuteTask ffprobeSessionExecuteTask = new FFprobeSessionExecuteTask((FFprobeSession) session, resultHandler, result);
+                asyncExecutorService.submit(ffprobeSessionExecuteTask);
+            } else {
+                resultHandler.errorAsync(result, "NOT_FFPROBE_SESSION", "A session is found but it does not have the correct type.");
+            }
+        }
+    }
+
+    protected void mediaInformationSessionExecute(@NonNull final Integer sessionId, @Nullable final Integer waitTimeout, @NonNull final Result result) {
+        final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+        if (session == null) {
+            resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
+        } else {
+            if (session instanceof MediaInformationSession) {
+                final int timeout;
+                if (isValidPositiveNumber(waitTimeout)) {
+                    timeout = waitTimeout;
+                } else {
+                    timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
+                }
+                final MediaInformationSessionExecuteTask mediaInformationSessionExecuteTask = new MediaInformationSessionExecuteTask((MediaInformationSession) session, timeout, resultHandler, result);
+                asyncExecutorService.submit(mediaInformationSessionExecuteTask);
+            } else {
+                resultHandler.errorAsync(result, "NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+            }
+        }
+    }
+
     protected void asyncFFmpegSessionExecute(@NonNull final Integer sessionId, @NonNull final Result result) {
         final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
         if (session == null) {
@@ -1110,8 +1179,8 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void writeToPipe(@NonNull final String inputPath, @NonNull final String namedPipePath, @NonNull final Result result) {
-        final AsyncWriteToPipeTask asyncTask = new AsyncWriteToPipeTask(inputPath, namedPipePath, resultHandler, result);
-        asyncWriteToPipeExecutorService.submit(asyncTask);
+        final WriteToPipeTask asyncTask = new WriteToPipeTask(inputPath, namedPipePath, resultHandler, result);
+        asyncExecutorService.submit(asyncTask);
     }
 
     protected void selectDocument(@NonNull final Boolean writable, @Nullable final String title, @Nullable final String type, @Nullable final String[] extraTypes, @NonNull final Result result) {
