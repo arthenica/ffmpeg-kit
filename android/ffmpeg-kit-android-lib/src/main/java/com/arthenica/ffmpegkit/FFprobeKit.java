@@ -371,7 +371,7 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Extracts media information using the command provided asynchronously.
+     * <p>Extracts media information using the command provided.
      *
      * @param command FFprobe command that prints media information for a file in JSON format
      * @return media information session created for this execution
@@ -379,7 +379,7 @@ public class FFprobeKit {
     public static MediaInformationSession getMediaInformationFromCommand(final String command) {
         final MediaInformationSession session = new MediaInformationSession(FFmpegKitConfig.parseArguments(command));
 
-        FFmpegKitConfig.asyncGetMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
+        FFmpegKitConfig.getMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
         return session;
     }
@@ -424,7 +424,7 @@ public class FFprobeKit {
                                                                                         final int waitTimeout) {
         final MediaInformationSession session = new MediaInformationSession(arguments, executeCallback, logCallback);
 
-        FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
+        FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
 
         return session;
     }
