@@ -68,7 +68,7 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 @implementation FFmpegKitReactNativeModule {
   BOOL logsEnabled;
   BOOL statisticsEnabled;
-  dispatch_queue_t asyncWriteToPipeDispatchQueue;
+  dispatch_queue_t asyncDispatchQueue;
 }
 
 RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
@@ -78,7 +78,7 @@ RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
     if (self) {
         logsEnabled = false;
         statisticsEnabled = false;
-        asyncWriteToPipeDispatchQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        asyncDispatchQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
         [self registerGlobalCallbacks];
     }
@@ -404,6 +404,59 @@ RCT_EXPORT_METHOD(ignoreSignal:(int)signalValue resolver:(RCTPromiseResolveBlock
     }
 }
 
+RCT_EXPORT_METHOD(ffmpegSessionExecute:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
+    if (session == nil) {
+      reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
+    } else {
+        if ([session isMemberOfClass:[FFmpegSession class]]) {
+            dispatch_async(asyncDispatchQueue, ^{
+                [FFmpegKitConfig ffmpegExecute:(FFmpegSession*)session];
+                resolve(nil);
+            });
+        } else {
+            reject(@"NOT_FFMPEG_SESSION", @"A session is found but it does not have the correct type.", nil);
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(ffprobeSessionExecute:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
+    if (session == nil) {
+      reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
+    } else {
+        if ([session isMemberOfClass:[FFprobeSession class]]) {
+            dispatch_async(asyncDispatchQueue, ^{
+                [FFmpegKitConfig ffprobeExecute:(FFprobeSession*)session];
+                resolve(nil);
+            });
+        } else {
+            reject(@"NOT_FFPROBE_SESSION", @"A session is found but it does not have the correct type.", nil);
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(mediaInformationSessionExecute:(int)sessionId withTimeout:(int)waitTimeout resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
+    if (session == nil) {
+      reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
+    } else {
+        if ([session isMemberOfClass:[MediaInformationSession class]]) {
+            int timeout;
+            if ([FFmpegKitReactNativeModule isValidPositiveNumber:waitTimeout]) {
+              timeout = waitTimeout;
+            } else {
+              timeout = AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
+            }
+            dispatch_async(asyncDispatchQueue, ^{
+                [FFmpegKitConfig getMediaInformationExecute:(MediaInformationSession*)session withTimeout:timeout];
+                resolve(nil);
+            });
+        } else {
+            reject(@"NOT_MEDIA_INFORMATION_SESSION", @"A session is found but it does not have the correct type.", nil);
+        }
+    }
+}
 RCT_EXPORT_METHOD(asyncFFmpegSessionExecute:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
     if (session == nil) {
@@ -518,7 +571,7 @@ RCT_EXPORT_METHOD(getPlatform:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
 }
 
 RCT_EXPORT_METHOD(writeToPipe:(NSString*)inputPath onPipe:(NSString*)namedPipePath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    dispatch_async(asyncWriteToPipeDispatchQueue, ^{
+    dispatch_async(asyncDispatchQueue, ^{
 
         NSLog(@"Starting copy %@ to pipe %@ operation.\n", inputPath, namedPipePath);
 

@@ -121,14 +121,14 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   private final AtomicBoolean logsEnabled;
   private final AtomicBoolean statisticsEnabled;
-  private final ExecutorService asyncWriteToPipeExecutorService;
+  private final ExecutorService asyncExecutorService;
 
   public FFmpegKitReactNativeModule(@Nullable ReactApplicationContext reactContext) {
     super(reactContext);
 
     this.logsEnabled = new AtomicBoolean(false);
     this.statisticsEnabled = new AtomicBoolean(false);
-    this.asyncWriteToPipeExecutorService = Executors.newFixedThreadPool(asyncWriteToPipeConcurrencyLimit);
+    this.asyncExecutorService = Executors.newFixedThreadPool(asyncWriteToPipeConcurrencyLimit);
 
     if (reactContext != null) {
       reactContext.addLifecycleEventListener(this);
@@ -161,7 +161,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @Override
   public void onHostDestroy() {
-    this.asyncWriteToPipeExecutorService.shutdown();
+    this.asyncExecutorService.shutdown();
   }
 
   protected void registerGlobalCallbacks(final ReactApplicationContext reactContext) {
@@ -574,6 +574,69 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   @ReactMethod
+  public void ffmpegSessionExecute(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session instanceof FFmpegSession) {
+          final FFmpegSessionExecuteTask ffmpegSessionExecuteTask = new FFmpegSessionExecuteTask((FFmpegSession) session, promise);
+          asyncExecutorService.submit(ffmpegSessionExecuteTask);
+        } else {
+          promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
+  public void ffprobeSessionExecute(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session instanceof FFprobeSession) {
+          final FFprobeSessionExecuteTask ffprobeSessionExecuteTask = new FFprobeSessionExecuteTask((FFprobeSession) session, promise);
+          asyncExecutorService.submit(ffprobeSessionExecuteTask);
+        } else {
+          promise.reject("NOT_FFPROBE_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
+  public void mediaInformationSessionExecute(final Double sessionId, final Double waitTimeout, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session instanceof MediaInformationSession) {
+          final int timeout;
+          if (isValidPositiveNumber(waitTimeout)) {
+            timeout = waitTimeout.intValue();
+          } else {
+            timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
+          }
+          final MediaInformationSessionExecuteTask mediaInformationSessionExecuteTask = new MediaInformationSessionExecuteTask((MediaInformationSession) session, timeout, promise);
+          asyncExecutorService.submit(mediaInformationSessionExecuteTask);
+        } else {
+          promise.reject("NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
   public void asyncFFmpegSessionExecute(final Double sessionId, final Promise promise) {
     if (sessionId != null) {
       Session session = FFmpegKitConfig.getSession(sessionId.longValue());
@@ -743,8 +806,8 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @ReactMethod
   public void writeToPipe(final String inputPath, final String namedPipePath, final Promise promise) {
-    final AsyncWriteToPipeTask asyncTask = new AsyncWriteToPipeTask(inputPath, namedPipePath, promise);
-    asyncWriteToPipeExecutorService.submit(asyncTask);
+    final WriteToPipeTask asyncTask = new WriteToPipeTask(inputPath, namedPipePath, promise);
+    asyncExecutorService.submit(asyncTask);
   }
 
   @ReactMethod

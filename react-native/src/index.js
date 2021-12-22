@@ -703,6 +703,37 @@ export class ArchDetect {
 export class FFmpegKit {
 
   /**
+   * <p>Synchronously executes FFmpeg command provided. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * @param command            FFmpeg command
+   * @param executeCallback    callback that will be called when the execution is completed
+   * @param logCallback        callback that will receive logs
+   * @param statisticsCallback callback that will receive statistics
+   * @return FFmpeg session created for this execution
+   */
+  static async execute(command, executeCallback, logCallback, statisticsCallback) {
+    return FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
+  }
+
+  /**
+   * <p>Synchronously executes FFmpeg with arguments provided.
+   *
+   * @param commandArguments   FFmpeg command options/arguments as string array
+   * @param executeCallback    callback that will be called when the execution is completed
+   * @param logCallback        callback that will receive logs
+   * @param statisticsCallback callback that will receive statistics
+   * @return FFmpeg session created for this execution
+   */
+  static async executeWithArguments(commandArguments, executeCallback, logCallback, statisticsCallback) {
+    let session = await FFmpegSession.create(commandArguments, executeCallback, logCallback, statisticsCallback);
+
+    await FFmpegKitConfig.ffmpegExecute(session);
+
+    return session;
+  }
+
+  /**
    * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
@@ -948,6 +979,40 @@ export class FFmpegKitConfig {
     await FFmpegKitConfig.init();
 
     return FFmpegKitReactNativeModule.ignoreSignal(signal);
+  }
+
+  /**
+   * <p>Synchronously executes the FFmpeg session provided.
+   *
+   * @param ffmpegSession FFmpeg session which includes command options/arguments
+   */
+  static async ffmpegExecute(ffmpegSession) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.ffmpegSessionExecute(ffmpegSession.getSessionId());
+  }
+
+  /**
+   * <p>Synchronously executes the FFprobe session provided.
+   *
+   * @param ffprobeSession FFprobe session which includes command options/arguments
+   */
+  static async ffprobeExecute(ffprobeSession) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.ffprobeSessionExecute(ffprobeSession.getSessionId());
+  }
+
+  /**
+   * <p>Synchronously executes the media information session provided.
+   *
+   * @param mediaInformationSession media information session which includes command options/arguments
+   * @param waitTimeout             max time to wait until media information is transmitted
+   */
+  static async getMediaInformationExecute(mediaInformationSession, waitTimeout) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.mediaInformationSessionExecute(mediaInformationSession.getSessionId(), FFmpegKitFactory.optionalNumericParameter(waitTimeout));
   }
 
   /**
@@ -1810,6 +1875,35 @@ export class FFmpegSession extends AbstractSession {
 export class FFprobeKit {
 
   /**
+   * <p>Synchronously executes FFprobe command provided. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * @param command FFprobe command
+   * @param executeCallback callback that will be called when the execution is completed
+   * @param logCallback callback that will receive logs
+   * @return FFprobe session created for this execution
+   */
+  static async execute(command, executeCallback, logCallback) {
+    return FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
+  }
+
+  /**
+   * <p>Synchronously executes FFprobe with arguments provided.
+   *
+   * @param commandArguments FFprobe command options/arguments as string array
+   * @param executeCallback callback that will be called when the execution is completed
+   * @param logCallback callback that will receive logs
+   * @return FFprobe session created for this execution
+   */
+  static async executeWithArguments(commandArguments, executeCallback, logCallback) {
+    let session = await FFprobeSession.create(commandArguments, executeCallback, logCallback);
+
+    await FFmpegKitConfig.ffprobeExecute(session);
+
+    return session;
+  }
+
+  /**
    * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
@@ -1840,6 +1934,53 @@ export class FFprobeKit {
     let session = await FFprobeSession.create(commandArguments, executeCallback, logCallback);
 
     await FFmpegKitConfig.asyncFFprobeExecute(session);
+
+    return session;
+  }
+
+  /**
+   * <p>Extracts media information for the file specified with path.
+   *
+   * @param path            path or uri of a media file
+   * @param executeCallback callback that will be notified when execution is completed
+   * @param logCallback     callback that will receive logs
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformation(path, executeCallback, logCallback, waitTimeout) {
+    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path];
+    return FFprobeKit.getMediaInformationFromCommandArguments(commandArguments, executeCallback, logCallback, waitTimeout);
+  }
+
+  /**
+   * <p>Extracts media information using the command provided. The command passed to
+   * this method must generate the output in JSON format in order to successfully extract media information from it.
+   *
+   * @param command         FFprobe command that prints media information for a file in JSON format
+   * @param executeCallback callback that will be notified when execution is completed
+   * @param logCallback     callback that will receive logs
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformationFromCommand(command, executeCallback, logCallback, waitTimeout) {
+    return FFprobeKit.getMediaInformationFromCommandArguments(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, waitTimeout);
+  }
+
+  /**
+   * <p>Extracts media information using the command arguments provided. The command
+   * passed to this method must generate the output in JSON format in order to successfully extract media information
+   * from it.
+   *
+   * @param commandArguments FFprobe command arguments that prints media information for a file in JSON format
+   * @param executeCallback callback that will be notified when execution is completed
+   * @param logCallback     callback that will receive logs
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformationFromCommandArguments(commandArguments, executeCallback, logCallback, waitTimeout) {
+    let session = await MediaInformationSession.create(commandArguments, executeCallback, logCallback);
+
+    await FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
 
     return session;
   }

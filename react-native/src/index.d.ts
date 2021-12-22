@@ -72,6 +72,10 @@ declare module 'ffmpeg-kit-react-native' {
 
   export class FFmpegKit {
 
+    static execute(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+
+    static executeWithArguments(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+
     static executeAsync(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
 
     static executeWithArgumentsAsync(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
@@ -111,6 +115,12 @@ declare module 'ffmpeg-kit-react-native' {
     static setEnvironmentVariable(name: string, value: string): Promise<void>;
 
     static ignoreSignal(signal: Signal): Promise<void>;
+
+    static ffmpegExecute(session: FFmpegSession): Promise<void>;
+
+    static ffprobeExecute(session: FFprobeSession): Promise<void>;
+
+    static getMediaInformationExecute(session: MediaInformationSession, waitTimeout?: number): Promise<void>;
 
     static asyncFFmpegExecute(session: FFmpegSession): Promise<void>;
 
@@ -202,9 +212,19 @@ declare module 'ffmpeg-kit-react-native' {
 
   export class FFprobeKit {
 
+    static execute(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+
+    static executeWithArguments(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+
     static executeAsync(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
 
     static executeWithArgumentsAsync(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+
+    static getMediaInformation(path: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationFromCommand(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationFromCommandArguments(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
 
     static getMediaInformationAsync(path: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
 
