@@ -26,33 +26,33 @@ import com.arthenica.smartexception.java.Exceptions;
  */
 public class AsyncFFprobeExecuteTask implements Runnable {
     private final FFprobeSession ffprobeSession;
-    private final ExecuteCallback executeCallback;
+    private final FFprobeSessionCompleteCallback completeCallback;
 
     public AsyncFFprobeExecuteTask(final FFprobeSession ffprobeSession) {
         this.ffprobeSession = ffprobeSession;
-        this.executeCallback = ffprobeSession.getExecuteCallback();
+        this.completeCallback = ffprobeSession.getCompleteCallback();
     }
 
     @Override
     public void run() {
         FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-        if (executeCallback != null) {
+        if (completeCallback != null) {
             try {
                 // NOTIFY SESSION CALLBACK DEFINED
-                executeCallback.apply(ffprobeSession);
+                completeCallback.apply(ffprobeSession);
             } catch (final Exception e) {
-                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session complete callback.%s", Exceptions.getStackTraceString(e)));
             }
         }
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
+        final FFprobeSessionCompleteCallback globalFFprobeSessionCompleteCallback = FFmpegKitConfig.getFFprobeSessionCompleteCallback();
+        if (globalFFprobeSessionCompleteCallback != null) {
             try {
                 // NOTIFY GLOBAL CALLBACK DEFINED
-                globalExecuteCallbackFunction.apply(ffprobeSession);
+                globalFFprobeSessionCompleteCallback.apply(ffprobeSession);
             } catch (final Exception e) {
-                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global ExecuteCallback block.%s", Exceptions.getStackTraceString(e)));
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global complete callback.%s", Exceptions.getStackTraceString(e)));
             }
         }
     }

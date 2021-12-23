@@ -17,7 +17,6 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "ExecuteCallback.h"
 #import "FFmpegSession.h"
 #import "FFmpegKitConfig.h"
 #import "LogCallback.h"
@@ -25,6 +24,7 @@
 
 @implementation FFmpegSession {
     StatisticsCallback _statisticsCallback;
+    FFmpegSessionCompleteCallback _completeCallback;
     NSMutableArray* _statistics;
     NSRecursiveLock* _statisticsLock;
 }
@@ -35,10 +35,11 @@
 
 - (instancetype)init:(NSArray*)arguments {
 
-    self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
         _statisticsCallback = nil;
+        _completeCallback = nil;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -46,12 +47,13 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
         _statisticsCallback = nil;
+        _completeCallback = completeCallback;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -59,12 +61,13 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
     if (self) {
         _statisticsCallback = statisticsCallback;
+        _completeCallback = completeCallback;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -72,12 +75,13 @@
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
+    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
 
     if (self) {
         _statisticsCallback = statisticsCallback;
+        _completeCallback = completeCallback;
         _statistics = [[NSMutableArray alloc] init];
         _statisticsLock = [[NSRecursiveLock alloc] init];
     }
@@ -87,6 +91,10 @@
 
 - (StatisticsCallback)getStatisticsCallback {
     return _statisticsCallback;
+}
+
+- (FFmpegSessionCompleteCallback)getCompleteCallback {
+    return _completeCallback;
 }
 
 - (NSArray*)getAllStatisticsWithTimeout:(int)waitTimeout {
@@ -134,6 +142,10 @@
 }
 
 - (BOOL)isFFprobe {
+    return false;
+}
+
+- (BOOL)isMediaInformation {
     return false;
 }
 

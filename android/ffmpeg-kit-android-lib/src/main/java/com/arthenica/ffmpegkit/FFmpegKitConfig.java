@@ -120,9 +120,11 @@ public class FFmpegKitConfig {
     private static ExecutorService asyncExecutorService;
 
     /* Global callbacks */
-    private static LogCallback globalLogCallbackFunction;
-    private static StatisticsCallback globalStatisticsCallbackFunction;
-    private static ExecuteCallback globalExecuteCallbackFunction;
+    private static LogCallback globalLogCallback;
+    private static StatisticsCallback globalStatisticsCallback;
+    private static FFmpegSessionCompleteCallback globalFFmpegSessionCompleteCallback;
+    private static FFprobeSessionCompleteCallback globalFFprobeSessionCompleteCallback;
+    private static MediaInformationSessionCompleteCallback globalMediaInformationSessionCompleteCallback;
     private static final SparseArray<SAFProtocolUrl> safIdMap;
     private static final SparseArray<SAFProtocolUrl> safFileDescriptorMap;
     private static LogRedirectionStrategy globalLogRedirectionStrategy;
@@ -163,9 +165,11 @@ public class FFmpegKitConfig {
         sessionHistoryList = new LinkedList<>();
         sessionHistoryLock = new Object();
 
-        globalLogCallbackFunction = null;
-        globalStatisticsCallbackFunction = null;
-        globalExecuteCallbackFunction = null;
+        globalLogCallback = null;
+        globalStatisticsCallback = null;
+        globalFFmpegSessionCompleteCallback = null;
+        globalFFprobeSessionCompleteCallback = null;
+        globalMediaInformationSessionCompleteCallback = null;
 
         safIdMap = new SparseArray<>();
         safFileDescriptorMap = new SparseArray<>();
@@ -239,12 +243,12 @@ public class FFmpegKitConfig {
                     // NOTIFY SESSION CALLBACK DEFINED
                     session.getLogCallback().apply(log);
                 } catch (final Exception e) {
-                    android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session LogCallback block.%s", Exceptions.getStackTraceString(e)));
+                    android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session log callback.%s", Exceptions.getStackTraceString(e)));
                 }
             }
         }
 
-        final LogCallback globalLogCallbackFunction = FFmpegKitConfig.globalLogCallbackFunction;
+        final LogCallback globalLogCallbackFunction = FFmpegKitConfig.globalLogCallback;
         if (globalLogCallbackFunction != null) {
             globalCallbackDefined = true;
 
@@ -252,7 +256,7 @@ public class FFmpegKitConfig {
                 // NOTIFY GLOBAL CALLBACK DEFINED
                 globalLogCallbackFunction.apply(log);
             } catch (final Exception e) {
-                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global LogCallback block.%s", Exceptions.getStackTraceString(e)));
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global log callback.%s", Exceptions.getStackTraceString(e)));
             }
         }
 
@@ -345,18 +349,18 @@ public class FFmpegKitConfig {
                     // NOTIFY SESSION CALLBACK IF DEFINED
                     ffmpegSession.getStatisticsCallback().apply(statistics);
                 } catch (final Exception e) {
-                    android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session StatisticsCallback block.%s", Exceptions.getStackTraceString(e)));
+                    android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session statistics callback.%s", Exceptions.getStackTraceString(e)));
                 }
             }
         }
 
-        final StatisticsCallback globalStatisticsCallbackFunction = FFmpegKitConfig.globalStatisticsCallbackFunction;
+        final StatisticsCallback globalStatisticsCallbackFunction = FFmpegKitConfig.globalStatisticsCallback;
         if (globalStatisticsCallbackFunction != null) {
             try {
                 // NOTIFY GLOBAL CALLBACK IF DEFINED
                 globalStatisticsCallbackFunction.apply(statistics);
             } catch (final Exception e) {
-                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global StatisticsCallback block.%s", Exceptions.getStackTraceString(e)));
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global statistics callback.%s", Exceptions.getStackTraceString(e)));
             }
         }
     }
@@ -704,8 +708,9 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFmpeg execution for the given session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFmpegSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
      * @param ffmpegSession FFmpeg session which includes command options/arguments
      */
@@ -718,8 +723,9 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFmpeg execution for the given session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFmpegSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
      * @param ffmpegSession   FFmpeg session which includes command options/arguments
      * @param executorService executor service that will be used to run this asynchronous operation
@@ -733,8 +739,9 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFprobe execution for the given session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
      * @param ffprobeSession FFprobe session which includes command options/arguments
      */
@@ -747,8 +754,9 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFprobe execution for the given session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
      * @param ffprobeSession  FFprobe session which includes command options/arguments
      * @param executorService executor service that will be used to run this asynchronous operation
@@ -762,10 +770,12 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFprobe execution for the given media information session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param mediaInformationSession media information session which includes command options/arguments
+     * @param mediaInformationSession media information session which includes command
+     *                                options/arguments
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final int waitTimeout) {
@@ -777,11 +787,14 @@ public class FFmpegKitConfig {
     /**
      * <p>Starts an asynchronous FFprobe execution for the given media information session.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@link ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param mediaInformationSession media information session which includes command options/arguments
-     * @param executorService         executor service that will be used to run this asynchronous operation
+     * @param mediaInformationSession media information session which includes command
+     *                                options/arguments
+     * @param executorService         executor service that will be used to run this asynchronous
+     *                                operation
      * @param waitTimeout             max time to wait until media information is transmitted
      */
     public static void asyncGetMediaInformationExecute(final MediaInformationSession mediaInformationSession, final ExecutorService executorService, final int waitTimeout) {
@@ -822,42 +835,82 @@ public class FFmpegKitConfig {
     }
 
     /**
-     * <p>Sets a global callback function to redirect FFmpeg/FFprobe logs.
+     * <p>Sets a global callback to redirect FFmpeg/FFprobe logs.
      *
-     * @param logCallback log callback function or null to disable a previously defined
-     *                    callback
+     * @param logCallback log callback or null to disable a previously defined callback
      */
     public static void enableLogCallback(final LogCallback logCallback) {
-        globalLogCallbackFunction = logCallback;
+        globalLogCallback = logCallback;
     }
 
     /**
-     * <p>Sets a global callback function to redirect FFmpeg statistics.
+     * <p>Sets a global callback to redirect FFmpeg statistics.
      *
-     * @param statisticsCallback statistics callback function or null to disable a previously
+     * @param statisticsCallback statistics callback or null to disable a previously
      *                           defined callback
      */
     public static void enableStatisticsCallback(final StatisticsCallback statisticsCallback) {
-        globalStatisticsCallbackFunction = statisticsCallback;
+        globalStatisticsCallback = statisticsCallback;
     }
 
     /**
-     * <p>Sets a global callback function to receive execution results.
+     * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results for FFmpeg
+     * sessions.
      *
-     * @param executeCallback execute callback function or null to disable a previously
-     *                        defined callback
+     * @param ffmpegSessionCompleteCallback complete callback or null to disable a
+     *                                      previously defined callback
      */
-    public static void enableExecuteCallback(final ExecuteCallback executeCallback) {
-        globalExecuteCallbackFunction = executeCallback;
+    public static void enableFFmpegSessionCompleteCallback(final FFmpegSessionCompleteCallback ffmpegSessionCompleteCallback) {
+        globalFFmpegSessionCompleteCallback = ffmpegSessionCompleteCallback;
     }
 
     /**
-     * <p>Returns the global execute callback function.
+     * <p>Returns the global FFmpegSessionCompleteCallback set.
      *
-     * @return global execute callback function
+     * @return global FFmpegSessionCompleteCallback or null if it is not set
      */
-    static ExecuteCallback getExecuteCallback() {
-        return globalExecuteCallbackFunction;
+    public static FFmpegSessionCompleteCallback getFFmpegSessionCompleteCallback() {
+        return globalFFmpegSessionCompleteCallback;
+    }
+
+    /**
+     * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results for FFprobe
+     * sessions.
+     *
+     * @param ffprobeSessionCompleteCallback complete callback or null to disable a
+     *                                       previously defined callback
+     */
+    public static void enableFFprobeSessionCompleteCallback(final FFprobeSessionCompleteCallback ffprobeSessionCompleteCallback) {
+        globalFFprobeSessionCompleteCallback = ffprobeSessionCompleteCallback;
+    }
+
+    /**
+     * <p>Returns the global FFprobeSessionCompleteCallback set.
+     *
+     * @return global FFprobeSessionCompleteCallback or null if it is not set
+     */
+    public static FFprobeSessionCompleteCallback getFFprobeSessionCompleteCallback() {
+        return globalFFprobeSessionCompleteCallback;
+    }
+
+    /**
+     * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution results for
+     * MediaInformation sessions.
+     *
+     * @param mediaInformationSessionCompleteCallback complete callback or null to disable
+     *                                                a previously defined callback
+     */
+    public static void enableMediaInformationSessionCompleteCallback(final MediaInformationSessionCompleteCallback mediaInformationSessionCompleteCallback) {
+        globalMediaInformationSessionCompleteCallback = mediaInformationSessionCompleteCallback;
+    }
+
+    /**
+     * <p>Returns the global MediaInformationSessionCompleteCallback set.
+     *
+     * @return global MediaInformationSessionCompleteCallback or null if it is not set
+     */
+    public static MediaInformationSessionCompleteCallback getMediaInformationSessionCompleteCallback() {
+        return globalMediaInformationSessionCompleteCallback;
     }
 
     /**
@@ -1135,7 +1188,7 @@ public class FFmpegKitConfig {
      *
      * @return all FFmpeg sessions in the session history
      */
-    static List<FFmpegSession> getFFmpegSessions() {
+    public static List<FFmpegSession> getFFmpegSessions() {
         final LinkedList<FFmpegSession> list = new LinkedList<>();
 
         synchronized (sessionHistoryLock) {
@@ -1154,13 +1207,32 @@ public class FFmpegKitConfig {
      *
      * @return all FFprobe sessions in the session history
      */
-    static List<FFprobeSession> getFFprobeSessions() {
+    public static List<FFprobeSession> getFFprobeSessions() {
         final LinkedList<FFprobeSession> list = new LinkedList<>();
 
         synchronized (sessionHistoryLock) {
             for (Session session : sessionHistoryList) {
                 if (session.isFFprobe()) {
                     list.add((FFprobeSession) session);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * <p>Returns all MediaInformation sessions in the session history.
+     *
+     * @return all MediaInformation sessions in the session history
+     */
+    public static List<MediaInformationSession> getMediaInformationSessions() {
+        final LinkedList<MediaInformationSession> list = new LinkedList<>();
+
+        synchronized (sessionHistoryLock) {
+            for (Session session : sessionHistoryList) {
+                if (session.isMediaInformation()) {
+                    list.add((MediaInformationSession) session);
                 }
             }
         }
@@ -1357,7 +1429,7 @@ public class FFmpegKitConfig {
     native static int nativeFFprobeExecute(final long sessionId, final String[] arguments);
 
     /**
-     * <p>Cancels an ongoing FFmpeg operation natively. This function does not wait for termination
+     * <p>Cancels an ongoing FFmpeg operation natively. This method does not wait for termination
      * to complete and returns immediately.
      *
      * @param sessionId id of the session
