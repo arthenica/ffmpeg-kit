@@ -11,7 +11,7 @@ make distclean 2>/dev/null 1>/dev/null
 if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/builds/unix/configure ]] || [[ ${RECONF_freetype} -eq 1 ]]; then
 
   # NOTE THAT FREETYPE DOES NOT SUPPORT AUTORECONF BUT IT COMES WITH AN autogen.sh
-  ./autogen.sh || return 1
+  ./autogen.sh || exit 1
 fi
 
 ./configure \

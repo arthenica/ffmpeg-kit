@@ -138,7 +138,7 @@ fi
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..58}; do
+  for library in {0..61}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library "$(get_library_name $library)" 1
     else
@@ -214,7 +214,7 @@ for run_arch in {0..12}; do
     . "${BASEDIR}"/scripts/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {0..58}; do
+    for library in {0..61}; do
       library_name=$(get_library_name ${library})
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"
@@ -272,7 +272,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   # COPY LICENSES
   LICENSE_BASEDIR="${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/res/raw
   rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-  for library in {0..46}; do
+  for library in {0..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       ENABLED_LIBRARY=$(get_library_name ${library} | sed 's/-/_/g')
       LICENSE_FILE="${LICENSE_BASEDIR}/license_${ENABLED_LIBRARY}.txt"

@@ -63,15 +63,18 @@ After that this script should be used to create an umbrella xcframework.\n"
   echo -e "  --enable-libxml2\t\tbuild umbrella xcframework for libxml2 [no]"
   echo -e "  --enable-opencore-amr\t\tbuild umbrella xcframework for opencore-amr [no]"
   echo -e "  --enable-openh264\t\tbuild umbrella xcframework for openh264 [no]"
+  echo -e "  --enable-openssl\t\tbuild umbrella xcframework for openssl [no]"
   echo -e "  --enable-opus\t\t\tbuild umbrella xcframework for opus [no]"
   echo -e "  --enable-sdl\t\t\tbuild umbrella xcframework for sdl [no]"
   echo -e "  --enable-shine\t\tbuild umbrella xcframework for shine [no]"
   echo -e "  --enable-snappy\t\tbuild umbrella xcframework for snappy [no]"
   echo -e "  --enable-soxr\t\t\tbuild umbrella xcframework for soxr [no]"
   echo -e "  --enable-speex\t\tbuild umbrella xcframework for speex [no]"
+  echo -e "  --enable-srt\t\t\tbuild umbrella xcframework for srt [no]"
   echo -e "  --enable-tesseract\t\tbuild umbrella xcframework for tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild umbrella xcframework for twolame [no]"
-  echo -e "  --enable-vo-amrwbenc\t\tbuild umbrella xcframework for vo-amrwbenc [no]\n"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild umbrella xcframework for vo-amrwbenc [no]"
+  echo -e "  --enable-zimg\t\t\tbuild umbrella xcframework for zimg [no]\n"
 
   echo -e "GPL libraries:"
   echo -e "  --enable-libvidstab\t\tbuild umbrella xcframework for libvidstab [no]"
@@ -244,7 +247,7 @@ done
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..58}; do
+  for library in {0..61}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       set_library "$(get_library_name "$library")" 1
     else
@@ -308,45 +311,6 @@ if [[ -n ${TARGET_ARCHITECTURE_VARIANT_INDEX_ARRAY[0]} ]]; then
 
   # INITIALIZE TARGET FOLDERS
   initialize_prebuilt_umbrella_xcframework_folders
-
-  # BUILD XCFRAMEWORKS FOR ENABLED LIBRARIES ON ENABLED ARCHITECTURE VARIANTS
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[${library}]} -eq 1 ]]; then
-
-      if [[ ${LIBRARY_LIBTHEORA} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libtheora"
-        create_umbrella_xcframework "libtheoraenc"
-        create_umbrella_xcframework "libtheoradec"
-
-      elif [[ ${LIBRARY_LIBVORBIS} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libvorbisfile"
-        create_umbrella_xcframework "libvorbisenc"
-        create_umbrella_xcframework "libvorbis"
-
-      elif [[ ${LIBRARY_LIBWEBP} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libwebpmux"
-        create_umbrella_xcframework "libwebpdemux"
-        create_umbrella_xcframework "libwebp"
-
-      elif [[ ${LIBRARY_OPENCOREAMR} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libopencore-amrnb"
-
-      elif [[ ${LIBRARY_NETTLE} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libnettle"
-        create_umbrella_xcframework "libhogweed"
-
-      else
-
-        create_umbrella_xcframework "$(get_static_archive_name "${library}")"
-
-      fi
-    fi
-  done
 
   for FFMPEG_LIB in "${FFMPEG_LIBS[@]}"; do
     create_umbrella_xcframework "${FFMPEG_LIB}"

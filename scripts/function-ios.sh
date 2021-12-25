@@ -27,7 +27,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.3+ devices" "      --target=ios sdk version\t\t\toverride minimum deployment target [12.1]" "      --mac-catalyst-target=ios sdk version\toverride minimum deployment target for mac catalyst [14.0]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10+ devices" "      --target=ios sdk version\t\t\toverride minimum deployment target [12.1]" "      --mac-catalyst-target=ios sdk version\toverride minimum deployment target for mac catalyst [14.0]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -77,12 +77,12 @@ enable_main_build() {
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "9.3") -le 0 ]]; then
+  if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "10") -le 0 ]]; then
     export IOS_MIN_VERSION=$DETECTED_IOS_SDK_VERSION
   else
 
-    # XCODE 7.3 HAS IOS SDK 9.3
-    export IOS_MIN_VERSION=9.3
+    # XCODE 8.0 HAS IOS SDK 10
+    export IOS_MIN_VERSION=10
   fi
 
   if [[ $(compare_versions "$DETECTED_IOS_SDK_VERSION" "13.0") -le 0 ]]; then
@@ -139,8 +139,7 @@ get_arch_specific_cflags() {
     echo "-arch arm64e -target $(get_target) -march=armv8.3-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64E"
     ;;
   i386)
-    # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
-    echo "-arch i386 -target $(get_target) -march=i386 -mtune=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386 -D__thread= "
+    echo "-arch i386 -target $(get_target) -march=i386 -mtune=i386 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_I386"
     ;;
   x86-64)
     echo "-arch x86_64 -target $(get_target) -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
@@ -152,7 +151,6 @@ get_arch_specific_cflags() {
 }
 
 get_size_optimization_cflags() {
-
   local ARCH_OPTIMIZATION=""
   case ${ARCH} in
   armv7 | armv7s | arm64 | arm64e | *-mac-catalyst)
@@ -167,7 +165,6 @@ get_size_optimization_cflags() {
 }
 
 get_size_optimization_asm_cflags() {
-
   local ARCH_OPTIMIZATION=""
   case $1 in
   jpeg | ffmpeg)
@@ -189,7 +186,6 @@ get_size_optimization_asm_cflags() {
 }
 
 get_app_specific_cflags() {
-
   local APP_FLAGS=""
   case $1 in
   fontconfig)
@@ -229,7 +225,7 @@ get_app_specific_cflags() {
   soxr | snappy)
     APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
     ;;
-  openh264 | x265)
+  openh264 | openssl | x265)
     APP_FLAGS="-Wno-unused-function"
     ;;
   *)
@@ -303,6 +299,9 @@ get_cxxflags() {
     ;;
   rubberband)
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    ;;
+  srt | zimg)
+    echo "-std=c++11 ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   *)
     echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"

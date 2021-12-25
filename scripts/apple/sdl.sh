@@ -15,7 +15,7 @@ make distclean 2>/dev/null 1>/dev/null
 overwrite_file "${BASEDIR}/tools/patch/make/sdl/configure.in" "${BASEDIR}/src/${LIB_NAME}/configure.in"
 
 # ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
-./autogen.sh || return 1
+./autogen.sh || exit 1
 
 # WORKAROUND TO EXCLUDE libunwind.h ON LTS BUILDS
 if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then

@@ -38,7 +38,7 @@ fi
 # FILTER WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..47}; do
+for library in {1..50}; do
   if [[ ${!library} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name $((library - 1)))
     enabled_library_list+=(${ENABLED_LIBRARY})
@@ -108,6 +108,11 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         run=1
       fi
       ;;
+    srt)
+      if [[ $OK_openssl -eq 1 ]]; then
+        run=1
+      fi
+      ;;
     tesseract)
       if [[ $OK_leptonica -eq 1 ]]; then
         run=1
@@ -145,12 +150,17 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
         "${BASEDIR}"/scripts/run-apple.sh "${library}" 1>>"${BASEDIR}"/build.log 2>&1
 
+        RC=$?
+
         # SET SOME FLAGS AFTER THE BUILD
-        if [ $? -eq 0 ]; then
+        if [ $RC -eq 0 ]; then
           ((completed += 1))
           declare "$BUILD_COMPLETED_FLAG=1"
           check_if_dependency_rebuilt "${library}"
           echo "ok"
+        elif [ $RC -eq 200 ]; then
+          echo -e "not supported\n\nSee build.log for details\n"
+          exit 1
         else
           echo -e "failed\n\nSee build.log for details\n"
           exit 1

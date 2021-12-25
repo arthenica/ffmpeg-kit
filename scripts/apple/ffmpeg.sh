@@ -104,7 +104,7 @@ esac
 CONFIGURE_POSTFIX=""
 
 # SET CONFIGURE OPTIONS
-for library in {1..59}; do
+for library in {1..62}; do
   if [[ ${!library} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
@@ -211,6 +211,11 @@ for library in {1..59}; do
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openh264 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopenh264"
       ;;
+    openssl)
+      FFMPEG_CFLAGS+=" $(pkg-config --cflags openssl 2>>"${BASEDIR}"/build.log)"
+      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openssl 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-openssl"
+      ;;
     opus)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags opus 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus 2>>"${BASEDIR}"/build.log)"
@@ -247,6 +252,11 @@ for library in {1..59}; do
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static speex 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libspeex"
       ;;
+    srt)
+      FFMPEG_CFLAGS+=" $(pkg-config --cflags srt 2>>"${BASEDIR}"/build.log)"
+      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static srt 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libsrt"
+      ;;
     tesseract)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags tesseract 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static tesseract 2>>"${BASEDIR}"/build.log)"
@@ -278,6 +288,11 @@ for library in {1..59}; do
       FFMPEG_CFLAGS+=" $(pkg-config --cflags xvidcore 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static xvidcore 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+      ;;
+    zimg)
+      FFMPEG_CFLAGS+=" $(pkg-config --cflags zimg 2>>"${BASEDIR}"/build.log)"
+      FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zimg 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libzimg"
       ;;
     expat)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
@@ -371,6 +386,8 @@ for library in {1..59}; do
       CONFIGURE_POSTFIX+=" --disable-videotoolbox"
     elif [[ ${library} -eq $((LIBRARY_APPLE_ZLIB + 1)) ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
+    elif [[ ${library} -eq $((LIBRARY_OPENSSL + 1)) ]]; then
+      CONFIGURE_POSTFIX+=" --disable-openssl"
     fi
   fi
 done
@@ -473,8 +490,6 @@ ${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffb
   --as="${AS}" \
   --ranlib="${RANLIB}" \
   --strip="${STRIP}" \
-  --ranlib="${RANLIB}" \
-  --strip="${STRIP}" \
   --nm="${NM}" \
   --extra-ldflags="$(get_min_version_cflags)" \
   --disable-autodetect \
@@ -491,7 +506,6 @@ ${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffb
   --disable-indev=v4l2 \
   --disable-indev=fbdev \
   ${SIZE_OPTIONS} \
-  --disable-openssl \
   --disable-xmm-clobber-test \
   ${DEBUG_OPTIONS} \
   --disable-neon-clobber-test \

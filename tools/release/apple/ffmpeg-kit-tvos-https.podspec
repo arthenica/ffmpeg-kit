@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-https-VERSION-tvos-framework.zip" }
 
-    s.tvos.deployment_target = '9.2'
+    s.tvos.deployment_target = '10.0'
     s.tvos.frameworks   = 'AudioToolbox','VideoToolbox','CoreMedia'
     s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 

@@ -2,36 +2,36 @@
 
 ### 1. Features
 #### 1.1 iOS
-- Supports `iOS SDK 12.1+` on Main releases and `iOS SDK 9.3+` on LTS releases
+- Supports `iOS SDK 12.1+` on Main releases and `iOS SDK 10+` on LTS releases
 - Includes `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `arm64e`, `i386`, `x86_64`, `x86_64-mac-catalyst` and 
   `arm64-mac-catalyst` architectures
 - Objective-C API
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
+- Creates shared `frameworks` and `xcframeworks`
 
 #### 1.2 macOS
-- Supports `macOS SDK 10.15+` on Main releases and `macOS SDK 10.11+` on LTS releases
+- Supports `macOS SDK 10.15+` on Main releases and `macOS SDK 10.12+` on LTS releases
 - Includes `arm64` and `x86_64` architectures
 - Objective-C API
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
+- Creates shared `frameworks` and `xcframeworks`
 
 #### 1.3 tvOS
-- Supports `tvOS SDK 10.2+` on Main releases and `tvOS SDK 9.2+` on LTS releases
+- Supports `tvOS SDK 11.0+` on Main releases and `tvOS SDK 10.0+` on LTS releases
 - Includes `arm64`, `arm64-simulator` and `x86_64` architectures
 - Objective-C API
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static `frameworks`, static `xcframeworks` and static `universal (fat)` libraries (.a)
+- Creates shared `frameworks` and `xcframeworks`
 
 ### 2. Building
 
-Run `ios.sh`/`macos.sh`/`tvos.sh` at project root directory to build `ffmpeg-kit` and `ffmpeg` static libraries for a 
-platform.
+Run `ios.sh`/`macos.sh`/`tvos.sh` inside the project root to build `ffmpeg-kit` and `ffmpeg` shared libraries
+for a platform.
 
 Optionally, use `apple.sh` to combine bundles created by these three scripts in a single bundle.
 
@@ -45,20 +45,20 @@ Please note that `FFmpegKit` project repository includes the source code of `FFm
 
 ##### 2.1.1 iOS
 
-- **Xcode 7.3.1** or later
-- **iOS SDK 9.3** or later
+- **Xcode 8.0** or later
+- **iOS SDK 10** or later
 - **Command Line Tools**
 
 ##### 2.1.2 macOS
 
-- **Xcode 7.3.1** or later
-- **macOS SDK 10.11** or later
+- **Xcode 8.0** or later
+- **macOS SDK 10.12** or later
 - **Command Line Tools**
 
 ##### 2.1.3 tvOS
 
-- **Xcode 7.3.1** or later
-- **tvOS SDK 9.2** or later
+- **Xcode 8.0** or later
+- **tvOS SDK 10.0** or later
 - **Command Line Tools**
 
 ##### 2.1.4 Packages

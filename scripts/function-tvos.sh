@@ -20,7 +20,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 9.2+ devices" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10.0+ devices" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -59,12 +59,12 @@ enable_main_build() {
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
 
-  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "9.2") -le 0 ]]; then
+  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "10.0") -le 0 ]]; then
     export TVOS_MIN_VERSION=$DETECTED_TVOS_SDK_VERSION
   else
 
-    # XCODE 7.3 HAS TVOS SDK 9.2
-    export TVOS_MIN_VERSION=9.2
+    # XCODE 8.0 HAS TVOS SDK 10.0
+    export TVOS_MIN_VERSION=10.0
   fi
 }
 
@@ -275,6 +275,9 @@ get_cxxflags() {
     ;;
   rubberband)
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    ;;
+  srt | zimg)
+    echo "-std=c++11 ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   *)
     echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"

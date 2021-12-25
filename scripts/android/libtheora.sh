@@ -16,7 +16,7 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_libtheora}
   # WORKAROUND NOT TO RUN CONFIGURE AT THE END OF autogen.sh
   ${SED_INLINE} 's/$srcdir\/configure/#$srcdir\/configure/g' "${BASEDIR}"/src/"${LIB_NAME}"/autogen.sh || return 1
 
-  ./autogen.sh || return 1
+  ./autogen.sh || exit 1
 fi
 
 ./configure \

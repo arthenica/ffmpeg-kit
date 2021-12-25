@@ -33,7 +33,7 @@ under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level" "      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (fd, saf)"
+  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level" "      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (saf)"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -69,7 +69,7 @@ build_application_mk() {
     local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
   fi
 
-  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
+  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_ZIMG]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SRT]} -eq 1 ]]; then
     local APP_STL="c++_shared"
   else
     local APP_STL="none"
@@ -334,7 +334,7 @@ get_app_specific_cflags() {
   rubberband)
     APP_FLAGS="-std=c99 -Wno-unused-function"
     ;;
-  libvpx | shine)
+  libvpx | openssl | shine | srt)
     APP_FLAGS="-Wno-unused-function"
     ;;
   soxr | snappy | libwebp)
@@ -392,7 +392,7 @@ get_cxxflags() {
   x265)
     echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
     ;;
-  rubberband)
+  rubberband | srt | zimg)
     echo "-std=c++11 ${OPTIMIZATION_FLAGS}"
     ;;
   *)
@@ -418,7 +418,7 @@ get_common_linked_libraries() {
   libvpx)
     echo "-lc -lm ${COMMON_LIBRARY_PATHS}"
     ;;
-  tesseract | x265)
+  srt | tesseract | x265)
     echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
     ;;
   *)
@@ -803,6 +803,26 @@ Cflags: -I\${includedir}
 EOF
 }
 
+create_srt_package_config() {
+  local SRT_VERSION="$1"
+
+  cat >"${INSTALL_PKG_CONFIG_DIR}/srt.pc" <<EOF
+prefix=${LIB_INSTALL_BASE}/srt
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: srt
+Description: SRT library set
+Version: ${SRT_VERSION}
+
+Libs: -L\${libdir} -lsrt
+Libs.private: -lc -lm -ldl -llog -lc++_shared
+Cflags: -I\${includedir} -I\${includedir}/srt
+Requires.private: openssl libcrypto
+EOF
+}
+
 create_tesseract_package_config() {
   local TESSERACT_VERSION="$1"
 
@@ -878,6 +898,24 @@ Version: ${XVIDCORE_VERSION}
 
 Requires:
 Libs: -L\${libdir}
+Cflags: -I\${includedir}
+EOF
+}
+
+create_zimg_package_config() {
+  local ZIMG_VERSION="$1"
+
+  cat >"${INSTALL_PKG_CONFIG_DIR}/zimg.pc" <<EOF
+prefix=${LIB_INSTALL_BASE}/zimg
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: zimg
+Description: Scaling, colorspace conversion, and dithering library
+Version: ${ZIMG_VERSION}
+
+Libs: -L\${libdir} -lzimg -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }

@@ -27,7 +27,7 @@ create_package() {
     sed -i '' "s/\.framework/\.xcframework/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/-framework/-xcframework/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/osx\.xcframeworks/osx\.frameworks/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
-    sed -i '' "s/10\.11/10\.15/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
+    sed -i '' "s/10\.12/10\.15/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/ffmpegkit\.xcframework\/LICENSE/ffmpegkit\.xcframework\/macos-arm64_x86_64\/ffmpegkit\.framework\/LICENSE/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
 }
 

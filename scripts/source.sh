@@ -182,6 +182,11 @@ get_library_source() {
     SOURCE_ID="v2.1.1"
     SOURCE_TYPE="TAG"
     ;;
+  openssl)
+    SOURCE_REPO_URL="https://github.com/tanersener/openssl"
+    SOURCE_ID="openssl-3.0.1"
+    SOURCE_TYPE="TAG"
+    ;;
   opus)
     SOURCE_REPO_URL="https://github.com/tanersener/opus"
     SOURCE_ID="v1.3.1"
@@ -217,6 +222,11 @@ get_library_source() {
     SOURCE_ID="Speex-1.2.0"
     SOURCE_TYPE="TAG"
     ;;
+  srt)
+    SOURCE_REPO_URL="https://github.com/tanersener/srt"
+    SOURCE_ID="v1.4.4"
+    SOURCE_TYPE="TAG"
+    ;;
   tesseract)
     SOURCE_REPO_URL="https://github.com/tanersener/tesseract"
     SOURCE_ID="3.05.02"
@@ -250,6 +260,11 @@ get_library_source() {
   xvidcore)
     SOURCE_REPO_URL="https://github.com/tanersener/xvidcore"
     SOURCE_ID="release-1_3_7"
+    SOURCE_TYPE="TAG"
+    ;;
+  zimg)
+    SOURCE_REPO_URL="https://github.com/tanersener/zimg"
+    SOURCE_ID="release-3.0.3"
     SOURCE_TYPE="TAG"
     ;;
   esac

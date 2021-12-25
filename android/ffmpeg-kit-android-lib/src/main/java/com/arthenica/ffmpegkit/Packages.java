@@ -51,6 +51,7 @@ public class Packages {
         supportedExternalLibraries.add("libxml2");
         supportedExternalLibraries.add("opencore-amr");
         supportedExternalLibraries.add("openh264");
+        supportedExternalLibraries.add("openssl");
         supportedExternalLibraries.add("opus");
         supportedExternalLibraries.add("rubberband");
         supportedExternalLibraries.add("sdl2");
@@ -58,11 +59,13 @@ public class Packages {
         supportedExternalLibraries.add("snappy");
         supportedExternalLibraries.add("soxr");
         supportedExternalLibraries.add("speex");
+        supportedExternalLibraries.add("srt");
         supportedExternalLibraries.add("tesseract");
         supportedExternalLibraries.add("twolame");
         supportedExternalLibraries.add("x264");
         supportedExternalLibraries.add("x265");
         supportedExternalLibraries.add("xvid");
+        supportedExternalLibraries.add("zimg");
     }
 
     /**
@@ -134,7 +137,8 @@ public class Packages {
                     externalLibraryList.contains("twolame") &&
                     externalLibraryList.contains("x264") &&
                     externalLibraryList.contains("x265") &&
-                    externalLibraryList.contains("xvid")) {
+                    externalLibraryList.contains("xvid") &&
+                    externalLibraryList.contains("zimg")) {
                 return "full-gpl";
             } else {
                 return "custom";
@@ -164,7 +168,8 @@ public class Packages {
                     externalLibraryList.contains("snappy") &&
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
-                    externalLibraryList.contains("twolame")) {
+                    externalLibraryList.contains("twolame") &&
+                    externalLibraryList.contains("zimg")) {
                 return "full";
             } else {
                 return "custom";
@@ -182,7 +187,8 @@ public class Packages {
                     externalLibraryList.contains("libtheora") &&
                     externalLibraryList.contains("libvpx") &&
                     externalLibraryList.contains("libwebp") &&
-                    externalLibraryList.contains("snappy")) {
+                    externalLibraryList.contains("snappy") &&
+                    externalLibraryList.contains("zimg")) {
                 return "video";
             } else {
                 return "custom";

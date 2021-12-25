@@ -72,7 +72,7 @@ CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
 # SET CONFIGURE OPTIONS
-for library in {1..58}; do
+for library in {1..62}; do
   if [[ ${!library} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
@@ -194,6 +194,11 @@ for library in {1..58}; do
       LDFLAGS+=" $(pkg-config --libs --static openh264 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopenh264"
       ;;
+    openssl)
+      CFLAGS+=" $(pkg-config --cflags openssl 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static openssl 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-openssl"
+      ;;
     opus)
       CFLAGS+=" $(pkg-config --cflags opus 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static opus 2>>"${BASEDIR}"/build.log)"
@@ -229,6 +234,11 @@ for library in {1..58}; do
       LDFLAGS+=" $(pkg-config --libs --static speex 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libspeex"
       ;;
+    srt)
+      CFLAGS+=" $(pkg-config --cflags srt 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static srt 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libsrt"
+      ;;
     tesseract)
       CFLAGS+=" $(pkg-config --cflags tesseract 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static tesseract 2>>"${BASEDIR}"/build.log)"
@@ -260,6 +270,11 @@ for library in {1..58}; do
       CFLAGS+=" $(pkg-config --cflags xvidcore 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static xvidcore 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+      ;;
+    zimg)
+      CFLAGS+=" $(pkg-config --cflags zimg 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static zimg 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libzimg"
       ;;
     expat)
       CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
@@ -302,6 +317,8 @@ for library in {1..58}; do
       CONFIGURE_POSTFIX+=" --disable-zlib"
     elif [[ ${library} -eq $((LIBRARY_ANDROID_MEDIA_CODEC + 1)) ]]; then
       CONFIGURE_POSTFIX+=" --disable-mediacodec"
+    elif [[ ${library} -eq $((LIBRARY_OPENSSL + 1)) ]]; then
+      CONFIGURE_POSTFIX+=" --disable-openssl"
     fi
   fi
 done
@@ -394,25 +411,27 @@ fi
   --enable-version3 \
   --arch="${TARGET_ARCH}" \
   --cpu="${TARGET_CPU}" \
+  --target-os=android \
+  ${ASM_OPTIONS} \
+  --ar="${AR}" \
   --cc="${CC}" \
   --cxx="${CXX}" \
   --ranlib="${RANLIB}" \
   --strip="${STRIP}" \
   --nm="${NM}" \
   --extra-libs="$(pkg-config --libs --static cpu-features)" \
-  --target-os=android \
-  ${ASM_OPTIONS} \
+  --disable-autodetect \
   --enable-cross-compile \
   --enable-pic \
   --enable-jni \
   --enable-optimizations \
   --enable-swscale \
   ${BUILD_LIBRARY_OPTIONS} \
+  --enable-pthreads \
   --enable-v4l2-m2m \
   --disable-outdev=fbdev \
   --disable-indev=fbdev \
   ${SIZE_OPTIONS} \
-  --disable-openssl \
   --disable-xmm-clobber-test \
   ${DEBUG_OPTIONS} \
   --disable-neon-clobber-test \

@@ -12,14 +12,6 @@ export HOGWEED_LIBS="-L${LIB_INSTALL_BASE}/nettle/lib -lhogweed -L${LIB_INSTALL_
 export GMP_CFLAGS="-I${LIB_INSTALL_BASE}/gmp/include"
 export GMP_LIBS="-L${LIB_INSTALL_BASE}/gmp/lib -lgmp"
 
-# SET BUILD OPTIONS
-case ${ARCH} in
-i386)
-  # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
-  export CFLAGS+=" -D__thread="
-  ;;
-esac
-
 # ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
 
