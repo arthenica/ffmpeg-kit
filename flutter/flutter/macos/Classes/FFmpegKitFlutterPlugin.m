@@ -57,7 +57,7 @@ static int const SESSION_TYPE_MEDIA_INFORMATION = 3;
 // EVENTS
 static NSString *const EVENT_LOG_CALLBACK_EVENT = @"FFmpegKitLogCallbackEvent";
 static NSString *const EVENT_STATISTICS_CALLBACK_EVENT = @"FFmpegKitStatisticsCallbackEvent";
-static NSString *const EVENT_EXECUTE_CALLBACK_EVENT = @"FFmpegKitExecuteCallbackEvent";
+static NSString *const EVENT_EXECUTE_CALLBACK_EVENT = @"FFmpegKitCompleteCallbackEvent";
 
 // ARGUMENT NAMES
 static NSString *const ARGUMENT_SESSION_ID = @"sessionId";

@@ -19,16 +19,20 @@
 
 import 'dart:io';
 
+import 'package:ffmpeg_kit_flutter/ffprobe_session.dart';
+import 'package:ffmpeg_kit_flutter/media_information_session.dart';
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
 
 import '../arch_detect.dart';
-import '../execute_callback.dart';
 import '../ffmpeg_kit_config.dart';
 import '../ffmpeg_session.dart';
+import '../ffmpeg_session_complete_callback.dart';
+import '../ffprobe_session_complete_callback.dart';
 import '../level.dart';
 import '../log_callback.dart';
 import '../log_redirection_strategy.dart';
+import '../media_information_session_complete_callback.dart';
 import '../packages.dart';
 import '../session.dart';
 import '../statistics.dart';
@@ -59,8 +63,8 @@ class FFmpegKitInitializer {
           eventMap['FFmpegKitLogCallbackEvent'];
       final Map<dynamic, dynamic>? statisticsEvent =
           eventMap['FFmpegKitStatisticsCallbackEvent'];
-      final Map<dynamic, dynamic>? executeEvent =
-          eventMap['FFmpegKitExecuteCallbackEvent'];
+      final Map<dynamic, dynamic>? completeEvent =
+          eventMap['FFmpegKitCompleteCallbackEvent'];
 
       if (logEvent != null) {
         _processLogCallbackEvent(logEvent);
@@ -70,8 +74,8 @@ class FFmpegKitInitializer {
         _processStatisticsCallbackEvent(statisticsEvent);
       }
 
-      if (executeEvent != null) {
-        _processExecuteCallbackEvent(executeEvent);
+      if (completeEvent != null) {
+        _processCompleteCallbackEvent(completeEvent);
       }
     }
   }
@@ -110,7 +114,7 @@ class FFmpegKitInitializer {
         // NOTIFY SESSION CALLBACK DEFINED
         logCallback(log);
       } on Exception catch (e, stack) {
-        print("Exception thrown inside session LogCallback block. $e");
+        print("Exception thrown inside session log callback. $e");
         print(stack);
       }
     }
@@ -123,7 +127,7 @@ class FFmpegKitInitializer {
         // NOTIFY GLOBAL CALLBACK DEFINED
         globalLogCallbackFunction(log);
       } on Exception catch (e, stack) {
-        print("Exception thrown inside global LogCallback block. $e");
+        print("Exception thrown inside global log callback. $e");
         print(stack);
       }
     }
@@ -185,7 +189,7 @@ class FFmpegKitInitializer {
         // NOTIFY SESSION CALLBACK DEFINED
         statisticsCallback(statistics);
       } on Exception catch (e, stack) {
-        print("Exception thrown inside session StatisticsCallback block. $e");
+        print("Exception thrown inside session statistics callback. $e");
         print(stack);
       }
     }
@@ -197,37 +201,96 @@ class FFmpegKitInitializer {
         // NOTIFY GLOBAL CALLBACK DEFINED
         globalStatisticsCallbackFunction(statistics);
       } on Exception catch (e, stack) {
-        print("Exception thrown inside global StatisticsCallback block. $e");
+        print("Exception thrown inside global statistics callback. $e");
         print(stack);
       }
     }
   }
 
-  void _processExecuteCallbackEvent(Map<dynamic, dynamic> event) {
+  void _processCompleteCallbackEvent(Map<dynamic, dynamic> event) {
     final int sessionId = event["sessionId"];
 
     FFmpegKitConfig.getSession(sessionId).then((Session? session) {
-      final ExecuteCallback? executeCallback = session?.getExecuteCallback();
+      if (session != null) {
+        if (session.isFFmpeg()) {
+          final ffmpegSession = session as FFmpegSession;
+          final FFmpegSessionCompleteCallback? completeCallback =
+              ffmpegSession.getCompleteCallback();
 
-      if (executeCallback != null && session != null) {
-        try {
-          // NOTIFY SESSION CALLBACK DEFINED
-          executeCallback(session);
-        } on Exception catch (e, stack) {
-          print("Exception thrown inside session ExecuteCallback block. $e");
-          print(stack);
-        }
-      }
+          if (completeCallback != null) {
+            try {
+              // NOTIFY SESSION CALLBACK DEFINED
+              completeCallback(ffmpegSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside session complete callback. $e");
+              print(stack);
+            }
+          }
 
-      final globalExecuteCallbackFunction =
-          FFmpegKitFactory.getGlobalExecuteCallback();
-      if (globalExecuteCallbackFunction != null && session != null) {
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalExecuteCallbackFunction(session);
-        } on Exception catch (e, stack) {
-          print("Exception thrown inside global ExecuteCallback block. $e");
-          print(stack);
+          final globalFFmpegSessionCompleteCallback =
+              FFmpegKitFactory.getGlobalFFmpegSessionCompleteCallback();
+          if (globalFFmpegSessionCompleteCallback != null) {
+            try {
+              // NOTIFY GLOBAL CALLBACK DEFINED
+              globalFFmpegSessionCompleteCallback(ffmpegSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside global complete callback. $e");
+              print(stack);
+            }
+          }
+        } else if (session.isFFprobe()) {
+          final ffprobeSession = session as FFprobeSession;
+          final FFprobeSessionCompleteCallback? completeCallback =
+              ffprobeSession.getCompleteCallback();
+
+          if (completeCallback != null) {
+            try {
+              // NOTIFY SESSION CALLBACK DEFINED
+              completeCallback(ffprobeSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside session complete callback. $e");
+              print(stack);
+            }
+          }
+
+          final globalFFprobeSessionCompleteCallback =
+              FFmpegKitFactory.getGlobalFFprobeSessionCompleteCallback();
+          if (globalFFprobeSessionCompleteCallback != null) {
+            try {
+              // NOTIFY GLOBAL CALLBACK DEFINED
+              globalFFprobeSessionCompleteCallback(ffprobeSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside global complete callback. $e");
+              print(stack);
+            }
+          }
+        } else if (session.isMediaInformation()) {
+          final mediaInformationSession = session as MediaInformationSession;
+          final MediaInformationSessionCompleteCallback? completeCallback =
+              mediaInformationSession.getCompleteCallback();
+
+          if (completeCallback != null) {
+            try {
+              // NOTIFY SESSION CALLBACK DEFINED
+              completeCallback(mediaInformationSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside session complete callback. $e");
+              print(stack);
+            }
+          }
+
+          final globalMediaInformationSessionCompleteCallback = FFmpegKitFactory
+              .getGlobalMediaInformationSessionCompleteCallback();
+          if (globalMediaInformationSessionCompleteCallback != null) {
+            try {
+              // NOTIFY GLOBAL CALLBACK DEFINED
+              globalMediaInformationSessionCompleteCallback(
+                  mediaInformationSession);
+            } on Exception catch (e, stack) {
+              print("Exception thrown inside global complete callback. $e");
+              print(stack);
+            }
+          }
         }
       }
     });

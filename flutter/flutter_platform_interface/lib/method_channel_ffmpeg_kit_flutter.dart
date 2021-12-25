@@ -334,8 +334,12 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
   // FFprobeKit
 
   @override
-  Future<List<dynamic>?> ffprobeKitListSessions() async =>
+  Future<List<dynamic>?> ffprobeKitListFFprobeSessions() async =>
       _channel.invokeMethod<List<dynamic>>('getFFprobeSessions');
+
+  @override
+  Future<List<dynamic>?> ffprobeKitListMediaInformationSessions() async =>
+      _channel.invokeMethod<List<dynamic>>('getMediaInformationSessions');
 
   // MediaInformationJsonParser
 

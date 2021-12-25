@@ -17,7 +17,6 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'execute_callback.dart';
 import 'log.dart';
 import 'log_callback.dart';
 import 'log_redirection_strategy.dart';
@@ -26,10 +25,7 @@ import 'session_state.dart';
 
 /// Common interface for all "FFmpegKit" sessions.
 abstract class Session {
-  /// Returns the session specific execute callback function.
-  ExecuteCallback? getExecuteCallback();
-
-  /// Returns the session specific log callback function.
+  /// Returns the session specific log callback.
   LogCallback? getLogCallback();
 
   /// Returns the session identifier.
@@ -105,6 +101,9 @@ abstract class Session {
 
   /// Returns whether it is an "FFprobe" session or not.
   bool isFFprobe();
+
+  /// Returns whether it is an "MediaInformation" session or not.
+  bool isMediaInformation();
 
   /// Cancels running the session.
   void cancel();

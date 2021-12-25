@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2021 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -17,13 +17,14 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'session.dart';
+import 'media_information_session.dart';
 
-/// Callback function invoked when a session ends running.
-/// Session has either SessionState.completed or SessionState.failed state when
-/// the callback is invoked.
+/// Callback function that is invoked when an asynchronous MediaInformation
+/// session has ended. Session has either SessionState.completed or
+/// SessionState.failed state when the callback is invoked.
 /// If it has SessionState.completed state, "ReturnCode" should be checked to
 /// see the execution result.
 /// If "getState" returns SessionState.failed then "getFailStackTrace" should
 /// be used to get the failure reason.
-typedef ExecuteCallback = void Function(Session session);
+typedef MediaInformationSessionCompleteCallback = void Function(
+    MediaInformationSession session);

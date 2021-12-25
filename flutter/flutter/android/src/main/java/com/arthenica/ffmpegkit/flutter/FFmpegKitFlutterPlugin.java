@@ -114,7 +114,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     // EVENTS
     public static final String EVENT_LOG_CALLBACK_EVENT = "FFmpegKitLogCallbackEvent";
     public static final String EVENT_STATISTICS_CALLBACK_EVENT = "FFmpegKitStatisticsCallbackEvent";
-    public static final String EVENT_EXECUTE_CALLBACK_EVENT = "FFmpegKitExecuteCallbackEvent";
+    public static final String EVENT_COMPLETE_CALLBACK_EVENT = "FFmpegKitCompleteCallbackEvent";
 
     // REQUEST CODES
     public static final int READABLE_REQUEST_CODE = 10000;
@@ -165,7 +165,9 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected void registerGlobalCallbacks() {
-        FFmpegKitConfig.enableExecuteCallback(this::emitSession);
+        FFmpegKitConfig.enableFFmpegSessionCompleteCallback(this::emitSession);
+        FFmpegKitConfig.enableFFprobeSessionCompleteCallback(this::emitSession);
+        FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(this::emitSession);
 
         FFmpegKitConfig.enableLogCallback(log -> {
             if (logsEnabled.get()) {
@@ -622,6 +624,9 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
             case "getFFprobeSessions":
                 getFFprobeSessions(result);
                 break;
+            case "getMediaInformationSessions":
+                getMediaInformationSessions(result);
+                break;
             case "getPackageName":
                 getPackageName(result);
                 break;
@@ -827,7 +832,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFmpegSession) {
+            if (session.isFFmpeg()) {
                 final int timeout;
                 if (isValidPositiveNumber(waitTimeout)) {
                     timeout = waitTimeout;
@@ -847,7 +852,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFmpegSession) {
+            if (session.isFFmpeg()) {
                 final List<Statistics> statistics = ((FFmpegSession) session).getStatistics();
                 resultHandler.successAsync(result, toStatisticsMapList(statistics));
             } else {
@@ -1020,7 +1025,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFmpegSession) {
+            if (session.isFFmpeg()) {
                 final FFmpegSessionExecuteTask ffmpegSessionExecuteTask = new FFmpegSessionExecuteTask((FFmpegSession) session, resultHandler, result);
                 asyncExecutorService.submit(ffmpegSessionExecuteTask);
             } else {
@@ -1034,7 +1039,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFprobeSession) {
+            if (session.isFFprobe()) {
                 final FFprobeSessionExecuteTask ffprobeSessionExecuteTask = new FFprobeSessionExecuteTask((FFprobeSession) session, resultHandler, result);
                 asyncExecutorService.submit(ffprobeSessionExecuteTask);
             } else {
@@ -1048,7 +1053,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof MediaInformationSession) {
+            if (session.isMediaInformation()) {
                 final int timeout;
                 if (isValidPositiveNumber(waitTimeout)) {
                     timeout = waitTimeout;
@@ -1068,7 +1073,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFmpegSession) {
+            if (session.isFFmpeg()) {
                 FFmpegKitConfig.asyncFFmpegExecute((FFmpegSession) session);
                 resultHandler.successAsync(result, null);
             } else {
@@ -1082,7 +1087,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof FFprobeSession) {
+            if (session.isFFprobe()) {
                 FFmpegKitConfig.asyncFFprobeExecute((FFprobeSession) session);
                 resultHandler.successAsync(result, null);
             } else {
@@ -1096,7 +1101,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         if (session == null) {
             resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
         } else {
-            if (session instanceof MediaInformationSession) {
+            if (session.isMediaInformation()) {
                 final int timeout;
                 if (isValidPositiveNumber(waitTimeout)) {
                     timeout = waitTimeout;
@@ -1282,7 +1287,11 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     // FFprobeKit
 
     protected void getFFprobeSessions(@NonNull final Result result) {
-        resultHandler.successAsync(result, toSessionMapList(FFprobeKit.listSessions()));
+        resultHandler.successAsync(result, toSessionMapList(FFprobeKit.listFFprobeSessions()));
+    }
+
+    protected void getMediaInformationSessions(@NonNull final Result result) {
+        resultHandler.successAsync(result, toSessionMapList(FFprobeKit.listMediaInformationSessions()));
     }
 
     // Packages
@@ -1328,7 +1337,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         sessionMap.put(KEY_SESSION_COMMAND, session.getCommand());
 
         if (session.isFFprobe()) {
-            if (session instanceof MediaInformationSession) {
+            if (session.isMediaInformation()) {
                 final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
                 final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
                 if (mediaInformation != null) {
@@ -1529,7 +1538,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 
     protected void emitSession(final Session session) {
         final HashMap<String, Object> sessionMap = new HashMap<>();
-        sessionMap.put(EVENT_EXECUTE_CALLBACK_EVENT, toMap(session));
+        sessionMap.put(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
         resultHandler.successAsync(eventSink, sessionMap);
     }
 

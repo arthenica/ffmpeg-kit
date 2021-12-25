@@ -364,9 +364,14 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
 
   // FFprobeKit
 
-  Future<List<dynamic>?> ffprobeKitListSessions() async {
+  Future<List<dynamic>?> ffprobeKitListFFprobeSessions() async {
     throw UnimplementedError(
-        'ffprobeKitListSessions() has not been implemented!');
+        'ffprobeKitListFFprobeSessions() has not been implemented!');
+  }
+
+  Future<List<dynamic>?> ffprobeKitListMediaInformationSessions() async {
+    throw UnimplementedError(
+        'ffprobeKitListMediaInformationSessions() has not been implemented!');
   }
 
   // MediaInformationJsonParser

@@ -21,8 +21,8 @@ import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platfor
 import 'package:flutter/services.dart';
 
 import 'abstract_session.dart';
-import 'execute_callback.dart';
 import 'ffmpeg_kit_config.dart';
+import 'ffmpeg_session_complete_callback.dart';
 import 'log_callback.dart';
 import 'log_redirection_strategy.dart';
 import 'src/ffmpeg_kit_factory.dart';
@@ -33,7 +33,7 @@ import 'statistics_callback.dart';
 class FFmpegSession extends AbstractSession {
   /// Creates a new FFmpeg session with [argumentsArray].
   static Future<FFmpegSession> create(List<String> argumentsArray,
-      [ExecuteCallback? executeCallback = null,
+      [FFmpegSessionCompleteCallback? completeCallback = null,
       LogCallback? logCallback = null,
       StatisticsCallback? statisticsCallback = null,
       LogRedirectionStrategy? logRedirectionStrategy = null]) async {
@@ -41,7 +41,8 @@ class FFmpegSession extends AbstractSession {
         argumentsArray, logRedirectionStrategy);
     final sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setExecuteCallback(sessionId, executeCallback);
+    FFmpegKitFactory.setFFmpegSessionCompleteCallback(
+        sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
     FFmpegKitFactory.setStatisticsCallback(sessionId, statisticsCallback);
 
@@ -53,9 +54,13 @@ class FFmpegSession extends AbstractSession {
   static FFmpegSession fromMap(Map<dynamic, dynamic> sessionMap) =>
       AbstractSession.createFFmpegSessionFromMap(sessionMap);
 
-  /// Returns the session specific statistics callback function.
+  /// Returns the session specific statistics callback.
   StatisticsCallback? getStatisticsCallback() =>
       FFmpegKitFactory.getStatisticsCallback(this.getSessionId());
+
+  /// Returns the session specific complete callback.
+  FFmpegSessionCompleteCallback? getCompleteCallback() =>
+      FFmpegKitFactory.getFFmpegSessionCompleteCallback(this.getSessionId());
 
   /// Returns all statistics entries generated for this session. If there are
   /// asynchronous statistics that are not delivered yet, this method waits for
@@ -120,4 +125,6 @@ class FFmpegSession extends AbstractSession {
   bool isFFmpeg() => true;
 
   bool isFFprobe() => false;
+
+  bool isMediaInformation() => false;
 }
