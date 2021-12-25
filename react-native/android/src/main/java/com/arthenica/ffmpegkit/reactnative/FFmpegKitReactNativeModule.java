@@ -111,7 +111,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   // EVENTS
   public static final String EVENT_LOG_CALLBACK_EVENT = "FFmpegKitLogCallbackEvent";
   public static final String EVENT_STATISTICS_CALLBACK_EVENT = "FFmpegKitStatisticsCallbackEvent";
-  public static final String EVENT_EXECUTE_CALLBACK_EVENT = "FFmpegKitExecuteCallbackEvent";
+  public static final String EVENT_COMPLETE_CALLBACK_EVENT = "FFmpegKitCompleteCallbackEvent";
 
   // REQUEST CODES
   public static final int READABLE_REQUEST_CODE = 10000;
@@ -165,9 +165,19 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   protected void registerGlobalCallbacks(final ReactApplicationContext reactContext) {
-    FFmpegKitConfig.enableExecuteCallback(session -> {
+    FFmpegKitConfig.enableFFmpegSessionCompleteCallback(session -> {
       final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
-      jsModule.emit(EVENT_EXECUTE_CALLBACK_EVENT, toMap(session));
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
+    });
+
+    FFmpegKitConfig.enableFFprobeSessionCompleteCallback(session -> {
+      final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
+    });
+
+    FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(session -> {
+      final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
     });
 
     FFmpegKitConfig.enableLogCallback(log -> {
@@ -359,7 +369,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           final int timeout;
           if (isValidPositiveNumber(waitTimeout)) {
             timeout = waitTimeout.intValue();
@@ -384,7 +394,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           final List<Statistics> statistics = ((FFmpegSession) session).getStatistics();
           promise.resolve(toStatisticsArray(statistics));
         } else {
@@ -580,7 +590,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           final FFmpegSessionExecuteTask ffmpegSessionExecuteTask = new FFmpegSessionExecuteTask((FFmpegSession) session, promise);
           asyncExecutorService.submit(ffmpegSessionExecuteTask);
         } else {
@@ -599,7 +609,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFprobeSession) {
+        if (session.isFFprobe()) {
           final FFprobeSessionExecuteTask ffprobeSessionExecuteTask = new FFprobeSessionExecuteTask((FFprobeSession) session, promise);
           asyncExecutorService.submit(ffprobeSessionExecuteTask);
         } else {
@@ -618,7 +628,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof MediaInformationSession) {
+        if (session.isMediaInformation()) {
           final int timeout;
           if (isValidPositiveNumber(waitTimeout)) {
             timeout = waitTimeout.intValue();
@@ -643,7 +653,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           FFmpegKitConfig.asyncFFmpegExecute((FFmpegSession) session);
           promise.resolve(null);
         } else {
@@ -662,7 +672,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFprobeSession) {
+        if (session.isFFprobe()) {
           FFmpegKitConfig.asyncFFprobeExecute((FFprobeSession) session);
           promise.resolve(null);
         } else {
@@ -681,7 +691,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof MediaInformationSession) {
+        if (session.isMediaInformation()) {
           final int timeout;
           if (isValidPositiveNumber(waitTimeout)) {
             timeout = waitTimeout.intValue();
@@ -932,7 +942,12 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @ReactMethod
   public void getFFprobeSessions(final Promise promise) {
-    promise.resolve(toSessionArray(FFprobeKit.listSessions()));
+    promise.resolve(toSessionArray(FFprobeKit.listFFprobeSessions()));
+  }
+
+  @ReactMethod
+  public void getMediaInformationSessions(final Promise promise) {
+    promise.resolve(toSessionArray(FFprobeKit.listMediaInformationSessions()));
   }
 
   // Packages
@@ -980,7 +995,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     sessionMap.putString(KEY_SESSION_COMMAND, session.getCommand());
 
     if (session.isFFprobe()) {
-      if (session instanceof MediaInformationSession) {
+      if (session.isMediaInformation()) {
         final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
         final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
         if (mediaInformation != null) {

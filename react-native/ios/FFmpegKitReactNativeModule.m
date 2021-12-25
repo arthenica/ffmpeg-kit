@@ -61,7 +61,7 @@ static int const SESSION_TYPE_MEDIA_INFORMATION = 3;
 // EVENTS
 static NSString *const EVENT_LOG_CALLBACK_EVENT = @"FFmpegKitLogCallbackEvent";
 static NSString *const EVENT_STATISTICS_CALLBACK_EVENT = @"FFmpegKitStatisticsCallbackEvent";
-static NSString *const EVENT_EXECUTE_CALLBACK_EVENT = @"FFmpegKitExecuteCallbackEvent";
+static NSString *const EVENT_COMPLETE_CALLBACK_EVENT = @"FFmpegKitCompleteCallbackEvent";
 
 extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 
@@ -91,15 +91,25 @@ RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
 
     [array addObject:EVENT_LOG_CALLBACK_EVENT];
     [array addObject:EVENT_STATISTICS_CALLBACK_EVENT];
-    [array addObject:EVENT_EXECUTE_CALLBACK_EVENT];
+    [array addObject:EVENT_COMPLETE_CALLBACK_EVENT];
 
     return array;
 }
 
 - (void)registerGlobalCallbacks {
-  [FFmpegKitConfig enableExecuteCallback:^(id<Session> session){
+  [FFmpegKitConfig enableFFmpegSessionCompleteCallback:^(FFmpegSession* session){
     NSDictionary *dictionary = [FFmpegKitReactNativeModule toSessionDictionary:session];
-    [self sendEventWithName:EVENT_EXECUTE_CALLBACK_EVENT body:dictionary];
+    [self sendEventWithName:EVENT_COMPLETE_CALLBACK_EVENT body:dictionary];
+  }];
+
+  [FFmpegKitConfig enableFFprobeSessionCompleteCallback:^(FFprobeSession* session){
+    NSDictionary *dictionary = [FFmpegKitReactNativeModule toSessionDictionary:session];
+    [self sendEventWithName:EVENT_COMPLETE_CALLBACK_EVENT body:dictionary];
+  }];
+
+  [FFmpegKitConfig enableMediaInformationSessionCompleteCallback:^(MediaInformationSession* session){
+    NSDictionary *dictionary = [FFmpegKitReactNativeModule toSessionDictionary:session];
+    [self sendEventWithName:EVENT_COMPLETE_CALLBACK_EVENT body:dictionary];
   }];
 
   [FFmpegKitConfig enableLogCallback: ^(Log* log){
@@ -234,7 +244,7 @@ RCT_EXPORT_METHOD(getArch:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRe
 // FFmpegSession
 
 RCT_EXPORT_METHOD(ffmpegSession:(NSArray*)arguments resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withExecuteCallback:nil withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    FFmpegSession* session = [[FFmpegSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
     resolve([FFmpegKitReactNativeModule toSessionDictionary:session]);
 }
 
@@ -243,7 +253,7 @@ RCT_EXPORT_METHOD(ffmpegSessionGetAllStatistics:(int)sessionId withTimeout:(int)
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFmpegSession class]]) {
+        if ([session isFFmpeg]) {
             int timeout;
             if ([FFmpegKitReactNativeModule isValidPositiveNumber:waitTimeout]) {
               timeout = waitTimeout;
@@ -263,7 +273,7 @@ RCT_EXPORT_METHOD(ffmpegSessionGetStatistics:(int)sessionId resolver:(RCTPromise
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFmpegSession class]]) {
+        if ([session isFFmpeg]) {
             NSArray* statistics = [(FFmpegSession*)session getStatistics];
             resolve([FFmpegKitReactNativeModule toStatisticsArray:statistics]);
         } else {
@@ -275,14 +285,14 @@ RCT_EXPORT_METHOD(ffmpegSessionGetStatistics:(int)sessionId resolver:(RCTPromise
 // FFprobeSession
 
 RCT_EXPORT_METHOD(ffprobeSession:(NSArray*)arguments resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
     resolve([FFmpegKitReactNativeModule toSessionDictionary:session]);
 }
 
 // MediaInformationSession
 
 RCT_EXPORT_METHOD(mediaInformationSession:(NSArray*)arguments resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withExecuteCallback:nil withLogCallback:nil];
+    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil];
     resolve([FFmpegKitReactNativeModule toSessionDictionary:session]);
 }
 
@@ -409,7 +419,7 @@ RCT_EXPORT_METHOD(ffmpegSessionExecute:(int)sessionId resolver:(RCTPromiseResolv
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFmpegSession class]]) {
+        if ([session isFFmpeg]) {
             dispatch_async(asyncDispatchQueue, ^{
                 [FFmpegKitConfig ffmpegExecute:(FFmpegSession*)session];
                 resolve(nil);
@@ -425,7 +435,7 @@ RCT_EXPORT_METHOD(ffprobeSessionExecute:(int)sessionId resolver:(RCTPromiseResol
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFprobeSession class]]) {
+        if ([session isFFprobe]) {
             dispatch_async(asyncDispatchQueue, ^{
                 [FFmpegKitConfig ffprobeExecute:(FFprobeSession*)session];
                 resolve(nil);
@@ -441,7 +451,7 @@ RCT_EXPORT_METHOD(mediaInformationSessionExecute:(int)sessionId withTimeout:(int
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[MediaInformationSession class]]) {
+        if ([session isMediaInformation]) {
             int timeout;
             if ([FFmpegKitReactNativeModule isValidPositiveNumber:waitTimeout]) {
               timeout = waitTimeout;
@@ -462,7 +472,7 @@ RCT_EXPORT_METHOD(asyncFFmpegSessionExecute:(int)sessionId resolver:(RCTPromiseR
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFmpegSession class]]) {
+        if ([session isFFmpeg]) {
             [FFmpegKitConfig asyncFFmpegExecute:(FFmpegSession*)session];
             resolve(nil);
         } else {
@@ -476,7 +486,7 @@ RCT_EXPORT_METHOD(asyncFFprobeSessionExecute:(int)sessionId resolver:(RCTPromise
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[FFprobeSession class]]) {
+        if ([session isFFprobe]) {
             [FFmpegKitConfig asyncFFprobeExecute:(FFprobeSession*)session];
             resolve(nil);
         } else {
@@ -490,7 +500,7 @@ RCT_EXPORT_METHOD(asyncMediaInformationSessionExecute:(int)sessionId withTimeout
     if (session == nil) {
       reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
     } else {
-        if ([session isMemberOfClass:[MediaInformationSession class]]) {
+        if ([session isMediaInformation]) {
             int timeout;
             if ([FFmpegKitReactNativeModule isValidPositiveNumber:waitTimeout]) {
               timeout = waitTimeout;
@@ -652,7 +662,11 @@ RCT_EXPORT_METHOD(getFFmpegSessions:(RCTPromiseResolveBlock)resolve rejecter:(RC
 // FFprobeKit
 
 RCT_EXPORT_METHOD(getFFprobeSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listSessions]]);
+    resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listFFprobeSessions]]);
+}
+
+RCT_EXPORT_METHOD(getMediaInformationSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listMediaInformationSessions]]);
 }
 
 // Packages
@@ -695,7 +709,7 @@ RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve rejecter:
         dictionary[KEY_SESSION_COMMAND] = [session getCommand];
 
         if ([session isFFprobe]) {
-          if ([(AbstractSession*)session isMemberOfClass:[MediaInformationSession class]]) {
+          if ([session isMediaInformation]) {
             MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
             dictionary[KEY_SESSION_MEDIA_INFORMATION] = [FFmpegKitReactNativeModule toMediaInformationDictionary:[mediaInformationSession getMediaInformation]];
             dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_MEDIA_INFORMATION];
