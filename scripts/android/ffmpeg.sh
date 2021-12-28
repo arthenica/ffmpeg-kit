@@ -158,7 +158,7 @@ for library in {0..61}; do
     libvidstab)
       CFLAGS+=" $(pkg-config --cflags vidstab 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static vidstab 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libvidstab"
       ;;
     libvorbis)
       CFLAGS+=" $(pkg-config --cflags vorbis 2>>"${BASEDIR}"/build.log)"
@@ -204,7 +204,7 @@ for library in {0..61}; do
     rubberband)
       CFLAGS+=" $(pkg-config --cflags rubberband 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static rubberband 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-librubberband"
       ;;
     sdl)
       CFLAGS+=" $(pkg-config --cflags sdl2 2>>"${BASEDIR}"/build.log)"
@@ -256,17 +256,17 @@ for library in {0..61}; do
     x264)
       CFLAGS+=" $(pkg-config --cflags x264 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static x264 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libx264"
       ;;
     x265)
       CFLAGS+=" $(pkg-config --cflags x265 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static x265 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libx265"
       ;;
     xvidcore)
       CFLAGS+=" $(pkg-config --cflags xvidcore 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static xvidcore 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libxvid"
       ;;
     zimg)
       CFLAGS+=" $(pkg-config --cflags zimg 2>>"${BASEDIR}"/build.log)"
@@ -332,6 +332,11 @@ for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
   LDFLAGS+=" $(pkg-config --libs --static ${!pc_file_name} 2>>"${BASEDIR}"/build.log)"
   CONFIGURE_POSTFIX+=" --enable-${!ffmpeg_flag_name}"
 done
+
+# SET ENABLE GPL FLAG WHEN REQUESTED
+if [ "$GPL_ENABLED" == "yes" ]; then
+  CONFIGURE_POSTFIX+=" --enable-gpl"
+fi
 
 export LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
