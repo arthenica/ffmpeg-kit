@@ -107,6 +107,14 @@ while [ ! $# -eq 0 ]; do
   --enable-gpl)
     GPL_ENABLED="yes"
     ;;
+  --enable-custom-library-*)
+    CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')
+    CUSTOM_LIBRARY_OPTION_VALUE=$(echo $1 | sed -e 's/^--enable-custom-.*=//g')
+
+    echo -e "INFO: Custom library options detected: ${CUSTOM_LIBRARY_OPTION_KEY} ${CUSTOM_LIBRARY_OPTION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_library_environment_variables "${CUSTOM_LIBRARY_OPTION_KEY}" "${CUSTOM_LIBRARY_OPTION_VALUE}"
+    ;;
   --enable-*)
     ENABLED_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
@@ -180,6 +188,7 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 print_redownload_requested_libraries
+print_custom_libraries
 
 # VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
@@ -195,13 +204,13 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
 done
 
 echo -n -e "\nDownloading sources: "
-echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # DOWNLOAD GNU CONFIG
 download_gnu_config
 
 # DOWNLOAD LIBRARY SOURCES
-downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
+downloaded_library_sources "${ENABLED_LIBRARIES[@]}"
 
 # SAVE ORIGINAL API LEVEL = NECESSARY TO BUILD 64bit ARCHITECTURES
 export ORIGINAL_API=${API}
@@ -280,7 +289,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   cd "${BASEDIR}"/android 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-  # COPY LICENSES
+  # COPY LIBRARY LICENSES
   LICENSE_BASEDIR="${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/res/raw
   rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   for library in {0..49}; do
@@ -298,6 +307,26 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
       echo -e "DEBUG: Copied the license file of ${ENABLED_LIBRARY} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
     fi
+  done
+
+  # COPY CUSTOM LIBRARY LICENSES
+  for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+    library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+    relative_license_path="CUSTOM_LIBRARY_${custom_library_index}_LICENSE_FILE"
+
+    destination_license_path="${LICENSE_BASEDIR}/license_${!library_name}.txt"
+
+    cp "${BASEDIR}/src/${!library_name}/${!relative_license_path}" "${destination_license_path}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    RC=$?
+
+    if [[ ${RC} -ne 0 ]]; then
+      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+
+    echo -e "DEBUG: Copied the license file of custom library ${!library_name} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
   done
 
   # COPY LIBRARY LICENSES

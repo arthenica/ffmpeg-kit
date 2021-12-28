@@ -496,6 +496,19 @@ get_host() {
   esac
 }
 
+#
+# 1. key
+# 2. value
+#
+generate_custom_library_environment_variables() {
+  CUSTOM_KEY=$(echo "CUSTOM_$1" | sed "s/\-/\_/g" | tr '[a-z]' '[A-Z]')
+  CUSTOM_VALUE="$2"
+
+  export "${CUSTOM_KEY}"="${CUSTOM_VALUE}"
+
+  echo -e "INFO: Custom library env variable generated: ${CUSTOM_KEY}=${CUSTOM_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+}
+
 skip_library() {
   SKIP_VARIABLE=$(echo "SKIP_$1" | sed "s/\-/\_/g")
 
@@ -797,6 +810,17 @@ display_help_gpl_libraries() {
   echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
 }
 
+display_help_custom_libraries() {
+  echo -e "Custom libraries:"
+  echo -e "  --enable-custom-library-[n]-name=value\t\t\tname of the custom library []"
+  echo -e "  --enable-custom-library-[n]-repo=value\t\t\tgit repository url []"
+  echo -e "  --enable-custom-library-[n]-repo-commit=value\t\t\tgit commit []"
+  echo -e "  --enable-custom-library-[n]-repo-tag=value\t\t\tgit tag []"
+  echo -e "  --enable-custom-library-[n]-package-config-file-name=value\tpackage config file installed by the build script []"
+  echo -e "  --enable-custom-library-[n]-ffmpeg-enable-flag=value\tlibrary name used in ffmpeg configure script to enable the library []"
+  echo -e "  --enable-custom-library-[n]-license-file=value\t\tlicence file path relative to the library source folder []\n"
+}
+
 display_help_advanced_options() {
   echo -e "Advanced options:"
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
@@ -827,7 +851,11 @@ reconf_library() {
   done
 
   if [[ ${library_supported} -ne 1 ]]; then
-    echo -e "INFO: --reconf flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    export ${RECONF_VARIABLE}=1
+    RECONF_LIBRARIES+=($1)
+    echo -e "INFO: --reconf flag detected for custom library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    echo -e "INFO: --reconf flag detected for library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -850,7 +878,11 @@ rebuild_library() {
   done
 
   if [[ ${library_supported} -ne 1 ]]; then
-    echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    export ${REBUILD_VARIABLE}=1
+    REBUILD_LIBRARIES+=($1)
+    echo -e "INFO: --rebuild flag detected for custom library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    echo -e "INFO: --rebuild flag detected for library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -879,7 +911,11 @@ redownload_library() {
   fi
 
   if [[ ${library_supported} -ne 1 ]]; then
-    echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}"/build.log 2>&1
+    export ${REDOWNLOAD_VARIABLE}=1
+    REDOWNLOAD_LIBRARIES+=($1)
+    echo -e "INFO: --redownload flag detected for custom library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    echo -e "INFO: --redownload flag detected for library $1.\n" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 
@@ -1464,6 +1500,69 @@ print_redownload_requested_libraries() {
   fi
 }
 
+print_custom_libraries() {
+  local counter=0
+
+  for index in {1..20}; do
+    LIBRARY_NAME="CUSTOM_LIBRARY_${index}_NAME"
+    LIBRARY_REPO="CUSTOM_LIBRARY_${index}_REPO"
+    LIBRARY_REPO_COMMIT="CUSTOM_LIBRARY_${index}_REPO_COMMIT"
+    LIBRARY_REPO_TAG="CUSTOM_LIBRARY_${index}_REPO_TAG"
+    LIBRARY_PACKAGE_CONFIG_FILE_NAME="CUSTOM_LIBRARY_${index}_PACKAGE_CONFIG_FILE_NAME"
+    LIBRARY_FFMPEG_ENABLE_FLAG="CUSTOM_LIBRARY_${index}_FFMPEG_ENABLE_FLAG"
+    LIBRARY_LICENSE_FILE="CUSTOM_LIBRARY_${index}_LICENSE_FILE"
+
+    if [[ -z "${!LIBRARY_NAME}" ]]; then
+      echo -e "INFO: Custom library ${index} not detected\n" 1>>"${BASEDIR}"/build.log 2>&1
+      break
+    fi
+
+    if [[ -z "${!LIBRARY_REPO}" ]]; then
+      echo -e "INFO: Custom library ${index} repo not set\n" 1>>"${BASEDIR}"/build.log 2>&1
+      continue
+    fi
+
+    if [[ -z "${!LIBRARY_REPO_COMMIT}" ]] && [[ -z "${!LIBRARY_REPO_TAG}" ]]; then
+      echo -e "INFO: Custom library ${index} repo source not set. Both commit id and tag are empty\n" 1>>"${BASEDIR}"/build.log 2>&1
+      continue
+    fi
+
+    if [[ -z "${!LIBRARY_PACKAGE_CONFIG_FILE_NAME}" ]]; then
+      echo -e "INFO: Custom library ${index} package config file not set\n" 1>>"${BASEDIR}"/build.log 2>&1
+      continue
+    fi
+
+    if [[ -z "${!LIBRARY_FFMPEG_ENABLE_FLAG}" ]]; then
+      echo -e "INFO: Custom library ${index} ffmpeg enable flag not set\n" 1>>"${BASEDIR}"/build.log 2>&1
+      continue
+    fi
+
+    if [[ -z "${!LIBRARY_LICENSE_FILE}" ]]; then
+      echo -e "INFO: Custom library ${index} license file not set\n" 1>>"${BASEDIR}"/build.log 2>&1
+      continue
+    fi
+
+    CUSTOM_LIBRARIES+=("${index}")
+
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Custom libraries: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n "${!LIBRARY_NAME}"
+
+    echo -e "INFO: Custom library options found for ${!LIBRARY_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo -e "INFO: ${counter} valid custom library definitions found\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ""
+  fi
+}
+
 # 1 - library index
 get_external_library_license_path() {
   case $1 in
@@ -1720,7 +1819,7 @@ is_gpl_licensed() {
   echo 1
 }
 
-downloaded_enabled_library_sources() {
+downloaded_library_sources() {
 
   # DOWNLOAD FFMPEG SOURCE CODE FIRST
   DOWNLOAD_RESULT=$(download_library_source "ffmpeg")
@@ -1740,6 +1839,18 @@ downloaded_enabled_library_sources() {
         echo -e "failed\n"
         exit 1
       fi
+    fi
+  done
+
+  for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+    library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+
+    echo -e "\nDEBUG: Downloading custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    DOWNLOAD_RESULT=$(download_custom_library_source "${custom_library_index}")
+    if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+      echo -e "failed\n"
+      exit 1
     fi
   done
 
@@ -1815,6 +1926,57 @@ download_library_source() {
     echo ${DOWNLOAD_RC}
   else
     echo -e "\nINFO: $1 library downloaded" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 0
+  fi
+}
+
+#
+# 1. custom library index
+#
+download_custom_library_source() {
+  local LIBRARY_NAME="CUSTOM_LIBRARY_$1_NAME"
+  local LIBRARY_REPO="CUSTOM_LIBRARY_$1_REPO"
+  local LIBRARY_REPO_COMMIT="CUSTOM_LIBRARY_$1_REPO_COMMIT"
+  local LIBRARY_REPO_TAG="CUSTOM_LIBRARY_$1_REPO_TAG"
+
+  local SOURCE_REPO_URL=""
+  local LIB_NAME="${!LIBRARY_NAME}"
+  local LIB_LOCAL_PATH=${BASEDIR}/src/${LIB_NAME}
+  local SOURCE_ID=""
+  local LIBRARY_RC=""
+  local DOWNLOAD_RC=""
+  local SOURCE_TYPE=""
+
+  echo -e "DEBUG: Downloading custom library source: ${LIB_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  SOURCE_REPO_URL=${!LIBRARY_REPO}
+  if [ -n "${!LIBRARY_REPO_TAG}" ]; then
+    SOURCE_ID=${!LIBRARY_REPO_TAG}
+    SOURCE_TYPE="TAG"
+  else
+    SOURCE_ID=${!LIBRARY_REPO_COMMIT}
+    SOURCE_TYPE="COMMIT"
+  fi
+
+  LIBRARY_RC=$(library_is_downloaded "${LIB_NAME}")
+
+  if [ ${LIBRARY_RC} -eq 0 ]; then
+    echo -e "INFO: ${LIB_NAME} already downloaded. Source folder found at ${LIB_LOCAL_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
+    echo 0
+    return
+  fi
+
+  if [ "${SOURCE_TYPE}" == "TAG" ]; then
+    DOWNLOAD_RC=$(clone_git_repository_with_tag "${SOURCE_REPO_URL}" "${SOURCE_ID}" "${LIB_LOCAL_PATH}")
+  else
+    DOWNLOAD_RC=$(clone_git_repository_with_commit_id "${SOURCE_REPO_URL}" "${LIB_LOCAL_PATH}" "${SOURCE_ID}")
+  fi
+
+  if [ ${DOWNLOAD_RC} -ne 0 ]; then
+    echo -e "INFO: Downloading custom library ${LIB_NAME} failed. Can not get library from ${SOURCE_REPO_URL}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo ${DOWNLOAD_RC}
+  else
+    echo -e "\nINFO: ${LIB_NAME} custom library downloaded" 1>>"${BASEDIR}"/build.log 2>&1
     echo 0
   fi
 }

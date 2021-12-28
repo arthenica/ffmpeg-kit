@@ -25,9 +25,6 @@ if [[ -z ${TOOLCHAIN_ARCH} ]]; then
   exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-
 echo -e "\nBuilding ${ARCH} platform on API level ${API}\n"
 echo -e "\nINFO: Starting new build for ${ARCH} on API level ${API} at $(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -206,11 +203,46 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
   done
 done
 
+# BUILD CUSTOM LIBRARIES
+for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+  library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+
+  echo -e "\nDEBUG: Custom library ${!library_name} will be built\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  # DEFINE SOME FLAGS TO REBUILD OPTIONS
+  REBUILD_FLAG=$(echo "REBUILD_${!library_name}" | sed "s/\-/\_/g")
+  LIBRARY_IS_INSTALLED=$(library_is_installed "${LIB_INSTALL_BASE}" "${!library_name}")
+
+  echo -e "INFO: Flags detected for custom library ${!library_name}: already installed=${LIBRARY_IS_INSTALLED}, rebuild requested by user=${!REBUILD_FLAG}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  if [[ ${LIBRARY_IS_INSTALLED} -ne 1 ]] || [[ ${!REBUILD_FLAG} -eq 1 ]]; then
+
+    echo -n "${!library_name}: "
+
+    "${BASEDIR}"/scripts/run-android.sh "${!library_name}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    RC=$?
+
+    # SET SOME FLAGS AFTER THE BUILD
+    if [ $RC -eq 0 ]; then
+      echo "ok"
+    elif [ $RC -eq 200 ]; then
+      echo -e "not supported\n\nSee build.log for details\n"
+      exit 1
+    else
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+  else
+    echo "${!library_name}: already built"
+  fi
+done
+
 # SKIP TO SPEED UP THE BUILD
 if [[ ${SKIP_ffmpeg} -ne 1 ]]; then
 
   # BUILD FFMPEG
-  "${BASEDIR}"/scripts/android/ffmpeg.sh "$@"
+  source "${BASEDIR}"/scripts/android/ffmpeg.sh
 
   if [[ $? -ne 0 ]]; then
     exit 1

@@ -116,6 +116,14 @@ while [ ! $# -eq 0 ]; do
   --enable-gpl)
     GPL_ENABLED="yes"
     ;;
+  --enable-custom-library-*)
+    CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')
+    CUSTOM_LIBRARY_OPTION_VALUE=$(echo $1 | sed -e 's/^--enable-custom-.*=//g')
+
+    echo -e "INFO: Custom library options detected: ${CUSTOM_LIBRARY_OPTION_KEY} ${CUSTOM_LIBRARY_OPTION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_library_environment_variables "${CUSTOM_LIBRARY_OPTION_KEY}" "${CUSTOM_LIBRARY_OPTION_VALUE}"
+    ;;
   --enable-*)
     ENABLED_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
@@ -191,6 +199,7 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 print_redownload_requested_libraries
+print_custom_libraries
 
 # VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
@@ -206,13 +215,13 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
 done
 
 echo -n -e "\nDownloading sources: "
-echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # DOWNLOAD GNU CONFIG
 download_gnu_config
 
 # DOWNLOAD LIBRARY SOURCES
-downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
+downloaded_library_sources "${ENABLED_LIBRARIES[@]}"
 
 # THIS WILL SAVE ARCHITECTURES TO BUILD
 TARGET_ARCH_LIST=()

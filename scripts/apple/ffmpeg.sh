@@ -6,9 +6,6 @@ if [ -z "${HOST_PKG_CONFIG_PATH}" ]; then
   exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-
 LIB_NAME="ffmpeg"
 
 echo -e "----------------------------------------------------------------" 1>>"${BASEDIR}"/build.log 2>&1
@@ -104,9 +101,9 @@ esac
 CONFIGURE_POSTFIX=""
 
 # SET CONFIGURE OPTIONS
-for library in {1..62}; do
-  if [[ ${!library} -eq 1 ]]; then
-    ENABLED_LIBRARY=$(get_library_name $((library - 1)))
+for library in {0..61}; do
+  if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+    ENABLED_LIBRARY=$(get_library_name ${library})
 
     echo -e "INFO: Enabling library ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -366,30 +363,43 @@ for library in {1..62}; do
 
     # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
     # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
-    if [[ ${library} -eq $((LIBRARY_SDL + 1)) ]]; then
+    if [[ ${library} -eq ${LIBRARY_SDL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-sdl2"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_AUDIOTOOLBOX + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_AUDIOTOOLBOX} ]]; then
       CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_AVFOUNDATION + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_AVFOUNDATION} ]]; then
       CONFIGURE_POSTFIX+=" --disable-avfoundation"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_BZIP2 + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_BZIP2} ]]; then
       CONFIGURE_POSTFIX+=" --disable-bzlib"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_COREIMAGE + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_COREIMAGE} ]]; then
       CONFIGURE_POSTFIX+=" --disable-coreimage --disable-appkit"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_LIBICONV + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_LIBICONV} ]]; then
       CONFIGURE_POSTFIX+=" --disable-iconv"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_OPENCL + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_OPENCL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-opencl"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_OPENGL + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_OPENGL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-opengl"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_VIDEOTOOLBOX + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_VIDEOTOOLBOX} ]]; then
       CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-    elif [[ ${library} -eq $((LIBRARY_APPLE_ZLIB + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_APPLE_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
-    elif [[ ${library} -eq $((LIBRARY_OPENSSL + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_OPENSSL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-openssl"
     fi
   fi
+done
+
+# SET CONFIGURE OPTIONS FOR CUSTOM LIBRARIES
+for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+  library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+  pc_file_name="CUSTOM_LIBRARY_${custom_library_index}_PACKAGE_CONFIG_FILE_NAME"
+  ffmpeg_flag_name="CUSTOM_LIBRARY_${custom_library_index}_FFMPEG_ENABLE_FLAG"
+
+  echo -e "INFO: Enabling custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  FFMPEG_CFLAGS+=" $(pkg-config --cflags ${!pc_file_name} 2>>"${BASEDIR}"/build.log)"
+  FFMPEG_LDFLAGS+=" $(pkg-config --libs --static ${!pc_file_name} 2>>"${BASEDIR}"/build.log)"
+  CONFIGURE_POSTFIX+=" --enable-${!ffmpeg_flag_name}"
 done
 
 # ALWAYS BUILD SHARED LIBRARIES

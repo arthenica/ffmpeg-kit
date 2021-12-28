@@ -53,6 +53,7 @@ libraries are created under the prebuilt folder.\n"
 
   display_help_common_libraries
   display_help_gpl_libraries
+  display_help_custom_libraries
   if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
     display_help_advanced_options "  --no-framework\t\tdo not build xcframework bundles [no]"
   else

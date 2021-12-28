@@ -266,6 +266,27 @@ create_ffmpeg_universal_library() {
     fi
   done
 
+  # COPY CUSTOM LIBRARY LICENSES
+  for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+    library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+    library_name_uppercase=$(echo "${!library_name}" | tr '[a-z]' '[A-Z]')
+    relative_license_path="CUSTOM_LIBRARY_${custom_library_index}_LICENSE_FILE"
+
+    destination_license_path="${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}/LICENSE.${library_name_uppercase}"
+
+    cp "${BASEDIR}/src/${!library_name}/${!relative_license_path}" "${destination_license_path}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    RC=$?
+
+    if [[ ${RC} -ne 0 ]]; then
+      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+
+    echo -e "DEBUG: Copied the license file of custom library ${!library_name} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+  done
+
   echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
@@ -406,6 +427,27 @@ create_ffmpeg_framework() {
 
             [[ ${RC} -ne 0 ]] && exit_universal_library "${LIBRARY_NAME}"
         fi
+      done
+
+      # COPY CUSTOM LIBRARY LICENSES
+      for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+        library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+        library_name_uppercase=$(echo "${!library_name}" | tr '[a-z]' '[A-Z]')
+        relative_license_path="CUSTOM_LIBRARY_${custom_library_index}_LICENSE_FILE"
+
+        destination_license_path="${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE.${ENABLED_LIBRARY_NAME_UPPERCASE}"
+
+        cp "${BASEDIR}/src/${!library_name}/${!relative_license_path}" "${destination_license_path}" 1>>"${BASEDIR}"/build.log 2>&1
+
+        RC=$?
+
+        if [[ ${RC} -ne 0 ]]; then
+          echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+          echo -e "failed\n\nSee build.log for details\n"
+          exit 1
+        fi
+
+        echo -e "DEBUG: Copied the license file of custom library ${!library_name} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
       done
     fi
 
