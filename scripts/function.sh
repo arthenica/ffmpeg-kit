@@ -1467,7 +1467,8 @@ print_redownload_requested_libraries() {
 # 1 - library index
 get_external_library_license_path() {
   case $1 in
-  1 | 35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.TXT" ;;
+  1) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.TXT" ;;
+  35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.txt" ;;
   3 | 39) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
   5 | 41) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/COPYING" ;;
   19) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/LICENSE" ;;

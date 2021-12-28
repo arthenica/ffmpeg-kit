@@ -16,6 +16,7 @@ export BASEDIR="$(pwd)"
 export FFMPEG_KIT_BUILD_TYPE="tvos"
 source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
+disabled_libraries=()
 
 # SET DEFAULTS SETTINGS
 enable_default_tvos_architectures
@@ -120,6 +121,11 @@ while [ ! $# -eq 0 ]; do
 
     enable_library "${ENABLED_LIBRARY}"
     ;;
+  --disable-lib-*)
+    DISABLED_LIB=$(echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-//g')
+
+    disabled_libraries+=("${DISABLED_LIB}")
+    ;;
   --disable-*)
     DISABLED_ARCH=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
@@ -149,6 +155,11 @@ if [[ -n ${BUILD_FULL} ]]; then
     fi
   done
 fi
+
+# DISABLE SPECIFIED LIBRARIES
+for disabled_library in ${disabled_libraries[@]}; do
+  set_library "${disabled_library}" 0
+done
 
 # IF HELP DISPLAYED EXIT
 if [[ -n ${DISPLAY_HELP} ]]; then
