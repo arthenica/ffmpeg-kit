@@ -813,12 +813,17 @@ display_help_gpl_libraries() {
 display_help_custom_libraries() {
   echo -e "Custom libraries:"
   echo -e "  --enable-custom-library-[n]-name=value\t\t\tname of the custom library []"
-  echo -e "  --enable-custom-library-[n]-repo=value\t\t\tgit repository url []"
-  echo -e "  --enable-custom-library-[n]-repo-commit=value\t\t\tgit commit []"
-  echo -e "  --enable-custom-library-[n]-repo-tag=value\t\t\tgit tag []"
+  echo -e "  --enable-custom-library-[n]-repo=value\t\t\tgit repository of the source code []"
+  echo -e "  --enable-custom-library-[n]-repo-commit=value\t\t\tgit commit to download the source code from []"
+  echo -e "  --enable-custom-library-[n]-repo-tag=value\t\t\tgit tag to download the source code from []"
   echo -e "  --enable-custom-library-[n]-package-config-file-name=value\tpackage config file installed by the build script []"
   echo -e "  --enable-custom-library-[n]-ffmpeg-enable-flag=value\tlibrary name used in ffmpeg configure script to enable the library []"
-  echo -e "  --enable-custom-library-[n]-license-file=value\t\tlicence file path relative to the library source folder []\n"
+  echo -e "  --enable-custom-library-[n]-license-file=value\t\tlicence file path relative to the library source folder []"
+  if [ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]; then
+    echo -e "  --enable-custom-library-[n]-uses-cpp\t\t\t\tflag to specify that the library uses libc++ []\n"
+  else
+    echo ""
+  fi
 }
 
 display_help_advanced_options() {
@@ -1511,6 +1516,7 @@ print_custom_libraries() {
     LIBRARY_PACKAGE_CONFIG_FILE_NAME="CUSTOM_LIBRARY_${index}_PACKAGE_CONFIG_FILE_NAME"
     LIBRARY_FFMPEG_ENABLE_FLAG="CUSTOM_LIBRARY_${index}_FFMPEG_ENABLE_FLAG"
     LIBRARY_LICENSE_FILE="CUSTOM_LIBRARY_${index}_LICENSE_FILE"
+    LIBRARY_USES_CPP="CUSTOM_LIBRARY_${index}_USES_CPP"
 
     if [[ -z "${!LIBRARY_NAME}" ]]; then
       echo -e "INFO: Custom library ${index} not detected\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -1540,6 +1546,11 @@ print_custom_libraries() {
     if [[ -z "${!LIBRARY_LICENSE_FILE}" ]]; then
       echo -e "INFO: Custom library ${index} license file not set\n" 1>>"${BASEDIR}"/build.log 2>&1
       continue
+    fi
+
+    if [[ -n "${!LIBRARY_USES_CPP}" ]] && [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo -e "INFO: Custom library ${index} is marked as uses libc++ \n" 1>>"${BASEDIR}"/build.log 2>&1
+      export CUSTOM_LIBRARY_USES_CPP=1
     fi
 
     CUSTOM_LIBRARIES+=("${index}")
