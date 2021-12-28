@@ -11,7 +11,7 @@ make distclean 2>/dev/null 1>/dev/null
 if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/builds/unix/configure ]] || [[ ${RECONF_freetype} -eq 1 ]]; then
 
   # NOTE THAT FREETYPE DOES NOT SUPPORT AUTORECONF BUT IT COMES WITH AN autogen.sh
-  ./autogen.sh || exit 1
+  ./autogen.sh || return 1
 fi
 
 ./configure \
@@ -37,4 +37,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_freetype_package_config "24.0.18" || return 1
+create_freetype_package_config "24.1.18" || return 1

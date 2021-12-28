@@ -28,7 +28,7 @@ export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
 export LDFLAGS=$(get_ldflags "${LIB_NAME}")
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # SET EXTRA BUILD FLAGS
 FFMPEG_CFLAGS=""
@@ -471,21 +471,21 @@ git checkout libavformat/protocols.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavutil 1>>"${BASEDIR}"/build.log 2>&1
 
 # 1. Workaround to prevent adding of -mdynamic-no-pic flag
-${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # 2. Workaround for videotoolbox on mac catalyst
 if [[ ${ARCH} == *-mac-catalyst ]]; then
-  ${SED_INLINE} 's/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' "${BASEDIR}"/src/${LIB_NAME}/libavcodec/videotoolbox.c || exit 1
+  ${SED_INLINE} 's/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' "${BASEDIR}"/src/${LIB_NAME}/libavcodec/videotoolbox.c || return 1
 else
-  ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' "${BASEDIR}"/src/${LIB_NAME}/libavcodec/videotoolbox.c || exit 1
+  ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' "${BASEDIR}"/src/${LIB_NAME}/libavcodec/videotoolbox.c || return 1
 fi
 
 # 3. Use thread local log levels
-${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # 4. Set friendly ffmpeg version
 FFMPEG_VERSION="v$(get_user_friendly_ffmpeg_version)"
-${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 ###################################################################
 
@@ -580,14 +580,14 @@ install_ffmpeg() {
 
     # DELETE THE PREVIOUS BUILD
     if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
-      rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
     fi
   else
 
     # LEAVE EVERYTHING EXCEPT frameworks
-    rm -rf "${FFMPEG_LIBRARY_PATH}/include" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-    rm -rf "${FFMPEG_LIBRARY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-    rm -rf "${FFMPEG_LIBRARY_PATH}/share" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/include" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/share" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
   fi
   make install 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -597,7 +597,7 @@ install_ffmpeg() {
   fi
 }
 
-${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # BUILD DYNAMIC LIBRARIES WITH DEFAULT OPTIONS
 build_ffmpeg
@@ -610,8 +610,8 @@ echo -e "\nShared libraries built successfully. Building frameworks.\n" 1>>"${BA
 
 create_temporary_framework() {
   local FRAMEWORK_NAME="$1"
-  mkdir -p "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-  cp "${FFMPEG_LIBRARY_PATH}/lib/${FRAMEWORK_NAME}.dylib" "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  mkdir -p "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  cp "${FFMPEG_LIBRARY_PATH}/lib/${FRAMEWORK_NAME}.dylib" "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 }
 
 create_temporary_framework "libavcodec"
@@ -622,10 +622,10 @@ create_temporary_framework "libavutil"
 create_temporary_framework "libswresample"
 create_temporary_framework "libswscale"
 
-${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-${SED_INLINE} "s|^ALLFFLIBS = .*|ALLFFLIBS = ${FFMPEG_LIBRARY_PATH}/framework|g" ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-${SED_INLINE} 's|$(LD_LIB)|-framework lib% |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-${SED_INLINE} 's|$(LD_PATH)lib|-F |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+${SED_INLINE} "s|^ALLFFLIBS = .*|ALLFFLIBS = ${FFMPEG_LIBRARY_PATH}/framework|g" ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+${SED_INLINE} 's|$(LD_LIB)|-framework lib% |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+${SED_INLINE} 's|$(LD_PATH)lib|-F |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # BUILD FRAMEWORKS AS DYNAMIC LIBRARIES
 build_ffmpeg

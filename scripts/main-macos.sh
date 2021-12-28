@@ -29,7 +29,7 @@ export LIB_INSTALL_BASE="${BASEDIR}/prebuilt/$(get_build_directory)"
 # CREATE PACKAGE CONFIG DIRECTORY FOR THIS ARCHITECTURE
 PKG_CONFIG_DIRECTORY="${LIB_INSTALL_BASE}/pkgconfig"
 if [ ! -d "${PKG_CONFIG_DIRECTORY}" ]; then
-  mkdir -p "${PKG_CONFIG_DIRECTORY}" || exit 1
+  mkdir -p "${PKG_CONFIG_DIRECTORY}" || return 1
 fi
 
 # FILTER WHICH EXTERNAL LIBRARIES WILL BE BUILT
@@ -221,7 +221,7 @@ if [[ ${SKIP_ffmpeg} -ne 1 ]]; then
   export LDFLAGS=$(get_ldflags "${LIB_NAME}")
   export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-  cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
   LIB_INSTALL_PREFIX="${LIB_INSTALL_BASE}/${LIB_NAME}"
 
@@ -239,7 +239,7 @@ fi
 if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
 
   # BUILD FFMPEG KIT
-  . "${BASEDIR}"/scripts/apple/ffmpeg-kit.sh "$@" || exit 1
+  . "${BASEDIR}"/scripts/apple/ffmpeg-kit.sh "$@" || return 1
 else
   echo -e "\nffmpeg-kit: skipped"
 fi

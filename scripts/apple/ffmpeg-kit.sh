@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 LIB_NAME="ffmpeg-kit"
 
@@ -25,7 +25,7 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS="$(get_ldflags ${LIB_NAME}) -F${LIB_INSTALL_BASE}/ffmpeg/framework -framework Foundation -framework CoreVideo -framework libavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-cd "${BASEDIR}"/apple 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+cd "${BASEDIR}"/apple 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # ALWAYS BUILD SHARED LIBRARIES
 BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static"
@@ -43,19 +43,19 @@ if [[ ${ENABLED_LIBRARIES[$LIBRARY_APPLE_VIDEOTOOLBOX]} -eq 1 ]]; then
 fi
 
 # ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
-autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # WORKAROUNDS
 if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
 
   # REMOVE OPTIONS FROM CONFIGURE TO FIX THE FOLLOWING ERROR
   # ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-  ${SED_INLINE} 's/$wl-flat_namespace //g' configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-  ${SED_INLINE} 's/$wl-undefined //g' configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-  ${SED_INLINE} 's/${wl}suppress//g' configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  ${SED_INLINE} 's/$wl-flat_namespace //g' configure 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  ${SED_INLINE} 's/$wl-undefined //g' configure 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  ${SED_INLINE} 's/${wl}suppress//g' configure 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
   # ld: file not found: dynamic_lookup
-  ${SED_INLINE} 's/${wl}dynamic_lookup//g' configure 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  ${SED_INLINE} 's/${wl}dynamic_lookup//g' configure 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
 ./configure \
@@ -79,7 +79,7 @@ fi
 
 # DELETE THE PREVIOUS BUILD OF THE LIBRARY
 if [ -d "${FFMPEG_KIT_LIBRARY_PATH}" ]; then
-  rm -rf "${FFMPEG_KIT_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  rm -rf "${FFMPEG_KIT_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
 make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1

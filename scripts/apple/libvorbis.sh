@@ -8,7 +8,7 @@ make distclean 2>/dev/null 1>/dev/null
 ${SED_INLINE} 's/\-mno-ieee-fp//g' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac || return 1
 
 # ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
-autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
 

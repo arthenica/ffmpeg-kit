@@ -9,7 +9,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 # REGENERATE BUILD FILES IF NECESSARY OR REQUESTED
 if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_twolame} -eq 1 ]]; then
-  NOCONFIGURE=1 ./autogen.sh || exit 1
+  NOCONFIGURE=1 ./autogen.sh || return 1
 fi
 
 ./configure \

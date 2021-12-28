@@ -13,7 +13,7 @@ get_library_source() {
     ;;
   chromaprint)
     SOURCE_REPO_URL="https://github.com/tanersener/chromaprint"
-    SOURCE_ID="v1.5.0"
+    SOURCE_ID="v1.5.1"
     SOURCE_TYPE="TAG"
     ;;
   cpu-features)
@@ -28,28 +28,28 @@ get_library_source() {
     ;;
   expat)
     SOURCE_REPO_URL="https://github.com/tanersener/libexpat"
-    SOURCE_ID="R_2_4_1"
+    SOURCE_ID="R_2_4_2"
     SOURCE_TYPE="TAG"
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
-    SOURCE_ID="b5ba74053c1ef9f38d9e7b3a036675f06d2b2714"
+    SOURCE_ID="30322ebe3c55d0fb18bea4ae04d0fcaf1f97d27f"
     SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.5-dev-3138-gb5ba74053c" # git describe --tags
+    SOURCE_GIT_DESCRIBE="n4.5-dev-3393-g30322ebe3c" # git describe --tags
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
-    SOURCE_ID="2.13.93"
+    SOURCE_ID="2.13.94"
     SOURCE_TYPE="TAG"
     ;;
   freetype)
     SOURCE_REPO_URL="https://github.com/tanersener/freetype2"
-    SOURCE_ID="VER-2-11-0"
+    SOURCE_ID="VER-2-11-1"
     SOURCE_TYPE="TAG"
     ;;
   fribidi)
     SOURCE_REPO_URL="https://github.com/tanersener/fribidi"
-    SOURCE_ID="v1.0.10"
+    SOURCE_ID="v1.0.11"
     SOURCE_TYPE="TAG"
     ;;
   giflib)
@@ -69,17 +69,17 @@ get_library_source() {
     ;;
   harfbuzz)
     SOURCE_REPO_URL="https://github.com/tanersener/harfbuzz"
-    SOURCE_ID="2.9.1"
+    SOURCE_ID="3.2.0"
     SOURCE_TYPE="TAG"
     ;;
   jpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/libjpeg-turbo"
-    SOURCE_ID="2.1.1"
+    SOURCE_ID="2.1.2"
     SOURCE_TYPE="TAG"
     ;;
   kvazaar)
     SOURCE_REPO_URL="https://github.com/tanersener/kvazaar"
-    SOURCE_ID="v2.0.0"
+    SOURCE_ID="v2.1.0"
     SOURCE_TYPE="TAG"
     ;;
   lame)
@@ -94,7 +94,7 @@ get_library_source() {
     ;;
   libaom)
     SOURCE_REPO_URL="https://github.com/tanersener/libaom"
-    SOURCE_ID="v3.1.2"
+    SOURCE_ID="v3.2.0"
     SOURCE_TYPE="TAG"
     ;;
   libass)
@@ -154,7 +154,7 @@ get_library_source() {
     ;;
   libvpx)
     SOURCE_REPO_URL="https://github.com/tanersener/libvpx"
-    SOURCE_ID="v1.10.0"
+    SOURCE_ID="v1.11.0"
     SOURCE_TYPE="TAG"
     ;;
   libwebp)
@@ -249,7 +249,7 @@ get_library_source() {
     ;;
   x264)
     SOURCE_REPO_URL="https://github.com/tanersener/x264"
-    SOURCE_ID="55d517bc4569272a2c9a367a4106c234aba2ffbc"
+    SOURCE_ID="5db6aa6cab1b146e07b60cc1736a01f21da01154"
     SOURCE_TYPE="COMMIT" # COMMIT -> r3027
     ;;
   x265)

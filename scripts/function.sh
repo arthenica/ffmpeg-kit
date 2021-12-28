@@ -255,15 +255,15 @@ is_library_supported_on_platform() {
   0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20)
     echo "0"
     ;;
-  21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 39 | 40)
+  21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40)
     echo "0"
     ;;
-  41 | 42 | 43 | 44 | 45 | 46 | 47 | 48)
+  42 | 43 | 44 | 45 | 46 | 47 | 48)
     echo "0"
     ;;
 
   # ANDROID
-  7 | 38 | 49 | 50 | 51)
+  7 | 41 | 49 | 50 | 51)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
       echo "0"
     else
@@ -929,11 +929,13 @@ redownload_library() {
 # 2. ignore unknown libraries
 #
 enable_library() {
-  local library_supported_on_platform=$(is_library_supported_on_platform "$1")
-  if [[ $library_supported_on_platform == 0 ]]; then
-    set_library "$1" 1
-  elif [[ $2 -ne 1 ]]; then
-    print_unknown_library "$1"
+  if [ -n "$1" ]; then
+    local library_supported_on_platform=$(is_library_supported_on_platform "$1")
+    if [[ $library_supported_on_platform == 0 ]]; then
+      set_library "$1" 1
+    elif [[ $2 -ne 1 ]]; then
+      print_unknown_library "$1"
+    fi
   fi
 }
 
