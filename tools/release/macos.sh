@@ -18,7 +18,7 @@ create_package() {
 
     cp -R "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
     cd "${CURRENT_PACKAGE}" || exit 1
-    zip -r "../ffmpeg-kit-$1-${PACKAGE_VERSION}-macos-xcframework.zip" * || exit 1
+    zip -r -y "../ffmpeg-kit-$1-${PACKAGE_VERSION}-macos-xcframework.zip" * || exit 1
 
     # COPY PODSPEC AS THE LAST ITEM
     cp "${BASEDIR}"/apple/"${PACKAGE_NAME}".podspec "${CURRENT_PACKAGE}" || exit 1

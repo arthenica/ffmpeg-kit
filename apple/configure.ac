@@ -1,6 +1,6 @@
-# ffmpeg-kit 4.5 configure.ac
+# ffmpeg-kit 4.5.1 configure.ac
 
-AC_INIT([ffmpeg-kit], [4.5], [https://github.com/tanersener/ffmpeg-kit/issues/new])
+AC_INIT([ffmpeg-kit], [4.5.1], [https://github.com/tanersener/ffmpeg-kit/issues/new])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FFmpegKit.m])
 

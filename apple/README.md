@@ -97,13 +97,10 @@ All libraries created can be found under the `prebuilt` directory.
 - `tvOS` `xcframeworks` for `Main` builds are located under the `bundle-apple-xcframework-tvos` folder.
 - `iOS` `frameworks` for `Main` builds are located under the `bundle-apple-framework-ios` folder.
 - `iOS` `frameworks` for `LTS` builds are located under the `bundle-apple-framework-ios-lts` folder.
-- `iOS` `universal (fat) libraries (.a)` for `LTS` builds are located under the `bundle-apple-universal-ios-lts` folder.
 - `macOS` `frameworks` for `Main` builds are located under the `bundle-apple-framework-macos` folder.
 - `macOS` `frameworks` for `LTS` builds are located under the `bundle-apple-framework-macos-lts` folder.
-- `macOS` `universal (fat) libraries (.a)` for `LTS` builds are located under the `bundle-apple-universal-macos-lts` folder.
 - `tvOS` `frameworks` for `Main` builds are located under the `bundle-apple-framework-tvos` folder.
 - `tvOS` `frameworks` for `LTS` builds are located under the `bundle-apple-framework-tvos-lts` folder.
-- `tvOS` `universal (fat) libraries (.a)` for `LTS` builds are located under the `bundle-apple-universal-tvos-lts` folder.
 
 ### 3. Using
 
@@ -114,17 +111,17 @@ All libraries created can be found under the `prebuilt` directory.
 
     - iOS
     ```yaml
-    pod 'ffmpeg-kit-ios-full', '~> 4.5'
+    pod 'ffmpeg-kit-ios-full', '~> 4.5.1'
     ```
 
     - macOS
     ```yaml
-    pod 'ffmpeg-kit-macos-full', '~> 4.5'
+    pod 'ffmpeg-kit-macos-full', '~> 4.5.1'
     ```
 
     - tvOS
     ```yaml
-    pod 'ffmpeg-kit-tvos-full', '~> 4.5'
+    pod 'ffmpeg-kit-tvos-full', '~> 4.5.1'
     ```
 
 2. Execute synchronous `FFmpeg` commands.
@@ -191,7 +188,7 @@ All libraries created can be found under the `prebuilt` directory.
 4. Execute asynchronous `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
 
     ```objectivec
-    id<Session> session = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withExecuteCallback:^(id<Session> session){
+    FFmpegSession* session = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withCompleteCallback:^(FFmpegSession* session){
         SessionState state = [session getState];
         ReturnCode *returnCode = [session getReturnCode];
 
@@ -225,7 +222,7 @@ All libraries created can be found under the `prebuilt` directory.
    - Asynchronous
 
     ```objectivec
-    [FFprobeKit executeAsync:ffmpegCommand withExecuteCallback:^(id<Session> session) {
+    [FFprobeKit executeAsync:ffmpegCommand withCompleteCallback:^(FFprobeSession* session) {
 
         CALLED WHEN SESSION IS EXECUTED
 
@@ -268,10 +265,18 @@ All libraries created can be found under the `prebuilt` directory.
 
 9. Enable global callbacks.
 
-    - Execute Callback, called when an async execution is ended
+    - Session type specific Complete Callbacks, called when an async session has been completed
 
         ```objectivec
-        [FFmpegKitConfig enableExecuteCallback:^(id<Session> session) {
+        [FFmpegKitConfig enableFFmpegSessionCompleteCallback:^(FFmpegSession* session) {
+            ...
+        }];
+
+        [FFmpegKitConfig enableFFprobeSessionCompleteCallback:^(FFprobeSession* session) {
+            ...
+        }];
+
+        [FFmpegKitConfig enableMediaInformationSessionCompleteCallback:^(MediaInformationSession* session) {
             ...
         }];
         ```

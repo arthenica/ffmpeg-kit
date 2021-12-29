@@ -251,7 +251,7 @@ get_arch_specific_cflags() {
   x86)
     case ${DETECTED_NDK_VERSION} in
       23*)
-        echo "-march=i686 -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
+        echo "-march=i686 -mtune=generic -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
         ;;
       *)
         echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DFFMPEG_KIT_X86"
@@ -261,7 +261,7 @@ get_arch_specific_cflags() {
   x86-64)
     case ${DETECTED_NDK_VERSION} in
       23*)
-        echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64"
+        echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=generic -DFFMPEG_KIT_X86_64"
         ;;
       *)
         echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DFFMPEG_KIT_X86_64"

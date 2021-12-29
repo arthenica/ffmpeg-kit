@@ -952,7 +952,7 @@ public class FFmpegKitConfig {
      * <p>Converts the given Structured Access Framework Uri (<code>"content:…"</code>) into an
      * SAF protocol url that can be used in FFmpeg and FFprobe commands.
      *
-     * <p>Requires API Level >= 19. On older API levels it returns an empty url.
+     * <p>Requires API Level 19+. On older API levels it returns an empty url.
      *
      * @param context  application context
      * @param uri      SAF uri
