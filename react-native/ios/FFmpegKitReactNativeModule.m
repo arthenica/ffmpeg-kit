@@ -637,7 +637,7 @@ RCT_EXPORT_METHOD(selectDocument:(BOOL)writable title:(NSString*)title type:(NSS
   reject(@"Not Supported", @"Not supported on iOS platform.", nil);
 }
 
-RCT_EXPORT_METHOD(getSafParameter:(BOOL)writable uri:(NSString*)uriString resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(getSafParameter:(NSString*)uriString mode:(NSString*)openMode resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   reject(@"Not Supported", @"Not supported on iOS platform.", nil);
 }
 

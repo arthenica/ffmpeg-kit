@@ -150,6 +150,12 @@ declare module 'ffmpeg-kit-react-native' {
 
     static setLogLevel(level: Level): Promise<void>;
 
+    static getSafParameterForRead(uriString: String): Promise<string>;
+
+    static getSafParameterForWrite(uriString: String): Promise<string>;
+
+    static getSafParameter(uriString: String, openMode: String): Promise<string>;
+
     static getSessionHistorySize(): Promise<number>;
 
     static setSessionHistorySize(sessionHistorySize: number): Promise<void>;
@@ -199,10 +205,6 @@ declare module 'ffmpeg-kit-react-native' {
     static selectDocumentForRead(type?: string, extraTypes?: string[]): Promise<string>;
 
     static selectDocumentForWrite(title?: string, type?: string, extraTypes?: string[]): Promise<string>;
-
-    static getSafParameterForRead(uriString): Promise<string>;
-
-    static getSafParameterForWrite(uriString): Promise<string>;
 
   }
 

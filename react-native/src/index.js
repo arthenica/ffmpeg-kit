@@ -1157,6 +1157,54 @@ export class FFmpegKitConfig {
   }
 
   /**
+   * <p>Converts the given Structured Access Framework Uri into an input url that can be used in FFmpeg
+   * and FFprobe commands.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @return input url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameterForRead(uriString) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, "r");
+  }
+
+  /**
+   * <p>Converts the given Structured Access Framework Uri into an output url that can be used in FFmpeg
+   * and FFprobe commands.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @return output url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameterForWrite(uriString) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, "w");
+  }
+
+  /**
+   * <p>Converts the given Structured Access Framework Uri into an saf protocol url opened with the given open mode.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @param openMode file mode to use as defined in Android Structured Access Framework documentation
+   * @return saf protocol url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameter(uriString, openMode) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, openMode);
+  }
+
+  /**
    * Returns the session history size.
    *
    * @return session history size
@@ -1520,38 +1568,6 @@ export class FFmpegKitConfig {
     await FFmpegKitConfig.init();
 
     return FFmpegKitReactNativeModule.selectDocument(true, title, type, extraTypes);
-  }
-
-  /**
-   * <p>Converts the given Structured Access Framework Uri into an input url that can be used in FFmpeg
-   * and FFprobe commands.
-   *
-   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
-   * API Level &ge; 19. On older API levels it returns an empty url.
-   *
-   * @param uriString SAF uri (<code>"content:…"</code>)
-   * @return input url that can be passed to FFmpegKit or FFprobeKit
-   */
-  static async getSafParameterForRead(uriString) {
-    await FFmpegKitConfig.init();
-
-    return FFmpegKitReactNativeModule.getSafParameter(false, uriString);
-  }
-
-  /**
-   * <p>Converts the given Structured Access Framework Uri into an output url that can be used in FFmpeg
-   * and FFprobe commands.
-   *
-   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
-   * API Level &ge; 19. On older API levels it returns an empty url.
-   *
-   * @param uriString SAF uri (<code>"content:…"</code>)
-   * @return output url that can be passed to FFmpegKit or FFprobeKit
-   */
-  static async getSafParameterForWrite(uriString) {
-    await FFmpegKitConfig.init();
-
-    return FFmpegKitReactNativeModule.getSafParameter(true, uriString);
   }
 
 }

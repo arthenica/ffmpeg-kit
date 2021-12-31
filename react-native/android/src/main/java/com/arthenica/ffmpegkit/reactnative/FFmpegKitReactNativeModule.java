@@ -894,22 +894,18 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   @ReactMethod
-  public void getSafParameter(final Boolean writable, final String uriString, final Promise promise) {
+  public void getSafParameter(final String uriString, final String openMode, final Promise promise) {
     final ReactApplicationContext reactContext = getReactApplicationContext();
 
     final Uri uri = Uri.parse(uriString);
     if (uri == null) {
-      Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters writable: %s, uriString: %s. Uri string cannot be parsed.", writable, uriString));
+      Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters uriString: %s, openMode: %s. Uri string cannot be parsed.", uriString, openMode));
       promise.reject("GET_SAF_PARAMETER_FAILED", "Uri string cannot be parsed.");
     } else {
       final String safParameter;
-      if (writable) {
-        safParameter = FFmpegKitConfig.getSafParameterForWrite(reactContext, uri);
-      } else {
-        safParameter = FFmpegKitConfig.getSafParameterForRead(reactContext, uri);
-      }
+      safParameter = FFmpegKitConfig.getSafParameter(reactContext, uri, openMode);
 
-      Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters writable: %s, uriString: %s completed with saf parameter: %s.", writable, uriString, safParameter));
+      Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters uriString: %s, openMode: %s completed with saf parameter: %s.", uriString, openMode, safParameter));
 
       promise.resolve(safParameter);
     }
@@ -994,19 +990,17 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     sessionMap.putDouble(KEY_SESSION_START_TIME, toLong(session.getStartTime()));
     sessionMap.putString(KEY_SESSION_COMMAND, session.getCommand());
 
-    if (session.isFFprobe()) {
-      if (session.isMediaInformation()) {
-        final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
-        final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
-        if (mediaInformation != null) {
-          sessionMap.putMap(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
-        }
-        sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
-      } else {
-        sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
-      }
-    } else {
+    if (session.isFFmpeg()) {
       sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFMPEG);
+    } else if (session.isFFprobe()) {
+      sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
+    } else if (session.isMediaInformation()) {
+      final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+      final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+      if (mediaInformation != null) {
+        sessionMap.putMap(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
+      }
+      sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
     }
 
     return sessionMap;
