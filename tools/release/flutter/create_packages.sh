@@ -19,7 +19,7 @@ create_main_releases() {
   for CURRENT_PACKAGE in "${PACKAGES[@]}"; do
     local FLUTTER_PACKAGE_NAME="$(echo "${CURRENT_PACKAGE}" | sed "s/\-/\_/g")"
     local PACKAGE_PATH="${PACKAGES_DIR}/${CURRENT_PACKAGE}"
-    cp -r ${SOURCE_DIR} ${PACKAGE_PATH}
+    cp -R ${SOURCE_DIR} ${PACKAGE_PATH}
 
     # 1. pubspec
     $SED_INLINE "s|name: ffmpeg_kit_flutter|name: ffmpeg_kit_flutter_$FLUTTER_PACKAGE_NAME|g" ${PACKAGE_PATH}/pubspec.yaml
@@ -54,7 +54,7 @@ create_lts_releases() {
   for CURRENT_PACKAGE in "${PACKAGES[@]}"; do
     local FLUTTER_PACKAGE_NAME="$(echo "${CURRENT_PACKAGE}" | sed "s/\-/\_/g")"
     local PACKAGE_PATH="${PACKAGES_DIR}/${CURRENT_PACKAGE}-lts"
-    cp -r ${SOURCE_DIR} ${PACKAGE_PATH}
+    cp -R ${SOURCE_DIR} ${PACKAGE_PATH}
 
     # 1. pubspec
     $SED_INLINE "s|name: ffmpeg_kit_flutter|name: ffmpeg_kit_flutter_$FLUTTER_PACKAGE_NAME|g" ${PACKAGE_PATH}/pubspec.yaml
@@ -103,4 +103,4 @@ create_main_releases;
 
 create_lts_releases;
 
-cp -r "${BASEDIR}/flutter/flutter_platform_interface" "$PACKAGES_DIR"
+cp -R "${BASEDIR}/flutter/flutter_platform_interface" "$PACKAGES_DIR"

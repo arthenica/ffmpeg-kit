@@ -1,8 +1,8 @@
-# ffmpeg-kit 4.4 configure.ac
+# ffmpeg-kit 4.5.1 configure.ac
 
-AC_INIT([ffmpeg-kit], [4.4], [https://github.com/tanersener/ffmpeg-kit/issues/new])
-AC_CONFIG_SRCDIR([src/FFmpegKit.m])
+AC_INIT([ffmpeg-kit], [4.5.1], [https://github.com/tanersener/ffmpeg-kit/issues/new])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([src/FFmpegKit.m])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_MAINTAINER_MODE
@@ -24,8 +24,8 @@ AM_PROG_AR
 AC_PROG_OBJC
 CFLAGS="$cflags_bckup"
 
-FFMPEG_LIBS="-lavcodec -lavfilter -lavformat -lavutil -lswscale -lswresample"
-AC_SUBST(FFMPEG_LIBS)
+FFMPEG_FRAMEWORKS="-framework libavcodec -framework libavfilter -framework libavformat -framework libavutil -framework libswscale -framework libswresample"
+AC_SUBST(FFMPEG_FRAMEWORKS)
 
 LT_INIT
 
@@ -58,7 +58,6 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_CHECK_FUNCS([dup2 floor memmove memset select strchr strcspn strerror strrchr strstr strtol malloc strcpy strlen vsnprintf])
 
-AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 
 AC_OUTPUT

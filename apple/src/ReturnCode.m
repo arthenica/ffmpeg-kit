@@ -44,15 +44,15 @@
     return _value;
 }
 
-- (BOOL)isSuccess {
+- (BOOL)isValueSuccess {
     return (_value == ReturnCodeSuccess);
 }
 
-- (BOOL)isError {
+- (BOOL)isValueError {
     return ((_value != ReturnCodeSuccess) && (_value != ReturnCodeCancel));
 }
 
-- (BOOL)isCancel {
+- (BOOL)isValueCancel {
     return (_value == ReturnCodeCancel);
 }
 

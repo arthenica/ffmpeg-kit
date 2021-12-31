@@ -38,26 +38,35 @@ static int64_t fd_seek(URLContext *h, int64_t pos, int whence)
 static int fd_open(URLContext *h, const char *filename, int flags)
 {
     FileContext *c = h->priv_data;
-    int fd;
+    int saf_id;
     struct stat st;
     char *final;
     char *saveptr = NULL;
-    char *fd_string = NULL;
+    char *saf_id_string = NULL;
     char filename_backup[128];
 
-    av_strstart(filename, "fd:", &filename);
     av_strstart(filename, "saf:", &filename);
     av_strlcpy(filename_backup, filename, FFMIN(sizeof(filename), sizeof(filename_backup)));
-    fd_string = av_strtok(filename_backup, ".", &saveptr);
+    saf_id_string = av_strtok(filename_backup, ".", &saveptr);
 
-    fd = strtol(fd_string, &final, 10);
-    if ((fd_string == final) || *final ) {
-        fd = -1;
+    saf_id = strtol(saf_id_string, &final, 10);
+    if ((saf_id_string == final) || *final ) {
+        saf_id = -1;
     }
 
-    c->fd = fd;
+    saf_open_function custom_saf_open = av_get_saf_open();
+    if (custom_saf_open != NULL) {
+        int rc = custom_saf_open(saf_id);
+        if (rc) {
+            c->fd = rc;
+        } else {
+            c->fd = saf_id;
+        }
+    } else {
+        c->fd = saf_id;
+    }
 
-    h->is_streamed = !fstat(fd, &st) && S_ISFIFO(st.st_mode);
+    h->is_streamed = !fstat(saf_id, &st) && S_ISFIFO(st.st_mode);
 
     /* Buffer writes more than the default 32k to improve throughput especially
      * with networked file systems */
@@ -74,7 +83,6 @@ static int fd_check(URLContext *h, int mask)
 {
     int ret = 0;
     const char *filename = h->filename;
-    av_strstart(filename, "fd:", &filename);
     av_strstart(filename, "saf:", &filename);
 
     {
@@ -109,7 +117,6 @@ static int fd_delete(URLContext *h)
 #if HAVE_UNISTD_H
     int ret;
     const char *filename = h->filename;
-    av_strstart(filename, "fd:", &filename);
     av_strstart(filename, "saf:", &filename);
 
     ret = rmdir(filename);
@@ -132,9 +139,7 @@ static int fd_move(URLContext *h_src, URLContext *h_dst)
 {
     const char *filename_src = h_src->filename;
     const char *filename_dst = h_dst->filename;
-    av_strstart(filename_src, "fd:", &filename_src);
     av_strstart(filename_src, "saf:", &filename_src);
-    av_strstart(filename_dst, "fd:", &filename_dst);
     av_strstart(filename_dst, "saf:", &filename_dst);
 
     if (rename(filename_src, filename_dst) < 0)
@@ -147,23 +152,16 @@ static int fd_close(URLContext *h)
 {
     FileContext *c = h->priv_data;
 
-    fd_close_function custom_fd_close = av_get_fd_close();
-    if (custom_fd_close != NULL) {
-        return custom_fd_close(c->fd);
+    saf_close_function custom_saf_close = av_get_saf_close();
+    if (custom_saf_close != NULL) {
+        return custom_saf_close(c->fd);
     } else {
-        return close(c->fd);
+        return 0;
     }
 }
 
 static const AVClass saf_class = {
     .class_name = "saf",
-    .item_name  = av_default_item_name,
-    .option     = file_options,
-    .version    = LIBAVUTIL_VERSION_INT,
-};
-
-static const AVClass fd_class = {
-    .class_name = "fd",
     .item_name  = av_default_item_name,
     .option     = file_options,
     .version    = LIBAVUTIL_VERSION_INT,
@@ -183,20 +181,4 @@ const URLProtocol ff_saf_protocol = {
     .priv_data_size      = sizeof(FileContext),
     .priv_data_class     = &saf_class,
     .default_whitelist   = "saf,crypto,data"
-};
-
-const URLProtocol ff_fd_protocol = {
-    .name                = "fd",
-    .url_open            = fd_open,
-    .url_read            = file_read,
-    .url_write           = file_write,
-    .url_seek            = fd_seek,
-    .url_close           = fd_close,
-    .url_get_file_handle = file_get_handle,
-    .url_check           = fd_check,
-    .url_delete          = fd_delete,
-    .url_move            = fd_move,
-    .priv_data_size      = sizeof(FileContext),
-    .priv_data_class     = &fd_class,
-    .default_whitelist   = "fd,crypto,data"
 };

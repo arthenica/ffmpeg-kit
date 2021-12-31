@@ -43,15 +43,15 @@ public class ReturnCode {
         return value;
     }
 
-    public boolean isSuccess() {
+    public boolean isValueSuccess() {
         return (value == SUCCESS);
     }
 
-    public boolean isError() {
+    public boolean isValueError() {
         return ((value != SUCCESS) && (value != CANCEL));
     }
 
-    public boolean isCancel() {
+    public boolean isValueCancel() {
         return (value == CANCEL);
     }
 

@@ -15,6 +15,7 @@ export BASEDIR="$(pwd)"
 export FFMPEG_KIT_BUILD_TYPE="android"
 source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
+disabled_libraries=()
 
 # SET DEFAULTS SETTINGS
 enable_default_android_architectures
@@ -106,10 +107,23 @@ while [ ! $# -eq 0 ]; do
   --enable-gpl)
     GPL_ENABLED="yes"
     ;;
+  --enable-custom-library-*)
+    CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')
+    CUSTOM_LIBRARY_OPTION_VALUE=$(echo $1 | sed -e 's/^--enable-custom-.*=//g')
+
+    echo -e "INFO: Custom library options detected: ${CUSTOM_LIBRARY_OPTION_KEY} ${CUSTOM_LIBRARY_OPTION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_library_environment_variables "${CUSTOM_LIBRARY_OPTION_KEY}" "${CUSTOM_LIBRARY_OPTION_VALUE}"
+    ;;
   --enable-*)
     ENABLED_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
     enable_library "${ENABLED_LIBRARY}"
+    ;;
+  --disable-lib-*)
+    DISABLED_LIB=$(echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-//g')
+
+    disabled_libraries+=("${DISABLED_LIB}")
     ;;
   --disable-*)
     DISABLED_ARCH=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
@@ -138,7 +152,7 @@ fi
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..58}; do
+  for library in {0..61}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library "$(get_library_name $library)" 1
     else
@@ -149,11 +163,20 @@ if [[ -n ${BUILD_FULL} ]]; then
   done
 fi
 
+# DISABLE SPECIFIED LIBRARIES
+for disabled_library in ${disabled_libraries[@]}; do
+  set_library "${disabled_library}" 0
+done
+
 # IF HELP DISPLAYED EXIT
 if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
 fi
+
+# SET API LEVEL IN build.gradle
+${SED_INLINE} "s/minSdkVersion .*/minSdkVersion ${API}/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
+${SED_INLINE} "s/versionCode ..0/versionCode ${API}0/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
 
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>"${BASEDIR}"/build.log 2>&1
@@ -165,6 +188,7 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 print_redownload_requested_libraries
+print_custom_libraries
 
 # VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
@@ -180,13 +204,13 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
 done
 
 echo -n -e "\nDownloading sources: "
-echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # DOWNLOAD GNU CONFIG
 download_gnu_config
 
 # DOWNLOAD LIBRARY SOURCES
-downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
+downloaded_library_sources "${ENABLED_LIBRARIES[@]}"
 
 # SAVE ORIGINAL API LEVEL = NECESSARY TO BUILD 64bit ARCHITECTURES
 export ORIGINAL_API=${API}
@@ -210,7 +234,7 @@ for run_arch in {0..12}; do
     . "${BASEDIR}"/scripts/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {0..58}; do
+    for library in {0..61}; do
       library_name=$(get_library_name ${library})
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"
@@ -265,10 +289,10 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   cd "${BASEDIR}"/android 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-  # COPY LICENSES
+  # COPY LIBRARY LICENSES
   LICENSE_BASEDIR="${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/res/raw
   rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-  for library in {0..46}; do
+  for library in {0..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       ENABLED_LIBRARY=$(get_library_name ${library} | sed 's/-/_/g')
       LICENSE_FILE="${LICENSE_BASEDIR}/license_${ENABLED_LIBRARY}.txt"
@@ -283,6 +307,26 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
       echo -e "DEBUG: Copied the license file of ${ENABLED_LIBRARY} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
     fi
+  done
+
+  # COPY CUSTOM LIBRARY LICENSES
+  for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+    library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+    relative_license_path="CUSTOM_LIBRARY_${custom_library_index}_LICENSE_FILE"
+
+    destination_license_path="${LICENSE_BASEDIR}/license_${!library_name}.txt"
+
+    cp "${BASEDIR}/src/${!library_name}/${!relative_license_path}" "${destination_license_path}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    RC=$?
+
+    if [[ ${RC} -ne 0 ]]; then
+      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+
+    echo -e "DEBUG: Copied the license file of custom library ${!library_name} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
   done
 
   # COPY LIBRARY LICENSES

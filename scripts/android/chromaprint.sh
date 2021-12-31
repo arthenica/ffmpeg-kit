@@ -14,17 +14,20 @@ cmake -Wno-dev \
   -DCMAKE_INSTALL_PREFIX="${LIB_INSTALL_PREFIX}" \
   -DCMAKE_SYSTEM_NAME=Generic \
   -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CC" \
+  -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CXX" \
   -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$LD" \
   -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AR" \
   -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AS" \
   -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_system_processor) \
   -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
   -DFFT_LIB=kissfft \
-  -DBUILD_SHARED_LIBS=0 "${BASEDIR}"/src/"${LIB_NAME}" || return 1
+  -DKISSFFT_SOURCE_DIR="${BASEDIR}"/src/"${LIB_NAME}"/src/3rdparty/kissfft \
+  -DBUILD_SHARED_LIBS=0 \
+  -DBUILD_TESTS=0 "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 
 make -j$(get_cpu_count) || return 1
 
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_chromaprint_package_config "1.5.0" || return 1
+create_chromaprint_package_config "1.5.1" || return 1

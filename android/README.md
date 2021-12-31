@@ -22,7 +22,7 @@ external libraries enabled.
 
 ##### 2.1.1 Android Tools
    - Android SDK Build Tools
-   - Android NDK r21e or later with LLDB and CMake
+   - Android NDK r22b or later with LLDB and CMake
 
 ##### 2.1.2 Packages
 
@@ -77,7 +77,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     }
 
     dependencies {
-        implementation 'com.arthenica:ffmpeg-kit-full:4.5'
+        implementation 'com.arthenica:ffmpeg-kit-full:4.5.1'
     }
     ```
 
@@ -144,10 +144,10 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 4. Execute asynchronous `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
 
     ```java
-    FFmpegKit.executeAsync("-i file1.mp4 -c:v mpeg4 file2.mp4", new ExecuteCallback() {
+    FFmpegKit.executeAsync("-i file1.mp4 -c:v mpeg4 file2.mp4", new FFmpegSessionCompleteCallback() {
 
         @Override
-        public void apply(Session session) {
+        public void apply(FFmpegSession session) {
             SessionState state = session.getState();
             ReturnCode returnCode = session.getReturnCode();
 
@@ -189,10 +189,10 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     - Asynchronous
 
     ```java
-    FFprobeKit.executeAsync(ffprobeCommand, new ExecuteCallback() {
+    FFprobeKit.executeAsync(ffprobeCommand, new FFprobeSessionCompleteCallback() {
    
         @Override
-        public void apply(Session session) {
+        public void apply(FFprobeSession session) {
 
             CALLED WHEN SESSION IS EXECUTED
 
@@ -235,6 +235,14 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
         FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 " + outputVideoPath);
         ```
 
+   - Writing to a file in a custom mode.
+
+       ```java
+       Uri safUri = intent.getData();
+       String path = FFmpegKitConfig.getSafParameter(requireContext(), safUri, "rw");
+       FFmpegKit.execute("-i file1.mp4 -c:v mpeg4 " + path);
+       ```
+
 9. Get previous `FFmpeg` and `FFprobe` sessions from session history.
 
     ```java
@@ -253,13 +261,29 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
 
 10. Enable global callbacks.
 
-    - Execute Callback, called when an async execution is ended
+    - Session type specific Complete Callbacks, called when an async session has been completed
 
         ```java
-        FFmpegKitConfig.enableExecuteCallback(new ExecuteCallback() {
+        FFmpegKitConfig.enableFFmpegSessionCompleteCallback(new FFmpegSessionCompleteCallback() {
 
             @Override
-            public void apply(Session session) {
+            public void apply(FFmpegSession session) {
+
+            }
+        });
+
+        FFmpegKitConfig.enableFFprobeSessionCompleteCallback(new FFprobeSessionCompleteCallback() {
+
+            @Override
+            public void apply(FFprobeSession session) {
+
+            }
+        });
+
+        FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(new MediaInformationSessionCompleteCallback() {
+
+            @Override
+            public void apply(MediaInformationSession session) {
 
             }
         });

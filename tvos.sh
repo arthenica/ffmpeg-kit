@@ -16,10 +16,10 @@ export BASEDIR="$(pwd)"
 export FFMPEG_KIT_BUILD_TYPE="tvos"
 source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
+disabled_libraries=()
 
 # SET DEFAULTS SETTINGS
 enable_default_tvos_architectures
-enable_main_build
 
 # SELECT XCODE VERSION USED FOR BUILDING
 XCODE_FOR_FFMPEG_KIT=$(ls ~/.xcode.for.ffmpeg.kit.sh 2>>"${BASEDIR}"/build.log)
@@ -28,7 +28,7 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT TVOS SDK VERSION
-DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>${BASEDIR}/build.log)"
+export DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>${BASEDIR}/build.log)"
 echo -e "\nINFO: Using SDK ${DETECTED_TVOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -44,6 +44,9 @@ if [[ -z ${BUILD_VERSION} ]]; then
   echo -e "\n(*): Can not run git commands in this folder. See build.log.\n"
   exit 1
 fi
+
+# MAIN BUILDS ENABLED BY DEFAULT
+enable_main_build
 
 # PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
 for argument in "$@"; do
@@ -113,10 +116,23 @@ while [ ! $# -eq 0 ]; do
   --enable-gpl)
     GPL_ENABLED="yes"
     ;;
+  --enable-custom-library-*)
+    CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')
+    CUSTOM_LIBRARY_OPTION_VALUE=$(echo $1 | sed -e 's/^--enable-custom-.*=//g')
+
+    echo -e "INFO: Custom library options detected: ${CUSTOM_LIBRARY_OPTION_KEY} ${CUSTOM_LIBRARY_OPTION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_library_environment_variables "${CUSTOM_LIBRARY_OPTION_KEY}" "${CUSTOM_LIBRARY_OPTION_VALUE}"
+    ;;
   --enable-*)
     ENABLED_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
     enable_library "${ENABLED_LIBRARY}"
+    ;;
+  --disable-lib-*)
+    DISABLED_LIB=$(echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-//g')
+
+    disabled_libraries+=("${DISABLED_LIB}")
     ;;
   --disable-*)
     DISABLED_ARCH=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
@@ -137,7 +153,7 @@ done
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..58}; do
+  for library in {0..61}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library "$(get_library_name "$library")" 1
     else
@@ -148,6 +164,11 @@ if [[ -n ${BUILD_FULL} ]]; then
   done
 fi
 
+# DISABLE SPECIFIED LIBRARIES
+for disabled_library in ${disabled_libraries[@]}; do
+  set_library "${disabled_library}" 0
+done
+
 # IF HELP DISPLAYED EXIT
 if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
@@ -155,17 +176,20 @@ if [[ -n ${DISPLAY_HELP} ]]; then
 fi
 
 # DISABLE NOT SUPPORTED ARCHITECTURES
-disable_tvos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}" "${DETECTED_TVOS_SDK_VERSION}"
+disable_tvos_architecture_not_supported_on_detected_sdk_version "${ARCH_ARM64_SIMULATOR}"
+
+# DISABLE NOT SUPPORTED LIBRARIES
+disable_tvos_videotoolbox_on_not_supported_sdk_version
 
 # CHECK SOME RULES FOR .framework BUNDLES
 
 # 1. DISABLE arm64-simulator WHEN arm64 IS ENABLED IN framework BUNDLES
-if [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
-  echo -e "INFO: Disabled arm64-simulator architecture which can not co-exist with arm64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
+if [[ ${NO_FRAMEWORK} -ne 1 ]] && [[ -z ${FFMPEG_KIT_XCF_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM64_SIMULATOR}]} -eq 1 ]]; then
+  echo -e "INFO: Disabled arm64-simulator architecture which cannot co-exist with arm64 in the same framework bundle.\n" 1>>"${BASEDIR}"/build.log 2>&1
   disable_arch "arm64-simulator"
 fi
 
-echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}static library for tvOS\n"
+echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}shared library for tvOS\n"
 echo -e -n "INFO: Building ffmpeg-kit ${BUILD_VERSION} ${BUILD_TYPE_ID}for tvOS: " 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "$(date)\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -175,6 +199,7 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 print_redownload_requested_libraries
+print_custom_libraries
 
 # VALIDATE GPL FLAGS
 for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
@@ -190,13 +215,13 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
 done
 
 echo -n -e "\nDownloading sources: "
-echo -e "INFO: Downloading source code of ffmpeg and enabled external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
+echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # DOWNLOAD GNU CONFIG
 download_gnu_config
 
 # DOWNLOAD LIBRARY SOURCES
-downloaded_enabled_library_sources "${ENABLED_LIBRARIES[@]}"
+downloaded_library_sources "${ENABLED_LIBRARIES[@]}"
 
 # THIS WILL SAVE ARCHITECTURES TO BUILD
 TARGET_ARCH_LIST=()
@@ -215,7 +240,7 @@ for run_arch in {0..12}; do
     TARGET_ARCH_LIST+=("${FULL_ARCH}")
 
     # CLEAR FLAGS
-    for library in {0..58}; do
+    for library in {0..61}; do
       library_name=$(get_library_name "${library}")
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"

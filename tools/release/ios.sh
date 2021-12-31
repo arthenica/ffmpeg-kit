@@ -16,9 +16,9 @@ create_package() {
     rm -rf "${CURRENT_PACKAGE}"
     mkdir -p "${CURRENT_PACKAGE}" || exit 1
 
-    cp -r "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
+    cp -R "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
     cd "${CURRENT_PACKAGE}" || exit 1
-    zip -r "../ffmpeg-kit-$1-${PACKAGE_VERSION}-ios-xcframework.zip" * || exit 1
+    zip -r -y "../ffmpeg-kit-$1-${PACKAGE_VERSION}-ios-xcframework.zip" * || exit 1
 
     # COPY PODSPEC AS THE LAST ITEM
     cp "${BASEDIR}"/apple/"${PACKAGE_NAME}".podspec "${CURRENT_PACKAGE}" || exit 1
@@ -27,7 +27,7 @@ create_package() {
     sed -i '' "s/\.framework/\.xcframework/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/-framework/-xcframework/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/ios\.xcframeworks/ios\.frameworks/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
-    sed -i '' "s/9\.3/12\.1/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
+    sed -i '' "s/10/12\.1/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/ffmpegkit\.xcframework\/LICENSE/ffmpegkit\.xcframework\/ios-arm64\/ffmpegkit\.framework\/LICENSE/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
 }
 

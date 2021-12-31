@@ -20,7 +20,7 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_nettle} -e
   # WORKAROUND TO FIX BUILD SYSTEM COMPILER ON macOS
   overwrite_file "${BASEDIR}"/tools/patch/make/nettle/aclocal.m4 "${BASEDIR}"/src/"${LIB_NAME}"/aclocal.m4
 
-  autoreconf_library "${LIB_NAME}"
+  autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
 ./configure \

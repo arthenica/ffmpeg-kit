@@ -21,6 +21,7 @@
 #define FFMPEG_KIT_MEDIA_INFORMATION_H
 
 #import <Foundation/Foundation.h>
+#import "Chapter.h"
 #import "StreamInformation.h"
 
 extern NSString* const MediaKeyMediaProperties;
@@ -38,7 +39,7 @@ extern NSString* const MediaKeyTags;
  */
 @interface MediaInformation : NSObject
 
-- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams;
+- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams withChapters:(NSArray*)chapters;
 
 /**
  * Returns file name.
@@ -102,6 +103,13 @@ extern NSString* const MediaKeyTags;
  * @return streams array
  */
 - (NSArray*)getStreams;
+
+/**
+ * Returns all chapters.
+ *
+ * @return chapters array
+ */
+- (NSArray*)getChapters;
 
 /**
  * Returns the media property associated with the key.

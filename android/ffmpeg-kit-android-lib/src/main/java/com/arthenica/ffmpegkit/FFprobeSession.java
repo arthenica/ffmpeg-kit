@@ -25,6 +25,11 @@ package com.arthenica.ffmpegkit;
 public class FFprobeSession extends AbstractSession implements Session {
 
     /**
+     * Session specific complete callback.
+     */
+    private final FFprobeSessionCompleteCallback completeCallback;
+
+    /**
      * Builds a new FFprobe session.
      *
      * @param arguments command arguments
@@ -36,39 +41,50 @@ public class FFprobeSession extends AbstractSession implements Session {
     /**
      * Builds a new FFprobe session.
      *
-     * @param arguments       command arguments
-     * @param executeCallback session specific execute callback function
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
      */
-    public FFprobeSession(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(arguments, executeCallback, null);
+    public FFprobeSession(final String[] arguments, final FFprobeSessionCompleteCallback completeCallback) {
+        this(arguments, completeCallback, null);
     }
 
     /**
      * Builds a new FFprobe session.
      *
-     * @param arguments       command arguments
-     * @param executeCallback session specific execute callback function
-     * @param logCallback     session specific log callback function
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
+     * @param logCallback      session specific log callback
      */
     public FFprobeSession(final String[] arguments,
-                          final ExecuteCallback executeCallback,
+                          final FFprobeSessionCompleteCallback completeCallback,
                           final LogCallback logCallback) {
-        this(arguments, executeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+        this(arguments, completeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
     /**
      * Builds a new FFprobe session.
      *
      * @param arguments              command arguments
-     * @param executeCallback        session specific execute callback function
-     * @param logCallback            session specific log callback function
+     * @param completeCallback       session specific complete callback
+     * @param logCallback            session specific log callback
      * @param logRedirectionStrategy session specific log redirection strategy
      */
     public FFprobeSession(final String[] arguments,
-                          final ExecuteCallback executeCallback,
+                          final FFprobeSessionCompleteCallback completeCallback,
                           final LogCallback logCallback,
                           final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, executeCallback, logCallback, logRedirectionStrategy);
+        super(arguments, logCallback, logRedirectionStrategy);
+
+        this.completeCallback = completeCallback;
+    }
+
+    /**
+     * Returns the session specific complete callback.
+     *
+     * @return session specific complete callback
+     */
+    public FFprobeSessionCompleteCallback getCompleteCallback() {
+        return completeCallback;
     }
 
     @Override
@@ -79,6 +95,11 @@ public class FFprobeSession extends AbstractSession implements Session {
     @Override
     public boolean isFFprobe() {
         return true;
+    }
+
+    @Override
+    public boolean isMediaInformation() {
+        return false;
     }
 
     @Override

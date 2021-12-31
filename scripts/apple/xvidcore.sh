@@ -13,8 +13,9 @@ esac
 # ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
 
-# REGENERATE BUILD FILES IF NECESSARY OR REQUESTED
-if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/"${LIB_NAME}"/build/generic/configure ]] || [[ ${RECONF_xvidcore} -eq 1 ]]; then
+# WORKAROUNDS
+git checkout configure.in 1>>"${BASEDIR}"/build.log 2>&1
+if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
 
   # WORKAROUND TO FIX THE FOLLOWING ERROR
   # ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
@@ -23,9 +24,10 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/"${LIB_NAME}"/build/generic/configure 
   # WORKAROUND TO FIX THE FOLLOWING ERROR
   # ld: -read_only_relocs and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
   ${SED_INLINE} 's/-Wl,-read_only_relocs,suppress//g' configure.in
-
-  ./bootstrap.sh
 fi
+
+# ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
+./bootstrap.sh
 
 ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
