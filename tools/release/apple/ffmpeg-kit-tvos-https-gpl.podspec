@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-tvos-https-gpl"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit tvOS Https GPL Static Framework"
+    s.summary           = "FFmpeg Kit tvOS Https GPL Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC
@@ -17,8 +17,8 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-https-gpl-VERSION-tvos-framework.zip" }
 
-    s.tvos.deployment_target = '9.2'
+    s.tvos.deployment_target = '10.0'
     s.tvos.frameworks   = 'AudioToolbox','VideoToolbox','CoreMedia'
-    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libhogweed.framework', 'libnettle.framework', 'libvidstab.framework', 'x264.framework', 'x265.framework', 'xvidcore.framework'
+    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

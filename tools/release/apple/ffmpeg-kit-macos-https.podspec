@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-macos-https"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit macOS Https Static Framework"
+    s.summary           = "FFmpeg Kit macOS Https Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC
@@ -17,8 +17,8 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-https-VERSION-macos-framework.zip" }
 
-    s.osx.deployment_target = '10.11'
-    s.osx.frameworks    = 'AudioToolbox','AVFoundation','CoreAudio','CoreImage','CoreMedia','OpenCL','OpenGL','VideoToolbox'
-    s.osx.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libhogweed.framework', 'libnettle.framework'
+    s.osx.deployment_target = '10.12'
+    s.osx.frameworks    = 'AudioToolbox','AVFoundation','CoreAudio','CoreImage','CoreMedia','OpenCL','OpenGL', 'Security', 'VideoToolbox'
+    s.osx.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

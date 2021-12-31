@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-tvos-audio"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit tvOS Audio Static Framework"
+    s.summary           = "FFmpeg Kit tvOS Audio Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC
@@ -17,8 +17,8 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-audio-VERSION-tvos-framework.zip" }
 
-    s.tvos.deployment_target = '9.2'
+    s.tvos.deployment_target = '10.0'
     s.tvos.frameworks   = 'AudioToolbox','VideoToolbox','CoreMedia'
-    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'lame.framework', 'libilbc.framework', 'libogg.framework', 'libopencore-amrnb.framework', 'libsndfile.framework', 'libvorbis.framework', 'libvorbisenc.framework', 'libvorbisfile.framework', 'opus.framework', 'shine.framework', 'soxr.framework', 'speex.framework', 'twolame.framework', 'vo-amrwbenc.framework'
+    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

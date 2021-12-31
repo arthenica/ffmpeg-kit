@@ -19,6 +19,9 @@
 
 #import "MediaInformationJsonParser.h"
 
+NSString* const MediaInformationJsonParserKeyStreams =  @"streams";
+NSString* const MediaInformationJsonParserKeyChapters = @"chapters";
+
 @implementation MediaInformationJsonParser
 
 + (MediaInformation*)from:(NSString*)ffprobeJsonOutput {
@@ -40,14 +43,21 @@
         return nil;
     }
 
-    NSArray* array = [jsonDictionary objectForKey:@"streams"];
+    NSArray* jsonStreamArray = [jsonDictionary objectForKey:MediaInformationJsonParserKeyStreams];
     NSMutableArray *streamArray = [[NSMutableArray alloc] init];
-    for(int i = 0; i<array.count; i++) {
-        NSDictionary *streamDictionary = [array objectAtIndex:i];
-        [streamArray addObject:[[StreamInformation alloc] init: streamDictionary]];
+    for(int i = 0; i<jsonStreamArray.count; i++) {
+        NSDictionary *streamDictionary = [jsonStreamArray objectAtIndex:i];
+        [streamArray addObject:[[StreamInformation alloc] init:streamDictionary]];
     }
 
-    return [[MediaInformation alloc] init:jsonDictionary withStreams:streamArray];
+    NSArray* jsonChapterArray = [jsonDictionary objectForKey:MediaInformationJsonParserKeyChapters];
+    NSMutableArray *chapterArray = [[NSMutableArray alloc] init];
+    for(int i = 0; i<jsonChapterArray.count; i++) {
+        NSDictionary *chapterDictionary = [jsonChapterArray objectAtIndex:i];
+        [chapterArray addObject:[[Chapter alloc] init:chapterDictionary]];
+    }
+
+    return [[MediaInformation alloc] init:jsonDictionary withStreams:streamArray withChapters:chapterArray];
 }
 
 @end

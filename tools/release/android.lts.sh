@@ -22,7 +22,8 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-export VERSION_CODE="${ANDROID_LTS_MIN_SDK}0"$(echo $1 | sed "s/\.//g")"0"
+VERSION_CODE="${ANDROID_LTS_MIN_SDK}0"$(echo $1 | sed "s/\.//g")"0"
+export VERSION_CODE=${VERSION_CODE:0:6}
 
 # VALIDATE VERSIONS
 if [[ "${ANDROID_FFMPEG_KIT_VERSION}" != "$1" ]]; then

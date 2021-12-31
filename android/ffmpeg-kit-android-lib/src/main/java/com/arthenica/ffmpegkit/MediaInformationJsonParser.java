@@ -34,6 +34,9 @@ import java.util.ArrayList;
  */
 public class MediaInformationJsonParser {
 
+    public static final String KEY_STREAMS = "streams";
+    public static final String KEY_CHAPTERS = "chapters";
+
     /**
      * Extracts <code>MediaInformation</code> from the given FFprobe json output. Note that this
      * method does not throw {@link JSONException} as {@link #fromWithError(String)} does and
@@ -59,18 +62,27 @@ public class MediaInformationJsonParser {
      * @throws JSONException if a parsing error occurs
      */
     public static MediaInformation fromWithError(final String ffprobeJsonOutput) throws JSONException {
-        JSONObject jsonObject = new JSONObject(ffprobeJsonOutput);
-        JSONArray streamArray = jsonObject.optJSONArray("streams");
+        final JSONObject jsonObject = new JSONObject(ffprobeJsonOutput);
+        final JSONArray streamArray = jsonObject.optJSONArray(KEY_STREAMS);
+        final JSONArray chapterArray = jsonObject.optJSONArray(KEY_CHAPTERS);
 
-        ArrayList<StreamInformation> arrayList = new ArrayList<>();
+        ArrayList<StreamInformation> streamList = new ArrayList<>();
         for (int i = 0; streamArray != null && i < streamArray.length(); i++) {
             JSONObject streamObject = streamArray.optJSONObject(i);
             if (streamObject != null) {
-                arrayList.add(new StreamInformation(streamObject));
+                streamList.add(new StreamInformation(streamObject));
             }
         }
 
-        return new MediaInformation(jsonObject, arrayList);
+        ArrayList<Chapter> chapterList = new ArrayList<>();
+        for (int i = 0; chapterArray != null && i < chapterArray.length(); i++) {
+            JSONObject chapterObject = chapterArray.optJSONObject(i);
+            if (chapterObject != null) {
+                chapterList.add(new Chapter(chapterObject));
+            }
+        }
+
+        return new MediaInformation(jsonObject, streamList, chapterList);
     }
 
 }

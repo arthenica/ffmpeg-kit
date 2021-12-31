@@ -80,8 +80,11 @@ static jmethodID logMethod;
 /** Global reference of statistics redirection method in Java */
 static jmethodID statisticsMethod;
 
-/** Global reference of closeParcelFileDescriptor method in Java */
-static jmethodID closeParcelFileDescriptorMethod;
+/** Global reference of safOpen method in Java */
+static jmethodID safOpenMethod;
+
+/** Global reference of safClose method in Java */
+static jmethodID safCloseMethod;
 
 /** Global reference of String class in Java */
 static jclass stringClass;
@@ -561,13 +564,21 @@ void *callbackThreadFunction() {
 }
 
 /**
- * Used by fd and saf protocols; is expected to be called from a Java thread, therefore we don't need attach/detach
+ * Used by saf protocol; is expected to be called from a Java thread, therefore we don't need attach/detach
  */
-int close_parcel_file_descriptor(int fd) {
+int saf_open(int safId) {
     JNIEnv *env = NULL;
     (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
-    (*env)->CallStaticVoidMethod(env, configClass, closeParcelFileDescriptorMethod, fd);
-    return 0;
+    return (*env)->CallStaticIntMethod(env, configClass, safOpenMethod, safId);
+}
+
+/**
+ * Used by saf protocol; is expected to be called from a Java thread, therefore we don't need attach/detach
+ */
+int saf_close(int fd) {
+    JNIEnv *env = NULL;
+    (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    return (*env)->CallStaticIntMethod(env, configClass, safCloseMethod, fd);
 }
 
 /**
@@ -615,9 +626,15 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    closeParcelFileDescriptorMethod = (*env)->GetStaticMethodID(env, localConfigClass, "closeParcelFileDescriptor", "(I)V");
+    safOpenMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safOpen", "(I)I");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "closeParcelFileDescriptor");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safOpen");
+        return JNI_FALSE;
+    }
+
+    safCloseMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safClose", "(I)I");
+    if (logMethod == NULL) {
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safClose");
         return JNI_FALSE;
     }
 
@@ -645,7 +662,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     redirectionEnabled = 0;
 
-    av_set_fd_close(close_parcel_file_descriptor);
+    av_set_saf_open(saf_open);
+    av_set_saf_close(saf_close);
 
     return JNI_VERSION_1_6;
 }

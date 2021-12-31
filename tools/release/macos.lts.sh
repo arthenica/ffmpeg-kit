@@ -6,8 +6,6 @@
 source ./common.sh
 export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/bundle-apple-framework-macos-lts"
 export COCOAPODS_DIRECTORY="${BASEDIR}/../../prebuilt/bundle-apple-cocoapods-macos-lts"
-export SOURCE_UNIVERSAL_PACKAGE="${BASEDIR}/../../prebuilt/bundle-apple-universal-macos-lts"
-export ALL_UNIVERSAL_DIRECTORY="${BASEDIR}/../../prebuilt/bundle-apple-all-universal-macos-lts"
 
 create_package() {
     local PACKAGE_NAME="ffmpeg-kit-macos-$1"
@@ -18,40 +16,16 @@ create_package() {
     rm -rf "${CURRENT_PACKAGE}"
     mkdir -p "${CURRENT_PACKAGE}" || exit 1
 
-    cp -r "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
+    cp -R "${SOURCE_PACKAGE}"/* "${CURRENT_PACKAGE}" || exit 1
     cd "${CURRENT_PACKAGE}" || exit 1
-    zip -r "../ffmpeg-kit-$1-${PACKAGE_VERSION}-macos-framework.zip" * || exit 1
+    zip -r -y "../ffmpeg-kit-$1-${PACKAGE_VERSION}-macos-framework.zip" * || exit 1
 
     # COPY PODSPEC AS THE LAST ITEM
     cp "${BASEDIR}"/apple/"${PACKAGE_NAME}".podspec "${CURRENT_PACKAGE}" || exit 1
     sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/DESCRIPTION/${PACKAGE_DESCRIPTION}/g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
+    sed -i '' "s|ffmpegkit\.framework\/LICENSE|ffmpegkit\.framework\/Resources\/LICENSE|g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
     sed -i '' "s/\,\'AVFoundation\'//g" "${CURRENT_PACKAGE}"/"${PACKAGE_NAME}".podspec || exit 1
-
-    mkdir -p "${ALL_UNIVERSAL_DIRECTORY}" || exit 1
-    local CURRENT_UNIVERSAL_PACKAGE="${ALL_UNIVERSAL_DIRECTORY}/${PACKAGE_NAME}-universal"
-    rm -rf "${CURRENT_UNIVERSAL_PACKAGE}"
-    mkdir -p "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
-    mkdir -p "${CURRENT_UNIVERSAL_PACKAGE}"/lib || exit 1
-
-    cd "${SOURCE_UNIVERSAL_PACKAGE}" || exit 1
-    find . -name "*.a" -exec cp {} "${CURRENT_UNIVERSAL_PACKAGE}"/lib \;  || exit 1
-
-    # COPY THE LICENSE FILE OF EACH LIBRARY
-    LICENSE_FILES=$(find . -name LICENSE | grep -vi ffmpeg)
-
-    for LICENSE_FILE in ${LICENSE_FILES[@]}
-    do
-        LIBRARY_NAME=$(echo "${LICENSE_FILE}" | sed 's/\.\///g;s/\/LICENSE//g')
-        cp "${LICENSE_FILE}" "${CURRENT_UNIVERSAL_PACKAGE}"/LICENSE."${LIBRARY_NAME}" || exit 1
-    done
-
-    cp -r "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg-kit/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
-    cp -r "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/include/* "${CURRENT_UNIVERSAL_PACKAGE}"/include || exit 1
-    cp "${SOURCE_UNIVERSAL_PACKAGE}"/ffmpeg/LICENSE "${CURRENT_UNIVERSAL_PACKAGE}"/LICENSE || exit 1
-
-    cd "${ALL_UNIVERSAL_DIRECTORY}" || exit 1
-    zip -r "ffmpeg-kit-$1-${PACKAGE_VERSION}-macos-static-universal.zip" "${PACKAGE_NAME}"-universal || exit 1
 }
 
 if [[ $# -ne 1 ]];
@@ -75,9 +49,6 @@ fi
 # CREATE COCOAPODS DIRECTORY
 rm -rf "${COCOAPODS_DIRECTORY}"
 mkdir -p "${COCOAPODS_DIRECTORY}" || exit 1
-
-rm -rf "${ALL_UNIVERSAL_DIRECTORY}"
-mkdir -p "${ALL_UNIVERSAL_DIRECTORY}" || exit 1
 
 # MIN RELEASE
 cd "${BASEDIR}/../.." || exit 1

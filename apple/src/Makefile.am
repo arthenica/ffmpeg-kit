@@ -1,11 +1,12 @@
 lib_LTLIBRARIES = libffmpegkit.la
 
-libffmpegkit_la_LIBADD = @FFMPEG_LIBS@
+libffmpegkit_la_LIBADD = @FFMPEG_FRAMEWORKS@
 
 libffmpegkit_la_SOURCES = \
     AbstractSession.m \
     ArchDetect.m \
     AtomicLong.m \
+    Chapter.m \
     FFmpegKit.m \
     FFmpegKitConfig.m \
     FFmpegSession.m \
@@ -35,28 +36,31 @@ include_HEADERS = \
     AbstractSession.h \
     ArchDetect.h \
     AtomicLong.h \
-    ExecuteCallback.h \
+    Chapter.h \
     FFmpegKit.h \
     FFmpegKitConfig.h \
     FFmpegSession.h \
-	FFprobeKit.h \
-	FFprobeSession.h \
-	Level.h \
-	Log.h \
-	LogCallback.h \
-	LogRedirectionStrategy.h \
-	MediaInformation.h \
-	MediaInformationJsonParser.h \
-	MediaInformationSession.h \
-	Packages.h \
-	ReturnCode.h \
-	Session.h \
-	SessionState.h \
-	Statistics.h \
-	StatisticsCallback.h \
-	StreamInformation.h \
-	ffmpegkit_exception.h \
-	fftools_cmdutils.h \
+    FFmpegSessionCompleteCallback.h \
+    FFprobeKit.h \
+    FFprobeSession.h \
+    FFprobeSessionCompleteCallback.h \
+    Level.h \
+    Log.h \
+    LogCallback.h \
+    LogRedirectionStrategy.h \
+    MediaInformation.h \
+    MediaInformationJsonParser.h \
+    MediaInformationSession.h \
+    MediaInformationSessionCompleteCallback.h \
+    Packages.h \
+    ReturnCode.h \
+    Session.h \
+    SessionState.h \
+    Statistics.h \
+    StatisticsCallback.h \
+    StreamInformation.h \
+    ffmpegkit_exception.h \
+    fftools_cmdutils.h \
     fftools_ffmpeg.h
 
 libffmpegkit_la_CFLAGS = $(CFLAGS)

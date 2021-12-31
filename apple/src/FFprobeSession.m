@@ -17,43 +17,64 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "ExecuteCallback.h"
 #import "FFprobeSession.h"
 #import "FFmpegKitConfig.h"
 #import "LogCallback.h"
 
-@implementation FFprobeSession
-
-- (instancetype)init:(NSArray*)arguments {
-
-    self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
-
-    return self;
+@implementation FFprobeSession {
+    FFprobeSessionCompleteCallback _completeCallback;
 }
 
 + (void)initialize {
     // EMPTY INITIALIZE
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
+- (instancetype)init:(NSArray*)arguments {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 
-    return self;
-}
-
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback {
-
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+    if (self) {
+        _completeCallback = nil;
+    }
 
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+
+    if (self) {
+        _completeCallback = completeCallback;
+    }
 
     return self;
+}
+
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
+
+    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+
+    if (self) {
+        _completeCallback = completeCallback;
+    }
+
+    return self;
+}
+
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+
+    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
+
+    if (self) {
+        _completeCallback = completeCallback;
+    }
+
+    return self;
+}
+
+- (FFprobeSessionCompleteCallback)getCompleteCallback {
+    return _completeCallback;
 }
 
 - (BOOL)isFFmpeg {
@@ -62,6 +83,10 @@
 
 - (BOOL)isFFprobe {
     return true;
+}
+
+- (BOOL)isMediaInformation {
+    return false;
 }
 
 @end

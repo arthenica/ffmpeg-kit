@@ -29,16 +29,9 @@ import java.util.concurrent.Future;
 public interface Session {
 
     /**
-     * Returns the session specific execute callback function.
+     * Returns the session specific log callback.
      *
-     * @return session specific execute callback function
-     */
-    ExecuteCallback getExecuteCallback();
-
-    /**
-     * Returns the session specific log callback function.
-     *
-     * @return session specific log callback function
+     * @return session specific log callback
      */
     LogCallback getLogCallback();
 
@@ -198,6 +191,9 @@ public interface Session {
 
     /**
      * Adds a new log entry for this session.
+     * <p>
+     * It is invoked internally by <code>FFmpegKit</code> library methods. Must not be used by user
+     * applications.
      *
      * @param log log entry
      */
@@ -223,6 +219,13 @@ public interface Session {
      * @return true if it is an <code>FFprobe</code> session, false otherwise
      */
     boolean isFFprobe();
+
+    /**
+     * Returns whether it is a <code>MediaInformation</code> session or not.
+     *
+     * @return true if it is a <code>MediaInformation</code> session, false otherwise
+     */
+    boolean isMediaInformation();
 
     /**
      * Cancels running the session.

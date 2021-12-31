@@ -19,12 +19,14 @@
 
 package com.arthenica.ffmpegkit;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 /**
  * <p>Executes a MediaInformation session asynchronously.
  */
 public class AsyncGetMediaInformationTask implements Runnable {
     private final MediaInformationSession mediaInformationSession;
-    private final ExecuteCallback executeCallback;
+    private final MediaInformationSessionCompleteCallback completeCallback;
     private final Integer waitTimeout;
 
     public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession) {
@@ -33,7 +35,7 @@ public class AsyncGetMediaInformationTask implements Runnable {
 
     public AsyncGetMediaInformationTask(final MediaInformationSession mediaInformationSession, final Integer waitTimeout) {
         this.mediaInformationSession = mediaInformationSession;
-        this.executeCallback = mediaInformationSession.getExecuteCallback();
+        this.completeCallback = mediaInformationSession.getCompleteCallback();
         this.waitTimeout = waitTimeout;
     }
 
@@ -41,13 +43,23 @@ public class AsyncGetMediaInformationTask implements Runnable {
     public void run() {
         FFmpegKitConfig.getMediaInformationExecute(mediaInformationSession, waitTimeout);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(mediaInformationSession);
+        if (completeCallback != null) {
+            try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                completeCallback.apply(mediaInformationSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session complete callback.%s", Exceptions.getStackTraceString(e)));
+            }
         }
 
-        if (executeCallback != null) {
-            executeCallback.apply(mediaInformationSession);
+        final MediaInformationSessionCompleteCallback globalMediaInformationSessionCompleteCallback = FFmpegKitConfig.getMediaInformationSessionCompleteCallback();
+        if (globalMediaInformationSessionCompleteCallback != null) {
+            try {
+                // NOTIFY GLOBAL CALLBACK DEFINEDs
+                globalMediaInformationSessionCompleteCallback.apply(mediaInformationSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global complete callback.%s", Exceptions.getStackTraceString(e)));
+            }
         }
     }
 

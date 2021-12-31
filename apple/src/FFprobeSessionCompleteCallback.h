@@ -17,13 +17,13 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FFMPEG_KIT_EXECUTE_CALLBACK_H
-#define FFMPEG_KIT_EXECUTE_CALLBACK_H
+#ifndef FFMPEG_KIT_FFPROBE_SESSION_COMPLETE_CALLBACK_H
+#define FFMPEG_KIT_FFPROBE_SESSION_COMPLETE_CALLBACK_H
 
-@protocol Session;
+@class FFprobeSession;
 
 /**
- * <p>Callback invoked when an asynchronous session ends running.
+ * <p>Callback function that is invoked when an asynchronous <code>FFprobe</code> session has ended.
  * <p>Session has either SessionStateCompleted or SessionStateFailed state when
  * the callback is invoked.
  * <p>If it has SessionStateCompleted state, <code>ReturnCode</code> should be checked to
@@ -43,8 +43,8 @@
  *
  * @param session session of the completed execution
  */
-typedef void (^ExecuteCallback)(id<Session> session);
+typedef void (^FFprobeSessionCompleteCallback)(FFprobeSession* session);
 
-#import "Session.h"
+#import "FFprobeSession.h"
 
-#endif // FFMPEG_KIT_EXECUTE_CALLBACK_H
+#endif // FFMPEG_KIT_FFPROBE_SESSION_COMPLETE_CALLBACK_H

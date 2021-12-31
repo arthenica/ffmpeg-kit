@@ -37,11 +37,11 @@ typedef NS_ENUM(NSUInteger, ReturnCodeEnum) {
 
 - (int)getValue;
 
-- (BOOL)isSuccess;
+- (BOOL)isValueSuccess;
 
-- (BOOL)isError;
+- (BOOL)isValueError;
 
-- (BOOL)isCancel;
+- (BOOL)isValueCancel;
 
 @end
 

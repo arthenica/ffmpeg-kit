@@ -23,12 +23,17 @@ package com.arthenica.ffmpegkit;
  * <p>A custom FFprobe session, which produces a <code>MediaInformation</code> object using the
  * FFprobe output.
  */
-public class MediaInformationSession extends FFprobeSession implements Session {
+public class MediaInformationSession extends AbstractSession implements Session {
 
     /**
      * Media information extracted in the session.
      */
     private MediaInformation mediaInformation;
+
+    /**
+     * Session specific complete callback.
+     */
+    private final MediaInformationSessionCompleteCallback completeCallback;
 
     /**
      * Creates a new media information session.
@@ -42,22 +47,24 @@ public class MediaInformationSession extends FFprobeSession implements Session {
     /**
      * Creates a new media information session.
      *
-     * @param arguments       command arguments
-     * @param executeCallback session specific execute callback function
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
      */
-    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback) {
-        this(arguments, executeCallback, null);
+    public MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback) {
+        this(arguments, completeCallback, null);
     }
 
     /**
      * Creates a new media information session.
      *
-     * @param arguments       command arguments
-     * @param executeCallback session specific execute callback function
-     * @param logCallback     session specific log callback function
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
+     * @param logCallback      session specific log callback
      */
-    public MediaInformationSession(final String[] arguments, final ExecuteCallback executeCallback, final LogCallback logCallback) {
-        super(arguments, executeCallback, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+    public MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
+        super(arguments, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+
+        this.completeCallback = completeCallback;
     }
 
     /**
@@ -77,6 +84,30 @@ public class MediaInformationSession extends FFprobeSession implements Session {
      */
     public void setMediaInformation(final MediaInformation mediaInformation) {
         this.mediaInformation = mediaInformation;
+    }
+
+    /**
+     * Returns the session specific complete callback.
+     *
+     * @return session specific complete callback
+     */
+    public MediaInformationSessionCompleteCallback getCompleteCallback() {
+        return completeCallback;
+    }
+
+    @Override
+    public boolean isFFmpeg() {
+        return false;
+    }
+
+    @Override
+    public boolean isFFprobe() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediaInformation() {
+        return true;
     }
 
     @Override

@@ -19,7 +19,6 @@
 
 #import "AbstractSession.h"
 #import "AtomicLong.h"
-#import "ExecuteCallback.h"
 #import "FFmpegKit.h"
 #import "FFmpegKitConfig.h"
 #import "LogCallback.h"
@@ -33,7 +32,6 @@ extern void addSessionToSessionHistory(id<Session> session);
 
 @implementation AbstractSession {
     long _sessionId;
-    ExecuteCallback _executeCallback;
     LogCallback _logCallback;
     NSDate* _createTime;
     NSDate* _startTime;
@@ -51,11 +49,10 @@ extern void addSessionToSessionHistory(id<Session> session);
     sessionIdGenerator = [[AtomicLong alloc] initWithValue:1];
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray*)arguments withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
     self = [super init];
     if (self) {
         _sessionId = [sessionIdGenerator getAndIncrement];
-        _executeCallback = executeCallback;
         _logCallback = logCallback;
         _createTime = [NSDate date];
         _startTime = nil;
@@ -72,10 +69,6 @@ extern void addSessionToSessionHistory(id<Session> session);
     }
 
     return self;
-}
-
-- (ExecuteCallback)getExecuteCallback {
-    return _executeCallback;
 }
 
 - (LogCallback)getLogCallback {
@@ -226,6 +219,11 @@ extern void addSessionToSessionHistory(id<Session> session);
 }
 
 - (BOOL)isFFprobe {
+    // IMPLEMENTED IN SUBCLASSES
+    return false;
+}
+
+- (BOOL)isMediaInformation {
     // IMPLEMENTED IN SUBCLASSES
     return false;
 }

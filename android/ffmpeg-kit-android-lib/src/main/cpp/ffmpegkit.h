@@ -27,7 +27,7 @@
 #include "libavutil/ffversion.h"
 
 /** Library version string */
-#define FFMPEG_KIT_VERSION "4.5"
+#define FFMPEG_KIT_VERSION "4.5.1"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "ffmpeg-kit"
