@@ -1,0 +1,151 @@
+name: apple nightly builds
+
+on:
+  schedule:
+    - cron:  '0 2 * * *'
+
+jobs:
+  build-ios-main-on-macos-bigsur:
+    name: ios main on big sur
+    runs-on: macos-11
+    strategy:
+      matrix:
+        xcode: [ '13.2.1' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./ios.sh -x --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-ios-lts-on-macos-catalina:
+    name: ios lts on catalina
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        xcode: [ '12.4' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./ios.sh -l --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-macos-main-on-macos-bigsur:
+    name: macos main on big sur
+    runs-on: macos-11
+    strategy:
+      matrix:
+        xcode: [ '13.2.1' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./macos.sh -x --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-macos-lts-on-macos-catalina:
+    name: macos lts on catalina
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        xcode: [ '12.4' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./macos.sh -l --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-tvos-main-on-macos-bigsur:
+    name: tvos main on big sur
+    runs-on: macos-11
+    strategy:
+      matrix:
+        xcode: [ '13.2.1' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./tvos.sh -x --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-tvos-lts-on-macos-catalina:
+    name: tvos lts on catalina
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        xcode: [ '12.4' ]
+        branches: [ 'main', 'development' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branches }}
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./tvos.sh -l --full --enable-gpl --disable-lib-srt
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
