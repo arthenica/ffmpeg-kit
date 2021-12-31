@@ -15,14 +15,16 @@ cmake -Wno-dev \
   -DCMAKE_SYSTEM_NAME="${CMAKE_SYSTEM_NAME}" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="${LIB_INSTALL_PREFIX}" \
+  -DCMAKE_CXX_COMPILER="$CXX" \
   -DCMAKE_C_COMPILER="$CC" \
   -DCMAKE_LINKER="$LD" \
   -DCMAKE_AR="$(xcrun --sdk "$(get_sdk_name)" -f ar)" \
   -DCMAKE_AS="$AS" \
   -DFFT_LIB=kissfft \
-  -DKISSFFT_SOURCE_DIR="${BASEDIR}"/src/"${LIB_NAME}"/vendor/kissfft \
+  -DKISSFFT_SOURCE_DIR="${BASEDIR}"/src/"${LIB_NAME}"/src/3rdparty/kissfft \
   -DCMAKE_SYSTEM_PROCESSOR="$(get_target_cpu)" \
-  -DBUILD_SHARED_LIBS=0 "${BASEDIR}"/src/"${LIB_NAME}" || return 1
+  -DBUILD_SHARED_LIBS=0 \
+  -DBUILD_TESTS=0 "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 
 make -j$(get_cpu_count) || return 1
 

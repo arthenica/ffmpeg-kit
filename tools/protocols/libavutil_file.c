@@ -17,12 +17,21 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static fd_close_function _fd_close_function = NULL;
+static saf_open_function _saf_open_function = NULL;
+static saf_close_function _saf_close_function = NULL;
 
-fd_close_function av_get_fd_close() {
-    return _fd_close_function;
+saf_open_function av_get_saf_open() {
+    return _saf_open_function;
 }
 
-void av_set_fd_close(fd_close_function close_function) {
-    _fd_close_function = close_function;
+saf_close_function av_get_saf_close() {
+    return _saf_close_function;
+}
+
+void av_set_saf_open(saf_open_function open_function) {
+    _saf_open_function = open_function;
+}
+
+void av_set_saf_close(saf_close_function close_function) {
+    _saf_close_function = close_function;
 }

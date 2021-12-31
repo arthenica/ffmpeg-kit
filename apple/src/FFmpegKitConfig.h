@@ -24,7 +24,6 @@
 #import <pthread.h>
 #import <unistd.h>
 #import <Foundation/Foundation.h>
-#import "ExecuteCallback.h"
 #import "FFmpegSession.h"
 #import "FFprobeSession.h"
 #import "LogCallback.h"
@@ -191,8 +190,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFmpeg execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an FFmpegSessionCompleteCallback if you want to be notified about the result.
  *
  * @param ffmpegSession FFmpeg session which includes command options/arguments
  */
@@ -201,8 +200,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFmpeg execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an FFmpegSessionCompleteCallback if you want to be notified about the result.
  *
  * @param ffmpegSession   FFmpeg session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation
@@ -212,8 +211,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFprobe execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an FFprobeSessionCompleteCallback if you want to be notified about the result.
  *
  * @param ffprobeSession FFprobe session which includes command options/arguments
  */
@@ -222,8 +221,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFprobe execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an FFprobeSessionCompleteCallback if you want to be notified about the result.
  *
  * @param ffprobeSession  FFprobe session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation
@@ -233,8 +232,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFprobe execution for the given media information session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an MediaInformationSessionCompleteCallback if you want to be notified about the result.
  *
  * @param mediaInformationSession media information session which includes command options/arguments
  * @param waitTimeout             max time to wait until media information is transmitted
@@ -244,8 +243,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * <p>Starts an asynchronous FFprobe execution for the given media information session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
- * ExecuteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution to complete.
+ * You must use an MediaInformationSessionCompleteCallback if you want to be notified about the result.
  *
  * @param mediaInformationSession media information session which includes command options/arguments
  * @param queue           dispatch queue that will be used to run this asynchronous operation
@@ -268,18 +267,47 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)enableStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
- * <p>Sets a global execute callback to receive execution results.
+ * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results for FFmpeg sessions.
  *
- * @param executeCallback execute callback or nil to disable a previously execute callback
+ * @param ffmpegSessionCompleteCallback complete callback or nil to disable a previously defined callback
  */
-+ (void)enableExecuteCallback:(ExecuteCallback)executeCallback;
++ (void)enableFFmpegSessionCompleteCallback:(FFmpegSessionCompleteCallback)ffmpegSessionCompleteCallback;
 
 /**
- * <p>Returns the global execute callback.
+ * <p>Returns the global FFmpegSessionCompleteCallback set.
  *
- * @return global execute callback
+ * @return global FFmpegSessionCompleteCallback or nil if it is not set
  */
-+ (ExecuteCallback)getExecuteCallback;
++ (FFmpegSessionCompleteCallback)getFFmpegSessionCompleteCallback;
+
+/**
+ * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results for FFprobe sessions.
+ *
+ * @param ffprobeSessionCompleteCallback complete callback or nil to disable a previously defined callback
+ */
++ (void)enableFFprobeSessionCompleteCallback:(FFprobeSessionCompleteCallback)ffprobeSessionCompleteCallback;
+
+/**
+ * <p>Returns the global FFprobeSessionCompleteCallback set.
+ *
+ * @return global FFprobeSessionCompleteCallback or nil if it is not set
+ */
++ (FFprobeSessionCompleteCallback)getFFprobeSessionCompleteCallback;
+
+/**
+ * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution results for MediaInformation sessions.
+ *
+ * @param mediaInformationSessionCompleteCallback complete callback or nil to disable a previously defined
+ * callback
+ */
++ (void)enableMediaInformationSessionCompleteCallback:(MediaInformationSessionCompleteCallback)mediaInformationSessionCompleteCallback;
+
+/**
+ * <p>Returns the global MediaInformationSessionCompleteCallback set.
+ *
+ * @return global MediaInformationSessionCompleteCallback or nil if it is not set
+ */
++ (MediaInformationSessionCompleteCallback)getMediaInformationSessionCompleteCallback;
 
 /**
  * Returns the current log level.
@@ -366,6 +394,13 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @return all FFprobe sessions in the session history
  */
 + (NSArray*)getFFprobeSessions;
+
+/**
+ * <p>Returns all MediaInformation sessions in the session history.
+ *
+ * @return all MediaInformation sessions in the session history
+ */
++ (NSArray*)getMediaInformationSessions;
 
 /**
  * <p>Returns sessions that have the given state.

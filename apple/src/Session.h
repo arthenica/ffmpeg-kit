@@ -21,7 +21,6 @@
 #define FFMPEG_KIT_SESSION_H
 
 #import <Foundation/Foundation.h>
-#import "ExecuteCallback.h"
 #import "Log.h"
 #import "LogCallback.h"
 #import "LogRedirectionStrategy.h"
@@ -34,13 +33,6 @@
 @protocol Session
 
 @required
-
-/**
- * Returns the session specific execute callback.
- *
- * @return session specific execute callback
- */
-- (ExecuteCallback)getExecuteCallback;
 
 /**
  * Returns the session specific log callback.
@@ -171,7 +163,7 @@
  * that end with SessionStateCompleted state. If a session is not started, still running or failed then
  * this method returns nil.
  *
- * @return the return code for this session if the session is completed, nil if session is
+ * @return the return code for this session if the session has completed, nil if session is
  * not started, still running or failed
  */
 - (ReturnCode*)getReturnCode;
@@ -205,6 +197,9 @@
 
 /**
  * Adds a new log entry for this session.
+ *
+ * It is invoked internally by <code>FFmpegKit</code> library methods. Must not be used by user
+ * applications.
  *
  * @param log log entry
  */
@@ -242,6 +237,13 @@
  * @return true if it is an <code>FFprobe</code> session, false otherwise
  */
 - (BOOL)isFFprobe;
+
+/**
+ * Returns whether it is a <code>MediaInformation</code> session or not.
+ *
+ * @return true if it is a <code>MediaInformation</code> session, false otherwise
+ */
+- (BOOL)isMediaInformation;
 
 /**
  * Cancels running the session.

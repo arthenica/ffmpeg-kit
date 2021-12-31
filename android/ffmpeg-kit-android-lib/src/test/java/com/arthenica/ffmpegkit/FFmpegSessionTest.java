@@ -32,8 +32,8 @@ public class FFmpegSessionTest {
     public void constructorTest() {
         FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS);
 
-        // 1. getExecuteCallback
-        Assert.assertNull(ffmpegSession.getExecuteCallback());
+        // 1. getCompleteCallback
+        Assert.assertNull(ffmpegSession.getCompleteCallback());
 
         // 2. getLogCallback
         Assert.assertNull(ffmpegSession.getLogCallback());
@@ -93,17 +93,17 @@ public class FFmpegSessionTest {
 
     @Test
     public void constructorTest2() {
-        ExecuteCallback executeCallback = new ExecuteCallback() {
+        FFmpegSessionCompleteCallback completeCallback = new FFmpegSessionCompleteCallback() {
 
             @Override
-            public void apply(Session session) {
+            public void apply(FFmpegSession session) {
             }
         };
 
-        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, executeCallback);
+        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, completeCallback);
 
-        // 1. getExecuteCallback
-        Assert.assertEquals(ffmpegSession.getExecuteCallback(), executeCallback);
+        // 1. getCompleteCallback
+        Assert.assertEquals(ffmpegSession.getCompleteCallback(), completeCallback);
 
         // 2. getLogCallback
         Assert.assertNull(ffmpegSession.getLogCallback());
@@ -163,10 +163,10 @@ public class FFmpegSessionTest {
 
     @Test
     public void constructorTest3() {
-        ExecuteCallback executeCallback = new ExecuteCallback() {
+        FFmpegSessionCompleteCallback completeCallback = new FFmpegSessionCompleteCallback() {
 
             @Override
-            public void apply(Session session) {
+            public void apply(FFmpegSession session) {
             }
         };
 
@@ -184,10 +184,10 @@ public class FFmpegSessionTest {
             }
         };
 
-        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, executeCallback, logCallback, statisticsCallback);
+        FFmpegSession ffmpegSession = new FFmpegSession(TEST_ARGUMENTS, completeCallback, logCallback, statisticsCallback);
 
-        // 1. getExecuteCallback
-        Assert.assertEquals(ffmpegSession.getExecuteCallback(), executeCallback);
+        // 1. getCompleteCallback
+        Assert.assertEquals(ffmpegSession.getCompleteCallback(), completeCallback);
 
         // 2. getLogCallback
         Assert.assertEquals(ffmpegSession.getLogCallback(), logCallback);

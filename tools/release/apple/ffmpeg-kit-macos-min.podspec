@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-macos-min"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit macOS Min Static Framework"
+    s.summary           = "FFmpeg Kit macOS Min Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-min-VERSION-macos-framework.zip" }
 
-    s.osx.deployment_target = '10.11'
+    s.osx.deployment_target = '10.12'
     s.osx.frameworks    = 'AudioToolbox','AVFoundation','CoreAudio','CoreImage','CoreMedia','OpenCL','OpenGL','VideoToolbox'
     s.osx.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 

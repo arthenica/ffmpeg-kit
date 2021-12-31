@@ -12,7 +12,7 @@ overwrite_file "${BASEDIR}"/tools/patch/make/rubberband/rubberband.pc.in "${BASE
 ${SED_INLINE} 's/%DEPENDENCIES%/sndfile, samplerate/g' "${BASEDIR}"/src/"${LIB_NAME}"/rubberband.pc.in || return 1
 
 # ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
-autoreconf_library "${LIB_NAME}"
+autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \

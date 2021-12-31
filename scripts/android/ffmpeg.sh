@@ -6,9 +6,6 @@ if [ -z "${HOST_PKG_CONFIG_PATH}" ]; then
   exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-source "${BASEDIR}"/scripts/function-"${FFMPEG_KIT_BUILD_TYPE}".sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
-
 LIB_NAME="ffmpeg"
 
 echo -e "----------------------------------------------------------------" 1>>"${BASEDIR}"/build.log 2>&1
@@ -32,7 +29,7 @@ export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
 export LDFLAGS=$(get_ldflags "${LIB_NAME}")
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # SET BUILD OPTIONS
 TARGET_CPU=""
@@ -72,9 +69,9 @@ CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
 # SET CONFIGURE OPTIONS
-for library in {1..58}; do
-  if [[ ${!library} -eq 1 ]]; then
-    ENABLED_LIBRARY=$(get_library_name $((library - 1)))
+for library in {0..61}; do
+  if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+    ENABLED_LIBRARY=$(get_library_name ${library})
 
     echo -e "INFO: Enabling library ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -161,7 +158,7 @@ for library in {1..58}; do
     libvidstab)
       CFLAGS+=" $(pkg-config --cflags vidstab 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static vidstab 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libvidstab"
       ;;
     libvorbis)
       CFLAGS+=" $(pkg-config --cflags vorbis 2>>"${BASEDIR}"/build.log)"
@@ -194,6 +191,11 @@ for library in {1..58}; do
       LDFLAGS+=" $(pkg-config --libs --static openh264 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libopenh264"
       ;;
+    openssl)
+      CFLAGS+=" $(pkg-config --cflags openssl 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static openssl 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-openssl"
+      ;;
     opus)
       CFLAGS+=" $(pkg-config --cflags opus 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static opus 2>>"${BASEDIR}"/build.log)"
@@ -202,7 +204,7 @@ for library in {1..58}; do
     rubberband)
       CFLAGS+=" $(pkg-config --cflags rubberband 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static rubberband 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-librubberband"
       ;;
     sdl)
       CFLAGS+=" $(pkg-config --cflags sdl2 2>>"${BASEDIR}"/build.log)"
@@ -229,6 +231,11 @@ for library in {1..58}; do
       LDFLAGS+=" $(pkg-config --libs --static speex 2>>"${BASEDIR}"/build.log)"
       CONFIGURE_POSTFIX+=" --enable-libspeex"
       ;;
+    srt)
+      CFLAGS+=" $(pkg-config --cflags srt 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static srt 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libsrt"
+      ;;
     tesseract)
       CFLAGS+=" $(pkg-config --cflags tesseract 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static tesseract 2>>"${BASEDIR}"/build.log)"
@@ -249,17 +256,22 @@ for library in {1..58}; do
     x264)
       CFLAGS+=" $(pkg-config --cflags x264 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static x264 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libx264"
       ;;
     x265)
       CFLAGS+=" $(pkg-config --cflags x265 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static x265 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libx265"
       ;;
     xvidcore)
       CFLAGS+=" $(pkg-config --cflags xvidcore 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static xvidcore 2>>"${BASEDIR}"/build.log)"
-      CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+      CONFIGURE_POSTFIX+=" --enable-libxvid"
+      ;;
+    zimg)
+      CFLAGS+=" $(pkg-config --cflags zimg 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static zimg 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-libzimg"
       ;;
     expat)
       CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
@@ -296,15 +308,35 @@ for library in {1..58}; do
 
     # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
     # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
-    if [[ ${library} -eq $((LIBRARY_SDL + 1)) ]]; then
+    if [[ ${library} -eq ${LIBRARY_SDL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-sdl2"
-    elif [[ ${library} -eq $((LIBRARY_ANDROID_ZLIB + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_ANDROID_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
-    elif [[ ${library} -eq $((LIBRARY_ANDROID_MEDIA_CODEC + 1)) ]]; then
+    elif [[ ${library} -eq ${LIBRARY_ANDROID_MEDIA_CODEC} ]]; then
       CONFIGURE_POSTFIX+=" --disable-mediacodec"
+    elif [[ ${library} -eq ${LIBRARY_OPENSSL} ]]; then
+      CONFIGURE_POSTFIX+=" --disable-openssl"
     fi
   fi
 done
+
+# SET CONFIGURE OPTIONS FOR CUSTOM LIBRARIES
+for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+  library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+  pc_file_name="CUSTOM_LIBRARY_${custom_library_index}_PACKAGE_CONFIG_FILE_NAME"
+  ffmpeg_flag_name="CUSTOM_LIBRARY_${custom_library_index}_FFMPEG_ENABLE_FLAG"
+
+  echo -e "INFO: Enabling custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  CFLAGS+=" $(pkg-config --cflags ${!pc_file_name} 2>>"${BASEDIR}"/build.log)"
+  LDFLAGS+=" $(pkg-config --libs --static ${!pc_file_name} 2>>"${BASEDIR}"/build.log)"
+  CONFIGURE_POSTFIX+=" --enable-${!ffmpeg_flag_name}"
+done
+
+# SET ENABLE GPL FLAG WHEN REQUESTED
+if [ "$GPL_ENABLED" == "yes" ]; then
+  CONFIGURE_POSTFIX+=" --enable-gpl"
+fi
 
 export LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
@@ -341,6 +373,13 @@ echo -n -e "\n${LIB_NAME}: "
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
   echo -e "INFO: Cleaning workspace for ${LIB_NAME}\n" 1>>"${BASEDIR}"/build.log 2>&1
   make distclean 2>/dev/null 1>/dev/null
+
+  # WORKAROUND TO MANUALLY DELETE UNCLEANED FILES
+  rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavfilter/opencl/*.o 1>>"${BASEDIR}"/build.log 2>&1
+  rm -f "${BASEDIR}"/src/"${LIB_NAME}"/libavcodec/neon/*.o 1>>"${BASEDIR}"/build.log 2>&1
+
+  # DELETE SHARED FRAMEWORK WORKAROUNDS
+  git checkout "${BASEDIR}/src/ffmpeg/ffbuild" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
 # UPDATE BUILD FLAGS
@@ -350,19 +389,19 @@ export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
 ulimit -n 2048 1>>"${BASEDIR}"/build.log 2>&1
 
 ########################### CUSTOMIZATIONS #######################
-cd "${BASEDIR}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+cd "${BASEDIR}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 git checkout android/ffmpeg-kit-android-lib/src/main/cpp/ffmpegkit.c 1>>"${BASEDIR}"/build.log 2>&1
-cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 git checkout libavformat/file.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavformat/protocols.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavutil 1>>"${BASEDIR}"/build.log 2>&1
 
 # 1. Use thread local log levels
-${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/"${LIB_NAME}"/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/"${LIB_NAME}"/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # 2. Set friendly ffmpeg version
 FFMPEG_VERSION="v$(get_user_friendly_ffmpeg_version)"
-${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # 3. Enable ffmpeg-kit protocols
 if [[ ${NO_FFMPEG_KIT_PROTOCOLS} == "1" ]]; then
@@ -373,7 +412,7 @@ else
   cat ../../tools/protocols/libavutil_file.h >> libavutil/file.h
   cat ../../tools/protocols/libavutil_file.c >> libavutil/file.c
   awk '{gsub(/ff_file_protocol;/,"ff_file_protocol;\nextern const URLProtocol ff_saf_protocol;")}1' libavformat/protocols.c > libavformat/protocols.c.tmp
-  awk '{gsub(/ff_file_protocol;/,"ff_file_protocol;\nextern const URLProtocol ff_fd_protocol;")}1' libavformat/protocols.c.tmp > libavformat/protocols.c
+  cat libavformat/protocols.c.tmp > libavformat/protocols.c
   echo -e "\nINFO: Enabled custom ffmpeg-kit protocols\n" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
@@ -387,25 +426,27 @@ fi
   --enable-version3 \
   --arch="${TARGET_ARCH}" \
   --cpu="${TARGET_CPU}" \
+  --target-os=android \
+  ${ASM_OPTIONS} \
+  --ar="${AR}" \
   --cc="${CC}" \
   --cxx="${CXX}" \
   --ranlib="${RANLIB}" \
   --strip="${STRIP}" \
   --nm="${NM}" \
   --extra-libs="$(pkg-config --libs --static cpu-features)" \
-  --target-os=android \
-  ${ASM_OPTIONS} \
+  --disable-autodetect \
   --enable-cross-compile \
   --enable-pic \
   --enable-jni \
   --enable-optimizations \
   --enable-swscale \
   ${BUILD_LIBRARY_OPTIONS} \
+  --enable-pthreads \
   --enable-v4l2-m2m \
   --disable-outdev=fbdev \
   --disable-indev=fbdev \
   ${SIZE_OPTIONS} \
-  --disable-openssl \
   --disable-xmm-clobber-test \
   ${DEBUG_OPTIONS} \
   --disable-neon-clobber-test \
@@ -462,7 +503,7 @@ fi
 
 # DELETE THE PREVIOUS BUILD OF THE LIBRARY BEFORE INSTALLING
 if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
-  rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 make install 1>>"${BASEDIR}"/build.log 2>&1
 

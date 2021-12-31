@@ -49,9 +49,15 @@ public class MediaInformation {
      */
     private final List<StreamInformation> streams;
 
-    public MediaInformation(final JSONObject jsonObject, final List<StreamInformation> streams) {
+    /**
+     * Stores chapters.
+     */
+    private final List<Chapter> chapters;
+
+    public MediaInformation(final JSONObject jsonObject, final List<StreamInformation> streams, final List<Chapter> chapters) {
         this.jsonObject = jsonObject;
         this.streams = streams;
+        this.chapters = chapters;
     }
 
     /**
@@ -133,6 +139,15 @@ public class MediaInformation {
      */
     public List<StreamInformation> getStreams() {
         return streams;
+    }
+
+    /**
+     * Returns all chapters.
+     *
+     * @return list of chapters
+     */
+    public List<Chapter> getChapters() {
+        return chapters;
     }
 
     /**

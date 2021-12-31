@@ -17,13 +17,13 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "ExecuteCallback.h"
+#import "MediaInformationSession.h"
 #import "LogCallback.h"
 #import "MediaInformation.h"
-#import "MediaInformationSession.h"
 
 @implementation MediaInformationSession {
     MediaInformation* _mediaInformation;
+    MediaInformationSessionCompleteCallback _completeCallback;
 }
 
 + (void)initialize {
@@ -32,21 +32,33 @@
 
 - (instancetype)init:(NSArray*)arguments {
 
-    self = [super init:arguments withExecuteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+
+    if (self) {
+        _completeCallback = nil;
+    }
 
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+
+    if (self) {
+        _completeCallback = completeCallback;
+    }
 
     return self;
 }
 
-- (instancetype)init:(NSArray*)arguments withExecuteCallback:(ExecuteCallback)executeCallback withLogCallback:(LogCallback)logCallback {
+- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
 
-    self = [super init:arguments withExecuteCallback:executeCallback withLogCallback:logCallback withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+
+    if (self) {
+        _completeCallback = completeCallback;
+    }
 
     return self;
 }
@@ -57,6 +69,22 @@
 
 - (void)setMediaInformation:(MediaInformation*)mediaInformation {
     _mediaInformation = mediaInformation;
+}
+
+- (MediaInformationSessionCompleteCallback)getCompleteCallback {
+    return _completeCallback;
+}
+
+- (BOOL)isFFmpeg {
+    return false;
+}
+
+- (BOOL)isFFprobe {
+    return false;
+}
+
+- (BOOL)isMediaInformation {
+    return true;
 }
 
 @end

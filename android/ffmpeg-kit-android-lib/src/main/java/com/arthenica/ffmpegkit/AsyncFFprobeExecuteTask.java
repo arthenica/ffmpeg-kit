@@ -19,29 +19,41 @@
 
 package com.arthenica.ffmpegkit;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 /**
  * <p>Executes an FFprobe session asynchronously.
  */
 public class AsyncFFprobeExecuteTask implements Runnable {
     private final FFprobeSession ffprobeSession;
-    private final ExecuteCallback executeCallback;
+    private final FFprobeSessionCompleteCallback completeCallback;
 
     public AsyncFFprobeExecuteTask(final FFprobeSession ffprobeSession) {
         this.ffprobeSession = ffprobeSession;
-        this.executeCallback = ffprobeSession.getExecuteCallback();
+        this.completeCallback = ffprobeSession.getCompleteCallback();
     }
 
     @Override
     public void run() {
         FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(ffprobeSession);
+        if (completeCallback != null) {
+            try {
+                // NOTIFY SESSION CALLBACK DEFINED
+                completeCallback.apply(ffprobeSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside session complete callback.%s", Exceptions.getStackTraceString(e)));
+            }
         }
 
-        if (executeCallback != null) {
-            executeCallback.apply(ffprobeSession);
+        final FFprobeSessionCompleteCallback globalFFprobeSessionCompleteCallback = FFmpegKitConfig.getFFprobeSessionCompleteCallback();
+        if (globalFFprobeSessionCompleteCallback != null) {
+            try {
+                // NOTIFY GLOBAL CALLBACK DEFINED
+                globalFFprobeSessionCompleteCallback.apply(ffprobeSession);
+            } catch (final Exception e) {
+                android.util.Log.e(FFmpegKitConfig.TAG, String.format("Exception thrown inside global complete callback.%s", Exceptions.getStackTraceString(e)));
+            }
         }
     }
 

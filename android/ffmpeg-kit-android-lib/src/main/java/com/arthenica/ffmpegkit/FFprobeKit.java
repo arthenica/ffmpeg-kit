@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
- * <p>Main class to run <code>FFprobe</code> commands. Supports executing commands both synchronously and
- * asynchronously.
+ * <p>Main class to run <code>FFprobe</code> commands. Supports executing commands both
+ * synchronously and asynchronously.
  * <pre>
  * FFprobeSession session = FFprobeKit.execute("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4");
  *
- * FFprobeSession asyncSession = FFprobeKit.executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", executeCallback);
+ * FFprobeSession asyncSession = FFprobeKit.executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", completeCallback);
  * </pre>
  * <p>Provides overloaded <code>execute</code> methods to define session specific callbacks.
  * <pre>
- * FFprobeSession session = FFprobeKit.executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", executeCallback, logCallback);
+ * FFprobeSession session = FFprobeKit.executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", completeCallback, logCallback);
  * </pre>
  * <p>It can extract media information for a file or a url, using {@link #getMediaInformation(String)} method.
  * <pre>
@@ -53,12 +53,22 @@ public class FFprobeKit {
     }
 
     /**
+     * <p>Builds the default command used to get media information for a file.
+     *
+     * @param path file path to use in the command
+     * @return default command arguments to get media information
+     */
+    private static String[] defaultGetMediaInformationCommandArguments(final String path) {
+        return new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path};
+    }
+
+    /**
      * <p>Synchronously executes FFprobe with arguments provided.
      *
      * @param arguments FFprobe command options/arguments as string array
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession execute(final String[] arguments) {
+    public static FFprobeSession executeWithArguments(final String[] arguments) {
         final FFprobeSession session = new FFprobeSession(arguments);
 
         FFmpegKitConfig.ffprobeExecute(session);
@@ -69,16 +79,17 @@ public class FFprobeKit {
     /**
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param arguments       FFprobe command options/arguments as string array
-     * @param executeCallback callback that will be called when the execution is completed
+     * @param arguments        FFprobe command options/arguments as string array
+     * @param completeCallback callback that will be called when the execution has completed
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback) {
-        final FFprobeSession session = new FFprobeSession(arguments, executeCallback);
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final FFprobeSessionCompleteCallback completeCallback) {
+        final FFprobeSession session = new FFprobeSession(arguments, completeCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session);
 
@@ -88,18 +99,19 @@ public class FFprobeKit {
     /**
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param arguments       FFprobe command options/arguments as string array
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
+     * @param arguments        FFprobe command options/arguments as string array
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final LogCallback logCallback) {
-        final FFprobeSession session = new FFprobeSession(arguments, executeCallback, logCallback);
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final FFprobeSessionCompleteCallback completeCallback,
+                                                           final LogCallback logCallback) {
+        final FFprobeSession session = new FFprobeSession(arguments, completeCallback, logCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session);
 
@@ -109,18 +121,19 @@ public class FFprobeKit {
     /**
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param arguments       FFprobe command options/arguments as string array
-     * @param executeCallback callback that will be called when the execution is completed
-     * @param executorService executor service that will be used to run this asynchronous operation
+     * @param arguments        FFprobe command options/arguments as string array
+     * @param completeCallback callback that will be called when the execution has completed
+     * @param executorService  executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final ExecutorService executorService) {
-        final FFprobeSession session = new FFprobeSession(arguments, executeCallback);
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final FFprobeSessionCompleteCallback completeCallback,
+                                                           final ExecutorService executorService) {
+        final FFprobeSession session = new FFprobeSession(arguments, completeCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
 
@@ -130,20 +143,21 @@ public class FFprobeKit {
     /**
      * <p>Starts an asynchronous FFprobe execution with arguments provided.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param arguments       FFprobe command options/arguments as string array
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param executorService executor service that will be used to run this asynchronous operation
+     * @param arguments        FFprobe command options/arguments as string array
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param executorService  executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
-    public static FFprobeSession executeAsync(final String[] arguments,
-                                              final ExecuteCallback executeCallback,
-                                              final LogCallback logCallback,
-                                              final ExecutorService executorService) {
-        final FFprobeSession session = new FFprobeSession(arguments, executeCallback, logCallback);
+    public static FFprobeSession executeWithArgumentsAsync(final String[] arguments,
+                                                           final FFprobeSessionCompleteCallback completeCallback,
+                                                           final LogCallback logCallback,
+                                                           final ExecutorService executorService) {
+        final FFprobeSession session = new FFprobeSession(arguments, completeCallback, logCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
 
@@ -159,59 +173,65 @@ public class FFprobeKit {
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession execute(final String command) {
-        return execute(FFmpegKitConfig.parseArguments(command));
+        return executeWithArguments(FFmpegKitConfig.parseArguments(command));
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
-     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used
+     * to split the command into arguments. You can use single or double quote characters to
+     * specify arguments inside your command.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param command         FFprobe command
-     * @param executeCallback callback that will be called when the execution is completed
+     * @param command          FFprobe command
+     * @param completeCallback callback that will be called when the execution has completed
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession executeAsync(final String command,
-                                              final ExecuteCallback executeCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback);
+                                              final FFprobeSessionCompleteCallback completeCallback) {
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback);
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
-     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used
+     * to split the command into arguments. You can use single or double quote characters to
+     * specify arguments inside your command.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param command         FFprobe command
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
+     * @param command          FFprobe command
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession executeAsync(final String command,
-                                              final ExecuteCallback executeCallback,
+                                              final FFprobeSessionCompleteCallback completeCallback,
                                               final LogCallback logCallback) {
-        return executeAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
+        return executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback);
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
-     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used
+     * to split the command into arguments. You can use single or double quote characters to
+     * specify arguments inside your command.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param command         FFprobe command
-     * @param executeCallback callback that will be called when the execution is completed
-     * @param executorService executor service that will be used to run this asynchronous operation
+     * @param command          FFprobe command
+     * @param completeCallback callback that will be called when the execution has completed
+     * @param executorService  executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession executeAsync(final String command,
-                                              final ExecuteCallback executeCallback,
+                                              final FFprobeSessionCompleteCallback completeCallback,
                                               final ExecutorService executorService) {
-        final FFprobeSession session = new FFprobeSession(FFmpegKitConfig.parseArguments(command), executeCallback);
+        final FFprobeSession session = new FFprobeSession(FFmpegKitConfig.parseArguments(command), completeCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
 
@@ -219,23 +239,25 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
-     * into arguments. You can use single or double quote characters to specify arguments inside your command.
+     * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used
+     * to split the command into arguments. You can use single or double quote characters to
+     * specify arguments inside your command.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use an {@link FFprobeSessionCompleteCallback} if you want to be notified about the
+     * result.
      *
-     * @param command         FFprobe command
-     * @param executeCallback callback that will be called when the execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param executorService executor service that will be used to run this asynchronous operation
+     * @param command          FFprobe command
+     * @param completeCallback callback that will be called when the execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param executorService  executor service that will be used to run this asynchronous operation
      * @return FFprobe session created for this execution
      */
     public static FFprobeSession executeAsync(final String command,
-                                              final ExecuteCallback executeCallback,
+                                              final FFprobeSessionCompleteCallback completeCallback,
                                               final LogCallback logCallback,
                                               final ExecutorService executorService) {
-        final FFprobeSession session = new FFprobeSession(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
+        final FFprobeSession session = new FFprobeSession(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback);
 
         FFmpegKitConfig.asyncFFprobeExecute(session, executorService);
 
@@ -249,7 +271,7 @@ public class FFprobeKit {
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformation(final String path) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path});
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path));
 
         FFmpegKitConfig.getMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -265,7 +287,7 @@ public class FFprobeKit {
      */
     public static MediaInformationSession getMediaInformation(final String path,
                                                               final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path});
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path));
 
         FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
 
@@ -273,18 +295,20 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+     * <p>Starts an asynchronous FFprobe execution to extract the media information for the
+     * specified file.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param path            path or uri of a media file
-     * @param executeCallback callback that will be called when the execution is completed
+     * @param path             path or uri of a media file
+     * @param completeCallback callback that will be called when the execution has completed
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformationAsync(final String path,
-                                                                   final ExecuteCallback executeCallback) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback);
+                                                                   final MediaInformationSessionCompleteCallback completeCallback) {
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), completeCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -292,22 +316,24 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+     * <p>Starts an asynchronous FFprobe execution to extract the media information for the
+     * specified file.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param path            path or uri of a media file
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param waitTimeout     max time to wait until media information is transmitted
+     * @param path             path or uri of a media file
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param waitTimeout      max time to wait until media information is transmitted
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformationAsync(final String path,
-                                                                   final ExecuteCallback executeCallback,
+                                                                   final MediaInformationSessionCompleteCallback completeCallback,
                                                                    final LogCallback logCallback,
                                                                    final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback, logCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), completeCallback, logCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
 
@@ -315,20 +341,22 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+     * <p>Starts an asynchronous FFprobe execution to extract the media information for the
+     * specified file.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param path            path or uri of a media file
-     * @param executeCallback callback that will be called when the execution is completed
-     * @param executorService executor service that will be used to run this asynchronous operation
+     * @param path             path or uri of a media file
+     * @param completeCallback callback that will be called when the execution has completed
+     * @param executorService  executor service that will be used to run this asynchronous operation
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformationAsync(final String path,
-                                                                   final ExecuteCallback executeCallback,
+                                                                   final MediaInformationSessionCompleteCallback completeCallback,
                                                                    final ExecutorService executorService) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), completeCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, executorService, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
@@ -336,24 +364,26 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
+     * <p>Starts an asynchronous FFprobe execution to extract the media information for the
+     * specified file.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param path            path or uri of a media file
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param executorService executor service that will be used to run this asynchronous operation
-     * @param waitTimeout     max time to wait until media information is transmitted
+     * @param path             path or uri of a media file
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param executorService  executor service that will be used to run this asynchronous operation
+     * @param waitTimeout      max time to wait until media information is transmitted
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformationAsync(final String path,
-                                                                   final ExecuteCallback executeCallback,
+                                                                   final MediaInformationSessionCompleteCallback completeCallback,
                                                                    final LogCallback logCallback,
                                                                    final ExecutorService executorService,
                                                                    final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path}, executeCallback, logCallback);
+        final MediaInformationSession session = new MediaInformationSession(defaultGetMediaInformationCommandArguments(path), completeCallback, logCallback);
 
         FFmpegKitConfig.asyncGetMediaInformationExecute(session, executorService, waitTimeout);
 
@@ -361,7 +391,7 @@ public class FFprobeKit {
     }
 
     /**
-     * <p>Extracts media information using the command provided asynchronously.
+     * <p>Extracts media information using the command provided.
      *
      * @param command FFprobe command that prints media information for a file in JSON format
      * @return media information session created for this execution
@@ -369,52 +399,57 @@ public class FFprobeKit {
     public static MediaInformationSession getMediaInformationFromCommand(final String command) {
         final MediaInformationSession session = new MediaInformationSession(FFmpegKitConfig.parseArguments(command));
 
-        FFmpegKitConfig.asyncGetMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
+        FFmpegKitConfig.getMediaInformationExecute(session, AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT);
 
         return session;
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract media information using a command. The command passed to
-     * this method must generate the output in JSON format in order to successfully extract media information from it.
+     * <p>Starts an asynchronous FFprobe execution to extract media information using a command.
+     * The command passed to this method must generate the output in JSON format in order to
+     * successfully extract media information from it.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param command         FFprobe command that prints media information for a file in JSON format
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param waitTimeout     max time to wait until media information is transmitted
+     * @param command          FFprobe command that prints media information for a file in JSON
+     *                         format
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param waitTimeout      max time to wait until media information is transmitted
      * @return media information session created for this execution
      */
     public static MediaInformationSession getMediaInformationFromCommandAsync(final String command,
-                                                                              final ExecuteCallback executeCallback,
+                                                                              final MediaInformationSessionCompleteCallback completeCallback,
                                                                               final LogCallback logCallback,
                                                                               final int waitTimeout) {
-        return getMediaInformationFromCommandArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, waitTimeout);
+        return getMediaInformationFromCommandArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, waitTimeout);
     }
 
     /**
-     * <p>Starts an asynchronous FFprobe execution to extract media information using command arguments. The command
-     * passed to this method must generate the output in JSON format in order to successfully extract media information
-     * from it.
+     * <p>Starts an asynchronous FFprobe execution to extract media information using command
+     * arguments. The command passed to this method must generate the output in JSON format in
+     * order to successfully extract media information from it.
      *
-     * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-     * {@jlink ExecuteCallback} if you want to be notified about the result.
+     * <p>Note that this method returns immediately and does not wait the execution to complete.
+     * You must use a {@link MediaInformationSessionCompleteCallback} if you want to be notified
+     * about the result.
      *
-     * @param arguments       FFprobe command arguments that print media information for a file in JSON format
-     * @param executeCallback callback that will be notified when execution is completed
-     * @param logCallback     callback that will receive logs
-     * @param waitTimeout     max time to wait until media information is transmitted
+     * @param arguments        FFprobe command arguments that print media information for a file in
+     *                         JSON format
+     * @param completeCallback callback that will be notified when execution has completed
+     * @param logCallback      callback that will receive logs
+     * @param waitTimeout      max time to wait until media information is transmitted
      * @return media information session created for this execution
      */
     private static MediaInformationSession getMediaInformationFromCommandArgumentsAsync(final String[] arguments,
-                                                                                        final ExecuteCallback executeCallback,
+                                                                                        final MediaInformationSessionCompleteCallback completeCallback,
                                                                                         final LogCallback logCallback,
                                                                                         final int waitTimeout) {
-        final MediaInformationSession session = new MediaInformationSession(arguments, executeCallback, logCallback);
+        final MediaInformationSession session = new MediaInformationSession(arguments, completeCallback, logCallback);
 
-        FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
+        FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
 
         return session;
     }
@@ -424,8 +459,17 @@ public class FFprobeKit {
      *
      * @return all FFprobe sessions in the session history
      */
-    public static List<FFprobeSession> listSessions() {
+    public static List<FFprobeSession> listFFprobeSessions() {
         return FFmpegKitConfig.getFFprobeSessions();
+    }
+
+    /**
+     * <p>Lists all MediaInformation sessions in the session history.
+     *
+     * @return all MediaInformation sessions in the session history
+     */
+    public static List<MediaInformationSession> listMediaInformationSessions() {
+        return FFmpegKitConfig.getMediaInformationSessions();
     }
 
 }

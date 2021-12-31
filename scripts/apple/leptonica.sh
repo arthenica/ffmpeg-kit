@@ -17,7 +17,7 @@ export LIBTIFF_CFLAGS="$(pkg-config --cflags libtiff-4)"
 export LIBTIFF_LIBS="$(pkg-config --libs --static libtiff-4)"
 
 export ZLIB_CFLAGS="$(pkg-config --cflags zlib)"
-export ZLIB_LIBS="$(pkg-config --libs --static zlib)"
+export ZLIB_LIBS="$(pkg-config --libs zlib)"
 
 export JPEG_CFLAGS="$(pkg-config --cflags libjpeg)"
 export JPEG_LIBS="$(pkg-config --libs --static libjpeg)"
@@ -27,7 +27,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 # REGENERATE BUILD FILES IF NECESSARY OR REQUESTED
 if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_leptonica} -eq 1 ]]; then
-  autoreconf_library "${LIB_NAME}"
+  autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
 ./configure \

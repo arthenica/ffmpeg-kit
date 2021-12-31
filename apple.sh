@@ -12,14 +12,11 @@ enable_default_architecture_variants() {
 display_help() {
   COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
-  echo -e "\n'$COMMAND' combines FFmpegKit frameworks created for apple architecture variants in an xcframework. \
+  echo -e "\n'$COMMAND' combines FFmpegKit frameworks created for Apple architecture variants in an xcframework. \
 It uses frameworks created under the prebuilt folder for iOS, tvOS and macOS architecture variants (iphoneos, \
 iphonesimulator, mac-catalyst, appletvos, appletvsimulator, macosx) as input and builds an umbrella xcframework under \
-the prebuilt folder.\n\n\
-Additional options can be specified to disable architectures or to build xcframeworks for external libraries as well.\
-\n\nPlease note that this script is only responsible of packaging existing frameworks, created by 'ios.sh', 'tvos.sh' \
-and 'macos.sh'. Running it will not compile any of these libraries again. Enabling an external library means building \
-an xcframework for that library. It does not guarantee that ffmpeg has support for it. Top level build scripts \
+the prebuilt folder.\n\nPlease note that this script is only responsible of packaging existing frameworks, created by \
+'ios.sh', 'tvos.sh' and 'macos.sh'. Running it will not compile any of these libraries again. Top level build scripts \
 ('ios.sh', 'tvos.sh', 'macos.sh') must be used to build ffmpeg with support for a specific external library first. \
 After that this script should be used to create an umbrella xcframework.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
@@ -29,10 +26,7 @@ After that this script should be used to create an umbrella xcframework.\n"
   echo -e "  -h, --help\t\t\tdisplay this help and exit"
   echo -e "  -v, --version\t\t\tdisplay version information and exit"
   echo -e "  -f, --force\t\t\tignore warnings"
-  echo -e "  -l, --lts\t\t\tinclude lts packages to support iOS 9.3+, tvOS 9.2+, macOS 10.11+ devices\n"
-
-  echo -e "Licensing options:"
-  echo -e "  --enable-gpl\t\t\tallow building umbrella xcframeworks for GPL libraries[no]\n"
+  echo -e "  -l, --lts\t\t\tinclude lts packages to support iOS 10+, tvOS 10+, macOS 10.12+ devices\n"
 
   echo -e "Architectures:"
   echo -e "  --disable-iphoneos\t\tdo not include iphoneos architecture variant [yes]"
@@ -41,44 +35,6 @@ After that this script should be used to create an umbrella xcframework.\n"
   echo -e "  --disable-appletvos\t\tdo not include appletvos architecture variant [yes]"
   echo -e "  --disable-appletvsimulator\tdo not include appletvsimulator architecture variant [yes]"
   echo -e "  --disable-macosx\t\tdo not include macosx architecture variant [yes]\n"
-
-  echo -e "Libraries:"
-  echo -e "  --full\t\t\tbuilds umbrella xcframeworks all non-GPL external libraries"
-  echo -e "  --enable-chromaprint\t\tbuild umbrella xcframework for chromaprint [no]"
-  echo -e "  --enable-dav1d\t\tbuild umbrella xcframework for dav1d [no]"
-  echo -e "  --enable-fontconfig\t\tbuild umbrella xcframework for fontconfig [no]"
-  echo -e "  --enable-freetype\t\tbuild umbrella xcframework for freetype [no]"
-  echo -e "  --enable-fribidi\t\tbuild umbrella xcframework for fribidi [no]"
-  echo -e "  --enable-gmp\t\t\tbuild umbrella xcframework for gmp [no]"
-  echo -e "  --enable-gnutls\t\tbuild umbrella xcframework for gnutls [no]"
-  echo -e "  --enable-kvazaar\t\tbuild umbrella xcframework for kvazaar [no]"
-  echo -e "  --enable-lame\t\t\tbuild umbrella xcframework for lame [no]"
-  echo -e "  --enable-libaom\t\tbuild umbrella xcframework for libaom [no]"
-  echo -e "  --enable-libass\t\tbuild umbrella xcframework for libass [no]"
-  echo -e "  --enable-libilbc\t\tbuild umbrella xcframework for libilbc [no]"
-  echo -e "  --enable-libtheora\t\tbuild umbrella xcframework for libtheora [no]"
-  echo -e "  --enable-libvorbis\t\tbuild umbrella xcframework for libvorbis [no]"
-  echo -e "  --enable-libvpx\t\tbuild umbrella xcframework for libvpx [no]"
-  echo -e "  --enable-libwebp\t\tbuild umbrella xcframework for libwebp [no]"
-  echo -e "  --enable-libxml2\t\tbuild umbrella xcframework for libxml2 [no]"
-  echo -e "  --enable-opencore-amr\t\tbuild umbrella xcframework for opencore-amr [no]"
-  echo -e "  --enable-openh264\t\tbuild umbrella xcframework for openh264 [no]"
-  echo -e "  --enable-opus\t\t\tbuild umbrella xcframework for opus [no]"
-  echo -e "  --enable-sdl\t\t\tbuild umbrella xcframework for sdl [no]"
-  echo -e "  --enable-shine\t\tbuild umbrella xcframework for shine [no]"
-  echo -e "  --enable-snappy\t\tbuild umbrella xcframework for snappy [no]"
-  echo -e "  --enable-soxr\t\t\tbuild umbrella xcframework for soxr [no]"
-  echo -e "  --enable-speex\t\tbuild umbrella xcframework for speex [no]"
-  echo -e "  --enable-tesseract\t\tbuild umbrella xcframework for tesseract [no]"
-  echo -e "  --enable-twolame\t\tbuild umbrella xcframework for twolame [no]"
-  echo -e "  --enable-vo-amrwbenc\t\tbuild umbrella xcframework for vo-amrwbenc [no]\n"
-
-  echo -e "GPL libraries:"
-  echo -e "  --enable-libvidstab\t\tbuild umbrella xcframework for libvidstab [no]"
-  echo -e "  --enable-rubberband\t\tbuild umbrella xcframework for rubber band [no]"
-  echo -e "  --enable-x264\t\t\tbuild umbrella xcframework for x264 [no]"
-  echo -e "  --enable-x265\t\t\tbuild umbrella xcframework for x265 [no]"
-  echo -e "  --enable-xvidcore\t\tbuild umbrella xcframework for xvidcore [no]\n"
 }
 
 initialize_prebuilt_umbrella_xcframework_folders() {
@@ -219,17 +175,6 @@ while [ ! $# -eq 0 ]; do
   -f | --force)
     export BUILD_FORCE="1"
     ;;
-  --full)
-    BUILD_FULL="1"
-    ;;
-  --enable-gpl)
-    GPL_ENABLED="yes"
-    ;;
-  --enable-*)
-    ENABLED_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
-
-    enable_library "${ENABLED_LIBRARY}"
-    ;;
   --disable-*)
     DISABLED_ARCH_VARIANT=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 
@@ -241,19 +186,6 @@ while [ ! $# -eq 0 ]; do
   esac
   shift
 done
-
-# PROCESS FULL OPTION AS LAST OPTION
-if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..58}; do
-    if [ ${GPL_ENABLED} == "yes" ]; then
-      set_library "$(get_library_name "$library")" 1
-    else
-      if [[ $(is_gpl_licensed "$library") -eq 1 ]]; then
-        set_library "$(get_library_name "$library")" 1
-      fi
-    fi
-  done
-fi
 
 # IF HELP DISPLAYED EXIT
 if [[ -n ${DISPLAY_HELP} ]]; then
@@ -270,19 +202,6 @@ print_enabled_architecture_variants
 print_enabled_xcframeworks
 
 echo ""
-
-# VALIDATE GPL FLAGS
-for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
-  if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
-    library_name=$(get_library_name "${gpl_library}")
-
-    if [ ${GPL_ENABLED} != "yes" ]; then
-      echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
-      echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" 1>>"${BASEDIR}"/build.log 2>&1
-      exit 1
-    fi
-  fi
-done
 
 # THIS WILL SAVE ARCHITECTURE VARIANTS TO BE INCLUDED
 TARGET_ARCHITECTURE_VARIANT_INDEX_ARRAY=()
@@ -308,45 +227,6 @@ if [[ -n ${TARGET_ARCHITECTURE_VARIANT_INDEX_ARRAY[0]} ]]; then
 
   # INITIALIZE TARGET FOLDERS
   initialize_prebuilt_umbrella_xcframework_folders
-
-  # BUILD XCFRAMEWORKS FOR ENABLED LIBRARIES ON ENABLED ARCHITECTURE VARIANTS
-  for library in {0..46}; do
-    if [[ ${ENABLED_LIBRARIES[${library}]} -eq 1 ]]; then
-
-      if [[ ${LIBRARY_LIBTHEORA} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libtheora"
-        create_umbrella_xcframework "libtheoraenc"
-        create_umbrella_xcframework "libtheoradec"
-
-      elif [[ ${LIBRARY_LIBVORBIS} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libvorbisfile"
-        create_umbrella_xcframework "libvorbisenc"
-        create_umbrella_xcframework "libvorbis"
-
-      elif [[ ${LIBRARY_LIBWEBP} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libwebpmux"
-        create_umbrella_xcframework "libwebpdemux"
-        create_umbrella_xcframework "libwebp"
-
-      elif [[ ${LIBRARY_OPENCOREAMR} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libopencore-amrnb"
-
-      elif [[ ${LIBRARY_NETTLE} == "${library}" ]]; then
-
-        create_umbrella_xcframework "libnettle"
-        create_umbrella_xcframework "libhogweed"
-
-      else
-
-        create_umbrella_xcframework "$(get_static_archive_name "${library}")"
-
-      fi
-    fi
-  done
 
   for FFMPEG_LIB in "${FFMPEG_LIBS[@]}"; do
     create_umbrella_xcframework "${FFMPEG_LIB}"

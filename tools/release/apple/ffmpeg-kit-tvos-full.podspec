@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
     s.name              = "ffmpeg-kit-tvos-full"
     s.version           = "VERSION"
-    s.summary           = "FFmpeg Kit tvOS Full Static Framework"
+    s.summary           = "FFmpeg Kit tvOS Full Shared Framework"
     s.description       = <<-DESC
     DESCRIPTION
     DESC
@@ -17,8 +17,8 @@ Pod::Spec.new do |s|
 
     s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-full-VERSION-tvos-framework.zip" }
 
-    s.tvos.deployment_target = '9.2'
+    s.tvos.deployment_target = '10.0'
     s.tvos.frameworks   = 'AudioToolbox','VideoToolbox','CoreMedia'
-    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'dav1d.framework', 'expat.framework', 'fontconfig.framework', 'freetype.framework', 'fribidi.framework', 'giflib.framework', 'gmp.framework', 'gnutls.framework', 'harfbuzz.framework', 'jpeg.framework', 'kvazaar.framework', 'lame.framework', 'libass.framework', 'libhogweed.framework', 'libilbc.framework', 'libnettle.framework', 'libogg.framework', 'libopencore-amrnb.framework', 'libpng.framework', 'libsndfile.framework', 'libtheora.framework', 'libtheoradec.framework', 'libtheoraenc.framework', 'libvorbis.framework', 'libvorbisenc.framework', 'libvorbisfile.framework', 'libvpx.framework', 'libwebp.framework', 'libwebpmux.framework', 'libwebpdemux.framework', 'libxml2.framework', 'opus.framework', 'shine.framework', 'snappy.framework', 'soxr.framework', 'speex.framework', 'tiff.framework', 'twolame.framework', 'vo-amrwbenc.framework'
+    s.tvos.vendored_frameworks = 'ffmpegkit.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

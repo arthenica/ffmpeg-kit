@@ -12,14 +12,6 @@ export HOGWEED_LIBS="-L${LIB_INSTALL_BASE}/nettle/lib -lhogweed -L${LIB_INSTALL_
 export GMP_CFLAGS="-I${LIB_INSTALL_BASE}/gmp/include"
 export GMP_LIBS="-L${LIB_INSTALL_BASE}/gmp/lib -lgmp"
 
-# SET BUILD OPTIONS
-case ${ARCH} in
-i386)
-  # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
-  export CFLAGS+=" -D__thread="
-  ;;
-esac
-
 # ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
 
@@ -56,4 +48,8 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.15.1" || return 1
+if [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+  create_gnutls_package_config "3.6.15.1" "-framework Security" || return 1
+else
+  create_gnutls_package_config "3.6.15.1" || return 1
+fi

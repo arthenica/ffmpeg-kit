@@ -9,7 +9,7 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_libvorbis}
   # -mno-ieee-fp OPTION IS NOT COMPATIBLE WITH clang. REMOVING IT
   ${SED_INLINE} 's/\-mno-ieee-fp//g' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac || return 1
 
-  autoreconf_library "${LIB_NAME}"
+  autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
 PKG_CONFIG= ./configure \

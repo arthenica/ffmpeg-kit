@@ -211,7 +211,7 @@ public class StreamInformation {
     /**
      * Returns all tags.
      *
-     * @return tags dictionary
+     * @return tags object
      */
     public JSONObject getTags() {
         return getProperties(KEY_TAGS);
