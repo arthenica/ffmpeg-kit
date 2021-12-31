@@ -330,16 +330,10 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
         'ffmpegKitConfigSelectDocumentForWrite() has not been implemented!');
   }
 
-  Future<String?> ffmpegKitConfigGetSafParameterForRead(
-      String uriString) async {
+  Future<String?> ffmpegKitConfigGetSafParameter(
+      String uriString, String openMode) async {
     throw UnimplementedError(
-        'ffmpegKitConfigGetSafParameterForRead() has not been implemented!');
-  }
-
-  Future<String?> ffmpegKitConfigGetSafParameterForWrite(
-      String uriString) async {
-    throw UnimplementedError(
-        'ffmpegKitConfigGetSafParameterForWrite() has not been implemented!');
+        'ffmpegKitConfigGetSafParameter() has not been implemented!');
   }
 
   // FFmpegKitFlutterInitializer

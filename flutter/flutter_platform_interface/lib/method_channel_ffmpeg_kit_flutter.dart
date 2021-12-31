@@ -302,16 +302,10 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       });
 
   @override
-  Future<String?> ffmpegKitConfigGetSafParameterForRead(
-          String uriString) async =>
+  Future<String?> ffmpegKitConfigGetSafParameter(
+          String uriString, String openMode) async =>
       _channel.invokeMethod<String>(
-          'getSafParameter', {'writable': false, 'uri': uriString});
-
-  @override
-  Future<String?> ffmpegKitConfigGetSafParameterForWrite(
-          String uriString) async =>
-      _channel.invokeMethod<String>(
-          'getSafParameter', {'writable': true, 'uri': uriString});
+          'getSafParameter', {'uri': uriString, 'openMode': openMode});
 
   // FFmpegKitFlutterInitializer
 

@@ -600,10 +600,11 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 break;
             case "getSafParameter":
                 final String uri = call.argument("uri");
-                if (writable != null && uri != null) {
-                    getSafParameter(writable, uri, result);
+                final String openMode = call.argument("openMode");
+                if (uri != null && openMode != null) {
+                    getSafParameter(uri, openMode, result);
                 } else if (uri != null) {
-                    resultHandler.errorAsync(result, "INVALID_WRITABLE", "Invalid writable value.");
+                    resultHandler.errorAsync(result, "INVALID_OPEN_MODE", "Invalid openMode value.");
                 } else {
                     resultHandler.errorAsync(result, "INVALID_URI", "Invalid uri value.");
                 }
@@ -1238,32 +1239,27 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         }
     }
 
-    protected void getSafParameter(@NonNull final Boolean writable, @NonNull final String uriString, @NonNull final Result result) {
+    protected void getSafParameter(@NonNull final String uriString, @NonNull final String openMode, @NonNull final Result result) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             android.util.Log.i(LIBRARY_NAME, String.format(Locale.getDefault(), "getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
-            resultHandler.errorAsync(result, "SELECT_FAILED", String.format(Locale.getDefault(), "getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
+            resultHandler.errorAsync(result, "GET_SAF_PARAMETER_FAILED", String.format(Locale.getDefault(), "getSafParameter is not supported on API Level %d", Build.VERSION.SDK_INT));
             return;
         }
 
         if (context != null) {
             final Uri uri = Uri.parse(uriString);
             if (uri == null) {
-                Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters writable: %s, uriString: %s. Uri string cannot be parsed.", writable, uriString));
+                Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters uriString: %s, openMode: %s. Uri string cannot be parsed.", uriString, openMode));
                 resultHandler.errorAsync(result, "GET_SAF_PARAMETER_FAILED", "Uri string cannot be parsed.");
             } else {
-                final String safParameter;
-                if (writable) {
-                    safParameter = FFmpegKitConfig.getSafParameterForWrite(context, uri);
-                } else {
-                    safParameter = FFmpegKitConfig.getSafParameterForRead(context, uri);
-                }
+                final String safParameter = FFmpegKitConfig.getSafParameter(context, uri, openMode);
 
-                Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters writable: %s, uriString: %s completed with saf parameter: %s.", writable, uriString, safParameter));
+                Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters uriString: %s, openMode: %s completed with saf parameter: %s.", uriString, openMode, safParameter));
 
                 resultHandler.successAsync(result, safParameter);
             }
         } else {
-            Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters writable: %s, uriString: %s. Context is null.", writable, uriString));
+            Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters uriString: %s, openMode: %s. Context is null.", uriString, openMode));
             resultHandler.errorAsync(result, "INVALID_CONTEXT", "Context is null.");
         }
     }
