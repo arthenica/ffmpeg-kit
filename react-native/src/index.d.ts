@@ -74,9 +74,9 @@ declare module 'ffmpeg-kit-react-native' {
 
   export class FFmpegKit {
 
-    static execute(command: string, completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+    static execute(command: string): Promise<FFmpegSession>;
 
-    static executeWithArguments(commandArguments: string[], completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+    static executeWithArguments(commandArguments: string[]): Promise<FFmpegSession>;
 
     static executeAsync(command: string, completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
 
@@ -236,19 +236,19 @@ declare module 'ffmpeg-kit-react-native' {
 
   export class FFprobeKit {
 
-    static execute(command: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+    static execute(command: string): Promise<FFprobeSession>;
 
-    static executeWithArguments(commandArguments: string[], completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+    static executeWithArguments(commandArguments: string[]): Promise<FFprobeSession>;
 
     static executeAsync(command: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
 
     static executeWithArgumentsAsync(commandArguments: string[], completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
 
-    static getMediaInformation(path: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static getMediaInformation(path: string, waitTimeout?: number): Promise<MediaInformationSession>;
 
-    static getMediaInformationFromCommand(command: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static getMediaInformationFromCommand(command: string, waitTimeout?: number): Promise<MediaInformationSession>;
 
-    static getMediaInformationFromCommandArguments(commandArguments: string[], completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static getMediaInformationFromCommandArguments(commandArguments: string[], waitTimeout?: number): Promise<MediaInformationSession>;
 
     static getMediaInformationAsync(path: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
 

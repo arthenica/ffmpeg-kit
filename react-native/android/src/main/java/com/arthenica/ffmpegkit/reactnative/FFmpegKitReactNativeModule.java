@@ -946,6 +946,32 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     promise.resolve(toSessionArray(FFprobeKit.listMediaInformationSessions()));
   }
 
+  // MediaInformationSession
+
+  @ReactMethod
+  public void getMediaInformation(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session.isMediaInformation()) {
+          final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+          final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+          if (mediaInformation != null) {
+            promise.resolve(toMap(mediaInformation));
+          } else {
+            promise.resolve(null);
+          }
+        } else {
+          promise.reject("NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
   // Packages
 
   @ReactMethod

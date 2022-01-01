@@ -709,26 +709,20 @@ export class FFmpegKit {
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
    * @param command            FFmpeg command
-   * @param completeCallback   callback that will be called when the execution has completed
-   * @param logCallback        callback that will receive logs
-   * @param statisticsCallback callback that will receive statistics
    * @return FFmpeg session created for this execution
    */
-  static async execute(command, completeCallback, logCallback, statisticsCallback) {
-    return FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, statisticsCallback);
+  static async execute(command) {
+    return FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
   }
 
   /**
    * <p>Synchronously executes FFmpeg with arguments provided.
    *
    * @param commandArguments   FFmpeg command options/arguments as string array
-   * @param completeCallback   callback that will be called when the execution has completed
-   * @param logCallback        callback that will receive logs
-   * @param statisticsCallback callback that will receive statistics
    * @return FFmpeg session created for this execution
    */
-  static async executeWithArguments(commandArguments, completeCallback, logCallback, statisticsCallback) {
-    let session = await FFmpegSession.create(commandArguments, completeCallback, logCallback, statisticsCallback);
+  static async executeWithArguments(commandArguments) {
+    let session = await FFmpegSession.create(commandArguments, undefined, undefined, undefined);
 
     await FFmpegKitConfig.ffmpegExecute(session);
 
@@ -1614,7 +1608,7 @@ class FFmpegKitFactory {
   }
 
   static getVersion() {
-    return "4.5";
+    return "4.5.1";
   }
 
   static getLogRedirectionStrategy(sessionId) {
@@ -2055,24 +2049,20 @@ export class FFprobeKit {
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
    * @param command FFprobe command
-   * @param completeCallback callback that will be called when the execution has completed
-   * @param logCallback callback that will receive logs
    * @return FFprobe session created for this execution
    */
-  static async execute(command, completeCallback, logCallback) {
-    return FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback);
+  static async execute(command) {
+    return FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
   }
 
   /**
    * <p>Synchronously executes FFprobe with arguments provided.
    *
    * @param commandArguments FFprobe command options/arguments as string array
-   * @param completeCallback callback that will be called when the execution has completed
-   * @param logCallback callback that will receive logs
    * @return FFprobe session created for this execution
    */
-  static async executeWithArguments(commandArguments, completeCallback, logCallback) {
-    let session = await FFprobeSession.create(commandArguments, completeCallback, logCallback);
+  static async executeWithArguments(commandArguments) {
+    let session = await FFprobeSession.create(commandArguments, undefined, undefined);
 
     await FFmpegKitConfig.ffprobeExecute(session);
 
@@ -2118,14 +2108,12 @@ export class FFprobeKit {
    * <p>Extracts media information for the file specified with path.
    *
    * @param path            path or uri of a media file
-   * @param completeCallback callback that will be notified when execution has completed
-   * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformation(path, completeCallback, logCallback, waitTimeout) {
+  static async getMediaInformation(path, waitTimeout) {
     const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path];
-    return FFprobeKit.getMediaInformationFromCommandArguments(commandArguments, completeCallback, logCallback, waitTimeout);
+    return FFprobeKit.getMediaInformationFromCommandArguments(commandArguments, waitTimeout);
   }
 
   /**
@@ -2133,13 +2121,11 @@ export class FFprobeKit {
    * this method must generate the output in JSON format in order to successfully extract media information from it.
    *
    * @param command         FFprobe command that prints media information for a file in JSON format
-   * @param completeCallback callback that will be notified when execution has completed
-   * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformationFromCommand(command, completeCallback, logCallback, waitTimeout) {
-    return FFprobeKit.getMediaInformationFromCommandArguments(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, waitTimeout);
+  static async getMediaInformationFromCommand(command, waitTimeout) {
+    return FFprobeKit.getMediaInformationFromCommandArguments(FFmpegKitConfig.parseArguments(command), waitTimeout);
   }
 
   /**
@@ -2148,15 +2134,18 @@ export class FFprobeKit {
    * from it.
    *
    * @param commandArguments FFprobe command arguments that prints media information for a file in JSON format
-   * @param completeCallback callback that will be notified when execution has completed
-   * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformationFromCommandArguments(commandArguments, completeCallback, logCallback, waitTimeout) {
-    let session = await MediaInformationSession.create(commandArguments, completeCallback, logCallback);
+  static async getMediaInformationFromCommandArguments(commandArguments, waitTimeout) {
+    let session = await MediaInformationSession.create(commandArguments, undefined, undefined);
 
     await FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
+
+    const mediaInformation = await FFmpegKitReactNativeModule.getMediaInformation(session.getSessionId());
+    if (mediaInformation !== undefined && mediaInformation !== null) {
+      session.setMediaInformation(new MediaInformation(mediaInformation));
+    }
 
     return session;
   }
@@ -2213,6 +2202,11 @@ export class FFprobeKit {
     let session = await MediaInformationSession.create(commandArguments, completeCallback, logCallback);
 
     await FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
+
+    const mediaInformation = await FFmpegKitReactNativeModule.getMediaInformation(session.getSessionId());
+    if (mediaInformation !== undefined && mediaInformation !== null) {
+      session.setMediaInformation(new MediaInformation(mediaInformation));
+    }
 
     return session;
   }

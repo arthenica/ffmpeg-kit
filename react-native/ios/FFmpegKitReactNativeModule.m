@@ -669,6 +669,22 @@ RCT_EXPORT_METHOD(getMediaInformationSessions:(RCTPromiseResolveBlock)resolve re
     resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listMediaInformationSessions]]);
 }
 
+// MediaInformationSession
+
+RCT_EXPORT_METHOD(getMediaInformation:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
+    if (session == nil) {
+        reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
+    } else {
+        if ([session isMediaInformation]) {
+            MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
+            resolve([FFmpegKitReactNativeModule toMediaInformationDictionary:[mediaInformationSession getMediaInformation]]);
+        } else {
+            reject(@"NOT_MEDIA_INFORMATION_SESSION", @"A session is found but it does not have the correct type.", nil);
+        }
+    }
+}
+
 // Packages
 
 RCT_EXPORT_METHOD(getPackageName:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
