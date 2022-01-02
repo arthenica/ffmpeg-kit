@@ -17,6 +17,7 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'chapter.dart';
 import 'stream_information.dart';
 
 /// Media information class.
@@ -82,6 +83,20 @@ class MediaInformation {
 
     this._allProperties?["streams"]?.forEach((Object? stream) {
       createStreamInformation(stream as Map<dynamic, dynamic>);
+    });
+
+    return list;
+  }
+
+  /// Returns all chapters found as a list.
+  List<Chapter> getChapters() {
+    final List<Chapter> list = List<Chapter>.empty(growable: true);
+
+    dynamic createChapter(Map<dynamic, dynamic> chapterProperties) =>
+        list.add(new Chapter(chapterProperties));
+
+    this._allProperties?["chapters"]?.forEach((Object? chapter) {
+      createChapter(chapter as Map<dynamic, dynamic>);
     });
 
     return list;

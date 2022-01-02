@@ -17,8 +17,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 450
-        versionName "4.5.0"
+        versionCode 451
+        versionName "4.5.1"
     }
 
     buildTypes {
@@ -43,6 +43,6 @@ repositories {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'com.arthenica:ffmpeg-kit-https:4.5'
+    implementation 'com.arthenica:ffmpeg-kit-https:4.5.1-1'
 }
 

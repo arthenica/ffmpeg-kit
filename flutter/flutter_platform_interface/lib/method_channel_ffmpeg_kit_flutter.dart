@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -99,13 +99,14 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
           int? sessionId) async =>
       _channel.invokeMethod<bool>(
           'abstractSessionThereAreAsynchronousMessagesInTransmit',
-          {'sessionId': sessionId}).then((value) => value ?? false);
+          {'sessionId': sessionId}).then((bool? value) => value ?? false);
 
   // ArchDetect
 
   @override
-  Future<String> archDetectGetArch() async =>
-      _channel.invokeMethod<String>('getArch').then((value) => value ?? "");
+  Future<String> archDetectGetArch() async => _channel
+      .invokeMethod<String>('getArch')
+      .then((String? value) => value ?? "");
 
   // FFmpegKit
 
@@ -178,6 +179,20 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
   @override
   Future<void> ffmpegKitConfigIgnoreSignal(int signal) async =>
       _channel.invokeMethod<void>('ignoreSignal', {'signal': signal});
+
+  @override
+  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async => _channel
+      .invokeMethod<void>('ffmpegSessionExecute', {'sessionId': sessionId});
+
+  @override
+  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async => _channel
+      .invokeMethod<void>('ffprobeSessionExecute', {'sessionId': sessionId});
+
+  @override
+  Future<void> ffmpegKitConfigGetMediaInformationExecute(
+          int? sessionId, int? waitTimeout) async =>
+      _channel.invokeMethod<void>('mediaInformationSessionExecute',
+          {'sessionId': sessionId, 'waitTimeout': waitTimeout});
 
   @override
   Future<void> ffmpegKitConfigAsyncFFmpegExecute(int? sessionId) async =>
@@ -286,16 +301,10 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       });
 
   @override
-  Future<String?> ffmpegKitConfigGetSafParameterForRead(
-          String uriString) async =>
+  Future<String?> ffmpegKitConfigGetSafParameter(
+          String uriString, String openMode) async =>
       _channel.invokeMethod<String>(
-          'getSafParameter', {'writable': false, 'uri': uriString});
-
-  @override
-  Future<String?> ffmpegKitConfigGetSafParameterForWrite(
-          String uriString) async =>
-      _channel.invokeMethod<String>(
-          'getSafParameter', {'writable': true, 'uri': uriString});
+          'getSafParameter', {'uri': uriString, 'openMode': openMode});
 
   // FFmpegKitFlutterInitializer
 
@@ -318,8 +327,12 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
   // FFprobeKit
 
   @override
-  Future<List<dynamic>?> ffprobeKitListSessions() async =>
+  Future<List<dynamic>?> ffprobeKitListFFprobeSessions() async =>
       _channel.invokeMethod<List<dynamic>>('getFFprobeSessions');
+
+  @override
+  Future<List<dynamic>?> ffprobeKitListMediaInformationSessions() async =>
+      _channel.invokeMethod<List<dynamic>>('getMediaInformationSessions');
 
   // MediaInformationJsonParser
 
@@ -336,6 +349,14 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       _channel.invokeMethod<Map<dynamic, dynamic>>(
           'mediaInformationJsonParserFromWithError',
           {'ffprobeJsonOutput': ffprobeJsonOutput});
+
+  // MediaInformationSession
+
+  @override
+  Future<Map<dynamic, dynamic>?> mediaInformationSessionGetMediaInformation(
+          int? sessionId) async =>
+      _channel.invokeMethod<Map<dynamic, dynamic>>(
+          'getMediaInformation', {'sessionId': sessionId});
 
   @override
   Future<String?> getPackageName() async =>

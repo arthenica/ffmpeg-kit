@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,9 +20,9 @@
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
 
-import 'execute_callback.dart';
 import 'ffmpeg_kit_config.dart';
 import 'ffmpeg_session.dart';
+import 'ffmpeg_session_complete_callback.dart';
 import 'log_callback.dart';
 import 'src/ffmpeg_kit_factory.dart';
 import 'statistics_callback.dart';
@@ -31,32 +31,49 @@ import 'statistics_callback.dart';
 class FFmpegKit {
   static FFmpegKitPlatform _platform = FFmpegKitPlatform.instance;
 
+  /// Synchronously executes FFmpeg command provided. Space character is used
+  /// to split command into arguments. You can use single or double quote
+  /// characters to specify arguments inside your command.
+  static Future<FFmpegSession> execute(String command) async =>
+      FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
+
+  /// Synchronously executes FFmpeg with arguments provided.
+  static Future<FFmpegSession> executeWithArguments(
+      List<String> commandArguments) async {
+    final session =
+        await FFmpegSession.create(commandArguments, null, null, null, null);
+
+    await FFmpegKitConfig.ffmpegExecute(session);
+
+    return session;
+  }
+
   /// Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
   /// into arguments. You can use single or double quote characters to specify arguments inside your command.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an
-  /// [ExecuteCallback] if you want to be notified about the result.
+  /// [FFmpegSessionCompleteCallback] if you want to be notified about the result.
   static Future<FFmpegSession> executeAsync(String command,
-          [ExecuteCallback? executeCallback = null,
+          [FFmpegSessionCompleteCallback? completeCallback = null,
           LogCallback? logCallback = null,
           StatisticsCallback? statisticsCallback = null]) async =>
       FFmpegKit.executeWithArgumentsAsync(
           FFmpegKitConfig.parseArguments(command),
-          executeCallback,
+          completeCallback,
           logCallback,
           statisticsCallback);
 
   /// Starts an asynchronous FFmpeg execution with arguments provided.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an
-  /// [ExecuteCallback] if you want to be notified about the result.
+  /// [FFmpegSessionCompleteCallback] if you want to be notified about the result.
   static Future<FFmpegSession> executeWithArgumentsAsync(
       List<String> commandArguments,
-      [ExecuteCallback? executeCallback = null,
+      [FFmpegSessionCompleteCallback? completeCallback = null,
       LogCallback? logCallback = null,
       StatisticsCallback? statisticsCallback = null]) async {
     final session = await FFmpegSession.create(commandArguments,
-        executeCallback, logCallback, statisticsCallback, null);
+        completeCallback, logCallback, statisticsCallback, null);
 
     await FFmpegKitConfig.asyncFFmpegExecute(session);
 

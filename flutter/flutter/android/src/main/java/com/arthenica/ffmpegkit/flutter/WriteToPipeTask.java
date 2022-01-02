@@ -29,13 +29,13 @@ import java.io.IOException;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class AsyncWriteToPipeTask implements Runnable {
+public class WriteToPipeTask implements Runnable {
     private final String inputPath;
     private final String namedPipePath;
     private final FFmpegKitFlutterMethodResultHandler resultHandler;
     private final MethodChannel.Result result;
 
-    public AsyncWriteToPipeTask(@NonNull final String inputPath, @NonNull final String namedPipePath, @NonNull final FFmpegKitFlutterMethodResultHandler resultHandler, @NonNull final MethodChannel.Result result) {
+    public WriteToPipeTask(@NonNull final String inputPath, @NonNull final String namedPipePath, @NonNull final FFmpegKitFlutterMethodResultHandler resultHandler, @NonNull final MethodChannel.Result result) {
         this.inputPath = inputPath;
         this.namedPipePath = namedPipePath;
         this.resultHandler = resultHandler;

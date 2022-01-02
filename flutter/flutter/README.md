@@ -10,15 +10,15 @@
     - `Android API Level 16` or later
     - `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `i386`, `x86_64`, `x86_64-mac-catalyst` and `arm64-mac-catalyst`
       architectures on iOS
-    - `iOS SDK 9.3` or later
+    - `iOS SDK 10` or later
     - `arm64` and `x86_64` architectures on macOS
-    - `macOS SDK 10.11+` or later
+    - `macOS SDK 10.12+` or later
     - Can process Storage Access Framework (SAF) Uris on Android
-    - 24 external libraries
+    - 25 external libraries
 
       `dav1d`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`
       , `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`
-      , `speex`, `twolame`, `vo-amrwbenc`
+      , `speex`, `twolame`, `vo-amrwbenc`, `zimg`
 
     - 4 external libraries with GPL license
 
@@ -32,7 +32,7 @@ Add `ffmpeg_kit_flutter` as a dependency in your `pubspec.yaml file`.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: ^4.5.0
+  ffmpeg_kit_flutter: 4.5.1
 ```
 
 #### 2.1 Packages
@@ -55,7 +55,7 @@ using the following dependency format.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter_<package name>: ^4.5.0
+  ffmpeg_kit_flutter_<package name>: 4.5.1
 ```
 
 Note that hyphens in the package name must be replaced with underscores. Additionally, do not forget to use the package
@@ -67,7 +67,7 @@ In order to install the `LTS` variant, append `-LTS` to the version you have for
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: 4.5.0-LTS
+  ffmpeg_kit_flutter: 4.5.1-LTS
 ```
 
 #### 2.4 LTS Releases
@@ -99,7 +99,7 @@ The following table shows the Android API level and iOS deployment target requir
 <td align="center">24</td>
 <td align="center">12.1</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 </tbody>
 </table>
@@ -111,7 +111,7 @@ The following table shows the Android API level and iOS deployment target requir
     ```dart
     import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', (session) async {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then((session) async {
       final returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) {
@@ -133,7 +133,7 @@ The following table shows the Android API level and iOS deployment target requir
 2. Each `execute` call creates a new session. Access every detail about your execution from the session created.
 
     ```dart
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', (session) async {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then((session) async {
 
       // Unique session id created for this execution
       final sessionId = session.getSessionId();
@@ -190,7 +190,7 @@ The following table shows the Android API level and iOS deployment target requir
 4. Execute `FFprobe` commands.
 
     ```dart
-    FFprobeKit.executeAsync(ffprobeCommand, (session) {
+    FFprobeKit.execute(ffprobeCommand).then((session) async {
 
       // CALLED WHEN SESSION IS EXECUTED
 
@@ -200,8 +200,18 @@ The following table shows the Android API level and iOS deployment target requir
 5. Get media information for a file/url.
 
     ```dart
-    FFprobeKit.getMediaInformationAsync('<file path or url>', (session) async {
-      final information = await (session as MediaInformationSession).getMediaInformation();
+    FFprobeKit.getMediaInformation('<file path or url>').then((session) async {
+      final information = await session.getMediaInformation();
+
+      if (information == null) {
+
+        // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
+        final state = FFmpegKitConfig.sessionStateToString(await session.getState());
+        final returnCode = await session.getReturnCode();
+        final failStackTrace = await session.getFailStackTrace();
+        final duration = await session.getDuration();
+        final output = await session.getOutput();
+      }
     });
     ```
 
@@ -237,7 +247,7 @@ The following table shows the Android API level and iOS deployment target requir
   });
   ```
 
-8. Get previous `FFmpeg` and `FFprobe` sessions from the session history.
+8. Get previous `FFmpeg`, `FFprobe` and `MediaInformation` sessions from the session history.
 
     ```dart
     FFmpegKit.listSessions().then((sessionList) {
@@ -246,7 +256,13 @@ The following table shows the Android API level and iOS deployment target requir
       });
     });
 
-    FFprobeKit.listSessions().then((sessionList) {
+    FFprobeKit.listFFprobeSessions().then((sessionList) {
+      sessionList.forEach((session) {
+        final sessionId = session.getSessionId();
+      });
+    });
+
+    FFprobeKit.listMediaInformationSessions().then((sessionList) {
       sessionList.forEach((session) {
         final sessionId = session.getSessionId();
       });
@@ -255,10 +271,18 @@ The following table shows the Android API level and iOS deployment target requir
 
 9. Enable global callbacks.
 
-- Execute Callback, called when an async execution is ended
+- Session type specific Complete Callbacks, called when an async session has been completed
 
   ```dart
-  FFmpegKitConfig.enableExecuteCallback((session) {
+  FFmpegKitConfig.enableFFmpegSessionCompleteCallback((session) {
+    final sessionId = session.getSessionId();
+  });
+
+  FFmpegKitConfig.enableFFprobeSessionCompleteCallback((session) {
+    final sessionId = session.getSessionId();
+  });
+
+  FFmpegKitConfig.enableMediaInformationSessionCompleteCallback((session) {
     final sessionId = session.getSessionId();
   });
   ```

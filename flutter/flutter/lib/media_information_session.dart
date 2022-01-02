@@ -18,26 +18,26 @@
  */
 
 import 'abstract_session.dart';
-import 'execute_callback.dart';
-import 'ffprobe_session.dart';
 import 'log_callback.dart';
 import 'media_information.dart';
+import 'media_information_session_complete_callback.dart';
 import 'src/ffmpeg_kit_factory.dart';
 
 /// A custom FFprobe session, which produces a "MediaInformation" object
 /// using the FFprobe output.
-class MediaInformationSession extends FFprobeSession {
+class MediaInformationSession extends AbstractSession {
   MediaInformation? _mediaInformation;
 
   /// Creates a new MediaInformation session with [argumentsArray].
   static Future<MediaInformationSession> create(List<String> argumentsArray,
-      [ExecuteCallback? executeCallback = null,
+      [MediaInformationSessionCompleteCallback? completeCallback = null,
       LogCallback? logCallback = null]) async {
     final session =
         await AbstractSession.createMediaInformationSession(argumentsArray);
     final sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setExecuteCallback(sessionId, executeCallback);
+    FFmpegKitFactory.setMediaInformationSessionCompleteCallback(
+        sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;
@@ -55,4 +55,15 @@ class MediaInformationSession extends FFprobeSession {
   void setMediaInformation(MediaInformation? mediaInformation) {
     this._mediaInformation = mediaInformation;
   }
+
+  /// Returns the session specific complete callback.
+  MediaInformationSessionCompleteCallback? getCompleteCallback() =>
+      FFmpegKitFactory.getMediaInformationSessionCompleteCallback(
+          this.getSessionId());
+
+  bool isFFmpeg() => false;
+
+  bool isFFprobe() => false;
+
+  bool isMediaInformation() => true;
 }

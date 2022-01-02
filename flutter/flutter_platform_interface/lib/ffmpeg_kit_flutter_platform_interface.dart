@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -218,6 +218,22 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
         ' has not been implemented!');
   }
 
+  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async {
+    throw UnimplementedError(
+        'ffmpegKitConfigFFmpegExecute() has not been implemented!');
+  }
+
+  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async {
+    throw UnimplementedError(
+        'ffmpegKitConfigFFprobeExecute() has not been implemented!');
+  }
+
+  Future<void> ffmpegKitConfigGetMediaInformationExecute(
+      int? sessionId, int? waitTimeout) async {
+    throw UnimplementedError('ffmpegKitConfigGetMediaInformationExecute()'
+        ' has not been implemented!');
+  }
+
   Future<void> ffmpegKitConfigSetLogLevel(int logLevel) async {
     throw UnimplementedError(
         'ffmpegKitConfigSetLogLevel() has not been implemented!');
@@ -314,16 +330,10 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
         'ffmpegKitConfigSelectDocumentForWrite() has not been implemented!');
   }
 
-  Future<String?> ffmpegKitConfigGetSafParameterForRead(
-      String uriString) async {
+  Future<String?> ffmpegKitConfigGetSafParameter(
+      String uriString, String openMode) async {
     throw UnimplementedError(
-        'ffmpegKitConfigGetSafParameterForRead() has not been implemented!');
-  }
-
-  Future<String?> ffmpegKitConfigGetSafParameterForWrite(
-      String uriString) async {
-    throw UnimplementedError(
-        'ffmpegKitConfigGetSafParameterForWrite() has not been implemented!');
+        'ffmpegKitConfigGetSafParameter() has not been implemented!');
   }
 
   // FFmpegKitFlutterInitializer
@@ -348,9 +358,14 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
 
   // FFprobeKit
 
-  Future<List<dynamic>?> ffprobeKitListSessions() async {
+  Future<List<dynamic>?> ffprobeKitListFFprobeSessions() async {
     throw UnimplementedError(
-        'ffprobeKitListSessions() has not been implemented!');
+        'ffprobeKitListFFprobeSessions() has not been implemented!');
+  }
+
+  Future<List<dynamic>?> ffprobeKitListMediaInformationSessions() async {
+    throw UnimplementedError(
+        'ffprobeKitListMediaInformationSessions() has not been implemented!');
   }
 
   // MediaInformationJsonParser
@@ -365,6 +380,12 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
       String ffprobeJsonOutput) async {
     throw UnimplementedError(
         'mediaInformationJsonParserFromWithError() has not been implemented!');
+  }
+
+  Future<Map<dynamic, dynamic>?> mediaInformationSessionGetMediaInformation(
+      int? sessionId) async {
+    throw UnimplementedError('mediaInformationSessionGetMediaInformation() '
+        'has not been implemented!');
   }
 
   Future<String?> getPackageName() async {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -20,13 +20,15 @@
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
 
-import 'execute_callback.dart';
 import 'ffmpeg_session.dart';
+import 'ffmpeg_session_complete_callback.dart';
 import 'ffprobe_session.dart';
+import 'ffprobe_session_complete_callback.dart';
 import 'level.dart';
 import 'log_callback.dart';
 import 'log_redirection_strategy.dart';
 import 'media_information_session.dart';
+import 'media_information_session_complete_callback.dart';
 import 'session.dart';
 import 'session_state.dart';
 import 'signal.dart';
@@ -215,10 +217,48 @@ class FFmpegKitConfig {
     }
   }
 
+  /// Synchronously executes the FFmpeg session provided.
+  static Future<void> ffmpegExecute(FFmpegSession ffmpegSession) async {
+    try {
+      await init();
+      return _platform
+          .ffmpegKitConfigFFmpegExecute(ffmpegSession.getSessionId());
+    } on PlatformException catch (e, stack) {
+      print("Plugin ffmpegExecute error: ${e.message}");
+      return Future.error("ffmpegExecute failed.", stack);
+    }
+  }
+
+  /// Synchronously executes the FFprobe session provided.
+  static Future<void> ffprobeExecute(FFprobeSession ffprobeSession) async {
+    try {
+      await init();
+      return _platform
+          .ffmpegKitConfigFFprobeExecute(ffprobeSession.getSessionId());
+    } on PlatformException catch (e, stack) {
+      print("Plugin ffprobeExecute error: ${e.message}");
+      return Future.error("ffprobeExecute failed.", stack);
+    }
+  }
+
+  /// Synchronously executes the media information session provided.
+  static Future<void> getMediaInformationExecute(
+      MediaInformationSession mediaInformationSession,
+      [int? waitTimeout = null]) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetMediaInformationExecute(
+          mediaInformationSession.getSessionId(), waitTimeout);
+    } on PlatformException catch (e, stack) {
+      print("Plugin getMediaInformationExecute error: ${e.message}");
+      return Future.error("getMediaInformationExecute failed.", stack);
+    }
+  }
+
   /// Starts an asynchronous FFmpeg execution for the given session.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an
-  /// [ExecuteCallback] if you want to be notified about the result.
+  /// [FFmpegSessionCompleteCallback] if you want to be notified about the result.
   static Future<void> asyncFFmpegExecute(FFmpegSession ffmpegSession) async {
     try {
       await init();
@@ -233,7 +273,7 @@ class FFmpegKitConfig {
   /// Starts an asynchronous FFprobe execution for the given session.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an
-  /// [ExecuteCallback] if you want to be notified about the result.
+  /// [FFprobeSessionCompleteCallback] if you want to be notified about the result.
   static Future<void> asyncFFprobeExecute(FFprobeSession ffprobeSession) async {
     try {
       await init();
@@ -248,7 +288,7 @@ class FFmpegKitConfig {
   /// Starts an asynchronous FFprobe execution for the given media information session.
   ///
   /// Note that this method returns immediately and does not wait the execution to complete. You must use an
-  /// [ExecuteCallback] if you want to be notified about the result.
+  /// [MediaInformationSessionCompleteCallback] if you want to be notified about the result.
   static Future<void> asyncGetMediaInformationExecute(
       MediaInformationSession mediaInformationSession,
       [int? waitTimeout = null]) async {
@@ -262,21 +302,54 @@ class FFmpegKitConfig {
     }
   }
 
-  /// Sets a global callback function to redirect FFmpeg/FFprobe logs.
+  /// Sets a global callback to redirect FFmpeg/FFprobe logs.
   static void enableLogCallback([LogCallback? logCallback = null]) {
     FFmpegKitFactory.setGlobalLogCallback(logCallback);
   }
 
-  /// Sets a global callback function to redirect FFmpeg statistics.
+  /// Sets a global callback to redirect FFmpeg statistics.
   static void enableStatisticsCallback(
       [StatisticsCallback? statisticsCallback = null]) {
     FFmpegKitFactory.setGlobalStatisticsCallback(statisticsCallback);
   }
 
-  /// Sets a global callback function to receive execution results.
-  static void enableExecuteCallback([ExecuteCallback? executeCallback = null]) {
-    FFmpegKitFactory.setGlobalExecuteCallback(executeCallback);
+  /// Sets a global FFmpegSessionCompleteCallback to receive execution results
+  /// for FFmpeg sessions.
+  static void enableFFmpegSessionCompleteCallback(
+      [FFmpegSessionCompleteCallback? ffmpegSessionCompleteCallback = null]) {
+    FFmpegKitFactory.setGlobalFFmpegSessionCompleteCallback(
+        ffmpegSessionCompleteCallback);
   }
+
+  /// Returns the global FFmpegSessionCompleteCallback set.
+  static FFmpegSessionCompleteCallback? getFFmpegSessionCompleteCallback() =>
+      FFmpegKitFactory.getGlobalFFmpegSessionCompleteCallback();
+
+  /// Sets a global FFprobeSessionCompleteCallback to receive execution results
+  /// for FFprobe sessions.
+  static void enableFFprobeSessionCompleteCallback(
+      [FFprobeSessionCompleteCallback? ffprobeSessionCompleteCallback = null]) {
+    FFmpegKitFactory.setGlobalFFprobeSessionCompleteCallback(
+        ffprobeSessionCompleteCallback);
+  }
+
+  /// Returns the global FFprobeSessionCompleteCallback set.
+  static FFprobeSessionCompleteCallback? getFFprobeSessionCompleteCallback() =>
+      FFmpegKitFactory.getGlobalFFprobeSessionCompleteCallback();
+
+  /// Sets a global MediaInformationSessionCompleteCallback to receive
+  /// execution results for MediaInformation sessions.
+  static void enableMediaInformationSessionCompleteCallback(
+      [MediaInformationSessionCompleteCallback?
+          mediaInformationSessionCompleteCallback = null]) {
+    FFmpegKitFactory.setGlobalMediaInformationSessionCompleteCallback(
+        mediaInformationSessionCompleteCallback);
+  }
+
+  /// Returns the global MediaInformationSessionCompleteCallback set.
+  static MediaInformationSessionCompleteCallback?
+      getMediaInformationSessionCompleteCallback() =>
+          FFmpegKitFactory.getGlobalMediaInformationSessionCompleteCallback();
 
   /// Returns the current log level.
   static int getLogLevel() => _activeLogLevel;
@@ -290,6 +363,55 @@ class FFmpegKitConfig {
     } on PlatformException catch (e, stack) {
       print("Plugin setLogLevel error: ${e.message}");
       return Future.error("setLogLevel failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri ("content:…") into
+  /// an input url that can be used in FFmpeg and FFprobe commands.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameterForRead(String uriString) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, "r");
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameterForRead error: ${e.message}");
+      return Future.error("getSafParameterForRead failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri ("content:…") into
+  /// an output url that can be used in FFmpeg and FFprobe commands.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameterForWrite(String uriString) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, "w");
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameterForWrite error: ${e.message}");
+      return Future.error("getSafParameterForWrite failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri into an saf protocol
+  /// url opened with the given open mode.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameter(
+      String uriString, String openMode) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, openMode);
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameter error: ${e.message}");
+      return Future.error("getSafParameter failed.", stack);
     }
   }
 
@@ -383,6 +505,72 @@ class FFmpegKitConfig {
     } on PlatformException catch (e, stack) {
       print("Plugin clearSessions error: ${e.message}");
       return Future.error("clearSessions failed.", stack);
+    }
+  }
+
+  /// Returns all FFmpeg sessions in the session history.
+  static Future<List<FFmpegSession>> getFFmpegSessions() async {
+    try {
+      await FFmpegKitConfig.init();
+      return _platform.ffmpegKitListSessions().then((sessions) {
+        if (sessions == null) {
+          return List.empty();
+        } else {
+          return sessions
+              .map((dynamic sessionObject) => FFmpegKitFactory.mapToSession(
+                  sessionObject as Map<dynamic, dynamic>))
+              .map((session) => session as FFmpegSession)
+              .toList();
+        }
+      });
+    } on PlatformException catch (e, stack) {
+      print("Plugin getFFmpegSessions error: ${e.message}");
+      return Future.error("getFFmpegSessions failed.", stack);
+    }
+  }
+
+  /// Returns all FFprobe sessions in the session history.
+  static Future<List<FFprobeSession>> getFFprobeSessions() async {
+    try {
+      await FFmpegKitConfig.init();
+      return _platform.ffprobeKitListFFprobeSessions().then((sessions) {
+        if (sessions == null) {
+          return List.empty();
+        } else {
+          return sessions
+              .map((dynamic sessionObject) => FFmpegKitFactory.mapToSession(
+                  sessionObject as Map<dynamic, dynamic>))
+              .map((session) => session as FFprobeSession)
+              .toList();
+        }
+      });
+    } on PlatformException catch (e, stack) {
+      print("Plugin getFFprobeSessions error: ${e.message}");
+      return Future.error("getFFprobeSessions failed.", stack);
+    }
+  }
+
+  /// Returns all MediaInformation sessions in the session history.
+  static Future<List<MediaInformationSession>>
+      getMediaInformationSessions() async {
+    try {
+      await FFmpegKitConfig.init();
+      return _platform
+          .ffprobeKitListMediaInformationSessions()
+          .then((sessions) {
+        if (sessions == null) {
+          return List.empty();
+        } else {
+          return sessions
+              .map((dynamic sessionObject) => FFmpegKitFactory.mapToSession(
+                  sessionObject as Map<dynamic, dynamic>))
+              .map((session) => session as MediaInformationSession)
+              .toList();
+        }
+      });
+    } on PlatformException catch (e, stack) {
+      print("Plugin getMediaInformationSessions error: ${e.message}");
+      return Future.error("getMediaInformationSessions failed.", stack);
     }
   }
 
@@ -622,38 +810,6 @@ class FFmpegKitConfig {
     } on PlatformException catch (e, stack) {
       print("Plugin selectDocumentForWrite error: ${e.message}");
       return Future.error("selectDocumentForWrite failed.", stack);
-    }
-  }
-
-  /// Converts the given Structured Access Framework Uri ("content:…") into
-  /// an input url that can be used in FFmpeg and FFprobe commands.
-  ///
-  /// Note that this method is Android only. It will fail if called on other
-  /// platforms. It also requires API Level &ge; 19. On older API levels it
-  /// returns an empty url.
-  static Future<String?> getSafParameterForRead(String uriString) async {
-    try {
-      await init();
-      return _platform.ffmpegKitConfigGetSafParameterForRead(uriString);
-    } on PlatformException catch (e, stack) {
-      print("Plugin getSafParameterForRead error: ${e.message}");
-      return Future.error("getSafParameterForRead failed.", stack);
-    }
-  }
-
-  /// Converts the given Structured Access Framework Uri ("content:…") into
-  /// an output url that can be used in FFmpeg and FFprobe commands.
-  ///
-  /// Note that this method is Android only. It will fail if called on other
-  /// platforms. It also requires API Level &ge; 19. On older API levels it
-  /// returns an empty url.
-  static Future<String?> getSafParameterForWrite(String uriString) async {
-    try {
-      await init();
-      return _platform.ffmpegKitConfigGetSafParameterForWrite(uriString);
-    } on PlatformException catch (e, stack) {
-      print("Plugin getSafParameterForWrite error: ${e.message}");
-      return Future.error("getSafParameterForWrite failed.", stack);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -17,18 +17,26 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '../execute_callback.dart';
 import '../ffmpeg_session.dart';
+import '../ffmpeg_session_complete_callback.dart';
 import '../ffprobe_session.dart';
+import '../ffprobe_session_complete_callback.dart';
 import '../log.dart';
 import '../log_callback.dart';
 import '../log_redirection_strategy.dart';
+import '../media_information.dart';
 import '../media_information_session.dart';
+import '../media_information_session_complete_callback.dart';
 import '../session.dart';
 import '../statistics.dart';
 import '../statistics_callback.dart';
 
-final executeCallbackMap = new Map<int, ExecuteCallback>();
+final ffmpegSessionCompleteCallbackMap =
+    new Map<int, FFmpegSessionCompleteCallback>();
+final ffprobeSessionCompleteCallbackMap =
+    new Map<int, FFprobeSessionCompleteCallback>();
+final mediaInformationSessionCompleteCallbackMap =
+    new Map<int, MediaInformationSessionCompleteCallback>();
 final logCallbackMap = new Map<int, LogCallback>();
 final statisticsCallbackMap = new Map<int, StatisticsCallback>();
 final logRedirectionStrategyMap = new Map<int, LogRedirectionStrategy>();
@@ -36,7 +44,10 @@ final logRedirectionStrategyMap = new Map<int, LogRedirectionStrategy>();
 class FFmpegKitFactory {
   static LogCallback? _logCallback;
   static StatisticsCallback? _statisticsCallback;
-  static ExecuteCallback? _executeCallback;
+  static FFmpegSessionCompleteCallback? _ffmpegSessionCompleteCallback;
+  static FFprobeSessionCompleteCallback? _ffprobeSessionCompleteCallback;
+  static MediaInformationSessionCompleteCallback?
+      _mediaInformationSessionCompleteCallback;
 
   static Statistics mapToStatistics(Map<dynamic, dynamic> statisticsMap) =>
       new Statistics(
@@ -80,7 +91,16 @@ class FFmpegKitFactory {
     }
   }
 
-  static String getVersion() => "4.5.0";
+  static MediaInformation? mapToNullableMediaInformation(
+      Map<dynamic, dynamic>? mediaInformationMap) {
+    if (mediaInformationMap != null) {
+      return new MediaInformation(mediaInformationMap);
+    } else {
+      return null;
+    }
+  }
+
+  static String getVersion() => "4.5.1";
 
   static LogRedirectionStrategy? getLogRedirectionStrategy(int? sessionId) =>
       logRedirectionStrategyMap[sessionId];
@@ -125,20 +145,64 @@ class FFmpegKitFactory {
     _statisticsCallback = statisticsCallback;
   }
 
-  static ExecuteCallback? getExecuteCallback(int? sessionId) =>
-      executeCallbackMap[sessionId];
+  static FFmpegSessionCompleteCallback? getFFmpegSessionCompleteCallback(
+          int? sessionId) =>
+      ffmpegSessionCompleteCallbackMap[sessionId];
 
-  static void setExecuteCallback(
-      int? sessionId, ExecuteCallback? executeCallback) {
-    if (sessionId != null && executeCallback != null) {
-      executeCallbackMap[sessionId] = executeCallback;
+  static void setFFmpegSessionCompleteCallback(
+      int? sessionId, FFmpegSessionCompleteCallback? completeCallback) {
+    if (sessionId != null && completeCallback != null) {
+      ffmpegSessionCompleteCallbackMap[sessionId] = completeCallback;
     }
   }
 
-  static ExecuteCallback? getGlobalExecuteCallback() => _executeCallback;
+  static FFmpegSessionCompleteCallback?
+      getGlobalFFmpegSessionCompleteCallback() =>
+          _ffmpegSessionCompleteCallback;
 
-  static void setGlobalExecuteCallback(ExecuteCallback? executeCallback) {
-    _executeCallback = executeCallback;
+  static void setGlobalFFmpegSessionCompleteCallback(
+      FFmpegSessionCompleteCallback? completeCallback) {
+    _ffmpegSessionCompleteCallback = completeCallback;
+  }
+
+  static FFprobeSessionCompleteCallback? getFFprobeSessionCompleteCallback(
+          int? sessionId) =>
+      ffprobeSessionCompleteCallbackMap[sessionId];
+
+  static void setFFprobeSessionCompleteCallback(
+      int? sessionId, FFprobeSessionCompleteCallback? completeCallback) {
+    if (sessionId != null && completeCallback != null) {
+      ffprobeSessionCompleteCallbackMap[sessionId] = completeCallback;
+    }
+  }
+
+  static FFprobeSessionCompleteCallback?
+      getGlobalFFprobeSessionCompleteCallback() =>
+          _ffprobeSessionCompleteCallback;
+
+  static void setGlobalFFprobeSessionCompleteCallback(
+      FFprobeSessionCompleteCallback? completeCallback) {
+    _ffprobeSessionCompleteCallback = completeCallback;
+  }
+
+  static MediaInformationSessionCompleteCallback?
+      getMediaInformationSessionCompleteCallback(int? sessionId) =>
+          mediaInformationSessionCompleteCallbackMap[sessionId];
+
+  static void setMediaInformationSessionCompleteCallback(int? sessionId,
+      MediaInformationSessionCompleteCallback? completeCallback) {
+    if (sessionId != null && completeCallback != null) {
+      mediaInformationSessionCompleteCallbackMap[sessionId] = completeCallback;
+    }
+  }
+
+  static MediaInformationSessionCompleteCallback?
+      getGlobalMediaInformationSessionCompleteCallback() =>
+          _mediaInformationSessionCompleteCallback;
+
+  static void setGlobalMediaInformationSessionCompleteCallback(
+      MediaInformationSessionCompleteCallback? completeCallback) {
+    _mediaInformationSessionCompleteCallback = completeCallback;
   }
 
   static DateTime? validDate(int? time) {

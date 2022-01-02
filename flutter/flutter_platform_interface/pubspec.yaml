@@ -5,7 +5,7 @@ issue_tracker: https://github.com/tanersener/ffmpeg-kit/issues
 homepage: https://github.com/tanersener/ffmpeg-kit
 # NOTE: We strongly prefer non-breaking changes, even at the expense of a
 # less-clean API. See https://flutter.dev/go/platform-interface-breaking-changes
-version: 0.1.0
+version: 0.2.1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
