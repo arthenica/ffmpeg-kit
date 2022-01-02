@@ -2,7 +2,7 @@ name: apple nightly builds
 
 on:
   schedule:
-    - cron:  '0 2 * * *'
+    - cron:  '0 3 * * *'
 
 jobs:
   build-ios-main-on-macos-bigsur:

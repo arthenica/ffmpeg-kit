@@ -2,7 +2,7 @@ name: nightly builds
 
 on:
   schedule:
-    - cron:  '0 4 * * *'
+    - cron:  '0 5 * * *'
 
 jobs:
   build-android-main-on-linux:
