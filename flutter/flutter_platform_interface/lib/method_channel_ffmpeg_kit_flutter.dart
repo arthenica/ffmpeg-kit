@@ -356,7 +356,7 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
   Future<Map<dynamic, dynamic>?> mediaInformationSessionGetMediaInformation(
           int? sessionId) async =>
       _channel.invokeMethod<Map<dynamic, dynamic>>(
-          'getMediaInformation(', {'sessionId': sessionId});
+          'getMediaInformation', {'sessionId': sessionId});
 
   @override
   Future<String?> getPackageName() async =>
