@@ -274,7 +274,7 @@
  * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
  * MediaInformationSessionCompleteCallback if you want to be notified about the result.
  *
- * @param command          FFprobe command that prints media information for a file in JSON format
+ * @param arguments        FFprobe command that prints media information for a file in JSON format
  * @param completeCallback callback that will be notified when execution has completed
  * @param logCallback      callback that will receive logs
  * @param queue            dispatch queue that will be used to run this asynchronous operation
