@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -99,13 +99,14 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
           int? sessionId) async =>
       _channel.invokeMethod<bool>(
           'abstractSessionThereAreAsynchronousMessagesInTransmit',
-          {'sessionId': sessionId}).then((value) => value ?? false);
+          {'sessionId': sessionId}).then((bool? value) => value ?? false);
 
   // ArchDetect
 
   @override
-  Future<String> archDetectGetArch() async =>
-      _channel.invokeMethod<String>('getArch').then((value) => value ?? "");
+  Future<String> archDetectGetArch() async => _channel
+      .invokeMethod<String>('getArch')
+      .then((String? value) => value ?? "");
 
   // FFmpegKit
 
@@ -180,14 +181,12 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       _channel.invokeMethod<void>('ignoreSignal', {'signal': signal});
 
   @override
-  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async =>
-      _channel.invokeMethod<void>(
-          'ffmpegSessionExecute', {'sessionId': sessionId});
+  Future<void> ffmpegKitConfigFFmpegExecute(int? sessionId) async => _channel
+      .invokeMethod<void>('ffmpegSessionExecute', {'sessionId': sessionId});
 
   @override
-  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async =>
-      _channel.invokeMethod<void>(
-          'ffprobeSessionExecute', {'sessionId': sessionId});
+  Future<void> ffmpegKitConfigFFprobeExecute(int? sessionId) async => _channel
+      .invokeMethod<void>('ffprobeSessionExecute', {'sessionId': sessionId});
 
   @override
   Future<void> ffmpegKitConfigGetMediaInformationExecute(
@@ -350,6 +349,14 @@ class MethodChannelFFmpegKit extends FFmpegKitPlatform {
       _channel.invokeMethod<Map<dynamic, dynamic>>(
           'mediaInformationJsonParserFromWithError',
           {'ffprobeJsonOutput': ffprobeJsonOutput});
+
+  // MediaInformationSession
+
+  @override
+  Future<Map<dynamic, dynamic>?> mediaInformationSessionGetMediaInformation(
+          int? sessionId) async =>
+      _channel.invokeMethod<Map<dynamic, dynamic>>(
+          'getMediaInformation(', {'sessionId': sessionId});
 
   @override
   Future<String?> getPackageName() async =>

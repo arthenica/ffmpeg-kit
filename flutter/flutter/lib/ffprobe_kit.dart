@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -35,19 +35,14 @@ class FFprobeKit {
   /// Synchronously executes FFprobe command provided. Space character is used
   /// to split command into arguments. You can use single or double quote
   /// characters to specify arguments inside your command.
-  static Future<FFprobeSession> execute(String command,
-          [FFprobeSessionCompleteCallback? completeCallback = null,
-          LogCallback? logCallback = null]) async =>
-      FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command),
-          completeCallback, logCallback);
+  static Future<FFprobeSession> execute(String command) async =>
+      FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
 
   /// Synchronously executes FFprobe with arguments provided.
   static Future<FFprobeSession> executeWithArguments(
-      List<String> commandArguments,
-      [FFprobeSessionCompleteCallback? completeCallback = null,
-      LogCallback? logCallback = null]) async {
-    final session = await FFprobeSession.create(
-        commandArguments, completeCallback, logCallback, null);
+      List<String> commandArguments) async {
+    final session =
+        await FFprobeSession.create(commandArguments, null, null, null);
 
     await FFmpegKitConfig.ffprobeExecute(session);
 
@@ -85,9 +80,7 @@ class FFprobeKit {
 
   /// Extracts media information for the file specified with path.
   static Future<MediaInformationSession> getMediaInformation(String path,
-      [MediaInformationSessionCompleteCallback? completeCallback = null,
-      LogCallback? logCallback = null,
-      int? waitTimeout = null]) async {
+      [int? waitTimeout = null]) async {
     final commandArguments = [
       "-v",
       "error",
@@ -101,7 +94,7 @@ class FFprobeKit {
       path
     ];
     return FFprobeKit.getMediaInformationFromCommandArguments(
-        commandArguments, completeCallback, logCallback, waitTimeout);
+        commandArguments, waitTimeout);
   }
 
   /// Extracts media information using the command provided. The command
@@ -109,27 +102,27 @@ class FFprobeKit {
   /// successfully extract media information from it.
   static Future<MediaInformationSession> getMediaInformationFromCommand(
           String command,
-          [MediaInformationSessionCompleteCallback? completeCallback = null,
-          LogCallback? logCallback = null,
-          int? waitTimeout = null]) async =>
+          [int? waitTimeout = null]) async =>
       FFprobeKit.getMediaInformationFromCommandArguments(
-          FFmpegKitConfig.parseArguments(command),
-          completeCallback,
-          logCallback,
-          waitTimeout);
+          FFmpegKitConfig.parseArguments(command), waitTimeout);
 
   /// Extracts media information using the command arguments provided. The
   /// command passed to this method must generate the output in JSON format in
   /// order to successfully extract media information from it.
   static Future<MediaInformationSession>
       getMediaInformationFromCommandArguments(List<String> commandArguments,
-          [MediaInformationSessionCompleteCallback? completeCallback = null,
-          LogCallback? logCallback = null,
-          int? waitTimeout = null]) async {
-    final session = await MediaInformationSession.create(
-        commandArguments, completeCallback, logCallback);
+          [int? waitTimeout = null]) async {
+    final session =
+        await MediaInformationSession.create(commandArguments, null, null);
 
     await FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
+
+    final mediaInformation = await _platform
+        .mediaInformationSessionGetMediaInformation(session.getSessionId())
+        .then(FFmpegKitFactory.mapToNullableMediaInformation);
+    if (mediaInformation != null) {
+      session.setMediaInformation(mediaInformation);
+    }
 
     return session;
   }
@@ -192,6 +185,13 @@ class FFprobeKit {
         commandArguments, completeCallback, logCallback);
 
     await FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
+
+    final mediaInformation = await _platform
+        .mediaInformationSessionGetMediaInformation(session.getSessionId())
+        .then(FFmpegKitFactory.mapToNullableMediaInformation);
+    if (mediaInformation != null) {
+      session.setMediaInformation(mediaInformation);
+    }
 
     return session;
   }

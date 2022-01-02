@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -380,6 +380,12 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
       String ffprobeJsonOutput) async {
     throw UnimplementedError(
         'mediaInformationJsonParserFromWithError() has not been implemented!');
+  }
+
+  Future<Map<dynamic, dynamic>?> mediaInformationSessionGetMediaInformation(
+      int? sessionId) async {
+    throw UnimplementedError('mediaInformationSessionGetMediaInformation() '
+        'has not been implemented!');
   }
 
   Future<String?> getPackageName() async {

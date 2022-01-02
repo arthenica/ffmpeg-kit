@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -24,6 +24,7 @@ import '../ffprobe_session_complete_callback.dart';
 import '../log.dart';
 import '../log_callback.dart';
 import '../log_redirection_strategy.dart';
+import '../media_information.dart';
 import '../media_information_session.dart';
 import '../media_information_session_complete_callback.dart';
 import '../session.dart';
@@ -90,7 +91,16 @@ class FFmpegKitFactory {
     }
   }
 
-  static String getVersion() => "4.5.0";
+  static MediaInformation? mapToNullableMediaInformation(
+      Map<dynamic, dynamic>? mediaInformationMap) {
+    if (mediaInformationMap != null) {
+      return new MediaInformation(mediaInformationMap);
+    } else {
+      return null;
+    }
+  }
+
+  static String getVersion() => "4.5.1";
 
   static LogRedirectionStrategy? getLogRedirectionStrategy(int? sessionId) =>
       logRedirectionStrategyMap[sessionId];

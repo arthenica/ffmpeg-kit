@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -363,6 +363,55 @@ class FFmpegKitConfig {
     } on PlatformException catch (e, stack) {
       print("Plugin setLogLevel error: ${e.message}");
       return Future.error("setLogLevel failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri ("content:…") into
+  /// an input url that can be used in FFmpeg and FFprobe commands.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameterForRead(String uriString) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, "r");
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameterForRead error: ${e.message}");
+      return Future.error("getSafParameterForRead failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri ("content:…") into
+  /// an output url that can be used in FFmpeg and FFprobe commands.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameterForWrite(String uriString) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, "w");
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameterForWrite error: ${e.message}");
+      return Future.error("getSafParameterForWrite failed.", stack);
+    }
+  }
+
+  /// Converts the given Structured Access Framework Uri into an saf protocol
+  /// url opened with the given open mode.
+  ///
+  /// Note that this method is Android only. It will fail if called on other
+  /// platforms. It also requires API Level &ge; 19. On older API levels it
+  /// returns an empty url.
+  static Future<String?> getSafParameter(
+      String uriString, String openMode) async {
+    try {
+      await init();
+      return _platform.ffmpegKitConfigGetSafParameter(uriString, openMode);
+    } on PlatformException catch (e, stack) {
+      print("Plugin getSafParameter error: ${e.message}");
+      return Future.error("getSafParameter failed.", stack);
     }
   }
 
@@ -761,55 +810,6 @@ class FFmpegKitConfig {
     } on PlatformException catch (e, stack) {
       print("Plugin selectDocumentForWrite error: ${e.message}");
       return Future.error("selectDocumentForWrite failed.", stack);
-    }
-  }
-
-  /// Converts the given Structured Access Framework Uri ("content:…") into
-  /// an input url that can be used in FFmpeg and FFprobe commands.
-  ///
-  /// Note that this method is Android only. It will fail if called on other
-  /// platforms. It also requires API Level &ge; 19. On older API levels it
-  /// returns an empty url.
-  static Future<String?> getSafParameterForRead(String uriString) async {
-    try {
-      await init();
-      return _platform.ffmpegKitConfigGetSafParameter(uriString, "r");
-    } on PlatformException catch (e, stack) {
-      print("Plugin getSafParameterForRead error: ${e.message}");
-      return Future.error("getSafParameterForRead failed.", stack);
-    }
-  }
-
-  /// Converts the given Structured Access Framework Uri ("content:…") into
-  /// an output url that can be used in FFmpeg and FFprobe commands.
-  ///
-  /// Note that this method is Android only. It will fail if called on other
-  /// platforms. It also requires API Level &ge; 19. On older API levels it
-  /// returns an empty url.
-  static Future<String?> getSafParameterForWrite(String uriString) async {
-    try {
-      await init();
-      return _platform.ffmpegKitConfigGetSafParameter(uriString, "w");
-    } on PlatformException catch (e, stack) {
-      print("Plugin getSafParameterForWrite error: ${e.message}");
-      return Future.error("getSafParameterForWrite failed.", stack);
-    }
-  }
-
-  /// Converts the given Structured Access Framework Uri into an saf protocol
-  /// url opened with the given open mode.
-  ///
-  /// Note that this method is Android only. It will fail if called on other
-  /// platforms. It also requires API Level &ge; 19. On older API levels it
-  /// returns an empty url.
-  static Future<String?> getSafParameter(
-      String uriString, String openMode) async {
-    try {
-      await init();
-      return _platform.ffmpegKitConfigGetSafParameter(uriString, openMode);
-    } on PlatformException catch (e, stack) {
-      print("Plugin getSafParameter error: ${e.message}");
-      return Future.error("getSafParameter failed.", stack);
     }
   }
 }

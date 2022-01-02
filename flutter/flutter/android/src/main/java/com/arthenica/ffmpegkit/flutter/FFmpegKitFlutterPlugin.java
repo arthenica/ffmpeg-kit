@@ -359,6 +359,13 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                     resultHandler.errorAsync(result, "INVALID_ARGUMENTS", "Invalid arguments array.");
                 }
                 break;
+            case "getMediaInformation":
+                if (sessionId != null) {
+                    getMediaInformation(sessionId, result);
+                } else {
+                    resultHandler.errorAsync(result, "INVALID_SESSION", "Invalid session id.");
+                }
+                break;
             case "mediaInformationJsonParserFrom":
                 if (ffprobeJsonOutput != null) {
                     mediaInformationJsonParserFrom(ffprobeJsonOutput, result);
@@ -876,6 +883,21 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         resultHandler.successAsync(result, toMap(session));
     }
 
+    protected void getMediaInformation(@NonNull final Integer sessionId, @NonNull final Result result) {
+        final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+        if (session == null) {
+            resultHandler.errorAsync(result, "SESSION_NOT_FOUND", "Session not found.");
+        } else {
+            if (session.isMediaInformation()) {
+                final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+                final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+                resultHandler.successAsync(result, toMap(mediaInformation));
+            } else {
+                resultHandler.errorAsync(result, "NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+            }
+        }
+    }
+
     // MediaInformationJsonParser
 
     protected void mediaInformationJsonParserFrom(@NonNull final String ffprobeJsonOutput, @NonNull final Result result) {
@@ -1332,19 +1354,17 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         sessionMap.put(KEY_SESSION_START_TIME, toLong(session.getStartTime()));
         sessionMap.put(KEY_SESSION_COMMAND, session.getCommand());
 
-        if (session.isFFprobe()) {
-            if (session.isMediaInformation()) {
-                final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
-                final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
-                if (mediaInformation != null) {
-                    sessionMap.put(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
-                }
-                sessionMap.put(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
-            } else {
-                sessionMap.put(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
-            }
-        } else {
+        if (session.isFFmpeg()) {
             sessionMap.put(KEY_SESSION_TYPE, SESSION_TYPE_FFMPEG);
+        } else if (session.isFFprobe()) {
+            sessionMap.put(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
+        } else if (session.isMediaInformation()) {
+            final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+            final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+            if (mediaInformation != null) {
+                sessionMap.put(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
+            }
+            sessionMap.put(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
         }
 
         return sessionMap;
@@ -1432,18 +1452,20 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     protected static Map<String, Object> toMap(final MediaInformation mediaInformation) {
-        Map<String, Object> map = new HashMap<>();
-
         if (mediaInformation != null) {
+            Map<String, Object> map = new HashMap<>();
+
             if (mediaInformation.getAllProperties() != null) {
                 JSONObject allProperties = mediaInformation.getAllProperties();
                 if (allProperties != null) {
                     map = toMap(allProperties);
                 }
             }
-        }
 
-        return map;
+            return map;
+        } else {
+            return null;
+        }
     }
 
     protected static Map<String, Object> toMap(final JSONObject jsonObject) {

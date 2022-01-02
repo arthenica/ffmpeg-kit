@@ -232,6 +232,12 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
     } else {
       result([FlutterError errorWithCode:@"INVALID_ARGUMENTS" message:@"Invalid arguments array." details:nil]);
     }
+  } else if ([@"getMediaInformation" isEqualToString:call.method]) {
+    if (sessionId != nil) {
+      [self getMediaInformation:sessionId result:result];
+    } else {
+      result([FlutterError errorWithCode:@"INVALID_SESSION" message:@"Invalid session id." details:nil]);
+    }
   } else if ([@"mediaInformationJsonParserFrom" isEqualToString:call.method]) {
     if (ffprobeJsonOutput != nil) {
       [self mediaInformationJsonParserFrom:ffprobeJsonOutput result:result];
@@ -607,6 +613,20 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 - (void)mediaInformationSession:(NSArray*)arguments result:(FlutterResult)result {
   MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil];
   result([FFmpegKitFlutterPlugin toSessionDictionary:session]);
+}
+
+- (void)getMediaInformation:(NSNumber*)sessionId result:(FlutterResult)result {
+  AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:[sessionId longValue]];
+  if (session == nil) {
+    result([FlutterError errorWithCode:@"SESSION_NOT_FOUND" message:@"Session not found." details:nil]);
+  } else {
+    if ([session isMediaInformation]) {
+        MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
+        result([FFmpegKitFlutterPlugin toMediaInformationDictionary:[mediaInformationSession getMediaInformation]]);
+    } else {
+        result([FlutterError errorWithCode:@"NOT_MEDIA_INFORMATION_SESSION" message:@"A session is found but it does not have the correct type." details:nil]);
+    }
+  }
 }
 
 // MediaInformationJsonParser
@@ -1061,16 +1081,14 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
     dictionary[KEY_SESSION_START_TIME] = [NSNumber numberWithLong:[[session getStartTime] timeIntervalSince1970]*1000];
     dictionary[KEY_SESSION_COMMAND] = [session getCommand];
 
-    if ([session isFFprobe]) {
-      if ([session isMediaInformation]) {
-        MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
-        dictionary[KEY_SESSION_MEDIA_INFORMATION] = [FFmpegKitFlutterPlugin toMediaInformationDictionary:[mediaInformationSession getMediaInformation]];
-        dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_MEDIA_INFORMATION];
-      } else {
-        dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFPROBE];
-      }
-    } else {
+    if ([session isFFmpeg]) {
       dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFMPEG];
+    } else if ([session isFFprobe]) {
+      dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFPROBE];
+    } else if ([session isMediaInformation]) {
+      MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
+      dictionary[KEY_SESSION_MEDIA_INFORMATION] = [FFmpegKitFlutterPlugin toMediaInformationDictionary:[mediaInformationSession getMediaInformation]];
+      dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_MEDIA_INFORMATION];
     }
 
     return dictionary;

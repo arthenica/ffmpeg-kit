@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -34,21 +34,14 @@ class FFmpegKit {
   /// Synchronously executes FFmpeg command provided. Space character is used
   /// to split command into arguments. You can use single or double quote
   /// characters to specify arguments inside your command.
-  static Future<FFmpegSession> execute(String command,
-          [FFmpegSessionCompleteCallback? completeCallback = null,
-          LogCallback? logCallback = null,
-          StatisticsCallback? statisticsCallback = null]) async =>
-      FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command),
-          completeCallback, logCallback, statisticsCallback);
+  static Future<FFmpegSession> execute(String command) async =>
+      FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
 
   /// Synchronously executes FFmpeg with arguments provided.
   static Future<FFmpegSession> executeWithArguments(
-      List<String> commandArguments,
-      [FFmpegSessionCompleteCallback? completeCallback = null,
-      LogCallback? logCallback = null,
-      StatisticsCallback? statisticsCallback = null]) async {
-    final session = await FFmpegSession.create(commandArguments,
-        completeCallback, logCallback, statisticsCallback, null);
+      List<String> commandArguments) async {
+    final session =
+        await FFmpegSession.create(commandArguments, null, null, null, null);
 
     await FFmpegKitConfig.ffmpegExecute(session);
 

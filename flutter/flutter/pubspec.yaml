@@ -21,7 +21,7 @@ flutter:
         pluginClass: FFmpegKitFlutterPlugin
 
 dependencies:
-  ffmpeg_kit_flutter_platform_interface: ^0.1.1
+  ffmpeg_kit_flutter_platform_interface: ^0.2.0
   flutter:
     sdk: flutter
 

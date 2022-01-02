@@ -43,6 +43,6 @@ repositories {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'com.arthenica:ffmpeg-kit-https:4.5.1'
+    implementation 'com.arthenica:ffmpeg-kit-https:4.5.1-1'
 }
 

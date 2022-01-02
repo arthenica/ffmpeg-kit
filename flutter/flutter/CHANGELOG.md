@@ -1,8 +1,8 @@
 ## 4.5.1
-- Bugfix release
+- Feature release based on native v4.5.1
 
 ## 4.5.1-LTS
-- Bugfix LTS release
+- Feature release based on native v4.5.1.LTS
 
 ## 4.5.0
 - Initial release
