@@ -8,11 +8,11 @@
   - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
   - `Android API Level 16` or later
   - `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `i386`, `x86_64`, `x86_64-mac-catalyst` and `arm64-mac-catalyst` architectures on iOS
-  - `iOS SDK 9.3` or later
+  - `iOS SDK 10` or later
   - Can process Storage Access Framework (SAF) Uris on Android
-  - 24 external libraries
+  - 25 external libraries
 
-    `dav1d`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `twolame`, `vo-amrwbenc`
+    `dav1d`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `twolame`, `vo-amrwbenc`, `zimg`
 
   - 4 external libraries with GPL license
 
@@ -73,7 +73,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">min-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">min-gpl</td>
@@ -82,7 +82,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">min-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">https</td>
@@ -91,7 +91,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">https-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">https-gpl</td>
@@ -100,7 +100,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">https-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">audio</td>
@@ -109,7 +109,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">audio-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">video</td>
@@ -118,7 +118,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">video-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">full</td>
@@ -127,7 +127,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">full-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">full-gpl</td>
@@ -136,7 +136,7 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">12.1</td>
 <td align="center">full-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">9.3</td>
+<td align="center">10</td>
 </tr>
 </tbody>
 </table>
@@ -152,7 +152,7 @@ packages using the instructions below.
 
 - Edit `android/build.gradle` file and add the package name in `ext.ffmpegKitPackage` variable.
 
-    ```
+    ```gradle
     ext {
         ffmpegKitPackage = "<package name>"
     }
@@ -163,7 +163,7 @@ packages using the instructions below.
 
 - Edit `ios/Podfile` file and add the package name as `subspec`. After that run `pod install` again.
 
-    ```
+    ```ruby
     pod 'ffmpeg-kit-react-native', :subspecs => ['<package name>'], :podspec => '../node_modules/ffmpeg-kit-react-native/ffmpeg-kit-react-native.podspec'
     ```
 
@@ -196,7 +196,7 @@ compare to each other.
     ```js
     import { FFmpegKit } from 'ffmpeg-kit-react-native';
 
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', async (session) => {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
       const returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) {
@@ -219,7 +219,7 @@ compare to each other.
    session created.
 
     ```js
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
 
       // Unique session id created for this execution
       const sessionId = session.getSessionId();
@@ -276,7 +276,7 @@ compare to each other.
 4. Execute `FFprobe` commands.
 
     ```js
-    FFprobeKit.executeAsync(ffprobeCommand, session => {
+    FFprobeKit.execute(ffprobeCommand).then(async (session) => {
 
       // CALLED WHEN SESSION IS EXECUTED
 
@@ -286,8 +286,18 @@ compare to each other.
 5. Get media information for a file/url.
 
     ```js
-    FFprobeKit.getMediaInformationAsync('<file path or url>', async (session) => {
+    FFprobeKit.getMediaInformation(testUrl).then(async (session) => {
       const information = await session.getMediaInformation();
+
+      if (information === undefined) {
+
+        // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
+        const state = FFmpegKitConfig.sessionStateToString(await session.getState());
+        const returnCode = await session.getReturnCode();
+        const failStackTrace = await session.getFailStackTrace();
+        const duration = await session.getDuration();
+        const output = await session.getOutput();
+      }
     });
     ```
 
@@ -323,7 +333,7 @@ compare to each other.
     });
     ```
 
-8. Get previous `FFmpeg` and `FFprobe` sessions from the session history.
+8. Get previous `FFmpeg`, `FFprobe` and `MediaInformation` sessions from the session history.
 
     ```js
     FFmpegKit.listSessions().then(sessionList => {
@@ -332,7 +342,13 @@ compare to each other.
       });
     });
 
-    FFprobeKit.listSessions().then(sessionList => {
+    FFprobeKit.listFFprobeSessions().then(sessionList => {
+      sessionList.forEach(async session => {
+        const sessionId = session.getSessionId();
+      });
+    });
+
+    FFprobeKit.listMediaInformationSessions().then(sessionList => {
       sessionList.forEach(async session => {
         const sessionId = session.getSessionId();
       });
@@ -340,10 +356,18 @@ compare to each other.
     ```
 
 9. Enable global callbacks.
-  - Execute Callback, called when an async execution is ended
+  - Session type specific Complete Callbacks, called when an async session has been completed
 
     ```js
-    FFmpegKitConfig.enableExecuteCallback(session => {
+    FFmpegKitConfig.enableFFmpegSessionCompleteCallback(session => {
+      const sessionId = session.getSessionId();
+    });
+
+    FFmpegKitConfig.enableFFprobeSessionCompleteCallback(session => {
+      const sessionId = session.getSessionId();
+    });
+
+    FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(session => {
       const sessionId = session.getSessionId();
     });
     ```

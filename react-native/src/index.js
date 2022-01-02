@@ -2,14 +2,16 @@ import {NativeEventEmitter, NativeModules} from 'react-native';
 
 const {FFmpegKitReactNativeModule} = NativeModules;
 
-const executeCallbackMap = new Map()
+const ffmpegSessionCompleteCallbackMap = new Map()
+const ffprobeSessionCompleteCallbackMap = new Map()
+const mediaInformationSessionCompleteCallbackMap = new Map()
 const logCallbackMap = new Map()
 const statisticsCallbackMap = new Map()
 const logRedirectionStrategyMap = new Map()
 
 const eventLogCallbackEvent = "FFmpegKitLogCallbackEvent";
 const eventStatisticsCallbackEvent = "FFmpegKitStatisticsCallbackEvent";
-const eventExecuteCallbackEvent = "FFmpegKitExecuteCallbackEvent";
+const eventCompleteCallbackEvent = "FFmpegKitCompleteCallbackEvent";
 
 export const LogRedirectionStrategy = {
   ALWAYS_PRINT_LOGS: 0,
@@ -20,18 +22,11 @@ export const LogRedirectionStrategy = {
 }
 
 export const SessionState = {
-  CREATED: 0,
-  RUNNING: 1,
-  FAILED: 2,
-  COMPLETED: 3
+  CREATED: 0, RUNNING: 1, FAILED: 2, COMPLETED: 3
 }
 
 export const Signal = {
-  SIGINT: 2,
-  SIGQUIT: 3,
-  SIGPIPE: 13,
-  SIGTERM: 15,
-  SIGXCPU: 24
+  SIGINT: 2, SIGQUIT: 3, SIGPIPE: 13, SIGTERM: 15, SIGXCPU: 24
 }
 
 class FFmpegKitReactNativeEventEmitter extends NativeEventEmitter {
@@ -66,17 +61,9 @@ class FFmpegKitReactNativeEventEmitter extends NativeEventEmitter {
 export class Session {
 
   /**
-   * Returns the session specific execute callback function.
+   * Returns the session specific log callback.
    *
-   * @return session specific execute callback function
-   */
-  getExecuteCallback() {
-  }
-
-  /**
-   * Returns the session specific log callback function.
-   *
-   * @return session specific log callback function
+   * @return session specific log callback
    */
   getLogCallback() {
   }
@@ -253,6 +240,14 @@ export class Session {
   }
 
   /**
+   * Returns whether it is a <code>MediaInformation</code> session or not.
+   *
+   * @return true if it is a <code>MediaInformation</code> session, false otherwise
+   */
+  isMediaInformation() {
+  }
+
+  /**
    * Cancels running the session.
    */
   cancel() {
@@ -261,8 +256,8 @@ export class Session {
 }
 
 /**
- * Abstract session implementation which includes common features shared by <code>FFmpeg</code>
- * and <code>FFprobe</code> sessions.
+ * Abstract session implementation which includes common features shared by <code>FFmpeg</code>,
+ * <code>FFprobe</code> and <code>MediaInformation</code> sessions.
  */
 export class AbstractSession extends Session {
 
@@ -452,18 +447,9 @@ export class AbstractSession extends Session {
   }
 
   /**
-   * Returns the session specific execute callback function.
+   * Returns the session specific log callback.
    *
-   * @return session specific execute callback function
-   */
-  getExecuteCallback() {
-    return FFmpegKitFactory.getExecuteCallback(this.getSessionId())
-  }
-
-  /**
-   * Returns the session specific log callback function.
-   *
-   * @return session specific log callback function
+   * @return session specific log callback
    */
   getLogCallback() {
     return FFmpegKitFactory.getLogCallback(this.getSessionId())
@@ -674,6 +660,15 @@ export class AbstractSession extends Session {
   }
 
   /**
+   * Returns whether it is a <code>MediaInformation</code> session or not.
+   *
+   * @return true if it is a <code>MediaInformation</code> session, false otherwise
+   */
+  isMediaInformation() {
+    return false;
+  }
+
+  /**
    * Cancels running the session.
    */
   cancel() {
@@ -710,36 +705,61 @@ export class ArchDetect {
 export class FFmpegKit {
 
   /**
+   * <p>Synchronously executes FFmpeg command provided. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * @param command            FFmpeg command
+   * @return FFmpeg session created for this execution
+   */
+  static async execute(command) {
+    return FFmpegKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
+  }
+
+  /**
+   * <p>Synchronously executes FFmpeg with arguments provided.
+   *
+   * @param commandArguments   FFmpeg command options/arguments as string array
+   * @return FFmpeg session created for this execution
+   */
+  static async executeWithArguments(commandArguments) {
+    let session = await FFmpegSession.create(commandArguments, undefined, undefined, undefined);
+
+    await FFmpegKitConfig.ffmpegExecute(session);
+
+    return session;
+  }
+
+  /**
    * <p>Starts an asynchronous FFmpeg execution for the given command. Space character is used to split the command
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFmpegSessionCompleteCallback if you want to be notified about the result.
    *
    * @param command            FFmpeg command
-   * @param executeCallback    callback that will be called when the execution is completed
+   * @param completeCallback   callback that will be called when the execution has completed
    * @param logCallback        callback that will receive logs
    * @param statisticsCallback callback that will receive statistics
    * @return FFmpeg session created for this execution
    */
-  static async executeAsync(command, executeCallback, logCallback, statisticsCallback) {
-    return FFmpegKit.executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, statisticsCallback);
+  static async executeAsync(command, completeCallback, logCallback, statisticsCallback) {
+    return FFmpegKit.executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, statisticsCallback);
   }
 
   /**
    * <p>Starts an asynchronous FFmpeg execution with arguments provided.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFmpegSessionCompleteCallback if you want to be notified about the result.
    *
    * @param commandArguments   FFmpeg command options/arguments as string array
-   * @param executeCallback    callback that will be called when the execution is completed
+   * @param completeCallback   callback that will be called when the execution has completed
    * @param logCallback        callback that will receive logs
    * @param statisticsCallback callback that will receive statistics
    * @return FFmpeg session created for this execution
    */
-  static async executeWithArgumentsAsync(commandArguments, executeCallback, logCallback, statisticsCallback) {
-    let session = await FFmpegSession.create(commandArguments, executeCallback, logCallback, statisticsCallback);
+  static async executeWithArgumentsAsync(commandArguments, completeCallback, logCallback, statisticsCallback) {
+    let session = await FFmpegSession.create(commandArguments, completeCallback, logCallback, statisticsCallback);
 
     await FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -749,7 +769,7 @@ export class FFmpegKit {
   /**
    * <p>Cancels the session specified with <code>sessionId</code>.
    *
-   * <p>This function does not wait for termination to complete and returns immediately.
+   * <p>This method does not wait for termination to complete and returns immediately.
    *
    * @param sessionId id of the session that will be cancelled
    */
@@ -958,10 +978,44 @@ export class FFmpegKitConfig {
   }
 
   /**
+   * <p>Synchronously executes the FFmpeg session provided.
+   *
+   * @param ffmpegSession FFmpeg session which includes command options/arguments
+   */
+  static async ffmpegExecute(ffmpegSession) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.ffmpegSessionExecute(ffmpegSession.getSessionId());
+  }
+
+  /**
+   * <p>Synchronously executes the FFprobe session provided.
+   *
+   * @param ffprobeSession FFprobe session which includes command options/arguments
+   */
+  static async ffprobeExecute(ffprobeSession) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.ffprobeSessionExecute(ffprobeSession.getSessionId());
+  }
+
+  /**
+   * <p>Synchronously executes the media information session provided.
+   *
+   * @param mediaInformationSession media information session which includes command options/arguments
+   * @param waitTimeout             max time to wait until media information is transmitted
+   */
+  static async getMediaInformationExecute(mediaInformationSession, waitTimeout) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.mediaInformationSessionExecute(mediaInformationSession.getSessionId(), FFmpegKitFactory.optionalNumericParameter(waitTimeout));
+  }
+
+  /**
    * <p>Starts an asynchronous FFmpeg execution for the given session.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFmpegSessionCompleteCallback if you want to be notified about the result.
    *
    * @param ffmpegSession FFmpeg session which includes command options/arguments
    */
@@ -975,7 +1029,7 @@ export class FFmpegKitConfig {
    * <p>Starts an asynchronous FFprobe execution for the given session.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFprobeSessionCompleteCallback if you want to be notified about the result.
    *
    * @param ffprobeSession FFprobe session which includes command options/arguments
    */
@@ -989,7 +1043,7 @@ export class FFmpegKitConfig {
    * <p>Starts an asynchronous FFprobe execution for the given media information session.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * MediaInformationSessionCompleteCallback if you want to be notified about the result.
    *
    * @param mediaInformationSession media information session which includes command options/arguments
    * @param waitTimeout             max time to wait until media information is transmitted
@@ -1001,9 +1055,9 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Sets a global callback function to redirect FFmpeg/FFprobe logs.
+   * <p>Sets a global callback to redirect FFmpeg/FFprobe logs.
    *
-   * @param logCallback log callback function or undefined to disable a previously defined
+   * @param logCallback log callback or undefined to disable a previously defined
    *                    callback
    */
   static enableLogCallback(logCallback) {
@@ -1011,9 +1065,9 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Sets a global callback function to redirect FFmpeg statistics.
+   * <p>Sets a global callback to redirect FFmpeg statistics.
    *
-   * @param statisticsCallback statistics callback function or undefined to disable a previously
+   * @param statisticsCallback statistics callback or undefined to disable a previously
    *                           defined callback
    */
   static enableStatisticsCallback(statisticsCallback) {
@@ -1021,13 +1075,58 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Sets a global callback function to receive execution results.
+   * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results for FFmpeg sessions.
    *
-   * @param executeCallback execute callback function or undefined to disable a previously
-   *                        defined callback
+   * @param ffmpegSessionCompleteCallback complete callback or undefined to disable a previously defined callback
    */
-  static enableExecuteCallback(executeCallback) {
-    FFmpegKitFactory.setGlobalExecuteCallback(executeCallback);
+  static enableFFmpegSessionCompleteCallback(ffmpegSessionCompleteCallback) {
+    FFmpegKitFactory.setGlobalFFmpegSessionCompleteCallback(ffmpegSessionCompleteCallback);
+  }
+
+  /**
+   * <p>Returns the global FFmpegSessionCompleteCallback set.
+   *
+   * @return global FFmpegSessionCompleteCallback or undefined if it is not set
+   */
+  static getFFmpegSessionCompleteCallback() {
+    return FFmpegKitFactory.getGlobalFFmpegSessionCompleteCallback();
+  }
+
+  /**
+   * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results for FFprobe sessions.
+   *
+   * @param ffprobeSessionCompleteCallback complete callback or undefined to disable a previously defined callback
+   */
+  static enableFFprobeSessionCompleteCallback(ffprobeSessionCompleteCallback) {
+    FFmpegKitFactory.setGlobalFFprobeSessionCompleteCallback(ffprobeSessionCompleteCallback);
+  }
+
+  /**
+   * <p>Returns the global FFprobeSessionCompleteCallback set.
+   *
+   * @return global FFprobeSessionCompleteCallback or undefined if it is not set
+   */
+  static getFFprobeSessionCompleteCallback() {
+    return FFmpegKitFactory.getGlobalFFprobeSessionCompleteCallback();
+  }
+
+  /**
+   * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution results for MediaInformation sessions.
+   *
+   * @param mediaInformationSessionCompleteCallback complete callback or undefined to disable a previously defined
+   * callback
+   */
+  static enableMediaInformationSessionCompleteCallback(mediaInformationSessionCompleteCallback) {
+    FFmpegKitFactory.setGlobalMediaInformationSessionCompleteCallback(mediaInformationSessionCompleteCallback);
+  }
+
+  /**
+   * <p>Returns the global MediaInformationSessionCompleteCallback set.
+   *
+   * @return global MediaInformationSessionCompleteCallback or undefined if it is not set
+   */
+  static getMediaInformationSessionCompleteCallback() {
+    return FFmpegKitFactory.getGlobalMediaInformationSessionCompleteCallback();
   }
 
   /**
@@ -1049,6 +1148,54 @@ export class FFmpegKitConfig {
 
     FFmpegKitFactory.setLogLevel(level);
     return FFmpegKitReactNativeModule.setLogLevel(level);
+  }
+
+  /**
+   * <p>Converts the given Structured Access Framework Uri into an input url that can be used in FFmpeg
+   * and FFprobe commands.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @return input url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameterForRead(uriString) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, "r");
+  }
+
+  /**
+   * <p>Converts the given Structured Access Framework Uri into an output url that can be used in FFmpeg
+   * and FFprobe commands.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @return output url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameterForWrite(uriString) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, "w");
+  }
+
+  /**
+   * <p>Converts the given Structured Access Framework Uri into an saf protocol url opened with the given open mode.
+   *
+   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
+   * API Level &ge; 19. On older API levels it returns an empty url.
+   *
+   * @param uriString SAF uri (<code>"content:…"</code>)
+   * @param openMode file mode to use as defined in Android Structured Access Framework documentation
+   * @return saf protocol url that can be passed to FFmpegKit or FFprobeKit
+   */
+  static async getSafParameter(uriString, openMode) {
+    await FFmpegKitConfig.init();
+
+    return FFmpegKitReactNativeModule.getSafParameter(uriString, openMode);
   }
 
   /**
@@ -1135,6 +1282,42 @@ export class FFmpegKitConfig {
     await FFmpegKitConfig.init();
 
     return FFmpegKitReactNativeModule.clearSessions();
+  }
+
+  /**
+   * <p>Returns all FFmpeg sessions in the session history.
+   *
+   * @return all FFmpeg sessions in the session history
+   */
+  static async getFFmpegSessions() {
+    await FFmpegKitConfig.init();
+
+    const sessionArray = await FFmpegKitReactNativeModule.getFFmpegSessions();
+    return sessionArray.map(FFmpegKitFactory.mapToSession);
+  }
+
+  /**
+   * <p>Returns all FFprobe sessions in the session history.
+   *
+   * @return all FFprobe sessions in the session history
+   */
+  static async getFFprobeSessions() {
+    await FFmpegKitConfig.init();
+
+    const sessionArray = await FFmpegKitReactNativeModule.getFFprobeSessions();
+    return sessionArray.map(FFmpegKitFactory.mapToSession);
+  }
+
+  /**
+   * <p>Returns all MediaInformation sessions in the session history.
+   *
+   * @return all MediaInformation sessions in the session history
+   */
+  static async getMediaInformationSessions() {
+    await FFmpegKitConfig.init();
+
+    const sessionArray = await FFmpegKitReactNativeModule.getMediaInformationSessions();
+    return sessionArray.map(FFmpegKitFactory.mapToSession);
   }
 
   /**
@@ -1381,59 +1564,20 @@ export class FFmpegKitConfig {
     return FFmpegKitReactNativeModule.selectDocument(true, title, type, extraTypes);
   }
 
-  /**
-   * <p>Converts the given Structured Access Framework Uri into an input url that can be used in FFmpeg
-   * and FFprobe commands.
-   *
-   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
-   * API Level &ge; 19. On older API levels it returns an empty url.
-   *
-   * @param uriString SAF uri (<code>"content:…"</code>)
-   * @return input url that can be passed to FFmpegKit or FFprobeKit
-   */
-  static async getSafParameterForRead(uriString) {
-    await FFmpegKitConfig.init();
-
-    return FFmpegKitReactNativeModule.getSafParameter(false, uriString);
-  }
-
-  /**
-   * <p>Converts the given Structured Access Framework Uri into an output url that can be used in FFmpeg
-   * and FFprobe commands.
-   *
-   * <p>Note that this method is Android only. It will fail if called on other platforms. It also requires
-   * API Level &ge; 19. On older API levels it returns an empty url.
-   *
-   * @param uriString SAF uri (<code>"content:…"</code>)
-   * @return output url that can be passed to FFmpegKit or FFprobeKit
-   */
-  static async getSafParameterForWrite(uriString) {
-    await FFmpegKitConfig.init();
-
-    return FFmpegKitReactNativeModule.getSafParameter(true, uriString);
-  }
-
 }
 
 class FFmpegKitFactory {
 
+  static #ffmpegSessionCompleteCallback = undefined;
+  static #ffprobeSessionCompleteCallback = undefined;
+  static #mediaInformationSessionCompleteCallback = undefined;
   static #logCallback = undefined;
   static #statisticsCallback = undefined;
-  static #executeCallback = undefined;
   static #activeLogLevel = undefined;
 
   static mapToStatistics(statisticsMap) {
     if (statisticsMap !== undefined) {
-      return new Statistics(
-        statisticsMap.sessionId,
-        statisticsMap.videoFrameNumber,
-        statisticsMap.videoFps,
-        statisticsMap.videoQuality,
-        statisticsMap.size,
-        statisticsMap.time,
-        statisticsMap.bitrate,
-        statisticsMap.speed
-      );
+      return new Statistics(statisticsMap.sessionId, statisticsMap.videoFrameNumber, statisticsMap.videoFps, statisticsMap.videoQuality, statisticsMap.size, statisticsMap.time, statisticsMap.bitrate, statisticsMap.speed);
     } else {
       return undefined;
     }
@@ -1464,7 +1608,7 @@ class FFmpegKitFactory {
   }
 
   static getVersion() {
-    return "4.5";
+    return "4.5.1";
   }
 
   static getLogRedirectionStrategy(sessionId) {
@@ -1511,22 +1655,58 @@ class FFmpegKitFactory {
     this.#statisticsCallback = statisticsCallback;
   }
 
-  static getExecuteCallback(sessionId) {
-    return executeCallbackMap.get(sessionId);
+  static getFFmpegSessionCompleteCallback(sessionId) {
+    return ffmpegSessionCompleteCallbackMap.get(sessionId);
   }
 
-  static setExecuteCallback(sessionId, executeCallback) {
-    if (executeCallback !== undefined) {
-      executeCallbackMap.set(sessionId, executeCallback);
+  static setFFmpegSessionCompleteCallback(sessionId, completeCallback) {
+    if (completeCallback !== undefined) {
+      ffmpegSessionCompleteCallbackMap.set(sessionId, completeCallback);
     }
   }
 
-  static getGlobalExecuteCallback() {
-    return this.#executeCallback;
+  static getGlobalFFmpegSessionCompleteCallback() {
+    return this.#ffmpegSessionCompleteCallback;
   }
 
-  static setGlobalExecuteCallback(executeCallback) {
-    this.#executeCallback = executeCallback;
+  static setGlobalFFmpegSessionCompleteCallback(completeCallback) {
+    this.#ffmpegSessionCompleteCallback = completeCallback;
+  }
+
+  static getFFprobeSessionCompleteCallback(sessionId) {
+    return ffprobeSessionCompleteCallbackMap.get(sessionId);
+  }
+
+  static setFFprobeSessionCompleteCallback(sessionId, completeCallback) {
+    if (completeCallback !== undefined) {
+      ffprobeSessionCompleteCallbackMap.set(sessionId, completeCallback);
+    }
+  }
+
+  static getGlobalFFprobeSessionCompleteCallback() {
+    return this.#ffprobeSessionCompleteCallback;
+  }
+
+  static setGlobalFFprobeSessionCompleteCallback(completeCallback) {
+    this.#ffprobeSessionCompleteCallback = completeCallback;
+  }
+
+  static getMediaInformationSessionCompleteCallback(sessionId) {
+    return mediaInformationSessionCompleteCallbackMap.get(sessionId);
+  }
+
+  static setMediaInformationSessionCompleteCallback(sessionId, completeCallback) {
+    if (completeCallback !== undefined) {
+      mediaInformationSessionCompleteCallbackMap.set(sessionId, completeCallback);
+    }
+  }
+
+  static getGlobalMediaInformationSessionCompleteCallback() {
+    return this.#mediaInformationSessionCompleteCallback;
+  }
+
+  static setGlobalMediaInformationSessionCompleteCallback(completeCallback) {
+    this.#mediaInformationSessionCompleteCallback = completeCallback;
   }
 
   static setLogLevel(logLevel) {
@@ -1571,124 +1751,147 @@ class FFmpegKitInitializer {
       return;
     }
 
-    FFmpegKitConfig.getSession(sessionId).then(session => {
-      activeLogRedirectionStrategy = session.getLogRedirectionStrategy();
+    if (FFmpegKitFactory.getLogRedirectionStrategy(sessionId) !== undefined) {
+      activeLogRedirectionStrategy = FFmpegKitFactory.getLogRedirectionStrategy(sessionId);
+    }
+    let activeLogCallback = FFmpegKitFactory.getLogCallback(sessionId);
+    if (activeLogCallback !== undefined) {
+      sessionCallbackDefined = true;
 
-      if (session.getLogCallback() !== undefined) {
-        sessionCallbackDefined = true;
-
-        try {
-          // NOTIFY SESSION CALLBACK DEFINED
-          session.getLogCallback()(log);
-        } catch (err) {
-          console.log("Exception thrown inside session LogCallback block.", err.stack);
-        }
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        activeLogCallback(log);
+      } catch (err) {
+        console.log("Exception thrown inside session log callback.", err.stack);
       }
+    }
 
-      let globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
-      if (globalLogCallbackFunction !== undefined) {
-        globalCallbackDefined = true;
+    let globalLogCallbackFunction = FFmpegKitFactory.getGlobalLogCallback();
+    if (globalLogCallbackFunction !== undefined) {
+      globalCallbackDefined = true;
 
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalLogCallbackFunction(log);
-        } catch (err) {
-          console.log("Exception thrown inside global LogCallback block.", err.stack);
-        }
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalLogCallbackFunction(log);
+      } catch (err) {
+        console.log("Exception thrown inside global log callback.", err.stack);
       }
+    }
 
-      // EXECUTE THE LOG STRATEGY
-      switch (activeLogRedirectionStrategy) {
-        case LogRedirectionStrategy.NEVER_PRINT_LOGS: {
+    // EXECUTE THE LOG STRATEGY
+    switch (activeLogRedirectionStrategy) {
+      case LogRedirectionStrategy.NEVER_PRINT_LOGS: {
+        return;
+      }
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_GLOBAL_CALLBACK_NOT_DEFINED: {
+        if (globalCallbackDefined) {
           return;
         }
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_GLOBAL_CALLBACK_NOT_DEFINED: {
-          if (globalCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_SESSION_CALLBACK_NOT_DEFINED: {
-          if (sessionCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED: {
-          if (globalCallbackDefined || sessionCallbackDefined) {
-            return;
-          }
-        }
-          break;
-        case LogRedirectionStrategy.ALWAYS_PRINT_LOGS: {
-        }
-          break;
       }
+        break;
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_SESSION_CALLBACK_NOT_DEFINED: {
+        if (sessionCallbackDefined) {
+          return;
+        }
+      }
+        break;
+      case LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED: {
+        if (globalCallbackDefined || sessionCallbackDefined) {
+          return;
+        }
+      }
+        break;
+      case LogRedirectionStrategy.ALWAYS_PRINT_LOGS: {
+      }
+        break;
+    }
 
-      // PRINT LOGS
-      switch (level) {
-        case Level.AV_LOG_QUIET: {
-          // PRINT NO OUTPUT
-        }
-          break;
-        default: {
-          console.log(text);
-        }
+    // PRINT LOGS
+    switch (level) {
+      case Level.AV_LOG_QUIET: {
+        // PRINT NO OUTPUT
       }
-    });
+        break;
+      default: {
+        console.log(text);
+      }
+    }
   }
 
   static processStatisticsCallbackEvent(event) {
     let statistics = FFmpegKitFactory.mapToStatistics(event);
     let sessionId = event.sessionId;
 
-    FFmpegKitConfig.getSession(sessionId).then(session => {
-      if (session.isFFmpeg()) {
-        if (session.getStatisticsCallback() !== undefined) {
-          try {
-            // NOTIFY SESSION CALLBACK DEFINED
-            session.getStatisticsCallback()(statistics);
-          } catch (err) {
-            console.log("Exception thrown inside session StatisticsCallback block.", err.stack);
-          }
-        }
+    let activeStatisticsCallback = FFmpegKitFactory.getStatisticsCallback(sessionId);
+    if (activeStatisticsCallback !== undefined) {
+      try {
+        // NOTIFY SESSION CALLBACK DEFINED
+        activeStatisticsCallback(statistics);
+      } catch (err) {
+        console.log("Exception thrown inside session statistics callback.", err.stack);
       }
+    }
 
-      let globalStatisticsCallbackFunction = FFmpegKitFactory.getGlobalStatisticsCallback();
-      if (globalStatisticsCallbackFunction !== undefined) {
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalStatisticsCallbackFunction(statistics);
-        } catch (err) {
-          console.log("Exception thrown inside global StatisticsCallback block.", err.stack);
-        }
+    let globalStatisticsCallbackFunction = FFmpegKitFactory.getGlobalStatisticsCallback();
+    if (globalStatisticsCallbackFunction !== undefined) {
+      try {
+        // NOTIFY GLOBAL CALLBACK DEFINED
+        globalStatisticsCallbackFunction(statistics);
+      } catch (err) {
+        console.log("Exception thrown inside global statistics callback.", err.stack);
       }
-    });
+    }
   }
 
-  static processExecuteCallbackEvent(event) {
-    let sessionId = event.sessionId;
+  static processCompleteCallbackEvent(event) {
+    if (event !== undefined) {
+      let sessionId = event.sessionId;
 
-    FFmpegKitConfig.getSession(sessionId).then(session => {
-      if (session.getExecuteCallback() !== undefined) {
-        try {
-          // NOTIFY SESSION CALLBACK DEFINED
-          session.getExecuteCallback()(session);
-        } catch (err) {
-          console.log("Exception thrown inside session ExecuteCallback block.", err.stack);
-        }
-      }
+      FFmpegKitConfig.getSession(sessionId).then(session => {
+        if (session !== undefined) {
+          if (session.getCompleteCallback() !== undefined) {
+            try {
+              // NOTIFY SESSION CALLBACK DEFINED
+              session.getCompleteCallback()(session);
+            } catch (err) {
+              console.log("Exception thrown inside session complete callback.", err.stack);
+            }
+          }
 
-      let globalExecuteCallbackFunction = FFmpegKitFactory.getGlobalExecuteCallback();
-      if (globalExecuteCallbackFunction !== undefined) {
-        try {
-          // NOTIFY GLOBAL CALLBACK DEFINED
-          globalExecuteCallbackFunction(session);
-        } catch (err) {
-          console.log("Exception thrown inside global ExecuteCallback block.", err.stack);
+          if (session.isFFmpeg()) {
+            let globalFFmpegSessionCompleteCallback = FFmpegKitFactory.getGlobalFFmpegSessionCompleteCallback();
+            if (globalFFmpegSessionCompleteCallback !== undefined) {
+              try {
+                // NOTIFY GLOBAL CALLBACK DEFINED
+                globalFFmpegSessionCompleteCallback(session);
+              } catch (err) {
+                console.log("Exception thrown inside global complete callback.", err.stack);
+              }
+            }
+          } else if (session.isFFprobe()) {
+            let globalFFprobeSessionCompleteCallback = FFmpegKitFactory.getGlobalFFprobeSessionCompleteCallback();
+            if (globalFFprobeSessionCompleteCallback !== undefined) {
+              try {
+                // NOTIFY GLOBAL CALLBACK DEFINED
+                globalFFprobeSessionCompleteCallback(session);
+              } catch (err) {
+                console.log("Exception thrown inside global complete callback.", err.stack);
+              }
+            }
+          } else if (session.isMediaInformation()) {
+            let globalMediaInformationSessionCompleteCallback = FFmpegKitFactory.getGlobalMediaInformationSessionCompleteCallback();
+            if (globalMediaInformationSessionCompleteCallback !== undefined) {
+              try {
+                // NOTIFY GLOBAL CALLBACK DEFINED
+                globalMediaInformationSessionCompleteCallback(session);
+              } catch (err) {
+                console.log("Exception thrown inside global complete callback.", err.stack);
+              }
+            }
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   static async initialize() {
@@ -1702,7 +1905,7 @@ class FFmpegKitInitializer {
 
     this.#eventEmitter.addListener(eventLogCallbackEvent, FFmpegKitInitializer.processLogCallbackEvent);
     this.#eventEmitter.addListener(eventStatisticsCallbackEvent, FFmpegKitInitializer.processStatisticsCallbackEvent);
-    this.#eventEmitter.addListener(eventExecuteCallbackEvent, FFmpegKitInitializer.processExecuteCallbackEvent);
+    this.#eventEmitter.addListener(eventCompleteCallbackEvent, FFmpegKitInitializer.processCompleteCallbackEvent);
 
     FFmpegKitFactory.setLogLevel(await FFmpegKitReactNativeModule.getLogLevel());
     const version = FFmpegKitFactory.getVersion();
@@ -1710,8 +1913,9 @@ class FFmpegKitInitializer {
     const arch = await ArchDetect.getArch();
     const packageName = await Packages.getPackageName();
     await FFmpegKitConfig.enableRedirection();
+    const isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
 
-    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}.`);
+    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
   }
 
 }
@@ -1732,17 +1936,17 @@ export class FFmpegSession extends AbstractSession {
    * Creates a new FFmpeg session.
    *
    * @param argumentsArray FFmpeg command arguments
-   * @param executeCallback callback that will be called when the execution is completed
+   * @param completeCallback callback that will be called when the execution has completed
    * @param logCallback callback that will receive logs
    * @param statisticsCallback callback that will receive statistics
    * @param logRedirectionStrategy defines how logs will be redirected
    * @returns FFmpeg session created
    */
-  static async create(argumentsArray, executeCallback, logCallback, statisticsCallback, logRedirectionStrategy) {
+  static async create(argumentsArray, completeCallback, logCallback, statisticsCallback, logRedirectionStrategy) {
     const session = await AbstractSession.createFFmpegSession(argumentsArray, logRedirectionStrategy);
     const sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setExecuteCallback(sessionId, executeCallback);
+    FFmpegKitFactory.setFFmpegSessionCompleteCallback(sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
     FFmpegKitFactory.setStatisticsCallback(sessionId, statisticsCallback);
 
@@ -1760,12 +1964,21 @@ export class FFmpegSession extends AbstractSession {
   }
 
   /**
-   * Returns the session specific statistics callback function.
+   * Returns the session specific statistics callback.
    *
-   * @return session specific statistics callback function
+   * @return session specific statistics callback
    */
   getStatisticsCallback() {
     return FFmpegKitFactory.getStatisticsCallback(this.getSessionId());
+  }
+
+  /**
+   * Returns the session specific complete callback.
+   *
+   * @return session specific complete callback
+   */
+  getCompleteCallback() {
+    return FFmpegKitFactory.getFFmpegSessionCompleteCallback(this.getSessionId());
   }
 
   /**
@@ -1806,7 +2019,7 @@ export class FFmpegSession extends AbstractSession {
     let statistics = await this.getStatistics();
 
     if (statistics.length > 0) {
-      return statistics[0];
+      return statistics[statistics.length - 1];
     } else {
       return undefined;
     }
@@ -1820,6 +2033,10 @@ export class FFmpegSession extends AbstractSession {
     return false;
   }
 
+  isMediaInformation() {
+    return false;
+  }
+
 }
 
 /**
@@ -1828,36 +2045,107 @@ export class FFmpegSession extends AbstractSession {
 export class FFprobeKit {
 
   /**
+   * <p>Synchronously executes FFprobe command provided. Space character is used to split the command
+   * into arguments. You can use single or double quote characters to specify arguments inside your command.
+   *
+   * @param command FFprobe command
+   * @return FFprobe session created for this execution
+   */
+  static async execute(command) {
+    return FFprobeKit.executeWithArguments(FFmpegKitConfig.parseArguments(command));
+  }
+
+  /**
+   * <p>Synchronously executes FFprobe with arguments provided.
+   *
+   * @param commandArguments FFprobe command options/arguments as string array
+   * @return FFprobe session created for this execution
+   */
+  static async executeWithArguments(commandArguments) {
+    let session = await FFprobeSession.create(commandArguments, undefined, undefined);
+
+    await FFmpegKitConfig.ffprobeExecute(session);
+
+    return session;
+  }
+
+  /**
    * <p>Starts an asynchronous FFprobe execution for the given command. Space character is used to split the command
    * into arguments. You can use single or double quote characters to specify arguments inside your command.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFprobeSessionCompleteCallback if you want to be notified about the result.
    *
    * @param command FFprobe command
-   * @param executeCallback callback that will be called when the execution is completed
+   * @param completeCallback callback that will be called when the execution has completed
    * @param logCallback callback that will receive logs
    * @return FFprobe session created for this execution
    */
-  static async executeAsync(command, executeCallback, logCallback) {
-    return FFprobeKit.executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback);
+  static async executeAsync(command, completeCallback, logCallback) {
+    return FFprobeKit.executeWithArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback);
   }
 
   /**
    * <p>Starts an asynchronous FFprobe execution with arguments provided.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * FFprobeSessionCompleteCallback if you want to be notified about the result.
    *
    * @param commandArguments FFprobe command options/arguments as string array
-   * @param executeCallback callback that will be called when the execution is completed
+   * @param completeCallback callback that will be called when the execution has completed
    * @param logCallback callback that will receive logs
    * @return FFprobe session created for this execution
    */
-  static async executeWithArgumentsAsync(commandArguments, executeCallback, logCallback) {
-    let session = await FFprobeSession.create(commandArguments, executeCallback, logCallback);
+  static async executeWithArgumentsAsync(commandArguments, completeCallback, logCallback) {
+    let session = await FFprobeSession.create(commandArguments, completeCallback, logCallback);
 
     await FFmpegKitConfig.asyncFFprobeExecute(session);
+
+    return session;
+  }
+
+  /**
+   * <p>Extracts media information for the file specified with path.
+   *
+   * @param path            path or uri of a media file
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformation(path, waitTimeout) {
+    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path];
+    return FFprobeKit.getMediaInformationFromCommandArguments(commandArguments, waitTimeout);
+  }
+
+  /**
+   * <p>Extracts media information using the command provided. The command passed to
+   * this method must generate the output in JSON format in order to successfully extract media information from it.
+   *
+   * @param command         FFprobe command that prints media information for a file in JSON format
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformationFromCommand(command, waitTimeout) {
+    return FFprobeKit.getMediaInformationFromCommandArguments(FFmpegKitConfig.parseArguments(command), waitTimeout);
+  }
+
+  /**
+   * <p>Extracts media information using the command arguments provided. The command
+   * passed to this method must generate the output in JSON format in order to successfully extract media information
+   * from it.
+   *
+   * @param commandArguments FFprobe command arguments that prints media information for a file in JSON format
+   * @param waitTimeout     max time to wait until media information is transmitted
+   * @return media information session created for this execution
+   */
+  static async getMediaInformationFromCommandArguments(commandArguments, waitTimeout) {
+    let session = await MediaInformationSession.create(commandArguments, undefined, undefined);
+
+    await FFmpegKitConfig.getMediaInformationExecute(session, waitTimeout);
+
+    const mediaInformation = await FFmpegKitReactNativeModule.getMediaInformation(session.getSessionId());
+    if (mediaInformation !== undefined && mediaInformation !== null) {
+      session.setMediaInformation(new MediaInformation(mediaInformation));
+    }
 
     return session;
   }
@@ -1866,17 +2154,17 @@ export class FFprobeKit {
    * <p>Starts an asynchronous FFprobe execution to extract the media information for the specified file.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * MediaInformationSessionCompleteCallback if you want to be notified about the result.
    *
    * @param path            path or uri of a media file
-   * @param executeCallback callback that will be notified when execution is completed
+   * @param completeCallback callback that will be notified when execution has completed
    * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformationAsync(path, executeCallback, logCallback, waitTimeout) {
-    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path];
-    return FFprobeKit.getMediaInformationFromCommandArgumentsAsync(commandArguments, executeCallback, logCallback, waitTimeout);
+  static async getMediaInformationAsync(path, completeCallback, logCallback, waitTimeout) {
+    const commandArguments = ["-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path];
+    return FFprobeKit.getMediaInformationFromCommandArgumentsAsync(commandArguments, completeCallback, logCallback, waitTimeout);
   }
 
   /**
@@ -1884,16 +2172,16 @@ export class FFprobeKit {
    * this method must generate the output in JSON format in order to successfully extract media information from it.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * MediaInformationSessionCompleteCallback if you want to be notified about the result.
    *
    * @param command         FFprobe command that prints media information for a file in JSON format
-   * @param executeCallback callback that will be notified when execution is completed
+   * @param completeCallback callback that will be notified when execution has completed
    * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformationFromCommandAsync(command, executeCallback, logCallback, waitTimeout) {
-    return FFprobeKit.getMediaInformationFromCommandArgumentsAsync(FFmpegKitConfig.parseArguments(command), executeCallback, logCallback, waitTimeout);
+  static async getMediaInformationFromCommandAsync(command, completeCallback, logCallback, waitTimeout) {
+    return FFprobeKit.getMediaInformationFromCommandArgumentsAsync(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, waitTimeout);
   }
 
   /**
@@ -1902,18 +2190,23 @@ export class FFprobeKit {
    * from it.
    *
    * <p>Note that this method returns immediately and does not wait the execution to complete. You must use an
-   * ExecuteCallback if you want to be notified about the result.
+   * MediaInformationSessionCompleteCallback if you want to be notified about the result.
    *
    * @param commandArguments FFprobe command arguments that prints media information for a file in JSON format
-   * @param executeCallback callback that will be notified when execution is completed
+   * @param completeCallback callback that will be notified when execution has completed
    * @param logCallback     callback that will receive logs
    * @param waitTimeout     max time to wait until media information is transmitted
    * @return media information session created for this execution
    */
-  static async getMediaInformationFromCommandArgumentsAsync(commandArguments, executeCallback, logCallback, waitTimeout) {
-    let session = await MediaInformationSession.create(commandArguments, executeCallback, logCallback);
+  static async getMediaInformationFromCommandArgumentsAsync(commandArguments, completeCallback, logCallback, waitTimeout) {
+    let session = await MediaInformationSession.create(commandArguments, completeCallback, logCallback);
 
     await FFmpegKitConfig.asyncGetMediaInformationExecute(session, waitTimeout);
+
+    const mediaInformation = await FFmpegKitReactNativeModule.getMediaInformation(session.getSessionId());
+    if (mediaInformation !== undefined && mediaInformation !== null) {
+      session.setMediaInformation(new MediaInformation(mediaInformation));
+    }
 
     return session;
   }
@@ -1923,10 +2216,22 @@ export class FFprobeKit {
    *
    * @return all FFprobe sessions in the session history
    */
-  static async listSessions() {
+  static async listFFprobeSessions() {
     await FFmpegKitConfig.init();
 
     const sessionArray = await FFmpegKitReactNativeModule.getFFprobeSessions();
+    return sessionArray.map(FFmpegKitFactory.mapToSession);
+  }
+
+  /**
+   * <p>Lists all MediaInformation sessions in the session history.
+   *
+   * @return all MediaInformation sessions in the session history
+   */
+  static async listMediaInformationSessions() {
+    await FFmpegKitConfig.init();
+
+    const sessionArray = await FFmpegKitReactNativeModule.getMediaInformationSessions();
     return sessionArray.map(FFmpegKitFactory.mapToSession);
   }
 
@@ -1948,16 +2253,16 @@ export class FFprobeSession extends AbstractSession {
    * Creates a new FFprobe session.
    *
    * @param argumentsArray FFprobe command arguments
-   * @param executeCallback callback that will be called when the execution is completed
+   * @param completeCallback callback that will be called when the execution has completed
    * @param logCallback callback that will receive logs
    * @param logRedirectionStrategy defines how logs will be redirected
    * @returns FFprobe session created
    */
-  static async create(argumentsArray, executeCallback, logCallback, logRedirectionStrategy) {
+  static async create(argumentsArray, completeCallback, logCallback, logRedirectionStrategy) {
     const session = await AbstractSession.createFFprobeSession(argumentsArray, logRedirectionStrategy);
     const sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setExecuteCallback(sessionId, executeCallback);
+    FFmpegKitFactory.setFFprobeSessionCompleteCallback(sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;
@@ -1973,12 +2278,25 @@ export class FFprobeSession extends AbstractSession {
     return AbstractSession.createFFprobeSessionFromMap(sessionMap);
   }
 
+  /**
+   * Returns the session specific complete callback.
+   *
+   * @return session specific complete callback
+   */
+  getCompleteCallback() {
+    return FFmpegKitFactory.getFFprobeSessionCompleteCallback(this.getSessionId());
+  }
+
   isFFmpeg() {
     return false;
   }
 
   isFFprobe() {
     return true;
+  }
+
+  isMediaInformation() {
+    return false;
   }
 
 }
@@ -2221,6 +2539,28 @@ export class MediaInformation {
   }
 
   /**
+   * Returns the chapters found as array.
+   *
+   * @returns Chapter array
+   */
+  getChapters() {
+    let list = [];
+    let chapterList;
+
+    if (this.#allProperties !== undefined) {
+      chapterList = this.#allProperties.chapters;
+    }
+
+    if (chapterList !== undefined) {
+      chapterList.forEach((chapter) => {
+        list.push(new Chapter(chapter));
+      });
+    }
+
+    return list;
+  }
+
+  /**
    * Returns the media property associated with the key.
    *
    * @param key property key
@@ -2324,7 +2664,7 @@ export class MediaInformationJsonParser {
  * <p>A custom FFprobe session, which produces a <code>MediaInformation</code> object using the
  * FFprobe output.
  */
-export class MediaInformationSession extends FFprobeSession {
+export class MediaInformationSession extends AbstractSession {
   #mediaInformation;
 
   /**
@@ -2338,15 +2678,15 @@ export class MediaInformationSession extends FFprobeSession {
    * Creates a new MediaInformationSession session.
    *
    * @param argumentsArray FFprobe command arguments
-   * @param executeCallback callback that will be called when the execution is completed
+   * @param completeCallback callback that will be called when the execution has completed
    * @param logCallback callback that will receive logs
    * @returns MediaInformationSession session created
    */
-  static async create(argumentsArray, executeCallback, logCallback) {
+  static async create(argumentsArray, completeCallback, logCallback) {
     const session = await AbstractSession.createMediaInformationSession(argumentsArray);
     const sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setExecuteCallback(sessionId, executeCallback);
+    FFmpegKitFactory.setMediaInformationSessionCompleteCallback(sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;
@@ -2381,6 +2721,27 @@ export class MediaInformationSession extends FFprobeSession {
     this.#mediaInformation = mediaInformation;
   }
 
+  /**
+   * Returns the session specific complete callback.
+   *
+   * @return session specific complete callback
+   */
+  getCompleteCallback() {
+    return FFmpegKitFactory.getMediaInformationSessionCompleteCallback(this.getSessionId());
+  }
+
+  isFFmpeg() {
+    return false;
+  }
+
+  isFFprobe() {
+    return false;
+  }
+
+  isMediaInformation() {
+    return true;
+  }
+
 }
 
 /**
@@ -2393,7 +2754,9 @@ export class Packages {
    *
    * @return predicted FFmpegKit ReactNative binary package name
    */
-  static getPackageName() {
+  static async getPackageName() {
+    await FFmpegKitConfig.init();
+
     return FFmpegKitReactNativeModule.getPackageName();
   }
 
@@ -2402,7 +2765,9 @@ export class Packages {
    *
    * @return enabled external libraries
    */
-  static getExternalLibraries() {
+  static async getExternalLibraries() {
+    await FFmpegKitConfig.init();
+
     return FFmpegKitReactNativeModule.getExternalLibraries();
   }
 
@@ -2765,6 +3130,140 @@ export class StreamInformation {
    *
    * @param key properties key
    * @return stream properties as an object or undefined if the key is not found
+   */
+  getProperties(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns all properties found.
+   *
+   * @returns an object in which properties can be accessed by property names
+   */
+  getAllProperties() {
+    return this.#allProperties;
+  }
+}
+
+/**
+ * Chapter class.
+ */
+export class Chapter {
+
+  static KEY_ID = "id";
+  static KEY_TIME_BASE = "time_base";
+  static KEY_START = "start";
+  static KEY_START_TIME = "start_time";
+  static KEY_END = "end";
+  static KEY_END_TIME = "end_time";
+  static KEY_TAGS = "tags";
+
+  #allProperties;
+
+  constructor(properties) {
+    this.#allProperties = properties;
+  }
+
+  /**
+   * Returns id.
+   *
+   * @return id
+   */
+  getId() {
+    return this.getNumberProperty(Chapter.KEY_ID);
+  }
+
+  /**
+   * Returns time base.
+   *
+   * @return time base
+   */
+  getTimeBase() {
+    return this.getStringProperty(Chapter.KEY_TIME_BASE);
+  }
+
+  /**
+   * Returns start.
+   *
+   * @return start
+   */
+  getStart() {
+    return this.getNumberProperty(Chapter.KEY_START);
+  }
+
+  /**
+   * Returns start time.
+   *
+   * @return start time
+   */
+  getStartTime() {
+    return this.getStringProperty(Chapter.KEY_START_TIME);
+  }
+
+  /**
+   * Returns end.
+   *
+   * @return end
+   */
+  getEnd() {
+    return this.getNumberProperty(Chapter.KEY_END);
+  }
+
+  /**
+   * Returns end time.
+   *
+   * @return end time
+   */
+  getEndTime() {
+    return this.getStringProperty(Chapter.KEY_END_TIME);
+  }
+
+  /**
+   * Returns all tags.
+   *
+   * @return tags object
+   */
+  getTags() {
+    return this.getProperties(StreamInformation.KEY_TAGS);
+  }
+
+  /**
+   * Returns the chapter property associated with the key.
+   *
+   * @param key property key
+   * @return chapter property as string or undefined if the key is not found
+   */
+  getStringProperty(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the chapter property associated with the key.
+   *
+   * @param key property key
+   * @return chapter property as number or undefined if the key is not found
+   */
+  getNumberProperty(key) {
+    if (this.#allProperties !== undefined) {
+      return this.#allProperties[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the chapter properties associated with the key.
+   *
+   * @param key properties key
+   * @return chapter properties as an object or undefined if the key is not found
    */
   getProperties(key) {
     if (this.#allProperties !== undefined) {

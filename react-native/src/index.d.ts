@@ -16,8 +16,6 @@ declare module 'ffmpeg-kit-react-native' {
 
     static createMediaInformationSessionFromMap(sessionMap: { [key: string]: any }): MediaInformationSession;
 
-    getExecuteCallback(): ExecuteCallback;
-
     getLogCallback(): LogCallback;
 
     getSessionId(): number;
@@ -58,6 +56,8 @@ declare module 'ffmpeg-kit-react-native' {
 
     isFFprobe(): boolean;
 
+    isMediaInformation(): boolean;
+
     cancel(): Promise<void>;
 
   }
@@ -68,13 +68,19 @@ declare module 'ffmpeg-kit-react-native' {
 
   }
 
-  export type ExecuteCallback = (session: Session) => void;
+  export type FFmpegSessionCompleteCallback = (session: FFmpegSession) => void;
+  export type FFprobeSessionCompleteCallback = (session: FFprobeSession) => void;
+  export type MediaInformationSessionCompleteCallback = (session: MediaInformationSession) => void;
 
   export class FFmpegKit {
 
-    static executeAsync(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+    static execute(command: string): Promise<FFmpegSession>;
 
-    static executeWithArgumentsAsync(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+    static executeWithArguments(commandArguments: string[]): Promise<FFmpegSession>;
+
+    static executeAsync(command: string, completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
+
+    static executeWithArgumentsAsync(commandArguments: string[], completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback): Promise<FFmpegSession>;
 
     static cancel(sessionId?: number): Promise<void>;
 
@@ -112,6 +118,12 @@ declare module 'ffmpeg-kit-react-native' {
 
     static ignoreSignal(signal: Signal): Promise<void>;
 
+    static ffmpegExecute(session: FFmpegSession): Promise<void>;
+
+    static ffprobeExecute(session: FFprobeSession): Promise<void>;
+
+    static getMediaInformationExecute(session: MediaInformationSession, waitTimeout?: number): Promise<void>;
+
     static asyncFFmpegExecute(session: FFmpegSession): Promise<void>;
 
     static asyncFFprobeExecute(session: FFprobeSession): Promise<void>;
@@ -122,11 +134,27 @@ declare module 'ffmpeg-kit-react-native' {
 
     static enableStatisticsCallback(statisticsCallback: StatisticsCallback): void;
 
-    static enableExecuteCallback(executeCallback: ExecuteCallback): void;
+    static enableFFmpegSessionCompleteCallback(completeCallback: FFmpegSessionCompleteCallback): void;
+
+    static getFFmpegSessionCompleteCallback(): FFmpegSessionCompleteCallback;
+
+    static enableFFprobeSessionCompleteCallback(completeCallback: FFprobeSessionCompleteCallback): void;
+
+    static getFFprobeSessionCompleteCallback(): FFprobeSessionCompleteCallback;
+
+    static enableMediaInformationSessionCompleteCallback(completeCallback: MediaInformationSessionCompleteCallback): void;
+
+    static getMediaInformationSessionCompleteCallback(): MediaInformationSessionCompleteCallback;
 
     static getLogLevel(): Level;
 
     static setLogLevel(level: Level): Promise<void>;
+
+    static getSafParameterForRead(uriString: String): Promise<string>;
+
+    static getSafParameterForWrite(uriString: String): Promise<string>;
+
+    static getSafParameter(uriString: String, openMode: String): Promise<string>;
 
     static getSessionHistorySize(): Promise<number>;
 
@@ -141,6 +169,12 @@ declare module 'ffmpeg-kit-react-native' {
     static getSessions(): Promise<Session[]>;
 
     static clearSessions(): Promise<void>;
+
+    static getFFmpegSessions(): Promise<FFmpegSession[]>;
+
+    static getFFprobeSessions(): Promise<FFprobeSession[]>;
+
+    static getMediaInformationSessions(): Promise<MediaInformationSession[]>;
 
     static getSessionsByState(state): Promise<Session[]>;
 
@@ -172,21 +206,19 @@ declare module 'ffmpeg-kit-react-native' {
 
     static selectDocumentForWrite(title?: string, type?: string, extraTypes?: string[]): Promise<string>;
 
-    static getSafParameterForRead(uriString): Promise<string>;
-
-    static getSafParameterForWrite(uriString): Promise<string>;
-
   }
 
   export class FFmpegSession extends AbstractSession implements Session {
 
     constructor();
 
-    static create(argumentsArray: Array<string>, executeCallback?: ExecuteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback, logRedirectionStrategy?: LogRedirectionStrategy): Promise<FFmpegSession>;
+    static create(argumentsArray: Array<string>, completeCallback?: FFmpegSessionCompleteCallback, logCallback?: LogCallback, statisticsCallback?: StatisticsCallback, logRedirectionStrategy?: LogRedirectionStrategy): Promise<FFmpegSession>;
 
     static fromMap(sessionMap: { [key: string]: any }): FFmpegSession;
 
     getStatisticsCallback(): StatisticsCallback;
+
+    getCompleteCallback(): FFmpegSessionCompleteCallback;
 
     getAllStatistics(waitTimeout?: number): Promise<Array<Statistics>>;
 
@@ -198,21 +230,35 @@ declare module 'ffmpeg-kit-react-native' {
 
     isFFprobe(): boolean;
 
+    isMediaInformation(): boolean;
+
   }
 
   export class FFprobeKit {
 
-    static executeAsync(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+    static execute(command: string): Promise<FFprobeSession>;
 
-    static executeWithArgumentsAsync(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
+    static executeWithArguments(commandArguments: string[]): Promise<FFprobeSession>;
 
-    static getMediaInformationAsync(path: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static executeAsync(command: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
 
-    static getMediaInformationFromCommandAsync(command: string, executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static executeWithArgumentsAsync(commandArguments: string[], completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback): Promise<FFprobeSession>;
 
-    static getMediaInformationFromCommandArgumentsAsync(commandArguments: string[], executeCallback?: ExecuteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+    static getMediaInformation(path: string, waitTimeout?: number): Promise<MediaInformationSession>;
 
-    static listSessions(): Promise<FFprobeSession[]>;
+    static getMediaInformationFromCommand(command: string, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationFromCommandArguments(commandArguments: string[], waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationAsync(path: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationFromCommandAsync(command: string, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static getMediaInformationFromCommandArgumentsAsync(commandArguments: string[], completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, waitTimeout?: number): Promise<MediaInformationSession>;
+
+    static listFFprobeSessions(): Promise<FFprobeSession[]>;
+
+    static listMediaInformationSessions(): Promise<MediaInformationSession[]>;
 
   }
 
@@ -220,13 +266,17 @@ declare module 'ffmpeg-kit-react-native' {
 
     constructor();
 
-    static create(argumentsArray: Array<string>, executeCallback?: ExecuteCallback, logCallback?: LogCallback, logRedirectionStrategy?: LogRedirectionStrategy): Promise<FFprobeSession>;
+    static create(argumentsArray: Array<string>, completeCallback?: FFprobeSessionCompleteCallback, logCallback?: LogCallback, logRedirectionStrategy?: LogRedirectionStrategy): Promise<FFprobeSession>;
 
     static fromMap(sessionMap: { [key: string]: any }): FFprobeSession;
+
+    getCompleteCallback(): FFprobeSessionCompleteCallback;
 
     isFFmpeg(): boolean;
 
     isFFprobe(): boolean;
+
+    isMediaInformation(): boolean;
 
   }
 
@@ -299,6 +349,8 @@ declare module 'ffmpeg-kit-react-native' {
 
     getStreams(): Array<StreamInformation>;
 
+    getChapters(): Array<Chapter>;
+
     getStringProperty(key: string): string;
 
     getNumberProperty(key: string): number;
@@ -319,17 +371,25 @@ declare module 'ffmpeg-kit-react-native' {
 
   }
 
-  export class MediaInformationSession extends FFprobeSession {
+  export class MediaInformationSession extends AbstractSession implements Session {
 
     constructor();
 
-    static create(argumentsArray: Array<string>, executeCallback?: ExecuteCallback, logCallback?: LogCallback): Promise<MediaInformationSession>;
+    static create(argumentsArray: Array<string>, completeCallback?: MediaInformationSessionCompleteCallback, logCallback?: LogCallback): Promise<MediaInformationSession>;
 
     static fromMap(sessionMap: { [key: string]: any }): MediaInformationSession;
 
     getMediaInformation(): MediaInformation;
 
     setMediaInformation(mediaInformation: MediaInformation): void;
+
+    getCompleteCallback(): MediaInformationSessionCompleteCallback;
+
+    isFFmpeg(): boolean;
+
+    isFFprobe(): boolean;
+
+    isMediaInformation(): boolean;
 
   }
 
@@ -364,8 +424,6 @@ declare module 'ffmpeg-kit-react-native' {
   }
 
   export interface Session {
-
-    getExecuteCallback(): ExecuteCallback;
 
     getLogCallback(): LogCallback;
 
@@ -406,6 +464,8 @@ declare module 'ffmpeg-kit-react-native' {
     isFFmpeg(): boolean;
 
     isFFprobe(): boolean;
+
+    isMediaInformation(): boolean;
 
     cancel(): Promise<void>;
 
@@ -522,6 +582,42 @@ declare module 'ffmpeg-kit-react-native' {
     getTimeBase(): string;
 
     getCodecTimeBase(): string;
+
+    getTags(): Record<string, any>;
+
+    getStringProperty(key): string;
+
+    getNumberProperty(key): number;
+
+    getProperties(key): Record<string, any>;
+
+    getAllProperties(): Record<string, any>;
+
+  }
+
+  export class Chapter {
+
+    static readonly KEY_ID: string;
+    static readonly KEY_TIME_BASE: string;
+    static readonly KEY_START: string;
+    static readonly KEY_START_TIME: string;
+    static readonly KEY_END: string;
+    static readonly KEY_END_TIME: string;
+    static readonly KEY_TAGS: string;
+
+    constructor(properties: Record<string, any>);
+
+    getId(): number;
+
+    getTimeBase(): string;
+
+    getStart(): number;
+
+    getStartTime(): string;
+
+    getEnd(): number;
+
+    getEndTime(): string;
 
     getTags(): Record<string, any>;
 

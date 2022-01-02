@@ -74,7 +74,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
 public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
@@ -112,7 +111,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   // EVENTS
   public static final String EVENT_LOG_CALLBACK_EVENT = "FFmpegKitLogCallbackEvent";
   public static final String EVENT_STATISTICS_CALLBACK_EVENT = "FFmpegKitStatisticsCallbackEvent";
-  public static final String EVENT_EXECUTE_CALLBACK_EVENT = "FFmpegKitExecuteCallbackEvent";
+  public static final String EVENT_COMPLETE_CALLBACK_EVENT = "FFmpegKitCompleteCallbackEvent";
 
   // REQUEST CODES
   public static final int READABLE_REQUEST_CODE = 10000;
@@ -122,14 +121,14 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   private final AtomicBoolean logsEnabled;
   private final AtomicBoolean statisticsEnabled;
-  private final ExecutorService asyncWriteToPipeExecutorService;
+  private final ExecutorService asyncExecutorService;
 
   public FFmpegKitReactNativeModule(@Nullable ReactApplicationContext reactContext) {
     super(reactContext);
 
     this.logsEnabled = new AtomicBoolean(false);
     this.statisticsEnabled = new AtomicBoolean(false);
-    this.asyncWriteToPipeExecutorService = Executors.newFixedThreadPool(asyncWriteToPipeConcurrencyLimit);
+    this.asyncExecutorService = Executors.newFixedThreadPool(asyncWriteToPipeConcurrencyLimit);
 
     if (reactContext != null) {
       reactContext.addLifecycleEventListener(this);
@@ -162,13 +161,23 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @Override
   public void onHostDestroy() {
-    this.asyncWriteToPipeExecutorService.shutdown();
+    this.asyncExecutorService.shutdown();
   }
 
   protected void registerGlobalCallbacks(final ReactApplicationContext reactContext) {
-    FFmpegKitConfig.enableExecuteCallback(session -> {
+    FFmpegKitConfig.enableFFmpegSessionCompleteCallback(session -> {
       final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
-      jsModule.emit(EVENT_EXECUTE_CALLBACK_EVENT, toMap(session));
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
+    });
+
+    FFmpegKitConfig.enableFFprobeSessionCompleteCallback(session -> {
+      final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
+    });
+
+    FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(session -> {
+      final DeviceEventManagerModule.RCTDeviceEventEmitter jsModule = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+      jsModule.emit(EVENT_COMPLETE_CALLBACK_EVENT, toMap(session));
     });
 
     FFmpegKitConfig.enableLogCallback(log -> {
@@ -235,7 +244,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
           timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
         }
         final List<com.arthenica.ffmpegkit.Log> allLogs = session.getAllLogs(timeout);
-        promise.resolve(toArray(allLogs.stream().map(FFmpegKitReactNativeModule::toMap)));
+        promise.resolve(toLogArray(allLogs));
       }
     } else {
       promise.reject("INVALID_SESSION", "Invalid session id.");
@@ -250,7 +259,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
         final List<com.arthenica.ffmpegkit.Log> allLogs = session.getLogs();
-        promise.resolve(toArray(allLogs.stream().map(FFmpegKitReactNativeModule::toMap)));
+        promise.resolve(toLogArray(allLogs));
       }
     } else {
       promise.reject("INVALID_SESSION", "Invalid session id.");
@@ -360,7 +369,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           final int timeout;
           if (isValidPositiveNumber(waitTimeout)) {
             timeout = waitTimeout.intValue();
@@ -368,7 +377,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
             timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
           }
           final List<Statistics> allStatistics = ((FFmpegSession) session).getAllStatistics(timeout);
-          promise.resolve(toArray(allStatistics.stream().map(FFmpegKitReactNativeModule::toMap)));
+          promise.resolve(toStatisticsArray(allStatistics));
         } else {
           promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
         }
@@ -385,9 +394,9 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           final List<Statistics> statistics = ((FFmpegSession) session).getStatistics();
-          promise.resolve(toArray(statistics.stream().map(FFmpegKitReactNativeModule::toMap)));
+          promise.resolve(toStatisticsArray(statistics));
         } else {
           promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
         }
@@ -575,13 +584,76 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   @ReactMethod
+  public void ffmpegSessionExecute(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session.isFFmpeg()) {
+          final FFmpegSessionExecuteTask ffmpegSessionExecuteTask = new FFmpegSessionExecuteTask((FFmpegSession) session, promise);
+          asyncExecutorService.submit(ffmpegSessionExecuteTask);
+        } else {
+          promise.reject("NOT_FFMPEG_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
+  public void ffprobeSessionExecute(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session.isFFprobe()) {
+          final FFprobeSessionExecuteTask ffprobeSessionExecuteTask = new FFprobeSessionExecuteTask((FFprobeSession) session, promise);
+          asyncExecutorService.submit(ffprobeSessionExecuteTask);
+        } else {
+          promise.reject("NOT_FFPROBE_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
+  public void mediaInformationSessionExecute(final Double sessionId, final Double waitTimeout, final Promise promise) {
+    if (sessionId != null) {
+      Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session.isMediaInformation()) {
+          final int timeout;
+          if (isValidPositiveNumber(waitTimeout)) {
+            timeout = waitTimeout.intValue();
+          } else {
+            timeout = AbstractSession.DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT;
+          }
+          final MediaInformationSessionExecuteTask mediaInformationSessionExecuteTask = new MediaInformationSessionExecuteTask((MediaInformationSession) session, timeout, promise);
+          asyncExecutorService.submit(mediaInformationSessionExecuteTask);
+        } else {
+          promise.reject("NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
+  }
+
+  @ReactMethod
   public void asyncFFmpegSessionExecute(final Double sessionId, final Promise promise) {
     if (sessionId != null) {
       Session session = FFmpegKitConfig.getSession(sessionId.longValue());
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFmpegSession) {
+        if (session.isFFmpeg()) {
           FFmpegKitConfig.asyncFFmpegExecute((FFmpegSession) session);
           promise.resolve(null);
         } else {
@@ -600,7 +672,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof FFprobeSession) {
+        if (session.isFFprobe()) {
           FFmpegKitConfig.asyncFFprobeExecute((FFprobeSession) session);
           promise.resolve(null);
         } else {
@@ -619,7 +691,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
       if (session == null) {
         promise.reject("SESSION_NOT_FOUND", "Session not found.");
       } else {
-        if (session instanceof MediaInformationSession) {
+        if (session.isMediaInformation()) {
           final int timeout;
           if (isValidPositiveNumber(waitTimeout)) {
             timeout = waitTimeout.intValue();
@@ -744,8 +816,8 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @ReactMethod
   public void writeToPipe(final String inputPath, final String namedPipePath, final Promise promise) {
-    final AsyncWriteToPipeTask asyncTask = new AsyncWriteToPipeTask(inputPath, namedPipePath, promise);
-    asyncWriteToPipeExecutorService.submit(asyncTask);
+    final WriteToPipeTask asyncTask = new WriteToPipeTask(inputPath, namedPipePath, promise);
+    asyncExecutorService.submit(asyncTask);
   }
 
   @ReactMethod
@@ -822,22 +894,18 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   @ReactMethod
-  public void getSafParameter(final Boolean writable, final String uriString, final Promise promise) {
+  public void getSafParameter(final String uriString, final String openMode, final Promise promise) {
     final ReactApplicationContext reactContext = getReactApplicationContext();
 
     final Uri uri = Uri.parse(uriString);
     if (uri == null) {
-      Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters writable: %s, uriString: %s. Uri string cannot be parsed.", writable, uriString));
+      Log.w(LIBRARY_NAME, String.format("Cannot getSafParameter using parameters uriString: %s, openMode: %s. Uri string cannot be parsed.", uriString, openMode));
       promise.reject("GET_SAF_PARAMETER_FAILED", "Uri string cannot be parsed.");
     } else {
       final String safParameter;
-      if (writable) {
-        safParameter = FFmpegKitConfig.getSafParameterForWrite(reactContext, uri);
-      } else {
-        safParameter = FFmpegKitConfig.getSafParameterForRead(reactContext, uri);
-      }
+      safParameter = FFmpegKitConfig.getSafParameter(reactContext, uri, openMode);
 
-      Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters writable: %s, uriString: %s completed with saf parameter: %s.", writable, uriString, safParameter));
+      Log.d(LIBRARY_NAME, String.format("getSafParameter using parameters uriString: %s, openMode: %s completed with saf parameter: %s.", uriString, openMode, safParameter));
 
       promise.resolve(safParameter);
     }
@@ -870,7 +938,38 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
 
   @ReactMethod
   public void getFFprobeSessions(final Promise promise) {
-    promise.resolve(toSessionArray(FFprobeKit.listSessions()));
+    promise.resolve(toSessionArray(FFprobeKit.listFFprobeSessions()));
+  }
+
+  @ReactMethod
+  public void getMediaInformationSessions(final Promise promise) {
+    promise.resolve(toSessionArray(FFprobeKit.listMediaInformationSessions()));
+  }
+
+  // MediaInformationSession
+
+  @ReactMethod
+  public void getMediaInformation(final Double sessionId, final Promise promise) {
+    if (sessionId != null) {
+      final Session session = FFmpegKitConfig.getSession(sessionId.longValue());
+      if (session == null) {
+        promise.reject("SESSION_NOT_FOUND", "Session not found.");
+      } else {
+        if (session.isMediaInformation()) {
+          final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+          final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+          if (mediaInformation != null) {
+            promise.resolve(toMap(mediaInformation));
+          } else {
+            promise.resolve(null);
+          }
+        } else {
+          promise.reject("NOT_MEDIA_INFORMATION_SESSION", "A session is found but it does not have the correct type.");
+        }
+      }
+    } else {
+      promise.reject("INVALID_SESSION", "Invalid session id.");
+    }
   }
 
   // Packages
@@ -917,19 +1016,17 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     sessionMap.putDouble(KEY_SESSION_START_TIME, toLong(session.getStartTime()));
     sessionMap.putString(KEY_SESSION_COMMAND, session.getCommand());
 
-    if (session.isFFprobe()) {
-      if (session instanceof MediaInformationSession) {
-        final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
-        final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
-        if (mediaInformation != null) {
-          sessionMap.putMap(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
-        }
-        sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
-      } else {
-        sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
-      }
-    } else {
+    if (session.isFFmpeg()) {
       sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFMPEG);
+    } else if (session.isFFprobe()) {
+      sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_FFPROBE);
+    } else if (session.isMediaInformation()) {
+      final MediaInformationSession mediaInformationSession = (MediaInformationSession) session;
+      final MediaInformation mediaInformation = mediaInformationSession.getMediaInformation();
+      if (mediaInformation != null) {
+        sessionMap.putMap(KEY_SESSION_MEDIA_INFORMATION, toMap(mediaInformation));
+      }
+      sessionMap.putDouble(KEY_SESSION_TYPE, SESSION_TYPE_MEDIA_INFORMATION);
     }
 
     return sessionMap;
@@ -1046,16 +1143,6 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     return statisticsMap;
   }
 
-  protected static WritableArray toSessionArray(final List<? extends Session> sessions) {
-    final WritableArray sessionArray = Arguments.createArray();
-
-    for (int i = 0; i < sessions.size(); i++) {
-      sessionArray.pushMap(toMap(sessions.get(i)));
-    }
-
-    return sessionArray;
-  }
-
   protected static WritableMap toMap(final MediaInformation mediaInformation) {
     WritableMap map = Arguments.createMap();
 
@@ -1102,14 +1189,6 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     return map;
   }
 
-  protected static WritableArray toArray(final Stream<WritableMap> stream) {
-    final WritableArray list = Arguments.createArray();
-
-    stream.forEachOrdered(list::pushMap);
-
-    return list;
-  }
-
   protected static WritableArray toList(final JSONArray array) {
     final WritableArray list = Arguments.createArray();
 
@@ -1150,6 +1229,36 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
     }
 
     return arguments.toArray(new String[0]);
+  }
+
+  protected static WritableArray toSessionArray(final List<? extends Session> sessionList) {
+    final WritableArray sessionArray = Arguments.createArray();
+
+    for (int i = 0; i < sessionList.size(); i++) {
+      sessionArray.pushMap(toMap(sessionList.get(i)));
+    }
+
+    return sessionArray;
+  }
+
+  protected static WritableArray toLogArray(final List<com.arthenica.ffmpegkit.Log> logList) {
+    final WritableArray logArray = Arguments.createArray();
+
+    for (int i = 0; i < logList.size(); i++) {
+      logArray.pushMap(toMap(logList.get(i)));
+    }
+
+    return logArray;
+  }
+
+  protected static WritableArray toStatisticsArray(final List<com.arthenica.ffmpegkit.Statistics> statisticsList) {
+    final WritableArray statisticsArray = Arguments.createArray();
+
+    for (int i = 0; i < statisticsList.size(); i++) {
+      statisticsArray.pushMap(toMap(statisticsList.get(i)));
+    }
+
+    return statisticsArray;
   }
 
   protected static boolean isValidPositiveNumber(final Double value) {

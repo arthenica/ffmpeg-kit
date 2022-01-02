@@ -27,12 +27,12 @@ import com.facebook.react.bridge.Promise;
 
 import java.io.IOException;
 
-public class AsyncWriteToPipeTask implements Runnable {
+public class WriteToPipeTask implements Runnable {
   private final String inputPath;
   private final String namedPipePath;
   private final Promise promise;
 
-  public AsyncWriteToPipeTask(final String inputPath, final String namedPipePath, final Promise promise) {
+  public WriteToPipeTask(final String inputPath, final String namedPipePath, final Promise promise) {
     this.inputPath = inputPath;
     this.namedPipePath = namedPipePath;
     this.promise = promise;
