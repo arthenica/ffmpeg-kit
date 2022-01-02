@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-11
     strategy:
       matrix:
-        xcode: [ '12.5.1', '13.0' ]
+        xcode: [ '12.5.1', '13.2.1' ]
     defaults:
       run:
         shell: bash
