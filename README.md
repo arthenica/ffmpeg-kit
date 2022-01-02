@@ -118,15 +118,16 @@ include them.
 The exact version number of `FFmpeg` is obtained using `git describe --tags`. `dev` part in the version string 
 indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch. 
 
-|  Platforms |  FFmpegKit Version | FFmpeg Version | Release Date |
-| :----: | :----: | :----: | :----: |
-| Flutter | [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0) | 4.5-dev-2008 | Oct 05, 2021 |
-| Flutter | [4.5.0-LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0.LTS) | 4.5-dev-2008 | Oct 05, 2021 |
-| React Native | [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0) | 4.5-dev-2008 | Oct 01, 2021 |
-| Android<br>Apple | [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5) | 4.5-dev-2008 | Sep 18, 2021 |
-| Android<br>Apple | [4.5.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.LTS) | 4.5-dev-2008 | Sep 18, 2021 |
-| Android<br>Apple | [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4) | 4.4-dev-3015 | Mar 03, 2021 |
-| Android<br>Apple | [4.4.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4.LTS) | 4.4-dev-3015 | Mar 03, 2021 |
+|    Platforms     |                                      FFmpegKit Version                                       | FFmpeg Version | Release Date |
+|:----------------:|:--------------------------------------------------------------------------------------------:| :------------: |:------------:|
+|     Flutter      |        [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.1)         | 4.5-dev-3393 | Jan 02, 2022 |
+|   React Native   |     [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.1)       | 4.5-dev-3393 | Jan 02, 2022 |
+|     Android      |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Jan 01, 2022 |
+|      Apple       |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Dec 30, 2021 |
+|     Flutter      |        [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0)         | 4.5-dev-2008 | Oct 05, 2021 |
+|   React Native   |      [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0)      | 4.5-dev-2008 | Oct 01, 2021 |
+| Android<br>Apple |              [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5)               | 4.5-dev-2008 | Sep 18, 2021 |
+| Android<br>Apple |              [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4)               | 4.4-dev-3015 | Mar 03, 2021 |
 
 ### 10. LTS Releases
 

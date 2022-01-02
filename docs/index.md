@@ -87,15 +87,16 @@ include them.
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup><br><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 <td align="center"><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>vo-amrwbenc</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup><br><sup>zimg</sup></td>
+<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup><br><sup>zimg</sup></td>
+<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>vo-amrwbenc</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup><br><sup>zimg</sup></td>
 </tr>
 </tbody>
 </table>
 
 - `AVFoundation` is not available on `tvOS`
 - `VideoToolbox` is not available on LTS releases of `iOS` and `tvOS`
+- `zimg` is supported since `v4.5.1`
 
 ### 8. Versions
 
@@ -104,15 +105,16 @@ include them.
 The exact version number of `FFmpeg` is obtained using `git describe --tags`. `dev` part in the version string
 indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch.
 
-|  Platforms |  FFmpegKit Version | FFmpeg Version | Release Date |
-| :----: | :----: | :----: | :----: |
-| Flutter | [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0) | 4.5-dev-2008 | Oct 05, 2021 |
-| Flutter | [4.5.0-LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0.LTS) | 4.5-dev-2008 | Oct 05, 2021 |
-| React Native | [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0) | 4.5-dev-2008 | Oct 01, 2021 |
-| Android<br>Apple | [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5) | 4.5-dev-2008 | Sep 18, 2021 |
-| Android<br>Apple | [4.5.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.LTS) | 4.5-dev-2008 | Sep 18, 2021 |
-| Android<br>Apple | [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4) | 4.4-dev-3015 | Mar 03, 2021 |
-| Android<br>Apple | [4.4.LTS](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4.LTS) | 4.4-dev-3015 | Mar 03, 2021 |
+|    Platforms     |                                      FFmpegKit Version                                       | FFmpeg Version | Release Date |
+|:----------------:|:--------------------------------------------------------------------------------------------:| :------------: |:------------:|
+|     Flutter      |        [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.1)         | 4.5-dev-3393 | Jan 02, 2022 |
+|   React Native   |     [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.1)       | 4.5-dev-3393 | Jan 02, 2022 |
+|     Android      |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Jan 01, 2022 |
+|      Apple       |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Dec 30, 2021 |
+|     Flutter      |        [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0)         | 4.5-dev-2008 | Oct 05, 2021 |
+|   React Native   |      [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0)      | 4.5-dev-2008 | Oct 01, 2021 |
+| Android<br>Apple |              [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5)               | 4.5-dev-2008 | Sep 18, 2021 |
+| Android<br>Apple |              [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4)               | 4.4-dev-3015 | Mar 03, 2021 |
 
 ### 10. LTS Releases
 
@@ -124,24 +126,25 @@ indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch.
 
 This table shows the differences between two variants.
 
-|        | Main Release | LTS Release |
-| :----: | :----: | :----: |
-| Android API Level | 24 | 16 | 
-| Android Camera Access | Yes | - |
+|        | Main Release |                        LTS Release                        |
+| :----: | :----: |:---------------------------------------------------------:|
+| Android API Level | 24 |                            16                             | 
+| Android Camera Access | Yes |                             -                             |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
-| iOS Min SDK | 12.1 | 9.3 |
-| iOS VideoToolbox | Yes | - |
-| iOS AVFoundation | Yes | - |
-| iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
-| iOS Bundle Format | XCFrameworks | Frameworks |
-| macOS Min SDK | 10.15 | 10.11 |
-| macOS AVFoundation | Yes | - |
-| macOS Architectures | arm64<br/>x86-64 | x86-64 |
-| macOS Bundle Format | XCFrameworks | Frameworks |
-| tvOS Min SDK | 11.0 | 9.2 |
-| tvOS VideoToolbox | Yes | - |
-| tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator | arm64<br/>x86-64 |
-| tvOS Bundle Format | XCFrameworks | Frameworks |
+| iOS Min SDK | 12.1 |                            10                             |
+| iOS VideoToolbox | Yes |                             -                             |
+| iOS AVFoundation | Yes |                             -                             |
+| iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst |            armv7<br/>arm64<br/>i386<br/>x86-64            |
+| iOS Bundle Format | XCFrameworks |                        Frameworks                         |
+| Mac Catalyst Min Version | 14.0 |                             -                             |
+| macOS Min SDK | 10.15 |                           10.12                           |
+| macOS AVFoundation | Yes |                             -                             |
+| macOS Architectures | arm64<br/>x86-64 |                          x86-64                           |
+| macOS Bundle Format | XCFrameworks |                        Frameworks                         |
+| tvOS Min SDK | 11.0 |                           10.0                            |
+| tvOS VideoToolbox | Yes |                             -                             |
+| tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator |                     arm64<br/>x86-64                      |
+| tvOS Bundle Format | XCFrameworks |                        Frameworks                         |
 
 ### 11. Documentation
 
