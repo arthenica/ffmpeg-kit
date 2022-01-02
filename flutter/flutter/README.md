@@ -32,7 +32,7 @@ Add `ffmpeg_kit_flutter` as a dependency in your `pubspec.yaml file`.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: ^4.5.1
+  ffmpeg_kit_flutter: 4.5.1
 ```
 
 #### 2.1 Packages
@@ -55,7 +55,7 @@ using the following dependency format.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter_<package name>: ^4.5.1
+  ffmpeg_kit_flutter_<package name>: 4.5.1
 ```
 
 Note that hyphens in the package name must be replaced with underscores. Additionally, do not forget to use the package
@@ -111,7 +111,7 @@ The following table shows the Android API level and iOS deployment target requir
     ```dart
     import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', (session) async {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then((session) async {
       final returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) {
@@ -133,7 +133,7 @@ The following table shows the Android API level and iOS deployment target requir
 2. Each `execute` call creates a new session. Access every detail about your execution from the session created.
 
     ```dart
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', (session) async {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then((session) async {
 
       // Unique session id created for this execution
       final sessionId = session.getSessionId();
@@ -190,7 +190,7 @@ The following table shows the Android API level and iOS deployment target requir
 4. Execute `FFprobe` commands.
 
     ```dart
-    FFprobeKit.executeAsync(ffprobeCommand, (session) {
+    FFprobeKit.execute(ffprobeCommand).then((session) async {
 
       // CALLED WHEN SESSION IS EXECUTED
 
@@ -200,8 +200,18 @@ The following table shows the Android API level and iOS deployment target requir
 5. Get media information for a file/url.
 
     ```dart
-    FFprobeKit.getMediaInformationAsync('<file path or url>', (session) async {
-      final information = await (session as MediaInformationSession).getMediaInformation();
+    FFprobeKit.getMediaInformation('<file path or url>').then((session) async {
+      final information = await session.getMediaInformation();
+
+      if (information == null) {
+
+        // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
+        final state = FFmpegKitConfig.sessionStateToString(await session.getState());
+        final returnCode = await session.getReturnCode();
+        final failStackTrace = await session.getFailStackTrace();
+        final duration = await session.getDuration();
+        final output = await session.getOutput();
+      }
     });
     ```
 

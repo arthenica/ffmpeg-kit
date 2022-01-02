@@ -19,8 +19,6 @@
 
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter/ffprobe_session.dart';
-import 'package:ffmpeg_kit_flutter/media_information_session.dart';
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
 
@@ -28,10 +26,12 @@ import '../arch_detect.dart';
 import '../ffmpeg_kit_config.dart';
 import '../ffmpeg_session.dart';
 import '../ffmpeg_session_complete_callback.dart';
+import '../ffprobe_session.dart';
 import '../ffprobe_session_complete_callback.dart';
 import '../level.dart';
 import '../log_callback.dart';
 import '../log_redirection_strategy.dart';
+import '../media_information_session.dart';
 import '../media_information_session_complete_callback.dart';
 import '../packages.dart';
 import '../session.dart';
