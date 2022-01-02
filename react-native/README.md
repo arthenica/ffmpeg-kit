@@ -196,7 +196,7 @@ compare to each other.
     ```js
     import { FFmpegKit } from 'ffmpeg-kit-react-native';
 
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', async (session) => {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
       const returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) {
@@ -219,7 +219,7 @@ compare to each other.
    session created.
 
     ```js
-    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
 
       // Unique session id created for this execution
       const sessionId = session.getSessionId();
@@ -276,7 +276,7 @@ compare to each other.
 4. Execute `FFprobe` commands.
 
     ```js
-    FFprobeKit.executeAsync(ffprobeCommand, session => {
+    FFprobeKit.execute(ffprobeCommand).then(async (session) => {
 
       // CALLED WHEN SESSION IS EXECUTED
 
@@ -286,8 +286,18 @@ compare to each other.
 5. Get media information for a file/url.
 
     ```js
-    FFprobeKit.getMediaInformationAsync('<file path or url>', async (session) => {
+    FFprobeKit.getMediaInformation(testUrl).then(async (session) => {
       const information = await session.getMediaInformation();
+
+      if (information === undefined) {
+
+        // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
+        const state = FFmpegKitConfig.sessionStateToString(await session.getState());
+        const returnCode = await session.getReturnCode();
+        const failStackTrace = await session.getFailStackTrace();
+        const duration = await session.getDuration();
+        const output = await session.getOutput();
+      }
     });
     ```
 

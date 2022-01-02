@@ -6,17 +6,6 @@
   "types": "src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
-  "files": [
-    "android",
-    "ffmpeg-kit-react-native.podspec",
-    "ios",
-    "src",
-    "!android/build",
-    "!ios/build",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__"
-  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
