@@ -22,7 +22,7 @@ external libraries enabled.
 
 ##### 2.1.1 Android Tools
    - Android SDK Build Tools
-   - Android NDK r22b or later with LLDB and CMake
+   - Android NDK r22b or later with LLDB and CMake (See [#292](https://github.com/tanersener/ffmpeg-kit/issues/292) if you want to use NDK r23b)
 
 ##### 2.1.2 Packages
 
