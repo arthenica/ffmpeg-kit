@@ -1144,16 +1144,18 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule imple
   }
 
   protected static WritableMap toMap(final MediaInformation mediaInformation) {
-    WritableMap map = Arguments.createMap();
-
     if (mediaInformation != null) {
+      WritableMap map = Arguments.createMap();
+
       JSONObject allProperties = mediaInformation.getAllProperties();
       if (allProperties != null) {
         map = toMap(allProperties);
       }
-    }
 
-    return map;
+      return map;
+    } else {
+      return null;
+    }
   }
 
   protected static WritableMap toMap(final JSONObject jsonObject) {
