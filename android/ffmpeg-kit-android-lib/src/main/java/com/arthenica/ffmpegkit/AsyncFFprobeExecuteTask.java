@@ -33,15 +33,23 @@ public class AsyncFFprobeExecuteTask implements Runnable {
 
     @Override
     public void run() {
-        FFmpegKitConfig.ffprobeExecute(ffprobeSession);
+        try {
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            } else {
+                FFmpegKitConfig.ffprobeExecute(ffprobeSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(ffprobeSession);
-        }
+                final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
+                if (globalExecuteCallbackFunction != null) {
+                    globalExecuteCallbackFunction.apply(ffprobeSession);
+                }
 
-        if (executeCallback != null) {
-            executeCallback.apply(ffprobeSession);
+                if (executeCallback != null) {
+                    executeCallback.apply(ffprobeSession);
+                }
+            }
+        } catch (Exception ex) {
+            Log.e("TAG", "Exception while probing ffmpeg task" + ex.toString());
         }
     }
 

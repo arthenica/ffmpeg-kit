@@ -33,15 +33,23 @@ public class AsyncFFmpegExecuteTask implements Runnable {
 
     @Override
     public void run() {
-        FFmpegKitConfig.ffmpegExecute(ffmpegSession);
+        try {
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            } else {
+                FFmpegKitConfig.ffmpegExecute(ffmpegSession);
 
-        final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
-        if (globalExecuteCallbackFunction != null) {
-            globalExecuteCallbackFunction.apply(ffmpegSession);
-        }
+                final ExecuteCallback globalExecuteCallbackFunction = FFmpegKitConfig.getExecuteCallback();
+                if (globalExecuteCallbackFunction != null) {
+                    globalExecuteCallbackFunction.apply(ffmpegSession);
+                }
 
-        if (executeCallback != null) {
-            executeCallback.apply(ffmpegSession);
+                if (executeCallback != null) {
+                    executeCallback.apply(ffmpegSession);
+                }
+            }
+        } catch (Exception ex) {
+            Log.e("TAG", "Exception while executing ffmpeg task" + ex.toString());
         }
     }
 }
