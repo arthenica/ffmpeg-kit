@@ -99,6 +99,7 @@ x86-64-mac-catalyst)
 esac
 
 CONFIGURE_POSTFIX=""
+HIGH_PRIORITY_LDFLAGS=""
 
 # SET CONFIGURE OPTIONS
 for library in {0..61}; do
@@ -294,6 +295,7 @@ for library in {0..61}; do
     expat)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static expat 2>>"${BASEDIR}"/build.log)"
+      HIGH_PRIORITY_LDFLAGS+=" $(pkg-config --libs --static expat 2>>"${BASEDIR}"/build.log)"
       ;;
     libogg)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags ogg 2>>"${BASEDIR}"/build.log)"
@@ -449,7 +451,7 @@ COMMON_LDFLAGS=$(get_common_ldflags)
 # UPDATE BUILD FLAGS
 export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS}${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
 export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
-export LDFLAGS="${ARCH_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
+export LDFLAGS="${ARCH_LDFLAGS}${HIGH_PRIORITY_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
 
 echo -n -e "\n${LIB_NAME}: "
 
