@@ -671,11 +671,9 @@ export class AbstractSession extends Session {
   /**
    * Cancels running the session.
    */
-  cancel() {
+  async cancel() {
     const sessionId = this.getSessionId();
-    if (sessionId === undefined) {
-      return FFmpegKitReactNativeModule.cancel();
-    } else {
+    if (sessionId !== undefined) {
       return FFmpegKitReactNativeModule.cancelSession(sessionId);
     }
   }
