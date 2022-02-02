@@ -669,11 +669,12 @@ export class AbstractSession extends Session {
   }
 
   /**
-   * Cancels running the session.
+   * Cancels running the session. Only starts cancellation. Does not guarantee that session is cancelled when promise resolves.
    */
-  cancel() {
+  async cancel() {
+    const sessionId = this.getSessionId();
     if (sessionId === undefined) {
-      return FFmpegKitReactNativeModule.cancel();
+      return Promise.reject(new Error('sessionId is not defined'));
     } else {
       return FFmpegKitReactNativeModule.cancelSession(sessionId);
     }
