@@ -66,7 +66,7 @@ Please note that `FFmpegKit` project repository includes the source code of `FFm
 Use your package manager (brew, etc.) to install the following packages.
 
 ```
-autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget autopoint meson ninja
+autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget gettext meson ninja
 ```
 
 #### 2.2 Options
