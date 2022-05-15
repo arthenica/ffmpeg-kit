@@ -5,6 +5,13 @@ on:
     branches:
       - development
       - main
+    paths:
+      - '.github/workflows/tvos-build-scripts.yml'
+      - 'apple/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'apple.sh'
+      - 'tvos.sh'
   pull_request:
     branches:
       - main

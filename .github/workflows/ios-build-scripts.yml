@@ -5,6 +5,13 @@ on:
     branches:
       - development
       - main
+    paths:
+      - '.github/workflows/ios-build-scripts.yml'
+      - 'apple/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'apple.sh'
+      - 'ios.sh'
   pull_request:
     branches:
       - main
