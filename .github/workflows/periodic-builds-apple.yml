@@ -20,7 +20,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: set up cmake
@@ -48,7 +48,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
@@ -74,7 +74,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
@@ -100,7 +100,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
@@ -126,7 +126,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
@@ -152,7 +152,7 @@ jobs:
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja
+        run: brew install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget meson ninja ragel --overwrite
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script

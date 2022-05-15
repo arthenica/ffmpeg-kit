@@ -5,15 +5,21 @@ on:
     branches:
       - development
       - main
-    paths-ignore:
-      - '**/README.md'
-      - 'docs/**'
+    paths:
+      - '.github/workflows/android-build-scripts.yml'
+      - 'android/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'android.sh'
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - '**/README.md'
-      - 'docs/**'
+    paths:
+      - '.github/workflows/android-build-scripts.yml'
+      - 'android/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'android.sh'
 
 jobs:
   build-main-on-linux:
