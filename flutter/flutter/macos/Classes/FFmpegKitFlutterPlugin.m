@@ -112,30 +112,40 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 - (void)registerGlobalCallbacks {
   [FFmpegKitConfig enableFFmpegSessionCompleteCallback:^(FFmpegSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableFFprobeSessionCompleteCallback:^(FFprobeSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableMediaInformationSessionCompleteCallback:^(MediaInformationSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableLogCallback: ^(Log* log){
     if (self->logsEnabled) {
       NSDictionary *dictionary = [FFmpegKitFlutterPlugin toLogDictionary:log];
-      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_LOG_CALLBACK_EVENT withDictionary:dictionary]);
+      dispatch_async(dispatch_get_main_queue(), ^() {
+        self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_LOG_CALLBACK_EVENT withDictionary:dictionary]);
+      });
     }
   }];
 
   [FFmpegKitConfig enableStatisticsCallback:^(Statistics* statistics){
     if (self->statisticsEnabled) {
       NSDictionary *dictionary = [FFmpegKitFlutterPlugin toStatisticsDictionary:statistics];
-      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_STATISTICS_CALLBACK_EVENT withDictionary:dictionary]);
+      dispatch_async(dispatch_get_main_queue(), ^() {
+        self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_STATISTICS_CALLBACK_EVENT withDictionary:dictionary]);
+      });
     }
   }];
 }
