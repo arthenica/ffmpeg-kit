@@ -813,6 +813,15 @@ export class FFmpegKitConfig {
   }
 
   /**
+   * Uninitializes the library.
+   *
+   * Calling this method before application termination is recommended but not required.
+   */
+  static async uninit() {
+    return FFmpegKitReactNativeModule.uninit();
+  }
+
+  /**
    * <p>Enables log and statistics redirection.
    *
    * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to console and sessions
