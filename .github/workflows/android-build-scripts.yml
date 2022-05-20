@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/android-build-scripts.yml'
       - 'android/**'
+      - '!android/README.md'
       - 'scripts/**'
       - 'tools/**'
       - 'android.sh'

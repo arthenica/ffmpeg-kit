@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/tvos-build-scripts.yml'
       - 'apple/**'
+      - '!apple/README.md'
       - 'scripts/**'
       - 'tools/**'
       - 'apple.sh'
