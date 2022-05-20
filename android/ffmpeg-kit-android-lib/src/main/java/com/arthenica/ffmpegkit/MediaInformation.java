@@ -90,7 +90,7 @@ public class MediaInformation {
     /**
      * Returns duration.
      *
-     * @return media duration in milliseconds
+     * @return media duration in "seconds.microseconds" format
      */
     public String getDuration() {
         return getStringProperty(KEY_DURATION);

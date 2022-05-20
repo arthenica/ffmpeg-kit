@@ -65,7 +65,7 @@ extern NSString* const MediaKeyTags;
 /**
  * Returns duration.
  *
- * @return media duration in milliseconds
+ * @return media duration in "seconds.microseconds" format
  */
 - (NSString*)getDuration;
 
