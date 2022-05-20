@@ -2484,7 +2484,7 @@ export class MediaInformation {
   /**
    * Returns duration.
    *
-   * @return media duration in milliseconds
+   * @return media duration in "seconds.microseconds" format
    */
   getDuration() {
     return this.getStringProperty(MediaInformation.KEY_DURATION);
