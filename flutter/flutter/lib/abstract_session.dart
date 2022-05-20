@@ -428,5 +428,18 @@ class AbstractSession extends Session {
   bool isMediaInformation() => false;
 
   /// Cancels running the session.
-  void cancel() {}
+  Future<void> cancel() async {
+    try {
+      final int? sessionId = getSessionId();
+      await FFmpegKitConfig.init();
+      if (sessionId == null) {
+        return _platform.ffmpegKitCancel();
+      } else {
+        return _platform.ffmpegKitCancelSession(sessionId);
+      }
+    } on PlatformException catch (e, stack) {
+      print("Plugin cancel error: ${e.message}");
+      return Future.error("cancel failed.", stack);
+    }
+  }
 }
