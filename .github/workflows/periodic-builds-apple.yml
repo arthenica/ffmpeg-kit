@@ -24,7 +24,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./ios.sh -x --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -50,7 +50,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./ios.sh -l --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -l --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -76,7 +76,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./macos.sh -x --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./macos.sh -x --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -102,7 +102,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./macos.sh -l --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./macos.sh -l --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -128,7 +128,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./tvos.sh -x --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./tvos.sh -x --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -154,7 +154,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" ./tvos.sh -l --full --enable-gpl --disable-lib-srt
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./tvos.sh -l --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
