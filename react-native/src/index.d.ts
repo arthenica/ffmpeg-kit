@@ -92,6 +92,8 @@ declare module 'ffmpeg-kit-react-native' {
 
     static init(): Promise<void>;
 
+    static uninit(): Promise<void>;
+
     static enableRedirection(): Promise<void>;
 
     static disableRedirection(): Promise<void>;
