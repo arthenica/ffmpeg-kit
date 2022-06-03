@@ -1,0 +1,12 @@
+/autom4te.cache/
+/Makefile
+/config.status
+/configure.tmp
+/configure~
+/.deps/
+/.libs/
+*.trs
+/unittests
+/test-driver
+/config.log
+/*.tmp

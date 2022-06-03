@@ -319,12 +319,12 @@ is_library_supported_on_platform() {
   local library_index=$(from_library_name "$1")
   case ${library_index} in
   # ALL
-  16 | 17 | 18 | 23 | 27 | 32 | 34 | 35 | 36)
+  16 | 17 | 18 | 23 | 27 | 32 | 34 | 35 | 36 | 50)
     echo "0"
     ;;
 
   # ALL EXCEPT LINUX
-  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 19 | 20 | 21 | 22 | 24 | 25 | 26 | 28 | 29 | 30 | 31 | 33 | 37 | 38 | 39 | 40 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 50)
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 19 | 20 | 21 | 22 | 24 | 25 | 26 | 28 | 29 | 30 | 31 | 33 | 37 | 38 | 39 | 40 | 42 | 43 | 44 | 45 | 46 | 47 | 48)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
       echo "1"
     else
@@ -2228,6 +2228,42 @@ download_gnu_config() {
     exit 1
   else
     echo -e "\nINFO: gnu config downloaded successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+}
+
+download_rapidjson() {
+  local SOURCE_REPO_URL=""
+  local LIB_NAME="rapidjson"
+  local LIB_LOCAL_PATH="${FFMPEG_KIT_TMPDIR}/source/${LIB_NAME}"
+  local SOURCE_ID=""
+  local DOWNLOAD_RC=""
+  local SOURCE_TYPE=""
+  REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$LIB_NAME")
+
+  echo -e "DEBUG: Downloading rapidjson source.\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  SOURCE_REPO_URL=$(get_library_source "${LIB_NAME}" 1)
+  SOURCE_ID=$(get_library_source "${LIB_NAME}" 2)
+  SOURCE_TYPE=$(get_library_source "${LIB_NAME}" 3)
+
+  if [[ -d "${LIB_LOCAL_PATH}" ]]; then
+    if [[ ${REDOWNLOAD_VARIABLE} -eq 1 ]]; then
+      echo -e "INFO: rapidjson already downloaded but re-download requested\n" 1>>"${BASEDIR}"/build.log 2>&1
+      rm -rf "${LIB_LOCAL_PATH}" 1>>"${BASEDIR}"/build.log 2>&1
+    else
+      echo -e "INFO: rapidjson already downloaded. Source folder found at ${LIB_LOCAL_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      return
+    fi
+  fi
+
+  DOWNLOAD_RC=$(clone_git_repository_with_tag "${SOURCE_REPO_URL}" "${SOURCE_ID}" "${LIB_LOCAL_PATH}")
+
+  if [[ ${DOWNLOAD_RC} -ne 0 ]]; then
+    echo -e "INFO: Downloading rapidjson failed. Can not get source from ${SOURCE_REPO_URL}\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "failed\n"
+    exit 1
+  else
+    echo -e "\nINFO: rapidjson downloaded successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
   fi
 }
 

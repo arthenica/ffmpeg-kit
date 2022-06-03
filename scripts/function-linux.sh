@@ -18,11 +18,11 @@ display_help() {
   local COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
   echo -e "\n'$COMMAND' builds FFmpegKit for Linux platform. By default only one Linux architecture \
-(x86_64) is built without any external libraries enabled. Options can be used to \
-disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL \
+(x86-64) is built without any external libraries enabled. Options can be used to \
+enable external libraries. Please note that GPL libraries (external libraries with GPL \
 license) need --enable-gpl flag to be set explicitly. When compilation ends, \
 libraries are created under the prebuilt folder.\n"
-  echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
+  echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
   display_help_options "  -l, --lts\t\t\tbuild lts packages to support older devices"
@@ -107,15 +107,15 @@ get_target_cpu() {
 }
 
 get_common_includes() {
-  echo ""
+  echo "-I${LLVM_CONFIG_INCLUDEDIR:-.}"
 }
 
 get_common_cflags() {
   if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD__FLAG="-DFFMPEG_KIT_LTS "
+    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
   fi
 
-  echo "-fstrict-aliasing -fPIC -DLINUX ${LTS_BUILD__FLAG} ${LLVM_CONFIG_CFLAGS}"
+  echo "-fstrict-aliasing -fPIC -DLINUX ${LTS_BUILD_FLAG} ${LLVM_CONFIG_CFLAGS}"
 }
 
 get_arch_specific_cflags() {
@@ -156,7 +156,10 @@ get_app_specific_cflags() {
   local APP_FLAGS=""
   case $1 in
   ffmpeg)
-    APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
+    APP_FLAGS="-Wno-unused-function"
+    ;;
+  ffmpeg-kit)
+    APP_FLAGS="-Wno-unused-function -Wno-pointer-sign -Wno-switch -Wno-deprecated-declarations"
     ;;
   kvazaar)
     APP_FLAGS="-std=gnu99 -Wno-unused-function"
@@ -202,21 +205,25 @@ get_cxxflags() {
     local OPTIMIZATION_FLAGS="${FFMPEG_KIT_DEBUG}"
   fi
 
-  local COMMON_FLAGS="${LLVM_CONFIG_CXXFLAGS} ${OPTIMIZATION_FLAGS}"
+  local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
+  local COMMON_FLAGS="${OPTIMIZATION_FLAGS} ${BUILD_DATE}"
 
   case $1 in
   ffmpeg)
     if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
-      echo "${LINK_TIME_OPTIMIZATION_FLAGS} ${LLVM_CONFIG_CXXFLAGS} -O2 -ffunction-sections -fdata-sections"
+      echo "${LINK_TIME_OPTIMIZATION_FLAGS} -std=c++11 -O2 -ffunction-sections -fdata-sections"
     else
-      echo "${FFMPEG_KIT_DEBUG} ${LLVM_CONFIG_CXXFLAGS}"
+      echo "${FFMPEG_KIT_DEBUG} -std=c++11"
     fi
     ;;
+  ffmpeg-kit)
+    echo "-std=c++11 ${COMMON_FLAGS}"
+    ;;
   srt | zimg)
-    echo "${COMMON_FLAGS} -fcxx-exceptions -fPIC"
+    echo "${COMMON_FLAGS} -std=c++11 -fcxx-exceptions -fPIC"
     ;;
   *)
-    echo "-fno-exceptions -fno-rtti ${COMMON_FLAGS}"
+    echo "-std=c++11 -fno-exceptions -fno-rtti ${COMMON_FLAGS}"
     ;;
   esac
 }
@@ -401,12 +408,12 @@ set_toolchain_paths() {
   if [[ $CLANG_VERSION != "none" ]]; then
     local CLANG_POSTFIX="-$CLANG_VERSION"
     export LLVM_CONFIG_CFLAGS=$(llvm-config-$CLANG_VERSION --cflags 2>>"${BASEDIR}"/build.log)
-    export LLVM_CONFIG_CXXFLAGS=$(llvm-config-$CLANG_VERSION --cxxflags 2>>"${BASEDIR}"/build.log)
+    export LLVM_CONFIG_INCLUDEDIR=$(llvm-config-$CLANG_VERSION --includedir 2>>"${BASEDIR}"/build.log)
     export LLVM_CONFIG_LDFLAGS=$(llvm-config-$CLANG_VERSION --ldflags 2>>"${BASEDIR}"/build.log)
   else
     local CLANG_POSTFIX=""
     export LLVM_CONFIG_CFLAGS=$(llvm-config --cflags 2>>"${BASEDIR}"/build.log)
-    export LLVM_CONFIG_CXXFLAGS=$(llvm-config --cxxflags 2>>"${BASEDIR}"/build.log)
+    export LLVM_CONFIG_INCLUDEDIR=$(llvm-config --includedir 2>>"${BASEDIR}"/build.log)
     export LLVM_CONFIG_LDFLAGS=$(llvm-config --ldflags 2>>"${BASEDIR}"/build.log)
   fi
 

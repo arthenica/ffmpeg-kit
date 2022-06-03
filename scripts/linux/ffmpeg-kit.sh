@@ -20,8 +20,8 @@ set_toolchain_paths "${LIB_NAME}"
 
 # SET BUILD FLAGS
 HOST=$(get_host)
-export CFLAGS="$(get_cflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include"
-export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export CFLAGS="$(get_cflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include -I${FFMPEG_KIT_TMPDIR}/source/rapidjson/include"
+export CXXFLAGS="$(get_cxxflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include -I${FFMPEG_KIT_TMPDIR}/source/rapidjson/include"
 export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${LIB_INSTALL_BASE}/ffmpeg/lib -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
@@ -46,10 +46,6 @@ autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
   --disable-fast-install \
   --disable-maintainer-mode \
   --host="${HOST}" 1>>"${BASEDIR}"/build.log 2>&1
-
-# WORKAROUND FOR clang: warning: using sysroot for 'MacOSX' but targeting 'iPhone'
-## ${SED_INLINE} "s|allow_undefined_flag -o|allow_undefined_flag -target $(get_target) -o|g" libtool 1>>"${BASEDIR}"/build.log 2>&1
-## ${SED_INLINE} 's|\$rpath/\\$soname|@rpath/ffmpegkit.framework/ffmpegkit|g' libtool 1>>"${BASEDIR}"/build.log 2>&1
 
 if [ $? -ne 0 ]; then
   echo -e "failed\n\nSee build.log for details\n"
