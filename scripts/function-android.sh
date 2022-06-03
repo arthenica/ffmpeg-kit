@@ -45,8 +45,8 @@ under the prebuilt folder.\n"
 
   echo -e "Libraries:"
   echo -e "  --full\t\t\tenables all external libraries"
-  echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec support[no]"
-  echo -e "  --enable-android-zlib\t\tbuild with built-in zlib support[no]"
+  echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec support [no]"
+  echo -e "  --enable-android-zlib\t\tbuild with built-in zlib support [no]"
 
   display_help_common_libraries
   display_help_gpl_libraries
