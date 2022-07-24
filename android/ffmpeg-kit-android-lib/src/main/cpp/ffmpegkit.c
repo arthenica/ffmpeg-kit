@@ -621,19 +621,19 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJIDD)V");
-    if (logMethod == NULL) {
+    if (statisticsMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
         return JNI_FALSE;
     }
 
     safOpenMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safOpen", "(I)I");
-    if (logMethod == NULL) {
+    if (safOpenMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safOpen");
         return JNI_FALSE;
     }
 
     safCloseMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safClose", "(I)I");
-    if (logMethod == NULL) {
+    if (safCloseMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safClose");
         return JNI_FALSE;
     }
