@@ -2384,8 +2384,8 @@ to_capital_case() {
 # 2. destination file
 #
 overwrite_file() {
-  rm -f "$2"
-  cp "$1" "$2"
+  rm -f "$2" 2>>"${BASEDIR}"/build.log
+  cp "$1" "$2" 2>>"${BASEDIR}"/build.log
 }
 
 #
@@ -2437,4 +2437,21 @@ command_exists() {
   else
     echo 1
   fi
+}
+
+#
+# 1. folder path
+#
+initialize_folder() {
+  rm -rf "$1" 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ $? -ne 0 ]]; then
+    return 1
+  fi
+
+  mkdir -p "$1" 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ $? -ne 0 ]]; then
+    return 1
+  fi
+
+  return 0
 }

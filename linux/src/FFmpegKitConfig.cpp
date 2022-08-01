@@ -19,9 +19,11 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "libavutil/ffversion.h"
-#include "libavutil/bprint.h"
-#include "fftools_ffmpeg.h"
+extern "C" {
+    #include "libavutil/ffversion.h"
+    #include "libavutil/bprint.h"
+    #include "fftools_ffmpeg.h"
+}
 #include "ArchDetect.h"
 #include "FFmpegKit.h"
 #include "FFmpegKitConfig.h"
@@ -91,11 +93,21 @@ __thread volatile long globalSessionId = 0;
 /** Holds the default log level */
 int configuredLogLevel = ffmpegkit::LevelAVLogInfo;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Forward declaration for function defined in fftools_ffmpeg.c */
 int ffmpeg_execute(int argc, char **argv);
 
 /** Forward declaration for function defined in fftools_ffprobe.c */
 int ffprobe_execute(int argc, char **argv);
+
+void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
+
+#ifdef __cplusplus
+}
+#endif
 
 static std::once_flag ffmpegKitInitializerFlag;
 
@@ -391,12 +403,16 @@ static void removeSession(long sessionId) {
     std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 0);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Adds a cancel session request to the session map.
  *
  * @param sessionId session id
  */
-static void cancelSession(long sessionId) {
+void cancelSession(long sessionId) {
     std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 2);
 }
 
@@ -406,13 +422,17 @@ static void cancelSession(long sessionId) {
  * @param sessionId session id
  * @return 1 if exists, false otherwise
  */
-static int cancelRequested(long sessionId) {
+int cancelRequested(long sessionId) {
     if (std::atomic_load(&sessionMap[sessionId % SESSION_MAP_SIZE]) == 2) {
         return 1;
     } else {
         return 0;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * Resets the number of messages in transmit for this session.
@@ -1182,6 +1202,8 @@ std::shared_ptr<ffmpegkit::Session> ffmpegkit::FFmpegKitConfig::getLastCompleted
             return session;
         }
     }
+
+    return nullptr;
 }
 
 std::shared_ptr<std::list<std::shared_ptr<ffmpegkit::Session>>> ffmpegkit::FFmpegKitConfig::getSessions() {

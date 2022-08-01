@@ -9,7 +9,7 @@ enable_default_linux_architectures() {
 }
 
 get_ffmpeg_kit_version() {
-  local FFMPEG_KIT_VERSION=$(grep '#define FFMPEG_KIT_VERSION' "${BASEDIR}"/linux/src/main/cpp/ffmpegkit.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+  local FFMPEG_KIT_VERSION=$(grep -Eo 'FFmpegKitVersion = .*' "${BASEDIR}/linux/src/FFmpegKitConfig.h" 2>>"${BASEDIR}"/build.log | grep -Eo ' \".*' | tr -d '"; ')
 
   echo "${FFMPEG_KIT_VERSION}"
 }
@@ -88,6 +88,72 @@ enable_main_build() {
 
 enable_lts_build() {
   export FFMPEG_KIT_LTS_BUILD="1"
+}
+
+install_pkg_config_file() {
+  local FILE_NAME="$1"
+  local SOURCE="${INSTALL_PKG_CONFIG_DIR}/${FILE_NAME}"
+  local DESTINATION="${FFMPEG_KIT_BUNDLE_PKG_CONFIG_DIRECTORY}/${FILE_NAME}"
+
+  # DELETE OLD FILE
+  rm -f "$DESTINATION" 2>>"${BASEDIR}"/build.log
+  if [[ $? -ne 0 ]]; then
+    echo -e "failed\n\nSee build.log for details\n"
+    exit 1
+  fi
+
+  # INSTALL THE NEW FILE
+  cp "$SOURCE" "$DESTINATION" 2>>"${BASEDIR}"/build.log
+  if [[ $? -ne 0 ]]; then
+    echo -e "failed\n\nSee build.log for details\n"
+    exit 1
+  fi
+
+  # UPDATE PATHS
+  ${SED_INLINE} "s|${LIB_INSTALL_BASE}/ffmpeg-kit|${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit|g" "$DESTINATION" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  ${SED_INLINE} "s|${LIB_INSTALL_BASE}/ffmpeg|${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit|g" "$DESTINATION" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+}
+
+get_bundle_directory() {
+  local LTS_POSTFIX=""
+  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
+    LTS_POSTFIX="-lts"
+  fi
+
+  echo "bundle-linux${LTS_POSTFIX}"
+}
+
+create_linux_bundle() {
+  set_toolchain_paths ""
+
+  local FFMPEG_KIT_VERSION=$(get_ffmpeg_kit_version)
+
+  local FFMPEG_KIT_BUNDLE_DIRECTORY="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit"
+  local FFMPEG_KIT_BUNDLE_INCLUDE_DIRECTORY="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include"
+  local FFMPEG_KIT_BUNDLE_LIB_DIRECTORY="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib"
+  local FFMPEG_KIT_BUNDLE_PKG_CONFIG_DIRECTORY="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/pkgconfig"
+
+  initialize_folder "${FFMPEG_KIT_BUNDLE_INCLUDE_DIRECTORY}"
+  initialize_folder "${FFMPEG_KIT_BUNDLE_LIB_DIRECTORY}"
+  initialize_folder "${FFMPEG_KIT_BUNDLE_PKG_CONFIG_DIRECTORY}"
+
+  # COPY HEADERS
+  cp -r -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/include/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
+  cp -r -P "${LIB_INSTALL_BASE}"/ffmpeg/include/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
+  cp -r -P ${FFMPEG_KIT_TMPDIR}/source/rapidjson/include/rapidjson "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
+
+  # COPY LIBS
+  cp -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/lib/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
+  cp -P "${LIB_INSTALL_BASE}"/ffmpeg/lib/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
+
+  install_pkg_config_file "libavformat.pc"
+  install_pkg_config_file "libswresample.pc"
+  install_pkg_config_file "libswscale.pc"
+  install_pkg_config_file "libavdevice.pc"
+  install_pkg_config_file "libavfilter.pc"
+  install_pkg_config_file "libavcodec.pc"
+  install_pkg_config_file "libavutil.pc"
+  install_pkg_config_file "ffmpeg-kit.pc"
 }
 
 get_cmake_system_processor() {
@@ -306,6 +372,25 @@ endian = 'little'
 [built-in options]
 default_library = 'static'
 prefix = '${LIB_INSTALL_PREFIX}'
+EOF
+}
+
+create_ffmpegkit_package_config() {
+  local FFMPEGKIT_VERSION="$1"
+
+  cat >"${INSTALL_PKG_CONFIG_DIR}/ffmpeg-kit.pc" <<EOF
+prefix=${LIB_INSTALL_BASE}/ffmpeg-kit
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: ffmpeg-kit
+Description: FFmpeg for applications
+Version: ${FFMPEGKIT_VERSION}
+
+Libs: -L\${libdir} -lstdc++ -lffmpegkit -lavutil
+Requires: libavfilter, libswscale, libavformat, libavcodec, libswresample, libavutil
+Cflags: -I\${includedir}
 EOF
 }
 

@@ -6220,7 +6220,7 @@ CFLAGS="$cflags_bckup"
 FFMPEG_LIBS="-lavcodec -lavfilter -lavformat -lavutil -lswscale -lswresample"
 
 
-VERSION_INFO="5:5:1"
+VERSION_INFO="9:1:5"
 
 
 case `pwd` in

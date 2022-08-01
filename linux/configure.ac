@@ -27,7 +27,7 @@ CFLAGS="$cflags_bckup"
 FFMPEG_LIBS="-lavcodec -lavfilter -lavformat -lavutil -lswscale -lswresample"
 AC_SUBST(FFMPEG_LIBS)
 
-VERSION_INFO="5:5:1"
+VERSION_INFO="9:1:5"
 AC_SUBST(VERSION_INFO)
 
 LT_INIT

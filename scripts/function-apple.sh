@@ -183,23 +183,6 @@ is_apple_architecture_variant_supported() {
 }
 
 #
-# 1. folder path
-#
-initialize_folder() {
-  rm -rf "$1" 1>>"${BASEDIR}"/build.log 2>&1
-  if [[ $? -ne 0 ]]; then
-    return 1
-  fi
-
-  mkdir -p "$1" 1>>"${BASEDIR}"/build.log 2>&1
-  if [[ $? -ne 0 ]]; then
-    return 1
-  fi
-
-  return 0
-}
-
-#
 # 1. architecture variant
 #
 # DEPENDS TARGET_ARCH_LIST VARIABLE

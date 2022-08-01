@@ -17,7 +17,9 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "fftools_ffmpeg.h"
+extern "C" {
+    #include "fftools_ffmpeg.h"
+}
 #include "ArchDetect.h"
 #include "FFmpegKit.h"
 #include "FFmpegKitConfig.h"

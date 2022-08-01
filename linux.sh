@@ -203,3 +203,17 @@ for run_arch in {0..12}; do
     done
   fi
 done
+
+# BUILD FFMPEG-KIT BUNDLE
+if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
+
+  echo -e -n "\nCreating the bundle under prebuilt: "
+
+  echo -e "DEBUG: Creating the bundle directory\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  initialize_folder "${BASEDIR}/prebuilt/$(get_bundle_directory)"
+
+  create_linux_bundle
+
+  echo -e "ok\n"
+fi
