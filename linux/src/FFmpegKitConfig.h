@@ -52,9 +52,8 @@ namespace ffmpegkit {
             /**
              * <p>Enables log and statistics redirection.
              *
-             * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to stdout and sessions
-             * collect log and statistics entries for the executions. It is possible to define global or
-             * session specific log/statistics callbacks as well.
+             * <p>When redirection is enabled FFmpeg/FFprobe sessions collect log and statistics entries for the
+             * executions. It is possible to define global or session specific log/statistics callbacks as well.
              *
              * <p>Note that redirection is enabled by default. If you do not want to use its functionality
              * please use disableRedirection method to disable it.
@@ -76,7 +75,7 @@ namespace ffmpegkit {
              * @param path directory that contains fontconfig configuration (fonts.conf)
              * @return zero on success, non-zero on error
              */
-            static int setFontconfigConfigurationPath(const char* path);
+            static int setFontconfigConfigurationPath(const std::string& path);
 
             /**
              * <p>Registers the fonts inside the given path, so they become available to use in FFmpeg
@@ -90,7 +89,7 @@ namespace ffmpegkit {
              * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
              *                          friendly names
              */
-            static void setFontDirectory(const char* fontDirectoryPath, const std::map<std::string, std::string>& fontNameMapping);
+            static void setFontDirectory(const std::string& fontDirectoryPath, const std::map<std::string,std::string>& fontNameMapping);
 
             /**
              * <p>Registers the fonts inside the given list of font directories, so they become available
@@ -104,7 +103,7 @@ namespace ffmpegkit {
              * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
              *                          friendly names
              */
-            static void setFontDirectoryList(const std::list<std::string>& fontDirectoryList, const std::map<std::string, std::string>& fontNameMapping);
+            static void setFontDirectoryList(const std::list<std::string>& fontDirectoryList, const std::map<std::string,std::string>& fontNameMapping);
 
             /**
              * <p>Creates a new named pipe to use in <code>FFmpeg</code> operations.
@@ -120,7 +119,7 @@ namespace ffmpegkit {
              *
              * @param ffmpegPipePath full path of the FFmpeg pipe
              */
-            static void closeFFmpegPipe(const char* ffmpegPipePath);
+            static void closeFFmpegPipe(const std::string& ffmpegPipePath);
 
             /**
              * <p>Returns the version of FFmpeg bundled within <code>FFmpegKit</code> library.
@@ -157,7 +156,7 @@ namespace ffmpegkit {
              * @param variableValue environment variable value
              * @return zero on success, non-zero on error
              */
-            static int setEnvironmentVariable(const char* variableName, const char* variableValue);
+            static int setEnvironmentVariable(const std::string& variableName, const std::string& variableValue);
 
             /**
              * <p>Registers a new ignored signal. Ignored signals are not handled by <code>FFmpegKit</code>
@@ -223,49 +222,49 @@ namespace ffmpegkit {
             /**
              * <p>Sets a global log callback to redirect FFmpeg/FFprobe logs.
              *
-             * @param logCallback log callback or nil to disable a previously defined log callback
+             * @param logCallback log callback or nullptr to disable a previously defined log callback
              */
             static void enableLogCallback(const ffmpegkit::LogCallback logCallback);
 
             /**
              * <p>Sets a global statistics callback to redirect FFmpeg statistics.
              *
-             * @param statisticsCallback statistics callback or nil to disable a previously defined statistics callback
+             * @param statisticsCallback statistics callback or nullptr to disable a previously defined statistics callback
              */
             static void enableStatisticsCallback(const ffmpegkit::StatisticsCallback statisticsCallback);
 
             /**
              * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results for FFmpeg sessions.
              *
-             * @param ffmpegSessionCompleteCallback complete callback or nil to disable a previously defined callback
+             * @param ffmpegSessionCompleteCallback complete callback or nullptr to disable a previously defined callback
              */
             static void enableFFmpegSessionCompleteCallback(const FFmpegSessionCompleteCallback ffmpegSessionCompleteCallback);
 
             /**
              * <p>Returns the global FFmpegSessionCompleteCallback set.
              *
-             * @return global FFmpegSessionCompleteCallback or nil if it is not set
+             * @return global FFmpegSessionCompleteCallback or nullptr if it is not set
              */
             static FFmpegSessionCompleteCallback getFFmpegSessionCompleteCallback();
 
             /**
              * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results for FFprobe sessions.
              *
-             * @param ffprobeSessionCompleteCallback complete callback or nil to disable a previously defined callback
+             * @param ffprobeSessionCompleteCallback complete callback or nullptr to disable a previously defined callback
              */
             static void enableFFprobeSessionCompleteCallback(const FFprobeSessionCompleteCallback ffprobeSessionCompleteCallback);
 
             /**
              * <p>Returns the global FFprobeSessionCompleteCallback set.
              *
-             * @return global FFprobeSessionCompleteCallback or nil if it is not set
+             * @return global FFprobeSessionCompleteCallback or nullptr if it is not set
              */
             static FFprobeSessionCompleteCallback getFFprobeSessionCompleteCallback();
 
             /**
              * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution results for MediaInformation sessions.
              *
-             * @param mediaInformationSessionCompleteCallback complete callback or nil to disable a previously defined
+             * @param mediaInformationSessionCompleteCallback complete callback or nullptr to disable a previously defined
              * callback
              */
             static void enableMediaInformationSessionCompleteCallback(const MediaInformationSessionCompleteCallback mediaInformationSessionCompleteCallback);
@@ -273,7 +272,7 @@ namespace ffmpegkit {
             /**
              * <p>Returns the global MediaInformationSessionCompleteCallback set.
              *
-             * @return global MediaInformationSessionCompleteCallback or nil if it is not set
+             * @return global MediaInformationSessionCompleteCallback or nullptr if it is not set
              */
             static MediaInformationSessionCompleteCallback getMediaInformationSessionCompleteCallback();
 
@@ -292,7 +291,7 @@ namespace ffmpegkit {
             static void setLogLevel(const ffmpegkit::Level level);
 
             /**
-             * Converts int log level to string.
+             * Converts log level to string.
              *
              * @param level value
              * @return string value
@@ -317,14 +316,14 @@ namespace ffmpegkit {
              * Returns the session specified with <code>sessionId</code> from the session history.
              *
              * @param sessionId session identifier
-             * @return session specified with sessionId or nil if it is not found in the history
+             * @return session specified with sessionId or nullptr if it is not found in the history
              */
             static std::shared_ptr<ffmpegkit::Session> getSession(const long sessionId);
 
             /**
              * Returns the last session created from the session history.
              *
-             * @return the last session created or nil if session history is empty
+             * @return the last session created or nullptr if session history is empty
              */
             static std::shared_ptr<ffmpegkit::Session> getLastSession();
 
@@ -332,7 +331,7 @@ namespace ffmpegkit {
              * Returns the last session completed from the session history.
              *
              * @return the last session completed. If there are no completed sessions in the history this
-             * method will return nil
+             * method will return nullptr
              */
             static std::shared_ptr<ffmpegkit::Session> getLastCompletedSession();
 
@@ -415,7 +414,7 @@ namespace ffmpegkit {
              * @param command string command
              * @return list of arguments
              */
-            static std::shared_ptr<std::list<std::string>> parseArguments(const char* command);
+            static std::shared_ptr<std::list<std::string>> parseArguments(const std::string& command);
 
             /**
              * <p>Concatenates arguments into a string adding a space character between two arguments.

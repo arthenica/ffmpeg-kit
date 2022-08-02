@@ -22,41 +22,6 @@
 #include <memory>
 #include <algorithm>
 
-static const std::set<const char*> supportedExternalLibraries = {
-    "dav1d",
-    "fontconfig",
-    "freetype",
-    "fribidi",
-    "gmp",
-    "gnutls",
-    "kvazaar",
-    "mp3lame",
-    "libaom",
-    "libass",
-    "iconv",
-    "libilbc",
-    "libtheora",
-    "libvidstab",
-    "libvorbis",
-    "libvpx",
-    "libwebp",
-    "libxml2",
-    "opencore-amr",
-    "openh264",
-    "opus",
-    "rubberband",
-    "sdl2",
-    "shine",
-    "snappy",
-    "soxr",
-    "speex",
-    "tesseract",
-    "twolame",
-    "x264",
-    "x265",
-    "xvid"
-};
-
 std::string ffmpegkit::Packages::getPackageName() {
     std::shared_ptr<std::set<std::string>> enabledLibrarySet = getExternalLibraries();
     #define contains_ext_lib(element) enabledLibrarySet->find(element) != enabledLibrarySet->end()
@@ -233,6 +198,39 @@ std::string ffmpegkit::Packages::getPackageName() {
 }
 
 std::shared_ptr<std::set<std::string>> ffmpegkit::Packages::getExternalLibraries() {
+    const std::set<const char*> supportedExternalLibraries{
+        "dav1d",
+        "fontconfig",
+        "freetype",
+        "fribidi",
+        "gmp",
+        "gnutls",
+        "kvazaar",
+        "mp3lame",
+        "libaom",
+        "libass",
+        "iconv",
+        "libilbc",
+        "libtheora",
+        "libvidstab",
+        "libvorbis",
+        "libvpx",
+        "libwebp",
+        "libxml2",
+        "opencore-amr",
+        "openh264",
+        "opus",
+        "rubberband",
+        "sdl2",
+        "shine",
+        "snappy",
+        "soxr",
+        "speex",
+        "tesseract",
+        "twolame",
+        "x264",
+        "x265",
+        "xvid"};
     std::string buildConfiguration(FFMPEG_CONFIGURATION);
     char libraryName1[50];
     char libraryName2[50];

@@ -37,7 +37,7 @@ namespace ffmpegkit {
              *
              * @param arguments command arguments
              */
-            FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::shared_ptr<std::list<std::string>> arguments);
 
             /**
              * Builds a new FFmpeg session.
@@ -45,7 +45,7 @@ namespace ffmpegkit {
              * @param arguments         command arguments
              * @param completeCallback  session specific complete callback
              */
-            FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback);
 
             /**
              * Builds a new FFmpeg session.
@@ -55,7 +55,7 @@ namespace ffmpegkit {
              * @param logCallback           session specific log callback
              * @param statisticsCallback    session specific statistics callback
              */
-            FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback);
 
             /**
              * Builds a new FFmpeg session.
@@ -66,7 +66,7 @@ namespace ffmpegkit {
              * @param statisticsCallback      session specific statistics callback
              * @param logRedirectionStrategy  session specific log redirection strategy
              */
-            FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, ffmpegkit::LogRedirectionStrategy logRedirectionStrategy);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, ffmpegkit::LogRedirectionStrategy logRedirectionStrategy);
 
             /**
              * Returns the session specific statistics callback.
@@ -112,7 +112,7 @@ namespace ffmpegkit {
             /**
              * Returns the last received statistics entry.
              *
-             * @return the last received statistics entry or nil if there are not any statistics entries
+             * @return the last received statistics entry or nullptr if there are not any statistics entries
              * received
              */
             std::shared_ptr<ffmpegkit::Statistics> getLastReceivedStatistics();
@@ -147,6 +147,20 @@ namespace ffmpegkit {
             bool isMediaInformation() const override;
 
         private:
+
+            struct PublicFFmpegSession;
+
+            /**
+             * Builds a new FFmpeg session.
+             *
+             * @param arguments               command arguments
+             * @param completeCallback        session specific complete callback
+             * @param logCallback             session specific log callback
+             * @param statisticsCallback      session specific statistics callback
+             * @param logRedirectionStrategy  session specific log redirection strategy
+             */
+            FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, ffmpegkit::LogRedirectionStrategy logRedirectionStrategy);
+
             ffmpegkit::StatisticsCallback _statisticsCallback;
             FFmpegSessionCompleteCallback _completeCallback;
             std::shared_ptr<std::list<std::shared_ptr<ffmpegkit::Statistics>>> _statistics;

@@ -36,7 +36,7 @@ namespace ffmpegkit {
              *
              * @param arguments command arguments
              */
-            FFprobeSession(const std::shared_ptr<std::list<std::string>> arguments);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::shared_ptr<std::list<std::string>> arguments);
 
             /**
              * Builds a new FFprobe session.
@@ -44,7 +44,7 @@ namespace ffmpegkit {
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
              */
-            FFprobeSession(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback);
 
             /**
              * Builds a new FFprobe session.
@@ -53,7 +53,7 @@ namespace ffmpegkit {
              * @param completeCallback session specific complete callback
              * @param logCallback      session specific log callback
              */
-            FFprobeSession(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback);
 
             /**
              * Builds a new FFprobe session.
@@ -63,7 +63,7 @@ namespace ffmpegkit {
              * @param logCallback             session specific log callback
              * @param logRedirectionStrategy  session specific log redirection strategy
              */
-            FFprobeSession(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
 
             /**
              * Returns the session specific complete callback.
@@ -94,6 +94,19 @@ namespace ffmpegkit {
             bool isMediaInformation() const override;
 
         private:
+
+            struct PublicFFprobeSession;
+
+            /**
+             * Builds a new FFprobe session.
+             *
+             * @param arguments               command arguments
+             * @param completeCallback        session specific complete callback
+             * @param logCallback             session specific log callback
+             * @param logRedirectionStrategy  session specific log redirection strategy
+             */
+            FFprobeSession(const std::shared_ptr<std::list<std::string>> arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
+
             FFprobeSessionCompleteCallback _completeCallback;
     };
 

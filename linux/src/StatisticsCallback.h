@@ -23,6 +23,7 @@
 #include "Statistics.h"
 #include <iostream>
 #include <memory>
+#include <functional>
 
 namespace ffmpegkit {
 
@@ -31,7 +32,7 @@ namespace ffmpegkit {
      *
      * @param statistics statistics entry
      */
-    typedef void (*StatisticsCallback)(const std::shared_ptr<ffmpegkit::Statistics> statistics);
+    typedef std::function<void(const std::shared_ptr<ffmpegkit::Statistics> statistics)> StatisticsCallback;
 
 }
 

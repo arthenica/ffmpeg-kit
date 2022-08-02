@@ -18,6 +18,8 @@
  */
 
 #include "MediaInformationJsonParser.h"
+// OVERRIDING THE MACRO TO PREVENT APPLICATION TERMINATION
+#define RAPIDJSON_ASSERT(x)
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -26,7 +28,7 @@
 static const char* MediaInformationJsonParserKeyStreams =  "streams";
 static const char* MediaInformationJsonParserKeyChapters = "chapters";
 
-std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::from(const char* ffprobeJsonOutput) {
+std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::from(const std::string& ffprobeJsonOutput) {
     std::string error;
 
     std::shared_ptr<ffmpegkit::MediaInformation> mediaInformation = fromWithError(ffprobeJsonOutput, error);
@@ -37,10 +39,10 @@ std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonPars
     return mediaInformation;
 }
 
-std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::fromWithError(const char* ffprobeJsonOutput, std::string& error) {
+std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::fromWithError(const std::string& ffprobeJsonOutput, std::string& error) {
     std::shared_ptr<rapidjson::Document> document = std::make_shared<rapidjson::Document>();
 
-    document->Parse(ffprobeJsonOutput);
+    document->Parse(ffprobeJsonOutput.c_str());
 
     if (document->HasParseError()) {
         error = GetParseError_En(document->GetParseError());

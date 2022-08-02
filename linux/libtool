@@ -90,7 +90,7 @@ EGREP="/bin/grep -E"
 FGREP="/bin/grep -F"
 
 # A BSD- or MS-compatible name lister.
-NM="/usr/bin/llvm-nm"
+NM="/bin/llvm-nm"
 
 # Whether we need soft or hard links.
 LN_S="ln -s"
@@ -141,7 +141,7 @@ DLLTOOL="false"
 sharedlib_from_linklib_cmd="printf %s\\n"
 
 # The archiver.
-AR="/usr/bin/llvm-ar"
+AR="/bin/llvm-ar"
 
 # Flags to create an archive.
 AR_FLAGS="cr"
@@ -150,10 +150,10 @@ AR_FLAGS="cr"
 archiver_list_spec="@"
 
 # A symbol stripping program.
-STRIP="/usr/bin/llvm-strip"
+STRIP="/bin/llvm-strip"
 
 # Commands used to install an old-style archive.
-RANLIB="/usr/bin/llvm-ranlib"
+RANLIB="/bin/llvm-ranlib"
 old_postinstall_cmds="chmod 644 \$oldlib~\$RANLIB \$tool_oldlib"
 old_postuninstall_cmds=""
 
@@ -161,10 +161,10 @@ old_postuninstall_cmds=""
 lock_old_archive_extraction=no
 
 # A C compiler.
-LTCC="/usr/bin/clang"
+LTCC="/bin/clang"
 
 # LTCC compiler flags.
-LTCFLAGS="-target x86_64-linux-gnu -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64 -Wno-unused-function -Wno-pointer-sign -Wno-switch -Wno-deprecated-declarations -fstrict-aliasing -fPIC -DLINUX  -I/usr/lib/llvm-10/include  -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Os -ffunction-sections -fdata-sections  -I/usr/lib/llvm-10/include -I/home/taner/Projects/ffmpeg-kit/prebuilt/linux-x86_64/ffmpeg/include -I/home/taner/Projects/ffmpeg-kit/.tmp/source/rapidjson/include"
+LTCFLAGS="-target x86_64-linux-gnu -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64 -Wno-unused-function -Wno-pointer-sign -Wno-switch -Wno-deprecated-declarations -fstrict-aliasing -fPIC -DLINUX  -I/usr/lib/llvm-10/include  -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Os -ffunction-sections -fdata-sections  -I/usr/lib/llvm-10/include -I/home/taner/Projects/ffmpeg-kit/prebuilt/linux-x86_64/ffmpeg/include -I/home/taner/Projects/ffmpeg-kit/.tmp/source/rapidjson/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([BCDEGRST][BCDEGRST]*\\)[	 ][	 ]*\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -281,7 +281,7 @@ finish_eval=""
 hardcode_into_libs=yes
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/usr/lib/llvm-10/lib/clang/10.0.0 /usr/lib/gcc/x86_64-linux-gnu/9 /usr/lib/x86_64-linux-gnu /lib/x86_64-linux-gnu /lib64 /usr/lib /usr/lib/llvm-10/lib /lib "
+sys_lib_search_path_spec="/usr/lib/llvm-10/lib/clang/10.0.0 /lib/gcc/x86_64-linux-gnu/9 /lib/x86_64-linux-gnu /lib64 /usr/lib/x86_64-linux-gnu /usr/lib64 /lib /usr/lib/llvm-10/lib /usr/lib "
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /usr/local/lib/i386-linux-gnu /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /usr/local/lib/i686-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/local/lib /usr/local/lib/x86_64-linux-gnu /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /lib32 /usr/lib32 "
@@ -299,12 +299,12 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Commands to strip libraries.
-old_striplib="/usr/bin/llvm-strip --strip-debug"
-striplib="/usr/bin/llvm-strip --strip-unneeded"
+old_striplib="/bin/llvm-strip --strip-debug"
+striplib="/bin/llvm-strip --strip-unneeded"
 
 
 # The linker used to build libraries.
-LD="/usr/bin/ld.lld -m elf_x86_64"
+LD="/bin/ld.lld -m elf_x86_64 -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -314,7 +314,7 @@ reload_cmds="\$LD\$reload_flag -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="/usr/bin/clang"
+CC="/bin/clang"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes
@@ -11764,7 +11764,7 @@ build_old_libs=`case $build_libtool_libs in yes) echo no;; *) echo yes;; esac`
 # ### BEGIN LIBTOOL TAG CONFIG: CXX
 
 # The linker used to build libraries.
-LD="/usr/bin/ld.lld -m elf_x86_64"
+LD="/bin/ld.lld -m elf_x86_64 -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -11774,7 +11774,7 @@ reload_cmds="\$LD\$reload_flag -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="/usr/bin/clang++"
+CC="/bin/clang++"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes
@@ -11895,17 +11895,17 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/usr/bin/../lib/gcc/x86_64-linux-gnu/9 /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu /lib/x86_64-linux-gnu /lib/../lib64 /usr/lib/x86_64-linux-gnu /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. /usr/lib/llvm-10/bin/../lib /lib /usr/lib"
+compiler_lib_search_dirs="/bin/../lib/gcc/x86_64-linux-gnu/9 /bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu /bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 /lib/x86_64-linux-gnu /lib/../lib64 /usr/lib/x86_64-linux-gnu /usr/lib/../lib64 /usr/lib/x86_64-linux-gnu/../../lib64 /bin/../lib/gcc/x86_64-linux-gnu/9/../../.. /usr/lib/llvm-10/bin/../lib /lib /usr/lib"
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
-predep_objects="/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbeginS.o"
-postdep_objects="/usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o"
+predep_objects="/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /bin/../lib/gcc/x86_64-linux-gnu/9/crtbeginS.o"
+postdep_objects="/bin/../lib/gcc/x86_64-linux-gnu/9/crtendS.o /bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o"
 predeps=""
 postdeps="-lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/usr/bin/../lib/gcc/x86_64-linux-gnu/9 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib"
+compiler_lib_search_path="-L/bin/../lib/gcc/x86_64-linux-gnu/9 -L/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/x86_64-linux-gnu/../../lib64 -L/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib"
 
 # ### END LIBTOOL TAG CONFIG: CXX

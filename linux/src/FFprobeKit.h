@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "FFprobeSession.h"
 #include "MediaInformationJsonParser.h"
+#include "MediaInformationSession.h"
 
 namespace ffmpegkit {
 
@@ -31,17 +32,17 @@ namespace ffmpegkit {
      * <p>Main class to run <code>FFprobe</code> commands. Supports executing commands both synchronously and
      * asynchronously.
      * <pre>
-     * FFprobeSession *session = [FFprobeKit execute:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4"];
+     * auto session = FFprobeKit::execute("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4");
      *
-     * FFprobeSession *asyncSession = [FFprobeKit executeAsync:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4" withCompleteCallback:completeCallback];
+     * auto asyncSession = FFprobeKit::executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", [](auto session){ ... });
      * </pre>
      * <p>Provides overloaded <code>execute</code> methods to define session specific callbacks.
      * <pre>
-     * FFprobeSession *session = [FFprobeKit executeAsync:@"-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4" withCompleteCallback:completeCallback withLogCallback:logCallback];
+     * auto session = FFprobeKit::executeAsync("-hide_banner -v error -show_entries format=size -of default=noprint_wrappers=1 file1.mp4", [](auto session){ ... }, [](auto log){ ... }];
      * </pre>
      * <p>It can extract media information for a file or a url, using getMediaInformation method.
      * <pre>
-     *      MediaInformationSession *session = [FFprobeKit getMediaInformation:@"file1.mp4"];
+     * auto session = FFprobeKit::getMediaInformation("file1.mp4");
      * </pre>
      */
     class FFprobeKit {

@@ -21,6 +21,7 @@
 #define FFMPEG_KIT_RETURN_CODE_H
 
 #include <memory>
+#include <iostream>
 
 namespace ffmpegkit {
 
@@ -37,7 +38,7 @@ namespace ffmpegkit {
             bool isValueSuccess() const;
             bool isValueError() const;
             bool isValueCancel() const;
-            friend std::ostream& operator<<(std::ostream& out, const ReturnCode& o);
+            friend std::ostream& operator<<(std::ostream& out, const std::shared_ptr<ffmpegkit::ReturnCode>& o);
         
         private:
             int _value;

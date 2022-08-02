@@ -22,96 +22,110 @@
 ffmpegkit::StreamInformation::StreamInformation(std::shared_ptr<rapidjson::Value> streamInformationValue) : _streamInformationValue{streamInformationValue} {
 }
 
-int64_t ffmpegkit::StreamInformation::getIndex() {
-    return (*_streamInformationValue)[KeyIndex].GetInt64();
+std::shared_ptr<int64_t> ffmpegkit::StreamInformation::getIndex() {
+    return getNumberProperty(KeyIndex);
 }
 
-std::string ffmpegkit::StreamInformation::getType() {
-    return (*_streamInformationValue)[KeyType].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getType() {
+    return getStringProperty(KeyType);
 }
 
-std::string ffmpegkit::StreamInformation::getCodec() {
-    return (*_streamInformationValue)[KeyCodec].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getCodec() {
+    return getStringProperty(KeyCodec);
 }
 
-std::string ffmpegkit::StreamInformation::getCodecLong() {
-    return (*_streamInformationValue)[KeyCodecLong].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getCodecLong() {
+    return getStringProperty(KeyCodecLong);
 }
 
-std::string ffmpegkit::StreamInformation::getFormat() {
-    return (*_streamInformationValue)[KeyFormat].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getFormat() {
+    return getStringProperty(KeyFormat);
 }
 
-int64_t ffmpegkit::StreamInformation::getWidth() {
-    return (*_streamInformationValue)[KeyWidth].GetInt64();
+std::shared_ptr<int64_t> ffmpegkit::StreamInformation::getWidth() {
+    return getNumberProperty(KeyWidth);
 }
 
-int64_t ffmpegkit::StreamInformation::getHeight() {
-    return (*_streamInformationValue)[KeyHeight].GetInt64();
+std::shared_ptr<int64_t> ffmpegkit::StreamInformation::getHeight() {
+    return getNumberProperty(KeyHeight);
 }
 
-std::string ffmpegkit::StreamInformation::getBitrate() {
-    return (*_streamInformationValue)[KeyBitRate].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getBitrate() {
+    return getStringProperty(KeyBitRate);
 }
 
-std::string ffmpegkit::StreamInformation::getSampleRate() {
-    return (*_streamInformationValue)[KeySampleRate].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getSampleRate() {
+    return getStringProperty(KeySampleRate);
 }
 
-std::string ffmpegkit::StreamInformation::getSampleFormat() {
-    return (*_streamInformationValue)[KeySampleFormat].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getSampleFormat() {
+    return getStringProperty(KeySampleFormat);
 }
 
-std::string ffmpegkit::StreamInformation::getChannelLayout() {
-    return (*_streamInformationValue)[KeyChannelLayout].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getChannelLayout() {
+    return getStringProperty(KeyChannelLayout);
 }
 
-std::string ffmpegkit::StreamInformation::getSampleAspectRatio() {
-    return (*_streamInformationValue)[KeySampleAspectRatio].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getSampleAspectRatio() {
+    return getStringProperty(KeySampleAspectRatio);
 }
 
-std::string ffmpegkit::StreamInformation::getDisplayAspectRatio() {
-    return (*_streamInformationValue)[KeyDisplayAspectRatio].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getDisplayAspectRatio() {
+    return getStringProperty(KeyDisplayAspectRatio);
 }
 
-std::string ffmpegkit::StreamInformation::getAverageFrameRate() {
-    return (*_streamInformationValue)[KeyAverageFrameRate].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getAverageFrameRate() {
+    return getStringProperty(KeyAverageFrameRate);
 }
 
-std::string ffmpegkit::StreamInformation::getRealFrameRate() {
-    return (*_streamInformationValue)[KeyRealFrameRate].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getRealFrameRate() {
+    return getStringProperty(KeyRealFrameRate);
 }
 
-std::string ffmpegkit::StreamInformation::getTimeBase() {
-    return (*_streamInformationValue)[KeyTimeBase].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getTimeBase() {
+    return getStringProperty(KeyTimeBase);
 }
 
-std::string ffmpegkit::StreamInformation::getCodecTimeBase() {
-    return (*_streamInformationValue)[KeyCodecTimeBase].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getCodecTimeBase() {
+    return getStringProperty(KeyCodecTimeBase);
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getTags() {
-    auto tags = std::make_shared<rapidjson::Value>();
-    *tags =  (*_streamInformationValue)[KeyTags];
-    return tags;
+    return getProperties(KeyTags);
 }
 
-std::string ffmpegkit::StreamInformation::getStringProperty(const char* key) {
-    return (*_streamInformationValue)[key].GetString();
+std::shared_ptr<std::string> ffmpegkit::StreamInformation::getStringProperty(const char* key) {
+    if (_streamInformationValue->HasMember(key)) {
+        return std::make_shared<std::string>((*_streamInformationValue)[key].GetString());
+    } else {
+        return nullptr;
+    }
 }
 
-int64_t ffmpegkit::StreamInformation::getNumberProperty(const char* key) {
-    return (*_streamInformationValue)[key].GetInt64();
+std::shared_ptr<int64_t> ffmpegkit::StreamInformation::getNumberProperty(const char* key) {
+    if (_streamInformationValue->HasMember(key)) {
+        return std::make_shared<int64_t>((*_streamInformationValue)[key].GetInt64());
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getProperties(const char* key) {
-    auto value = std::make_shared<rapidjson::Value>();
-    *value =  (*_streamInformationValue)[key];
-    return value;
+    if (_streamInformationValue->HasMember(key)) {
+        auto value = std::make_shared<rapidjson::Value>();
+        *value = (*_streamInformationValue)[key];
+        return value;
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getAllProperties() {
-    auto all = std::make_shared<rapidjson::Value>();
-    *all =  (*_streamInformationValue);
-    return all;
+    if (_streamInformationValue != nullptr) {
+        auto all = std::make_shared<rapidjson::Value>();
+        *all =  (*_streamInformationValue);
+        return all;
+    } else {
+        return nullptr;
+    }
 }

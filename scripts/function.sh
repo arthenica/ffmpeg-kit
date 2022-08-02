@@ -205,12 +205,11 @@ get_library_name() {
   84) echo "linux-opus" ;;
   85) echo "linux-snappy" ;;
   86) echo "linux-soxr" ;;
-  87) echo "linux-chromaprint" ;;
-  88) echo "linux-twolame" ;;
-  89) echo "linux-sdl" ;;
-  90) echo "linux-tesseract" ;;
-  91) echo "linux-vaapi" ;;
-  92) echo "linux-vo-amrwbenc" ;;
+  87) echo "linux-twolame" ;;
+  88) echo "linux-sdl" ;;
+  89) echo "linux-tesseract" ;;
+  90) echo "linux-vaapi" ;;
+  91) echo "linux-vo-amrwbenc" ;;
   esac
 }
 
@@ -303,12 +302,11 @@ from_library_name() {
   linux-opus) echo 84 ;;
   linux-snappy) echo 85 ;;
   linux-soxr) echo 86 ;;
-  linux-chromaprint) echo 87 ;;
-  linux-twolame) echo 88 ;;
-  linux-sdl) echo 89 ;;
-  linux-tesseract) echo 90 ;;
-  linux-vaapi) echo 91 ;;
-  linux-vo-amrwbenc) echo 92 ;;
+  linux-twolame) echo 87 ;;
+  linux-sdl) echo 88 ;;
+  linux-tesseract) echo 89 ;;
+  linux-vaapi) echo 90 ;;
+  linux-vo-amrwbenc) echo 91 ;;
   esac
 }
 
@@ -319,12 +317,12 @@ is_library_supported_on_platform() {
   local library_index=$(from_library_name "$1")
   case ${library_index} in
   # ALL
-  16 | 17 | 18 | 23 | 27 | 32 | 34 | 35 | 36 | 50)
+  16 | 17 | 18 | 23 | 27 | 28 | 32 | 34 | 35 | 36 | 50)
     echo "0"
     ;;
 
   # ALL EXCEPT LINUX
-  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 19 | 20 | 21 | 22 | 24 | 25 | 26 | 28 | 29 | 30 | 31 | 33 | 37 | 38 | 39 | 40 | 42 | 43 | 44 | 45 | 46 | 47 | 48)
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 19 | 20 | 21 | 22 | 24 | 25 | 26 | 29 | 30 | 31 | 33 | 37 | 38 | 39 | 40 | 42 | 43 | 44 | 45 | 46 | 47 | 48)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
       echo "1"
     else
@@ -1256,9 +1254,6 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
     ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
     ;;
-  linux-chromaprint)
-    ENABLED_LIBRARIES[LIBRARY_LINUX_CHROMAPRINT]=$2
-    ;;
   linux-fontconfig)
     ENABLED_LIBRARIES[LIBRARY_LINUX_FONTCONFIG]=$2
     set_library "linux-libiconv" $2
@@ -1604,7 +1599,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # SUPPLEMENTARY LIBRARIES NOT PRINTED
-  for library in {50..57} {59..92} {0..36}; do
+  for library in {50..57} {59..91} {0..36}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "

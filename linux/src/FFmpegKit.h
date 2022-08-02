@@ -32,13 +32,13 @@ namespace ffmpegkit {
      * <p>Main class to run <code>FFmpeg</code> commands. Supports executing commands both synchronously and
      * asynchronously.
      * <pre>
-     * FFmpegSession *session = [FFmpegKit execute:@"-i file1.mp4 -c:v libxvid file1.avi"];
+     * auto session = FFmpegKit::execute:("-i file1.mp4 -c:v libxvid file1.avi");
      *
-     * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withCompleteCallback:completeCallback];
+     * auto asyncSession = FFmpegKit::executeAsync:("-i file1.mp4 -c:v libxvid file1.avi", [](auto session){ ... });
      * </pre>
      * <p>Provides overloaded <code>execute</code> methods to define session specific callbacks.
      * <pre>
-     * FFmpegSession *asyncSession = [FFmpegKit executeAsync:@"-i file1.mp4 -c:v libxvid file1.avi" withCompleteCallback:completeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback];
+     * auto asyncSession = FFmpegKit::executeAsync:("-i file1.mp4 -c:v libxvid file1.avi, [](auto session){ ... }, [](auto log){ ... }, [](auto statistics){ ... });
      * </pre>
      */
     class FFmpegKit {

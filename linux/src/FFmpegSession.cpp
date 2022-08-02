@@ -22,20 +22,40 @@
 #include "LogCallback.h"
 #include "StatisticsCallback.h"
 
-ffmpegkit::FFmpegSession::FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments) :
-    ffmpegkit::FFmpegSession(arguments, nullptr, nullptr, nullptr) {
+extern void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> session);
+
+std::shared_ptr<ffmpegkit::FFmpegSession> ffmpegkit::FFmpegSession::create(const std::shared_ptr<std::list<std::string>> arguments) {
+    std::shared_ptr<ffmpegkit::FFmpegSession> session = std::static_pointer_cast<ffmpegkit::FFmpegSession>(std::make_shared<ffmpegkit::FFmpegSession::PublicFFmpegSession>(arguments, nullptr, nullptr, nullptr, ffmpegkit::FFmpegKitConfig::getLogRedirectionStrategy()));
+    addSessionToSessionHistory(session);
+    return session;
 }
 
-ffmpegkit::FFmpegSession::FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback) :
-    ffmpegkit::FFmpegSession(arguments, completeCallback, nullptr, nullptr) {
+std::shared_ptr<ffmpegkit::FFmpegSession> ffmpegkit::FFmpegSession::create(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback) {
+    std::shared_ptr<ffmpegkit::FFmpegSession> session = std::static_pointer_cast<ffmpegkit::FFmpegSession>(std::make_shared<ffmpegkit::FFmpegSession::PublicFFmpegSession>(arguments, completeCallback, nullptr, nullptr, ffmpegkit::FFmpegKitConfig::getLogRedirectionStrategy()));
+    addSessionToSessionHistory(session);
+    return session;
 }
 
-ffmpegkit::FFmpegSession::FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback) :
-    ffmpegkit::FFmpegSession(arguments, completeCallback, logCallback, statisticsCallback, ffmpegkit::FFmpegKitConfig::getLogRedirectionStrategy()) {
+std::shared_ptr<ffmpegkit::FFmpegSession> ffmpegkit::FFmpegSession::create(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback) {
+    std::shared_ptr<ffmpegkit::FFmpegSession> session = std::static_pointer_cast<ffmpegkit::FFmpegSession>(std::make_shared<ffmpegkit::FFmpegSession::PublicFFmpegSession>(arguments, completeCallback, logCallback, statisticsCallback, ffmpegkit::FFmpegKitConfig::getLogRedirectionStrategy()));
+    addSessionToSessionHistory(session);
+    return session;
 }
+
+std::shared_ptr<ffmpegkit::FFmpegSession> ffmpegkit::FFmpegSession::create(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, LogRedirectionStrategy logRedirectionStrategy) {
+    std::shared_ptr<ffmpegkit::FFmpegSession> session = std::static_pointer_cast<ffmpegkit::FFmpegSession>(std::make_shared<ffmpegkit::FFmpegSession::PublicFFmpegSession>(arguments, completeCallback, logCallback, statisticsCallback, logRedirectionStrategy));
+    addSessionToSessionHistory(session);
+    return session;
+}
+
+struct ffmpegkit::FFmpegSession::PublicFFmpegSession : public ffmpegkit::FFmpegSession {
+    PublicFFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, LogRedirectionStrategy logRedirectionStrategy) :
+      FFmpegSession(arguments, completeCallback, logCallback, statisticsCallback, logRedirectionStrategy) {
+    }
+};
 
 ffmpegkit::FFmpegSession::FFmpegSession(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, LogRedirectionStrategy logRedirectionStrategy) :
-    ffmpegkit::AbstractSession(arguments, logCallback, logRedirectionStrategy), _completeCallback{completeCallback}, _statisticsCallback{statisticsCallback} {
+    ffmpegkit::AbstractSession(arguments, logCallback, logRedirectionStrategy), _completeCallback{completeCallback}, _statisticsCallback{statisticsCallback}, _statistics{std::make_shared<std::list<std::shared_ptr<ffmpegkit::Statistics>>>()} {
 }
 
 ffmpegkit::StatisticsCallback ffmpegkit::FFmpegSession::getStatisticsCallback() {

@@ -20,6 +20,8 @@
 #ifndef FFMPEG_KIT_STREAM_INFORMATION_H
 #define FFMPEG_KIT_STREAM_INFORMATION_H
 
+// OVERRIDING THE MACRO TO PREVENT APPLICATION TERMINATION
+#define RAPIDJSON_ASSERT(x)
 #include "rapidjson/document.h"
 #include <string>
 #include <memory>
@@ -57,152 +59,152 @@ namespace ffmpegkit {
              *
              * @return stream index, starting from zero
              */
-            int64_t getIndex();
+            std::shared_ptr<int64_t> getIndex();
 
             /**
              * Returns stream type.
              *
              * @return stream type; audio or video
              */
-            std::string getType();
+            std::shared_ptr<std::string> getType();
 
             /**
              * Returns stream codec.
              *
              * @return stream codec
              */
-            std::string getCodec();
+            std::shared_ptr<std::string> getCodec();
 
             /**
              * Returns stream codec in long format.
              *
              * @return stream codec with additional profile and mode information
              */
-            std::string getCodecLong();
+            std::shared_ptr<std::string> getCodecLong();
 
             /**
              * Returns stream format.
              *
              * @return stream format
              */
-            std::string getFormat();
+            std::shared_ptr<std::string> getFormat();
 
             /**
              * Returns width.
              *
              * @return width in pixels
              */
-            int64_t getWidth();
+            std::shared_ptr<int64_t> getWidth();
 
             /**
              * Returns height.
              *
              * @return height in pixels
              */
-            int64_t getHeight();
+            std::shared_ptr<int64_t> getHeight();
 
             /**
              * Returns bitrate.
              *
              * @return bitrate in kb/s
              */
-            std::string getBitrate();
+            std::shared_ptr<std::string> getBitrate();
 
             /**
              * Returns sample rate.
              *
              * @return sample rate in hz
              */
-            std::string getSampleRate();
+            std::shared_ptr<std::string> getSampleRate();
 
             /**
              * Returns sample format.
              *
              * @return sample format
              */
-            std::string getSampleFormat();
+            std::shared_ptr<std::string> getSampleFormat();
 
             /**
              * Returns channel layout.
              *
              * @return channel layout
              */
-            std::string getChannelLayout();
+            std::shared_ptr<std::string> getChannelLayout();
 
             /**
              * Returns sample aspect ratio.
              *
              * @return sample aspect ratio
              */
-            std::string getSampleAspectRatio();
+            std::shared_ptr<std::string> getSampleAspectRatio();
 
             /**
              * Returns display aspect ratio.
              *
              * @return display aspect ratio
              */
-            std::string getDisplayAspectRatio();
+            std::shared_ptr<std::string> getDisplayAspectRatio();
 
             /**
              * Returns average frame rate.
              *
              * @return average frame rate in fps
              */
-            std::string getAverageFrameRate();
+            std::shared_ptr<std::string> getAverageFrameRate();
 
             /**
              * Returns real frame rate.
              *
              * @return real frame rate in tbr
              */
-            std::string getRealFrameRate();
+            std::shared_ptr<std::string> getRealFrameRate();
 
             /**
              * Returns time base.
              *
              * @return time base in tbn
              */
-            std::string getTimeBase();
+            std::shared_ptr<std::string> getTimeBase();
 
             /**
              * Returns codec time base.
              *
              * @return codec time base in tbc
              */
-            std::string getCodecTimeBase();
+            std::shared_ptr<std::string> getCodecTimeBase();
 
             /**
              * Returns all tags.
              *
-             * @return tags dictionary
+             * @return tags Value
              */
             std::shared_ptr<rapidjson::Value> getTags();
 
             /**
              * Returns the stream property associated with the key.
              *
-             * @return stream property as string or nil if the key is not found
+             * @return stream property as string or nullptr if the key is not found
              */
-            std::string getStringProperty(const char* key);
+            std::shared_ptr<std::string> getStringProperty(const char* key);
 
             /**
              * Returns the stream property associated with the key.
              *
-             * @return stream property as number or nil if the key is not found
+             * @return stream property as number or nullptr if the key is not found
              */
-            int64_t getNumberProperty(const char* key);
+            std::shared_ptr<int64_t> getNumberProperty(const char* key);
 
             /**
              * Returns the stream properties associated with the key.
              *
-             * @return stream properties in a dictionary or nil if the key is not found
+             * @return stream properties in a Value or nullptr if the key is not found
             */
             std::shared_ptr<rapidjson::Value> getProperties(const char* key);
 
             /**
              * Returns all stream properties defined.
              *
-             * @return all stream properties in a dictionary or nil if no properties are defined
+             * @return all stream properties in a Value or nullptr if no properties are defined
             */
             std::shared_ptr<rapidjson::Value> getAllProperties();
 

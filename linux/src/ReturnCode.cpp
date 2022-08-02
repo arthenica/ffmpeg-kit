@@ -46,6 +46,14 @@ bool ffmpegkit::ReturnCode::isValueCancel() const {
     return (_value == Cancel);
 }
 
-std::ostream& operator<<(std::ostream& out, const ffmpegkit::ReturnCode& o) {
-    return out << o.getValue();
+namespace ffmpegkit {
+
+    std::ostream& operator<<(std::ostream& out, const std::shared_ptr<ffmpegkit::ReturnCode>& o) {
+        if (o == nullptr) {
+            return out;
+        } else {
+            return out << o->_value;
+        }
+    }
+
 }

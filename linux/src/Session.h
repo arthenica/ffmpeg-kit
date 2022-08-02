@@ -164,9 +164,9 @@ namespace ffmpegkit {
             /**
              * Returns the return code for this session. Note that return code is only set for sessions
              * that end with SessionStateCompleted state. If a session is not started, still running or failed then
-             * this method returns nil.
+             * this method returns nullptr.
              *
-             * @return the return code for this session if the session has completed, nil if session is
+             * @return the return code for this session if the session has completed, nullptr if session is
              * not started, still running or failed
              */
             virtual std::shared_ptr<ffmpegkit::ReturnCode> getReturnCode() const = 0;
@@ -175,9 +175,9 @@ namespace ffmpegkit {
              * Returns the stack trace of the exception received while executing this session.
              * <p>
              * The stack trace is only set for sessions that end with SessionStateFailed state. For sessions that has
-             * SessionStateCompleted state this method returns nil.
+             * SessionStateCompleted state this method returns an empty string.
              *
-             * @return stack trace of the exception received while executing this session, nil if session
+             * @return stack trace of the exception received while executing this session, an empty string if session
              * is not started, still running or completed
              */
             virtual std::string getFailStackTrace() const = 0;

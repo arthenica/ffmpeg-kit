@@ -34,7 +34,6 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Libraries:"
   echo -e "  --full\t\t\tenables all external libraries"
   echo -e "  --enable-linux-alsa\t\tbuild with built-in alsa support [no]"
-  echo -e "  --enable-linux-chromaprint\tbuild with built-in chromaprint support [no]"
   echo -e "  --enable-linux-fontconfig\tbuild with built-in fontconfig support [no]"
   echo -e "  --enable-linux-freetype\tbuild with built-in freetype support [no]"
   echo -e "  --enable-linux-fribidi\tbuild with built-in fribidi support [no]"
@@ -62,6 +61,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "  --enable-linux-v4l2\t\tbuild with built-in v4l2 support [no]"
   echo -e "  --enable-linux-vo-amrwbenc\tbuild with built-in vo-amrwbenc support [no]"
   echo -e "  --enable-linux-zlib\t\tbuild with built-in zlib support [no]"
+  echo -e "  --enable-chromaprint\t\tbuild with chromaprint support [no]"
   echo -e "  --enable-dav1d\t\tbuild with dav1d [no]"
   echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
   echo -e "  --enable-libaom\t\tbuild with libaom [no]"
@@ -143,8 +143,8 @@ create_linux_bundle() {
   cp -r -P ${FFMPEG_KIT_TMPDIR}/source/rapidjson/include/rapidjson "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
 
   # COPY LIBS
-  cp -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/lib/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
-  cp -P "${LIB_INSTALL_BASE}"/ffmpeg/lib/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
+  cp -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/lib/lib* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
+  cp -P "${LIB_INSTALL_BASE}"/ffmpeg/lib/lib* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log
 
   install_pkg_config_file "libavformat.pc"
   install_pkg_config_file "libswresample.pc"
@@ -272,7 +272,7 @@ get_cxxflags() {
   fi
 
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
-  local COMMON_FLAGS="${OPTIMIZATION_FLAGS} ${BUILD_DATE}"
+  local COMMON_FLAGS="${OPTIMIZATION_FLAGS} ${BUILD_DATE} $(get_arch_specific_cflags)"
 
   case $1 in
   ffmpeg)
@@ -372,6 +372,24 @@ endian = 'little'
 [built-in options]
 default_library = 'static'
 prefix = '${LIB_INSTALL_PREFIX}'
+EOF
+}
+
+create_chromaprint_package_config() {
+  local CHROMAPRINT_VERSION="$1"
+
+  cat >"${INSTALL_PKG_CONFIG_DIR}/libchromaprint.pc" <<EOF
+prefix="${LIB_INSTALL_BASE}"/chromaprint
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: chromaprint
+Description: Audio fingerprint library
+URL: http://acoustid.org/chromaprint
+Version: ${CHROMAPRINT_VERSION}
+Libs: -L\${libdir} -lchromaprint -lstdc++
+Cflags: -I\${includedir}
 EOF
 }
 
@@ -511,7 +529,6 @@ set_toolchain_paths() {
   export STRIP=$(command -v "llvm-strip$CLANG_POSTFIX")
   export NM=$(command -v "llvm-nm$CLANG_POSTFIX")
   export INSTALL_PKG_CONFIG_DIR="${BASEDIR}"/prebuilt/$(get_build_directory)/pkgconfig
-  export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
   if [ ! -d "${INSTALL_PKG_CONFIG_DIR}" ]; then
     mkdir -p "${INSTALL_PKG_CONFIG_DIR}" 1>>"${BASEDIR}"/build.log 2>&1

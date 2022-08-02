@@ -48,7 +48,7 @@ CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
 # SET CONFIGURE OPTIONS
-for library in {0..92}; do
+for library in {0..91}; do
   if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
     ENABLED_LIBRARY=$(get_library_name ${library})
 
@@ -57,9 +57,6 @@ for library in {0..92}; do
     case ${ENABLED_LIBRARY} in
     linux-alsa)
       CONFIGURE_POSTFIX+=" --enable-alsa"
-      ;;
-    linux-chromaprint)
-      CONFIGURE_POSTFIX+=" --enable-chromaprint"
       ;;
     linux-fontconfig)
       CONFIGURE_POSTFIX+=" --enable-libfontconfig"
@@ -154,6 +151,11 @@ for library in {0..92}; do
     linux-zlib)
       CONFIGURE_POSTFIX+=" --enable-zlib"
       ;;
+    chromaprint)
+      CFLAGS+=" $(pkg-config --cflags libchromaprint 2>>"${BASEDIR}"/build.log)"
+      LDFLAGS+=" $(pkg-config --libs --static libchromaprint 2>>"${BASEDIR}"/build.log)"
+      CONFIGURE_POSTFIX+=" --enable-chromaprint"
+      ;;
     dav1d)
       CFLAGS+=" $(pkg-config --cflags dav1d 2>>"${BASEDIR}"/build.log)"
       LDFLAGS+=" $(pkg-config --libs --static dav1d 2>>"${BASEDIR}"/build.log)"
@@ -206,8 +208,6 @@ for library in {0..92}; do
     # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
     if [[ ${library} -eq ${LIBRARY_LINUX_ALSA} ]]; then
       CONFIGURE_POSTFIX+=" --disable-alsa"
-    elif [[ ${library} -eq ${LIBRARY_LINUX_CHROMAPRINT} ]]; then
-      CONFIGURE_POSTFIX+=" --disable-chromaprint"
     elif [[ ${library} -eq ${LIBRARY_LINUX_FONTCONFIG} ]]; then
       CONFIGURE_POSTFIX+=" --disable-libfontconfig"
     elif [[ ${library} -eq ${LIBRARY_LINUX_FREETYPE} ]]; then
@@ -264,6 +264,8 @@ for library in {0..92}; do
       CONFIGURE_POSTFIX+=" --disable-libxvid"
     elif [[ ${library} -eq ${LIBRARY_SYSTEM_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
+    elif [[ ${library} -eq ${LIBRARY_CHROMAPRINT} ]]; then
+      CONFIGURE_POSTFIX+=" --disable-chromaprint"
     elif [[ ${library} -eq ${LIBRARY_DAV1D} ]]; then
       CONFIGURE_POSTFIX+=" --disable-libdav1d"
     elif [[ ${library} -eq ${LIBRARY_KVAZAAR} ]]; then

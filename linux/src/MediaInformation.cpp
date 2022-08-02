@@ -23,38 +23,43 @@ ffmpegkit::MediaInformation::MediaInformation(std::shared_ptr<rapidjson::Value> 
     _mediaInformationValue{mediaInformationValue}, _streams{streams}, _chapters{chapters} {
 }
 
-std::string ffmpegkit::MediaInformation::getFilename() {
-    return (*_mediaInformationValue)[KeyFilename].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getFilename() {
+    return getStringProperty(KeyFilename);
 }
 
-std::string ffmpegkit::MediaInformation::getFormat() {
-    return (*_mediaInformationValue)[KeyFormat].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getFormat() {
+    return getStringProperty(KeyFormat);
 }
 
-std::string ffmpegkit::MediaInformation::getLongFormat() {
-    return (*_mediaInformationValue)[KeyFormatLong].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getLongFormat() {
+    return getStringProperty(KeyFormatLong);
 }
 
-std::string ffmpegkit::MediaInformation::getStartTime() {
-    return (*_mediaInformationValue)[KeyStartTime].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getStartTime() {
+    return getStringProperty(KeyStartTime);
 }
 
-std::string ffmpegkit::MediaInformation::getDuration() {
-    return (*_mediaInformationValue)[KeyDuration].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getDuration() {
+    return getStringProperty(KeyDuration);
 }
 
-std::string ffmpegkit::MediaInformation::getSize() {
-    return (*_mediaInformationValue)[KeySize].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getSize() {
+    return getStringProperty(KeySize);
 }
 
-std::string ffmpegkit::MediaInformation::getBitrate() {
-    return (*_mediaInformationValue)[KeyBitRate].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getBitrate() {
+    return getStringProperty(KeyBitRate);
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::MediaInformation::getTags() {
-    auto tags = std::make_shared<rapidjson::Value>();
-    *tags =  (*_mediaInformationValue)[KeyTags];
-    return tags;
+    auto mediaProperties = getMediaProperties();
+    if (mediaProperties->HasMember(KeyTags)) {
+        auto tags = std::make_shared<rapidjson::Value>();
+        *tags = (*mediaProperties)[KeyTags];
+        return tags;
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::StreamInformation>>> ffmpegkit::MediaInformation::getStreams() {
@@ -65,28 +70,50 @@ std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::Chapter>>> ffmpegkit::Med
     return _chapters;
 }
 
-std::string ffmpegkit::MediaInformation::getStringProperty(const char* key) {
-    return (*_mediaInformationValue)[key].GetString();
+std::shared_ptr<std::string> ffmpegkit::MediaInformation::getStringProperty(const char* key) {
+    auto mediaProperties = getMediaProperties();
+    if (mediaProperties->HasMember(key)) {
+        return std::make_shared<std::string>((*mediaProperties)[key].GetString());
+    } else {
+        return nullptr;
+    }
 }
 
-int64_t ffmpegkit::MediaInformation::getNumberProperty(const char* key) {
-    return (*_mediaInformationValue)[key].GetInt64();
+std::shared_ptr<int64_t> ffmpegkit::MediaInformation::getNumberProperty(const char* key) {
+    auto mediaProperties = getMediaProperties();
+    if (mediaProperties->HasMember(key)) {
+        return std::make_shared<int64_t>((*mediaProperties)[key].GetInt64());
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::MediaInformation::getProperties(const char* key) {
-    auto value = std::make_shared<rapidjson::Value>();
-    *value =  (*_mediaInformationValue)[key];
-    return value;
+    if (_mediaInformationValue->HasMember(key)) {
+        auto value = std::make_shared<rapidjson::Value>();
+        *value = (*_mediaInformationValue)[key];
+        return value;
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::MediaInformation::getMediaProperties() {
-    auto mediaProperties = std::make_shared<rapidjson::Value>();
-    *mediaProperties =  (*_mediaInformationValue)[KeyMediaProperties];
-    return mediaProperties;
+    if (_mediaInformationValue->HasMember(KeyMediaProperties)) {
+        auto mediaProperties = std::make_shared<rapidjson::Value>();
+        *mediaProperties = (*_mediaInformationValue)[KeyMediaProperties];
+        return mediaProperties;
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::MediaInformation::getAllProperties() {
-    auto all = std::make_shared<rapidjson::Value>();
-    *all =  (*_mediaInformationValue);
-    return all;
+    if (_mediaInformationValue != nullptr) {
+        auto all = std::make_shared<rapidjson::Value>();
+        *all = (*_mediaInformationValue);
+        return all;
+    } else {
+        return nullptr;
+    }
 }

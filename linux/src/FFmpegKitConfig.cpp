@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pthread.h>
 extern "C" {
     #include "libavutil/ffversion.h"
     #include "libavutil/bprint.h"
@@ -75,7 +76,6 @@ static ffmpegkit::LogRedirectionStrategy globalLogRedirectionStrategy;
 static int redirectionEnabled;
 static std::recursive_mutex callbackDataMutex;
 static std::mutex callbackMutex;
-static std::unique_lock<std::mutex> callbackLock(callbackMutex);
 static std::condition_variable callbackMonitor;
 class CallbackData;
 static std::list<CallbackData*> callbackDataList;
@@ -110,17 +110,18 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
 #endif
 
 static std::once_flag ffmpegKitInitializerFlag;
+static pthread_t callbackThread;
 
 void* ffmpegKitInitialize();
 
-static const void* _ffmpegKitConfigInitializer = ffmpegKitInitialize();
+const void* _ffmpegKitConfigInitializer{ffmpegKitInitialize()};
 
 enum CallbackType {
     LogType,
     StatisticsType
 };
 
-static bool fs_exists(const std::string &s, const bool isFile, const bool isDirectory) {
+static bool fs_exists(const std::string& s, const bool isFile, const bool isDirectory) {
     struct stat dir_info;
 
     if (stat(s.c_str(), &dir_info) == 0) {
@@ -133,6 +134,16 @@ static bool fs_exists(const std::string &s, const bool isFile, const bool isDire
     }
 
     return false;
+}
+
+static bool fs_create_dir(const std::string& s) {
+    if (!fs_exists(s, false, true)) {
+        if (mkdir(s.c_str(), S_IRWXU | S_IRWXG | S_IROTH) != 0) {
+            std::cout << "Failed to create directory: " << s << ". Operation failed with " << errno << "." << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> session) {
@@ -258,6 +269,7 @@ class CallbackData {
  * @param milliSeconds wait time in milliseconds
  */
 static void callbackWait(int milliSeconds) {
+    std::unique_lock<std::mutex> callbackLock{callbackMutex};
     callbackMonitor.wait_for(callbackLock, std::chrono::milliseconds(milliSeconds));
 }
 
@@ -583,7 +595,7 @@ static void process_log(long sessionId, int levelValueInt, AVBPrint* logMessage)
             break;
         default:
             // WRITE TO STDOUT
-            std::cout << ffmpegkit::FFmpegKitConfig::logLevelToString(levelValue) << ": " << logMessage->str << std::endl;
+            std::cout << ffmpegkit::FFmpegKitConfig::logLevelToString(levelValue) << ": " << logMessage->str;
             break;
     }
 }
@@ -619,7 +631,7 @@ void process_statistics(long sessionId, int videoFrameNumber, float videoFps, fl
 /**
  * Forwards asynchronous messages to Callbacks.
  */
-static void callbackBlockFunction() {
+void *callbackThreadFunction(void *pointer) {
     int activeLogLevel = av_log_get_level();
     if ((activeLogLevel != ffmpegkit::LevelAVLogQuiet) && (ffmpegkit::LevelAVLogDebug <= activeLogLevel)) {
         std::cout << "Async callback block started." << std::endl;
@@ -663,6 +675,8 @@ static void callbackBlockFunction() {
     if ((activeLogLevel != ffmpegkit::LevelAVLogQuiet) && (ffmpegkit::LevelAVLogDebug <= activeLogLevel)) {
         std::cout << "Async callback block stopped." << std::endl;
     }
+
+    return NULL;
 }
 
 static int executeFFmpeg(const long sessionId, const std::shared_ptr<std::list<std::string>> arguments) {
@@ -786,7 +800,12 @@ void ffmpegkit::FFmpegKitConfig::enableRedirection() {
 
     lock.unlock();
 
-    std::async(std::launch::async, callbackBlockFunction);
+    int rc = pthread_create(&callbackThread, NULL, callbackThreadFunction, NULL);
+    if (rc != 0) {
+        std::cout << "Failed to create async callback block: %d" << rc << std::endl;
+        lock.unlock();
+        return;
+    }
 
     av_log_set_callback(ffmpegkit_log_callback_function);
     set_report_callback(ffmpegkit_statistics_callback_function);
@@ -805,21 +824,23 @@ void ffmpegkit::FFmpegKitConfig::disableRedirection() {
 
     lock.unlock();
 
+    callbackNotify();
+
+    pthread_detach(callbackThread);
+
     av_log_set_callback(av_log_default_callback);
     set_report_callback(NULL);
-
-    callbackNotify();
 }
 
-int ffmpegkit::FFmpegKitConfig::setFontconfigConfigurationPath(const char* path) {
+int ffmpegkit::FFmpegKitConfig::setFontconfigConfigurationPath(const std::string& path) {
     return ffmpegkit::FFmpegKitConfig::setEnvironmentVariable("FONTCONFIG_PATH", path);
 }
 
-void ffmpegkit::FFmpegKitConfig::setFontDirectory(const char* fontDirectoryPath, const std::map<std::string, std::string>& fontNameMapping) {
+void ffmpegkit::FFmpegKitConfig::setFontDirectory(const std::string& fontDirectoryPath, const std::map<std::string,std::string>& fontNameMapping) {
     ffmpegkit::FFmpegKitConfig::setFontDirectoryList(std::list<std::string>{fontDirectoryPath}, fontNameMapping);
 }
 
-void ffmpegkit::FFmpegKitConfig::setFontDirectoryList(const std::list<std::string>& fontDirectoryList, const std::map<std::string, std::string>& fontNameMapping) {
+void ffmpegkit::FFmpegKitConfig::setFontDirectoryList(const std::list<std::string>& fontDirectoryList, const std::map<std::string,std::string>& fontNameMapping) {
     int validFontNameMappingCount = 0;
 
     const char *parentDirectory = std::getenv("HOME");
@@ -830,20 +851,19 @@ void ffmpegkit::FFmpegKitConfig::setFontDirectoryList(const std::list<std::strin
         }
     }
 
-    auto tempConfigurationDirectory = std::string(parentDirectory) + "/.ffmpegkit/fontconfig";
+    std::string cacheDir = std::string(parentDirectory) + "/.cache";
+    std::string ffmpegKitDir = cacheDir + "/ffmpegkit";
+    auto tempConfigurationDirectory = ffmpegKitDir + "/fontconfig";
     auto fontConfigurationFile = std::string(tempConfigurationDirectory) + "/fonts.conf";
 
-    if (!fs_exists(tempConfigurationDirectory, false, true)) {
-        if (mkdir(tempConfigurationDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH) != 0) {
-            std::cout << "Failed to set font directory. Error received while creating temp conf directory: " << errno << std::endl;
-            return;
-        }
-        std::cout << "Created temporary font conf directory: TRUE." << std::endl;
+    if (!fs_create_dir(cacheDir) || !fs_create_dir(ffmpegKitDir) || !fs_create_dir(tempConfigurationDirectory)) {
+        return;
     }
+    std::cout << "Created temporary font conf directory: TRUE." << std::endl;
 
     if (fs_exists(fontConfigurationFile, true, false)) {
         bool fontConfigurationDeleted = std::remove(fontConfigurationFile.c_str());
-        std::cout << "Deleted old temporary font configuration: " << (fontConfigurationDeleted?"TRUE":"FALSE") << "." << std::endl;
+        std::cout << "Deleted old temporary font configuration: " << (fontConfigurationDeleted == 0?"TRUE":"FALSE") << "." << std::endl;
     }
 
     /* PROCESS MAPPINGS FIRST */
@@ -851,18 +871,18 @@ void ffmpegkit::FFmpegKitConfig::setFontDirectoryList(const std::list<std::strin
     for (auto const& pair : fontNameMapping) {
         if ((pair.first.size() > 0) && (pair.second.size() > 0)) {
 
-            fontNameMappingBlock += "        <match target=\"pattern\">\n";
-            fontNameMappingBlock += "                <test qual=\"any\" name=\"family\">\n";
-            fontNameMappingBlock += "                        <string>";
+            fontNameMappingBlock += "    <match target=\"pattern\">\n";
+            fontNameMappingBlock += "        <test qual=\"any\" name=\"family\">\n";
+            fontNameMappingBlock += "                <string>";
             fontNameMappingBlock += pair.first;
             fontNameMappingBlock += "</string>\n";
-            fontNameMappingBlock += "                </test>\n";
-            fontNameMappingBlock += "                <edit name=\"family\" mode=\"assign\" binding=\"same\">\n";
-            fontNameMappingBlock += "                        <string>";
+            fontNameMappingBlock += "        </test>\n";
+            fontNameMappingBlock += "        <edit name=\"family\" mode=\"assign\" binding=\"same\">\n";
+            fontNameMappingBlock += "            <string>";
             fontNameMappingBlock += pair.second;
             fontNameMappingBlock += "</string>\n";
-            fontNameMappingBlock += "                </edit>\n";
-            fontNameMappingBlock += "        </match>\n";
+            fontNameMappingBlock += "        </edit>\n";
+            fontNameMappingBlock += "    </match>\n";
 
             validFontNameMappingCount++;
         }
@@ -880,7 +900,7 @@ void ffmpegkit::FFmpegKitConfig::setFontDirectoryList(const std::list<std::strin
         fontConfiguration += "</dir>\n";
     }
     fontConfiguration += fontNameMappingBlock;
-    fontConfiguration += "</fontconfig>";
+    fontConfiguration += "</fontconfig>\n";
 
     std::ofstream fontConfigurationStream(fontConfigurationFile, std::ios::out | std::ios::trunc);
     if (fontConfigurationStream) {
@@ -910,16 +930,15 @@ std::shared_ptr<std::string> ffmpegkit::FFmpegKitConfig::registerNewFFmpegPipe()
     }
 
     // PIPES ARE CREATED UNDER THE PIPES DIRECTORY
-    auto pipesDir = std::string(parentDirectory) + "/.ffmpegkit/pipes";
+    std::string cacheDir = std::string(parentDirectory) + "/.cache";
+    std::string ffmpegKitDir = cacheDir + "/ffmpegkit";
+    std::string pipesDir = ffmpegKitDir + "/pipes";
 
-    if (!fs_exists(pipesDir, false, true)) {
-        if (mkdir(pipesDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH) != 0) {
-            std::cout << "Failed to create pipes directory: " << pipesDir << ". Operation failed with " << errno << "." << std::endl;
-            return nullptr;
-        }
+    if (!fs_create_dir(cacheDir) || !fs_create_dir(ffmpegKitDir) || !fs_create_dir(pipesDir)) {
+        return nullptr;
     }
 
-    std::shared_ptr<std::string> newFFmpegPipePath = std::make_shared<std::string>(pipesDir + FFmpegKitNamedPipePrefix + std::to_string(pipeIndexGenerator++));
+    std::shared_ptr<std::string> newFFmpegPipePath = std::make_shared<std::string>(pipesDir + "/" + FFmpegKitNamedPipePrefix + std::to_string(pipeIndexGenerator++));
 
     // FIRST CLOSE OLD PIPES WITH THE SAME NAME
     ffmpegkit::FFmpegKitConfig::closeFFmpegPipe(newFFmpegPipePath->c_str());
@@ -933,8 +952,8 @@ std::shared_ptr<std::string> ffmpegkit::FFmpegKitConfig::registerNewFFmpegPipe()
     }
 }
 
-void ffmpegkit::FFmpegKitConfig::closeFFmpegPipe(const char* ffmpegPipePath) {
-    std::remove(ffmpegPipePath);
+void ffmpegkit::FFmpegKitConfig::closeFFmpegPipe(const std::string& ffmpegPipePath) {
+    std::remove(ffmpegPipePath.c_str());
 }
 
 std::string ffmpegkit::FFmpegKitConfig::getFFmpegVersion() {
@@ -963,8 +982,8 @@ std::string ffmpegkit::FFmpegKitConfig::getBuildDate() {
     return std::string(buildDate);
 }
 
-int ffmpegkit::FFmpegKitConfig::setEnvironmentVariable(const char* variableName, const char* variableValue) {
-    return setenv(variableName, variableValue, true);
+int ffmpegkit::FFmpegKitConfig::setEnvironmentVariable(const std::string& variableName, const std::string& variableValue) {
+    return setenv(variableName.c_str(), variableValue.c_str(), true);
 }
 
 void ffmpegkit::FFmpegKitConfig::ignoreSignal(const ffmpegkit::Signal signal) {
@@ -1023,7 +1042,7 @@ void ffmpegkit::FFmpegKitConfig::getMediaInformationExecute(const std::shared_pt
 }
 
 void ffmpegkit::FFmpegKitConfig::asyncFFmpegExecute(const std::shared_ptr<ffmpegkit::FFmpegSession> ffmpegSession) {
-    std::async(std::launch::async, [&]() {
+    auto thread = std::thread([ffmpegSession]() {
         ffmpegkit::FFmpegKitConfig::ffmpegExecute(ffmpegSession);
 
         ffmpegkit::FFmpegSessionCompleteCallback completeCallback = ffmpegSession->getCompleteCallback();
@@ -1046,10 +1065,12 @@ void ffmpegkit::FFmpegKitConfig::asyncFFmpegExecute(const std::shared_ptr<ffmpeg
             }
         }
     });
+
+    thread.detach();
 }
 
 void ffmpegkit::FFmpegKitConfig::asyncFFprobeExecute(const std::shared_ptr<ffmpegkit::FFprobeSession> ffprobeSession) {
-    std::async(std::launch::async, [&]() {
+    auto thread = std::thread([ffprobeSession]() {
         ffmpegkit::FFmpegKitConfig::ffprobeExecute(ffprobeSession);
 
         ffmpegkit::FFprobeSessionCompleteCallback completeCallback = ffprobeSession->getCompleteCallback();
@@ -1072,10 +1093,12 @@ void ffmpegkit::FFmpegKitConfig::asyncFFprobeExecute(const std::shared_ptr<ffmpe
             }
         }
     });
+
+    thread.detach();
 }
 
 void ffmpegkit::FFmpegKitConfig::asyncGetMediaInformationExecute(const std::shared_ptr<ffmpegkit::MediaInformationSession> mediaInformationSession, const int waitTimeout) {
-    std::async(std::launch::async, [&]() {
+    auto thread = std::thread([mediaInformationSession,waitTimeout]() {
         ffmpegkit::FFmpegKitConfig::getMediaInformationExecute(mediaInformationSession, waitTimeout);
 
         ffmpegkit::MediaInformationSessionCompleteCallback completeCallback = mediaInformationSession->getCompleteCallback();
@@ -1098,6 +1121,8 @@ void ffmpegkit::FFmpegKitConfig::asyncGetMediaInformationExecute(const std::shar
             }
         }
     });
+
+    thread.detach();
 }
 
 void ffmpegkit::FFmpegKitConfig::enableLogCallback(const ffmpegkit::LogCallback callback) {
@@ -1321,14 +1346,14 @@ std::string ffmpegkit::FFmpegKitConfig::sessionStateToString(SessionState state)
     }
 }
 
-std::shared_ptr<std::list<std::string>> ffmpegkit::FFmpegKitConfig::parseArguments(const char* command) {
+std::shared_ptr<std::list<std::string>> ffmpegkit::FFmpegKitConfig::parseArguments(const std::string& command) {
     auto argumentList = std::make_shared<std::list<std::string>>();
     std::string currentArgument;
 
     bool singleQuoteStarted = false;
     bool doubleQuoteStarted = false;
 
-    for (int i = 0; i < std::strlen(command); i++) {
+    for (int i = 0; i < command.size(); i++) {
         char previousChar;
         if (i > 0) {
             previousChar = command[i - 1];

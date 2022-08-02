@@ -21,7 +21,7 @@
 
 extern void* ffmpegKitInitialize();
 
-static const void* _archDetectInitializer = ffmpegKitInitialize();
+const void* _archDetectInitializer{ffmpegKitInitialize()};
 
 std::string ffmpegkit::ArchDetect::getArch() {
 #ifdef FFMPEG_KIT_ARM64

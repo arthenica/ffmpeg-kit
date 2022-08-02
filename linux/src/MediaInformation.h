@@ -49,103 +49,103 @@ namespace ffmpegkit {
              *
              * @return media file name
              */
-            std::string getFilename();
+            std::shared_ptr<std::string> getFilename();
 
             /**
              * Returns format.
              *
              * @return media format
              */
-            std::string getFormat();
+            std::shared_ptr<std::string> getFormat();
 
             /**
              * Returns long format.
              *
              * @return media long format
              */
-            std::string getLongFormat();
+            std::shared_ptr<std::string> getLongFormat();
 
             /**
              * Returns duration.
              *
              * @return media duration in milliseconds
              */
-            std::string getDuration();
+            std::shared_ptr<std::string> getDuration();
 
             /**
              * Returns start time.
              *
              * @return media start time in milliseconds
              */
-            std::string getStartTime();
+            std::shared_ptr<std::string> getStartTime();
 
             /**
              * Returns size.
              *
              * @return media size in bytes
              */
-            std::string getSize();
+            std::shared_ptr<std::string> getSize();
 
             /**
              * Returns bitrate.
              *
              * @return media bitrate in kb/s
              */
-            std::string getBitrate();
+            std::shared_ptr<std::string> getBitrate();
 
             /**
              * Returns all tags.
              *
-             * @return tags dictionary
+             * @return tags Value
              */
             std::shared_ptr<rapidjson::Value> getTags();
 
             /**
              * Returns all streams.
              *
-             * @return streams array
+             * @return streams vector
              */
             std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::StreamInformation>>> getStreams();
 
             /**
              * Returns all chapters.
              *
-             * @return chapters array
+             * @return chapters vector
              */
             std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::Chapter>>> getChapters();
 
             /**
              * Returns the media property associated with the key.
              *
-             * @return media property as string or nil if the key is not found
+             * @return media property as string or nullptr if the key is not found
              */
-            std::string getStringProperty(const char* key);
+            std::shared_ptr<std::string> getStringProperty(const char* key);
 
             /**
              * Returns the media property associated with the key.
              *
-             * @return media property as number or nil if the key is not found
+             * @return media property as number or nullptr if the key is not found
              */
-            int64_t getNumberProperty(const char* key);
+            std::shared_ptr<int64_t> getNumberProperty(const char* key);
 
             /**
              * Returns the media properties associated with the key.
              *
-             * @return media properties in a dictionary or nil if the key is not found
+             * @return media properties in a Value or nullptr if the key is not found
             */
             std::shared_ptr<rapidjson::Value> getProperties(const char* key);
 
             /**
              * Returns all media properties.
              *
-             * @return all media properties in a dictionary or nil if no media properties are defined
+             * @return all media properties in a Value or nullptr if no media properties are defined
             */
             std::shared_ptr<rapidjson::Value> getMediaProperties();
 
             /**
              * Returns all properties defined.
              *
-             * @return all properties in a dictionary or nil if no properties are defined
+             * @return all properties in a Value or nullptr if no properties are defined
             */
             std::shared_ptr<rapidjson::Value> getAllProperties();
 

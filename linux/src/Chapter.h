@@ -20,6 +20,8 @@
 #ifndef FFMPEG_KIT_CHAPTER_H
 #define FFMPEG_KIT_CHAPTER_H
 
+// OVERRIDING THE MACRO TO PREVENT APPLICATION TERMINATION
+#define RAPIDJSON_ASSERT(x)
 #include "rapidjson/document.h"
 #include <string>
 #include <iostream>
@@ -42,45 +44,45 @@ namespace ffmpegkit {
 
             Chapter(std::shared_ptr<rapidjson::Value> chapterValue);
 
-            int64_t getId();
+            std::shared_ptr<int64_t> getId();
 
-            std::string getTimeBase();
+            std::shared_ptr<std::string> getTimeBase();
 
-            int64_t getStart();
+            std::shared_ptr<int64_t> getStart();
 
-            std::string getStartTime();
+            std::shared_ptr<std::string> getStartTime();
 
-            int64_t getEnd();
+            std::shared_ptr<int64_t> getEnd();
 
-            std::string getEndTime();
+            std::shared_ptr<std::string> getEndTime();
 
             std::shared_ptr<rapidjson::Value> getTags();
 
             /**
              * Returns the chapter property associated with the key.
              *
-             * @return chapter property as string or nil if the key is not found
+             * @return chapter property as string or nullptr if the key is not found
              */
-            std::string getStringProperty(const char* key);
+            std::shared_ptr<std::string> getStringProperty(const char* key);
 
             /**
              * Returns the chapter property associated with the key.
              *
-             * @return chapter property as number or nil if the key is not found
+             * @return chapter property as number or nullptr if the key is not found
              */
-            int64_t getNumberProperty(const char* key);
+            std::shared_ptr<int64_t> getNumberProperty(const char* key);
 
             /**
              * Returns the chapter properties associated with the key.
              *
-             * @return chapter properties in a dictionary or nil if the key is not found
+             * @return chapter properties in a Value or nullptr if the key is not found
              */
             std::shared_ptr<rapidjson::Value> getProperties(const char* key);
 
             /**
              * Returns all chapter properties defined.
              *
-             * @return all chapter properties in a dictionary or nil if no properties are defined
+             * @return all chapter properties in a Value or nullptr if no properties are defined
              */
             std::shared_ptr<rapidjson::Value> getAllProperties();
 

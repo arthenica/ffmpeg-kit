@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <memory>
+#include <functional>
 
 namespace ffmpegkit {
 
@@ -36,19 +37,19 @@ namespace ffmpegkit {
      * <p>If <code>getState</code> returns SessionStateFailed then
      * <code>getFailStackTrace</code> should be used to get the failure reason.
      * <pre>
-     *  switch ([session getState]) {
+     *  switch (session->getState()) {
      *      case SessionStateCompleted:
-     *          ReturnCode *returnCode = [session getReturnCode];
+     *          auto returnCode = session->getReturnCode();
      *          break;
      *      case SessionStateFailed:
-     *          NSString *failStackTrace = [session getFailStackTrace];
+     *          auto failStackTrace = session->getFailStackTrace();
      *          break;
      *  }
      * </pre>
      *
      * @param session session of the completed execution
      */
-    typedef void (*FFprobeSessionCompleteCallback)(const std::shared_ptr<ffmpegkit::FFprobeSession> session);
+    typedef std::function<void(const std::shared_ptr<ffmpegkit::FFprobeSession> session)> FFprobeSessionCompleteCallback;
 
     #include "FFprobeSession.h"
 

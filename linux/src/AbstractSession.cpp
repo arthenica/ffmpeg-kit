@@ -42,7 +42,6 @@ ffmpegkit::AbstractSession::AbstractSession(const std::shared_ptr<std::list<std:
   _state{SessionStateCreated},
   _returnCode{nullptr},
   _logRedirectionStrategy{logRedirectionStrategy} {
-    addSessionToSessionHistory(shared_from_this());
 }
 
 void ffmpegkit::AbstractSession::waitForAsynchronousMessagesInTransmit(const int timeout) const {

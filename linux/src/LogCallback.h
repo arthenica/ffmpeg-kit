@@ -23,6 +23,7 @@
 #include "Log.h"
 #include <iostream>
 #include <memory>
+#include <functional>
 
 namespace ffmpegkit {
 
@@ -31,7 +32,7 @@ namespace ffmpegkit {
      *
      * @param log log entry
      */
-    typedef void (*LogCallback)(const std::shared_ptr<ffmpegkit::Log> log);
+    typedef std::function<void(const std::shared_ptr<ffmpegkit::Log> log)> LogCallback;
 
 }
 
