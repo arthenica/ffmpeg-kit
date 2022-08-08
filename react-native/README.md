@@ -40,7 +40,7 @@ a `ffmpeg-kit-react-native` package with `libvpx` inside.
 
 `ffmpeg-kit` provides eight packages that include different sets of external libraries. These packages are
 named according to the external libraries included in them. Refer to
-[Packages](https://github.com/tanersener/ffmpeg-kit#7-packages) section of the project README to see the names
+[Packages](https://github.com/tanersener/ffmpeg-kit#8-packages) section of the project README to see the names
 of those packages and external libraries included in each of them.
 
 ##### 2.1.1 Package Names
