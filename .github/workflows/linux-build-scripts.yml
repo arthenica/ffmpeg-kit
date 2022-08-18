@@ -31,6 +31,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
       - name: run the build script
         run: ./linux.sh -d
       - name: print build logs
@@ -47,6 +49,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
       - name: run the build script
         run: ./linux.sh -d --lts
       - name: print build logs
@@ -63,6 +67,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
       - name: run the build script
         run: ./linux.sh -d
       - name: print build logs
@@ -79,6 +85,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
       - name: run the build script
         run: ./linux.sh -d --lts
       - name: print build logs

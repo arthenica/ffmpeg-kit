@@ -192,11 +192,6 @@ get_library_source() {
     SOURCE_ID="v1.3.1"
     SOURCE_TYPE="TAG"
     ;;
-  rapidjson)
-    SOURCE_REPO_URL="https://github.com/tanersener/rapidjson"
-    SOURCE_ID="v1.1.0"
-    SOURCE_TYPE="TAG"
-    ;;
   rubberband)
     SOURCE_REPO_URL="https://github.com/tanersener/rubberband"
     SOURCE_ID="v1.8.2"

@@ -19,8 +19,9 @@ AC_C_BIGENDIAN(AC_DEFINE([HIGHFIRST], [1], [big-endian machine]))
 
 # Checks for programs.
 cflags_bckup="$CFLAGS"
-AC_PROG_CC
-AC_PROG_CXX
+AC_LANG([C++])
+AC_PROG_CXX(clang++ llvm-g++ g++)
+AX_CXX_COMPILE_STDCXX(11, noext)
 AM_PROG_AR
 CFLAGS="$cflags_bckup"
 
@@ -35,6 +36,9 @@ LT_INIT
 # Checks for header files.
 AC_CHECK_HEADERS([libavformat/avformat.h libavcodec/avcodec.h libavfilter/avfilter.h libavutil/avutil.h libswresample/swresample.h], [], [
   AC_MSG_ERROR([unable to find ffmpeg headers])
+])
+AC_CHECK_HEADERS([rapidjson/document.h], [], [
+  AC_MSG_ERROR([unable to find rapidjson headers])
 ])
 AC_CHECK_HEADERS([fcntl.h limits.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h])
 

@@ -140,7 +140,6 @@ create_linux_bundle() {
   # COPY HEADERS
   cp -r -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/include/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
   cp -r -P "${LIB_INSTALL_BASE}"/ffmpeg/include/* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
-  cp -r -P ${FFMPEG_KIT_TMPDIR}/source/rapidjson/include/rapidjson "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/include" 2>>"${BASEDIR}"/build.log
 
   # COPY LIBS
   cp -P "${LIB_INSTALL_BASE}"/ffmpeg-kit/lib/lib* "${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib" 2>>"${BASEDIR}"/build.log

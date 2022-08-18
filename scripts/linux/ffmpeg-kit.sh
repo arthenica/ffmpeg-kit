@@ -21,8 +21,8 @@ set_toolchain_paths "${LIB_NAME}"
 # SET BUILD FLAGS
 HOST=$(get_host)
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
-export CFLAGS="$(get_cflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include -I${FFMPEG_KIT_TMPDIR}/source/rapidjson/include"
-export CXXFLAGS="$(get_cxxflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include -I${FFMPEG_KIT_TMPDIR}/source/rapidjson/include"
+export CFLAGS="$(get_cflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include"
+export CXXFLAGS="$(get_cxxflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/ffmpeg/include"
 export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${LIB_INSTALL_BASE}/ffmpeg/lib -lavdevice"
 
 cd "${BASEDIR}"/linux 1>>"${BASEDIR}"/build.log 2>&1 || return 1

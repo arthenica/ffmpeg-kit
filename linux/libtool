@@ -164,7 +164,7 @@ lock_old_archive_extraction=no
 LTCC="/bin/clang"
 
 # LTCC compiler flags.
-LTCFLAGS="-target x86_64-linux-gnu -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64 -Wno-unused-function -Wno-pointer-sign -Wno-switch -Wno-deprecated-declarations -fstrict-aliasing -fPIC -DLINUX  -I/usr/lib/llvm-10/include  -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Os -ffunction-sections -fdata-sections  -I/usr/lib/llvm-10/include -I/home/taner/Projects/ffmpeg-kit/prebuilt/linux-x86_64/ffmpeg/include -I/home/taner/Projects/ffmpeg-kit/.tmp/source/rapidjson/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include"
+LTCFLAGS="-target x86_64-linux-gnu -march=x86-64 -msse4.2 -mpopcnt -m64 -DFFMPEG_KIT_X86_64 -Wno-unused-function -Wno-pointer-sign -Wno-switch -Wno-deprecated-declarations -fstrict-aliasing -fPIC -DLINUX  -I/usr/lib/llvm-10/include  -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -g -I/usr/lib/llvm-10/include -I/home/taner/Projects/ffmpeg-kit/prebuilt/linux-x86_64/ffmpeg/include"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([BCDEGRST][BCDEGRST]*\\)[	 ][	 ]*\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -304,7 +304,7 @@ striplib="/bin/llvm-strip --strip-unneeded"
 
 
 # The linker used to build libraries.
-LD="/bin/ld.lld -m elf_x86_64 -m elf_x86_64"
+LD="/bin/ld.lld -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -11764,7 +11764,7 @@ build_old_libs=`case $build_libtool_libs in yes) echo no;; *) echo yes;; esac`
 # ### BEGIN LIBTOOL TAG CONFIG: CXX
 
 # The linker used to build libraries.
-LD="/bin/ld.lld -m elf_x86_64 -m elf_x86_64"
+LD="/bin/ld.lld -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -11774,7 +11774,7 @@ reload_cmds="\$LD\$reload_flag -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="/bin/clang++"
+CC="/bin/clang++ -std=c++11"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes

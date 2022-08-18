@@ -175,9 +175,6 @@ echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 
 # DOWNLOAD GNU CONFIG
 download_gnu_config
 
-# DOWNLOAD RAPIDJSON
-download_rapidjson
-
 # DOWNLOAD LIBRARY SOURCES
 downloaded_library_sources "${ENABLED_LIBRARIES[@]}"
 
