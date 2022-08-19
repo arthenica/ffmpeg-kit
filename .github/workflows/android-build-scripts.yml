@@ -13,6 +13,7 @@ on:
       - 'android.sh'
   pull_request:
     branches:
+      - development
       - main
     paths:
       - '.github/workflows/android-build-scripts.yml'

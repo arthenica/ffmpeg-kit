@@ -14,6 +14,7 @@ on:
       - 'tvos.sh'
   pull_request:
     branches:
+      - development
       - main
     paths:
       - '.github/workflows/tvos-build-scripts.yml'
