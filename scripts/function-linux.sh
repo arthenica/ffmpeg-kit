@@ -153,6 +153,35 @@ create_linux_bundle() {
   install_pkg_config_file "libavcodec.pc"
   install_pkg_config_file "libavutil.pc"
   install_pkg_config_file "ffmpeg-kit.pc"
+
+  # COPY LIBRARY LICENSES
+  LICENSE_BASEDIR="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib"
+  rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  for library in {0..49}; do
+    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+      ENABLED_LIBRARY=$(get_library_name ${library} | sed 's/-/_/g')
+      LICENSE_FILE="${LICENSE_BASEDIR}/license_${ENABLED_LIBRARY}.txt"
+
+      RC=$(copy_external_library_license_file ${library} "${LICENSE_FILE}")
+
+      if [[ ${RC} -ne 0 ]]; then
+        echo -e "DEBUG: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
+        echo -e "failed\n\nSee build.log for details\n"
+        exit 1
+      fi
+
+      echo -e "DEBUG: Copied the license file of ${ENABLED_LIBRARY} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+    fi
+  done
+
+  # COPY LIBRARY LICENSES
+  if [[ ${GPL_ENABLED} == "yes" ]]; then
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+  else
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+  fi
+
+  echo -e "DEBUG: Copied the ffmpeg-kit license successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
 get_cmake_system_processor() {

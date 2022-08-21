@@ -57,12 +57,7 @@ if [ -d "${FFMPEG_KIT_LIBRARY_PATH}" ]; then
   rm -rf "${FFMPEG_KIT_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
-make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
-
-make install 1>>"${BASEDIR}"/build.log 2>&1
-
-# CREATE PACKAGE CONFIG MANUALLY
-create_ffmpegkit_package_config "$(get_ffmpeg_kit_version)" || return 1
+make -j$(get_cpu_count) install 1>>"${BASEDIR}"/build.log 2>&1
 
 if [ $? -eq 0 ]; then
   echo "ok"
@@ -70,3 +65,6 @@ else
   echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
+
+# CREATE PACKAGE CONFIG MANUALLY
+create_ffmpegkit_package_config "$(get_ffmpeg_kit_version)" || return 1
