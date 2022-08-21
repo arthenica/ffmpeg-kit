@@ -104,6 +104,16 @@ typedef NS_ENUM(NSUInteger, CallbackType) {
     StatisticsType
 };
 
+void deleteExpiredSessions() {
+    while ([sessionHistoryList count] > sessionHistorySize) {
+        id<Session> first = [sessionHistoryList firstObject];
+        if (first != nil) {
+            [sessionHistoryList removeObjectAtIndex:0];
+            [sessionHistoryMap removeObjectForKey:[NSNumber numberWithLong:[first getSessionId]]];
+        }
+    }
+}
+
 void addSessionToSessionHistory(id<Session> session) {
     NSNumber* sessionIdNumber = [NSNumber numberWithLong:[session getSessionId]];
 
@@ -111,19 +121,12 @@ void addSessionToSessionHistory(id<Session> session) {
 
     /*
      * ASYNC SESSIONS CALL THIS METHOD TWICE
-     * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+     * THIS CHECK PREVENTS ADDING THE SAME SESSION AGAIN
      */
     if ([sessionHistoryMap objectForKey:sessionIdNumber] == nil) {
         [sessionHistoryMap setObject:session forKey:sessionIdNumber];
         [sessionHistoryList addObject:session];
-        if ([sessionHistoryList count] > sessionHistorySize) {
-            id<Session> first = [sessionHistoryList firstObject];
-            if (first != nil) {
-                NSNumber* key = [NSNumber numberWithLong:[first getSessionId]];
-                [sessionHistoryList removeObject:key];
-                [sessionHistoryMap removeObjectForKey:key];
-            }
-        }
+        deleteExpiredSessions();
     }
 
     [sessionHistoryLock unlock];
@@ -1169,6 +1172,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         @throw([NSException exceptionWithName:NSInvalidArgumentException reason:@"Session history size must not exceed the hard limit!" userInfo:nil]);
     } else if (pSessionHistorySize > 0) {
         sessionHistorySize = pSessionHistorySize;
+        deleteExpiredSessions();
     }
 }
 

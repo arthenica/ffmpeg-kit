@@ -26,7 +26,7 @@ import java.util.List;
 
 public class FFmpegSessionTest {
 
-    private static final String[] TEST_ARGUMENTS = new String[]{"argument1", "argument2"};
+    static final String[] TEST_ARGUMENTS = new String[]{"argument1", "argument2"};
 
     @Test
     public void constructorTest() {

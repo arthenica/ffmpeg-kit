@@ -1086,6 +1086,22 @@ public class FFmpegKitConfig {
             throw new IllegalArgumentException("Session history size must not exceed the hard limit!");
         } else if (sessionHistorySize > 0) {
             FFmpegKitConfig.sessionHistorySize = sessionHistorySize;
+            deleteExpiredSessions();
+        }
+    }
+
+    /**
+     * Deletes expired sessions.
+     */
+    private static void deleteExpiredSessions() {
+        while (sessionHistoryList.size() > sessionHistorySize) {
+            try {
+                Session expiredSession = sessionHistoryList.remove(0);
+                if (expiredSession != null) {
+                    sessionHistoryMap.remove(expiredSession.getSessionId());
+                }
+            } catch (final IndexOutOfBoundsException ignored) {
+            }
         }
     }
 
@@ -1099,18 +1115,13 @@ public class FFmpegKitConfig {
 
             /*
              * ASYNC SESSIONS CALL THIS METHOD TWICE
-             * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+             * THIS CHECK PREVENTS ADDING THE SAME SESSION AGAIN
              */
             final boolean sessionAlreadyAdded = sessionHistoryMap.containsKey(session.getSessionId());
             if (!sessionAlreadyAdded) {
                 sessionHistoryMap.put(session.getSessionId(), session);
                 sessionHistoryList.add(session);
-                if (sessionHistoryList.size() > sessionHistorySize) {
-                    try {
-                        sessionHistoryList.remove(0);
-                    } catch (final IndexOutOfBoundsException ignored) {
-                    }
-                }
+                deleteExpiredSessions();
             }
         }
     }

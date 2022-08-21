@@ -146,6 +146,16 @@ static bool fs_create_dir(const std::string& s) {
     return true;
 }
 
+void deleteExpiredSessions() {
+    while (sessionHistoryList.size() > sessionHistorySize) {
+        auto first = sessionHistoryList.front();
+        if (first != nullptr) {
+            sessionHistoryList.pop_front();
+            sessionHistoryMap.erase(first->getSessionId());
+        }
+    }
+}
+
 void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> session) {
     std::unique_lock<std::recursive_mutex> lock(sessionMutex, std::defer_lock);
 
@@ -155,19 +165,12 @@ void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> sessio
 
     /*
      * ASYNC SESSIONS CALL THIS METHOD TWICE
-     * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+     * THIS CHECK PREVENTS ADDING THE SAME SESSION AGAIN
      */
     if (sessionHistoryMap.count(sessionId) == 0) {
         sessionHistoryMap.insert({sessionId, session});
         sessionHistoryList.push_back(session);
-        if (sessionHistoryList.size() > sessionHistorySize) {
-            auto first = sessionHistoryList.front();
-            if (first != nullptr) {
-                auto expiredSessionId = first->getSessionId();
-                sessionHistoryList.pop_front();
-                sessionHistoryMap.erase(expiredSessionId);
-            }
-        }
+        deleteExpiredSessions();
     }
 
     lock.unlock();
@@ -1194,6 +1197,7 @@ void ffmpegkit::FFmpegKitConfig::setSessionHistorySize(const int newSessionHisto
         throw std::runtime_error("Session history size must not exceed the hard limit!");
     } else if (newSessionHistorySize > 0) {
         sessionHistorySize = newSessionHistorySize;
+        deleteExpiredSessions();
     }
 }
 
