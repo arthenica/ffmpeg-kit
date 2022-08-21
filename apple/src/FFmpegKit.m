@@ -31,7 +31,7 @@
 
     [FFmpegKitConfig class];
 
-    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@\n", [Packages getPackageName], [ArchDetect getArch], [FFmpegKitConfig getVersion], [FFmpegKitConfig getBuildDate]);
+    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@.\n", [Packages getPackageName], [ArchDetect getArch], [FFmpegKitConfig getVersion], [FFmpegKitConfig getBuildDate]);
 }
 
 + (FFmpegSession*)executeWithArguments:(NSArray*)arguments {
