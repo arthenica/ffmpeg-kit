@@ -840,14 +840,14 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         if ((fontName != nil) && (mappedFontName != nil) && ([fontName length] > 0) && ([mappedFontName length] > 0)) {
 
             fontNameMappingBlock = [NSString stringWithFormat:@"%@\n%@\n%@%@%@\n%@\n%@\n%@%@%@\n%@\n%@\n",
-                @"        <match target=\"pattern\">",
-                @"                <test qual=\"any\" name=\"family\">",
-                @"                        <string>", fontName, @"</string>",
-                @"                </test>",
-                @"                <edit name=\"family\" mode=\"assign\" binding=\"same\">",
-                @"                        <string>", mappedFontName, @"</string>",
-                @"                </edit>",
-                @"        </match>"];
+                @"    <match target=\"pattern\">",
+                @"        <test qual=\"any\" name=\"family\">",
+                @"            <string>", fontName, @"</string>",
+                @"        </test>",
+                @"        <edit name=\"family\" mode=\"assign\" binding=\"same\">",
+                @"            <string>", mappedFontName, @"</string>",
+                @"        </edit>",
+                @"    </match>"];
 
             validFontNameMappingCount++;
         }
@@ -862,10 +862,10 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         NSString *fontDirectoryPath = [fontDirectoryArray objectAtIndex:i];
         [fontConfiguration appendString: @"    <dir>"];
         [fontConfiguration appendString: fontDirectoryPath];
-        [fontConfiguration appendString: @"</dir>"];
+        [fontConfiguration appendString: @"</dir>\n"];
     }
     [fontConfiguration appendString:fontNameMappingBlock];
-    [fontConfiguration appendString:@"</fontconfig>"];
+    [fontConfiguration appendString:@"</fontconfig>\n"];
 
     if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
         NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);

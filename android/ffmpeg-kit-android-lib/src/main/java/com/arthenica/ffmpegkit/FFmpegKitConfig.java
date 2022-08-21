@@ -430,14 +430,14 @@ public class FFmpegKitConfig {
                 String mappedFontName = mapping.getValue();
 
                 if ((fontName != null) && (mappedFontName != null) && (fontName.trim().length() > 0) && (mappedFontName.trim().length() > 0)) {
-                    fontNameMappingBlock.append("        <match target=\"pattern\">\n");
-                    fontNameMappingBlock.append("                <test qual=\"any\" name=\"family\">\n");
-                    fontNameMappingBlock.append(String.format("                        <string>%s</string>\n", fontName));
-                    fontNameMappingBlock.append("                </test>\n");
-                    fontNameMappingBlock.append("                <edit name=\"family\" mode=\"assign\" binding=\"same\">\n");
-                    fontNameMappingBlock.append(String.format("                        <string>%s</string>\n", mappedFontName));
-                    fontNameMappingBlock.append("                </edit>\n");
-                    fontNameMappingBlock.append("        </match>\n");
+                    fontNameMappingBlock.append("    <match target=\"pattern\">\n");
+                    fontNameMappingBlock.append("        <test qual=\"any\" name=\"family\">\n");
+                    fontNameMappingBlock.append(String.format("            <string>%s</string>\n", fontName));
+                    fontNameMappingBlock.append("        </test>\n");
+                    fontNameMappingBlock.append("        <edit name=\"family\" mode=\"assign\" binding=\"same\">\n");
+                    fontNameMappingBlock.append(String.format("            <string>%s</string>\n", mappedFontName));
+                    fontNameMappingBlock.append("        </edit>\n");
+                    fontNameMappingBlock.append("    </match>\n");
 
                     validFontNameMappingCount++;
                 }
@@ -455,7 +455,7 @@ public class FFmpegKitConfig {
             fontConfigBuilder.append("</dir>\n");
         }
         fontConfigBuilder.append(fontNameMappingBlock);
-        fontConfigBuilder.append("</fontconfig>");
+        fontConfigBuilder.append("</fontconfig>\n");
 
         final AtomicReference<FileOutputStream> reference = new AtomicReference<>();
         try {
