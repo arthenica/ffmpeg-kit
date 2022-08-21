@@ -224,15 +224,15 @@ get_common_includes() {
 
 get_common_cflags() {
   if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD__FLAG="-DFFMPEG_KIT_LTS "
+    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
   fi
 
   case ${DETECTED_NDK_VERSION} in
     23*)
-      echo "-fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_MIN_SDK_VERSION__=${API}"
+      echo "-fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD_FLAG}-D__ANDROID__ -D__ANDROID_MIN_SDK_VERSION__=${API}"
       ;;
     *)
-      echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+      echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD_FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
       ;;
   esac
 }
