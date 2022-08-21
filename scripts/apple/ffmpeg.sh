@@ -383,7 +383,7 @@ for library in {0..61}; do
       CONFIGURE_POSTFIX+=" --disable-opengl"
     elif [[ ${library} -eq ${LIBRARY_APPLE_VIDEOTOOLBOX} ]]; then
       CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-    elif [[ ${library} -eq ${LIBRARY_APPLE_ZLIB} ]]; then
+    elif [[ ${library} -eq ${LIBRARY_SYSTEM_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
     elif [[ ${library} -eq ${LIBRARY_OPENSSL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-openssl"

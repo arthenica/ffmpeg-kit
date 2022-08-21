@@ -310,7 +310,7 @@ for library in {0..61}; do
     # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
     if [[ ${library} -eq ${LIBRARY_SDL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-sdl2"
-    elif [[ ${library} -eq ${LIBRARY_ANDROID_ZLIB} ]]; then
+    elif [[ ${library} -eq ${LIBRARY_SYSTEM_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
     elif [[ ${library} -eq ${LIBRARY_ANDROID_MEDIA_CODEC} ]]; then
       CONFIGURE_POSTFIX+=" --disable-mediacodec"
