@@ -32,7 +32,7 @@ namespace ffmpegkit {
      */
     class MediaInformation {
         public:
-            static constexpr const char* KeyMediaProperties = "format";
+            static constexpr const char* KeyFormatProperties = "format";
             static constexpr const char* KeyFilename = "filename";
             static constexpr const char* KeyFormat = "format_name";
             static constexpr const char* KeyFormatLong = "format_long_name";
@@ -115,32 +115,53 @@ namespace ffmpegkit {
             std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::Chapter>>> getChapters();
 
             /**
-             * Returns the media property associated with the key.
+             * Returns the property associated with the key.
              *
-             * @return media property as string or nullptr if the key is not found
+             * @return property as string or nullptr if the key is not found
              */
             std::shared_ptr<std::string> getStringProperty(const char* key);
 
             /**
-             * Returns the media property associated with the key.
+             * Returns the property associated with the key.
              *
-             * @return media property as number or nullptr if the key is not found
+             * @return property as number or nullptr if the key is not found
              */
             std::shared_ptr<int64_t> getNumberProperty(const char* key);
 
             /**
-             * Returns the media properties associated with the key.
+             * Returns the property associated with the key.
              *
-             * @return media properties in a Value or nullptr if the key is not found
+             * @return property in a Value or nullptr if the key is not found
             */
-            std::shared_ptr<rapidjson::Value> getProperties(const char* key);
+            std::shared_ptr<rapidjson::Value> getProperty(const char* key);
 
             /**
-             * Returns all media properties.
+             * Returns the format property associated with the key.
              *
-             * @return all media properties in a Value or nullptr if no media properties are defined
+             * @return format property as string or nullptr if the key is not found
+             */
+            std::shared_ptr<std::string> getStringFormatProperty(const char* key);
+
+            /**
+             * Returns the format property associated with the key.
+             *
+             * @return format property as number or nullptr if the key is not found
+             */
+            std::shared_ptr<int64_t> getNumberFormatProperty(const char* key);
+
+            /**
+             * Returns the format property associated with the key.
+             *
+             * @return format property in a Value or nullptr if the key is not found
             */
-            std::shared_ptr<rapidjson::Value> getMediaProperties();
+            std::shared_ptr<rapidjson::Value> getFormatProperty(const char* key);
+
+            /**
+             * Returns all format properties defined.
+             *
+             * @return all format properties in a Value or nullptr if no format properties are defined
+            */
+            std::shared_ptr<rapidjson::Value> getFormatProperties();
 
             /**
              * Returns all properties defined.

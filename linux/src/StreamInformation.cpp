@@ -91,7 +91,7 @@ std::shared_ptr<std::string> ffmpegkit::StreamInformation::getCodecTimeBase() {
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getTags() {
-    return getProperties(KeyTags);
+    return getProperty(KeyTags);
 }
 
 std::shared_ptr<std::string> ffmpegkit::StreamInformation::getStringProperty(const char* key) {
@@ -110,7 +110,7 @@ std::shared_ptr<int64_t> ffmpegkit::StreamInformation::getNumberProperty(const c
     }
 }
 
-std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getProperties(const char* key) {
+std::shared_ptr<rapidjson::Value> ffmpegkit::StreamInformation::getProperty(const char* key) {
     if (_streamInformationValue->HasMember(key)) {
         auto value = std::make_shared<rapidjson::Value>();
         *value = (*_streamInformationValue)[key];

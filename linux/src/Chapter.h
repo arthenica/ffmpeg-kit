@@ -73,11 +73,11 @@ namespace ffmpegkit {
             std::shared_ptr<int64_t> getNumberProperty(const char* key);
 
             /**
-             * Returns the chapter properties associated with the key.
+             * Returns the chapter property associated with the key.
              *
-             * @return chapter properties in a Value or nullptr if the key is not found
+             * @return chapter property in a Value or nullptr if the key is not found
              */
-            std::shared_ptr<rapidjson::Value> getProperties(const char* key);
+            std::shared_ptr<rapidjson::Value> getProperty(const char* key);
 
             /**
              * Returns all chapter properties defined.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -63,7 +63,7 @@ public class Chapter {
     }
 
     public JSONObject getTags() {
-        return getProperties(KEY_TAGS);
+        return getProperty(KEY_TAGS);
     }
 
     /**
@@ -73,13 +73,13 @@ public class Chapter {
      * @return chapter property as string or null if the key is not found
      */
     public String getStringProperty(final String key) {
-        JSONObject chapterProperties = getAllProperties();
-        if (chapterProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (chapterProperties.has(key)) {
-            return chapterProperties.optString(key);
+        if (allProperties.has(key)) {
+            return allProperties.optString(key);
         } else {
             return null;
         }
@@ -92,31 +92,31 @@ public class Chapter {
      * @return chapter property as Long or null if the key is not found
      */
     public Long getNumberProperty(String key) {
-        JSONObject chapterProperties = getAllProperties();
-        if (chapterProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (chapterProperties.has(key)) {
-            return chapterProperties.optLong(key);
+        if (allProperties.has(key)) {
+            return allProperties.optLong(key);
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the chapter properties associated with the key.
+     * Returns the chapter property associated with the key.
      *
-     * @param key properties key
-     * @return chapter properties as a JSONObject or null if the key is not found
+     * @param key property key
+     * @return chapter property as a JSONObject or null if the key is not found
      */
-    public JSONObject getProperties(String key) {
-        JSONObject chapterProperties = getAllProperties();
-        if (chapterProperties == null) {
+    public JSONObject getProperty(String key) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        return chapterProperties.optJSONObject(key);
+        return allProperties.optJSONObject(key);
     }
 
     /**

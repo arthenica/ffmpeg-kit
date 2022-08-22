@@ -47,7 +47,7 @@ std::shared_ptr<std::string> ffmpegkit::Chapter::getEndTime() {
 }
 
 std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getTags() {
-    return getProperties(KeyTags);
+    return getProperty(KeyTags);
 }
 
 std::shared_ptr<std::string> ffmpegkit::Chapter::getStringProperty(const char* key) {
@@ -66,7 +66,7 @@ std::shared_ptr<int64_t> ffmpegkit::Chapter::getNumberProperty(const char* key) 
     }
 }
 
-std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getProperties(const char* key) {
+std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getProperty(const char* key) {
     if (_chapterValue->HasMember(key)) {
         auto value = std::make_shared<rapidjson::Value>();
         *value = (*_chapterValue)[key];
