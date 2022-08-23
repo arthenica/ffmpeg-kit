@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -22,7 +22,7 @@ import 'stream_information.dart';
 
 /// Media information class.
 class MediaInformation {
-  static const keyMediaProperties = "format";
+  static const keyFormatProperties = "format";
   static const keyFilename = "filename";
   static const keyFormat = "format_name";
   static const keyFormatLong = "format_long_name";
@@ -38,40 +38,54 @@ class MediaInformation {
   MediaInformation(this._allProperties);
 
   /// Returns file name.
-  String? getFilename() => this.getStringProperty(MediaInformation.keyFilename);
+  String? getFilename() =>
+      this.getStringFormatProperty(MediaInformation.keyFilename);
 
   /// Returns format.
-  String? getFormat() => this.getStringProperty(MediaInformation.keyFormat);
+  String? getFormat() =>
+      this.getStringFormatProperty(MediaInformation.keyFormat);
 
   /// Returns long format.
   String? getLongFormat() =>
-      this.getStringProperty(MediaInformation.keyFormatLong);
+      this.getStringFormatProperty(MediaInformation.keyFormatLong);
 
   /// Returns duration.
-  String? getDuration() => this.getStringProperty(MediaInformation.keyDuration);
+  String? getDuration() =>
+      this.getStringFormatProperty(MediaInformation.keyDuration);
 
   /// Returns start time.
   String? getStartTime() =>
-      this.getStringProperty(MediaInformation.keyStartTime);
+      this.getStringFormatProperty(MediaInformation.keyStartTime);
 
   /// Returns size.
-  String? getSize() => this.getStringProperty(MediaInformation.keySize);
+  String? getSize() => this.getStringFormatProperty(MediaInformation.keySize);
 
   /// Returns bitrate.
-  String? getBitrate() => this.getStringProperty(MediaInformation.keyBitRate);
+  String? getBitrate() =>
+      this.getStringFormatProperty(MediaInformation.keyBitRate);
 
   /// Returns all tags.
   Map<dynamic, dynamic>? getTags() =>
-      this.getProperties(StreamInformation.keyTags);
+      this.getFormatProperty(StreamInformation.keyTags);
 
-  /// Returns the media property associated with the key.
-  String? getStringProperty(String key) => this.getMediaProperties()?[key];
+  /// Returns the property associated with the key.
+  String? getStringProperty(String key) => this.getAllProperties()?[key];
 
-  /// Returns the media property associated with the key.
-  num? getNumberProperty(String key) => this.getMediaProperties()?[key];
+  /// Returns the property associated with the key.
+  num? getNumberProperty(String key) => this.getAllProperties()?[key];
 
-  /// Returns the media properties associated with the key.
-  dynamic getProperties(String key) => this.getMediaProperties()?[key];
+  /// Returns the property associated with the key.
+  dynamic getProperty(String key) => this.getAllProperties()?[key];
+
+  /// Returns the format property associated with the key.
+  String? getStringFormatProperty(String key) =>
+      this.getFormatProperties()?[key];
+
+  /// Returns the format property associated with the key.
+  num? getNumberFormatProperty(String key) => this.getFormatProperties()?[key];
+
+  /// Returns the format property associated with the key.
+  dynamic getFormatProperty(String key) => this.getFormatProperties()?[key];
 
   /// Returns all streams found as a list.
   List<StreamInformation> getStreams() {
@@ -102,9 +116,9 @@ class MediaInformation {
     return list;
   }
 
-  /// Returns all media properties.
-  Map<dynamic, dynamic>? getMediaProperties() =>
-      this._allProperties?[keyMediaProperties];
+  /// Returns all format properties found.
+  Map<dynamic, dynamic>? getFormatProperties() =>
+      this._allProperties?[keyFormatProperties];
 
   /// Returns all properties found, including stream properties.
   Map<dynamic, dynamic>? getAllProperties() => this._allProperties;

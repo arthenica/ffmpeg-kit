@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -51,7 +51,7 @@ class Chapter {
   String? getEndTime() => this.getStringProperty(Chapter.keyEndTime);
 
   /// Returns all tags.
-  Map<dynamic, dynamic>? getTags() => this.getProperties(Chapter.keyTags);
+  Map<dynamic, dynamic>? getTags() => this.getProperty(Chapter.keyTags);
 
   /// Returns the chapter property associated with the key.
   String? getStringProperty(String key) => this._allProperties?[key];
@@ -59,8 +59,8 @@ class Chapter {
   /// Returns the chapter property associated with the key.
   num? getNumberProperty(String key) => this._allProperties?[key];
 
-  /// Returns the chapter properties associated with the key.
-  dynamic getProperties(String key) => this._allProperties?[key];
+  /// Returns the chapter property associated with the key.
+  dynamic getProperty(String key) => this._allProperties?[key];
 
   /// Returns all properties found.
   Map<dynamic, dynamic>? getAllProperties() => this._allProperties;
