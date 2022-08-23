@@ -321,7 +321,7 @@ declare module 'ffmpeg-kit-react-native' {
 
   export class MediaInformation {
 
-    static readonly KEY_MEDIA_PROPERTIES: string;
+    static readonly KEY_FORMAT_PROPERTIES: string;
     static readonly KEY_FILENAME: string;
     static readonly KEY_FORMAT: string;
     static readonly KEY_FORMAT_LONG: string;
@@ -357,9 +357,15 @@ declare module 'ffmpeg-kit-react-native' {
 
     getNumberProperty(key: string): number;
 
-    getProperties(key: string): Record<string, any>;
+    getProperty(key: string): any;
 
-    getMediaProperties(): Record<string, any>;
+    getStringFormatProperty(key: string): string;
+
+    getNumberFormatProperty(key: string): number;
+
+    getFormatProperty(key: string): any;
+
+    getFormatProperties(): Record<string, any>;
 
     getAllProperties(): Record<string, any>;
 
@@ -591,7 +597,7 @@ declare module 'ffmpeg-kit-react-native' {
 
     getNumberProperty(key): number;
 
-    getProperties(key): Record<string, any>;
+    getProperty(key): any;
 
     getAllProperties(): Record<string, any>;
 
@@ -627,7 +633,7 @@ declare module 'ffmpeg-kit-react-native' {
 
     getNumberProperty(key): number;
 
-    getProperties(key): Record<string, any>;
+    getProperty(key): any;
 
     getAllProperties(): Record<string, any>;
 
