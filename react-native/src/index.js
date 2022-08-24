@@ -297,13 +297,6 @@ export class AbstractSession extends Session {
   #logRedirectionStrategy;
 
   /**
-   * Creates a new abstract session.
-   */
-  constructor() {
-    super();
-  }
-
-  /**
    * Creates a new FFmpeg session.
    *
    * @param argumentsArray FFmpeg command arguments
@@ -1605,12 +1598,12 @@ class FFmpegKitFactory {
     if (sessionMap !== undefined) {
       switch (sessionMap.type) {
         case 2:
-          return FFprobeSession.fromMap(sessionMap);
+          return AbstractSession.createFFprobeSessionFromMap(sessionMap);
         case 3:
-          return MediaInformationSession.fromMap(sessionMap);
+          return AbstractSession.createMediaInformationSessionFromMap(sessionMap);
         case 1:
         default:
-          return FFmpegSession.fromMap(sessionMap);
+          return AbstractSession.createFFmpegSessionFromMap(sessionMap);
       }
     } else {
       return undefined;
@@ -1936,13 +1929,6 @@ class FFmpegKitInitializer {
 export class FFmpegSession extends AbstractSession {
 
   /**
-   * Creates an empty FFmpeg session.
-   */
-  constructor() {
-    super();
-  }
-
-  /**
    * Creates a new FFmpeg session.
    *
    * @param argumentsArray FFmpeg command arguments
@@ -1961,16 +1947,6 @@ export class FFmpegSession extends AbstractSession {
     FFmpegKitFactory.setStatisticsCallback(sessionId, statisticsCallback);
 
     return session;
-  }
-
-  /**
-   * Creates a new FFmpeg session from the given map.
-   *
-   * @param sessionMap map that includes session fields as map keys
-   * @returns FFmpeg session created
-   */
-  static fromMap(sessionMap) {
-    return AbstractSession.createFFmpegSessionFromMap(sessionMap);
   }
 
   /**
@@ -2253,13 +2229,6 @@ export class FFprobeKit {
 export class FFprobeSession extends AbstractSession {
 
   /**
-   * Creates an empty FFprobe session.
-   */
-  constructor() {
-    super();
-  }
-
-  /**
    * Creates a new FFprobe session.
    *
    * @param argumentsArray FFprobe command arguments
@@ -2276,16 +2245,6 @@ export class FFprobeSession extends AbstractSession {
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;
-  }
-
-  /**
-   * Creates a new FFprobe session from the given map.
-   *
-   * @param sessionMap map that includes session fields as map keys
-   * @returns FFprobe session created
-   */
-  static fromMap(sessionMap) {
-    return AbstractSession.createFFprobeSessionFromMap(sessionMap);
   }
 
   /**
@@ -2723,13 +2682,6 @@ export class MediaInformationSession extends AbstractSession {
   #mediaInformation;
 
   /**
-   * Creates an empty MediaInformationSession.
-   */
-  constructor() {
-    super();
-  }
-
-  /**
    * Creates a new MediaInformationSession session.
    *
    * @param argumentsArray FFprobe command arguments
@@ -2745,16 +2697,6 @@ export class MediaInformationSession extends AbstractSession {
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;
-  }
-
-  /**
-   * Creates a new MediaInformationSession from the given map.
-   *
-   * @param sessionMap map that includes session fields as map keys
-   * @returns MediaInformationSession created
-   */
-  static fromMap(sessionMap) {
-    return AbstractSession.createMediaInformationSessionFromMap(sessionMap);
   }
 
   /**
