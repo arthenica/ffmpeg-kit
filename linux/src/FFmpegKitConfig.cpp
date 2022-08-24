@@ -1350,8 +1350,8 @@ std::string ffmpegkit::FFmpegKitConfig::sessionStateToString(SessionState state)
     }
 }
 
-std::shared_ptr<std::list<std::string>> ffmpegkit::FFmpegKitConfig::parseArguments(const std::string& command) {
-    auto argumentList = std::make_shared<std::list<std::string>>();
+std::list<std::string> ffmpegkit::FFmpegKitConfig::parseArguments(const std::string& command) {
+    std::list<std::string> argumentList;
     std::string currentArgument;
 
     bool singleQuoteStarted = false;
@@ -1370,7 +1370,7 @@ std::shared_ptr<std::list<std::string>> ffmpegkit::FFmpegKitConfig::parseArgumen
             if (singleQuoteStarted || doubleQuoteStarted) {
                 currentArgument += currentChar;
             } else if (currentArgument.size() > 0) {
-                argumentList->push_back(currentArgument);
+                argumentList.push_back(currentArgument);
                 currentArgument = "";
             }
         } else if (currentChar == '\'' && (previousChar == 0 || previousChar != '\\')) {
@@ -1395,7 +1395,7 @@ std::shared_ptr<std::list<std::string>> ffmpegkit::FFmpegKitConfig::parseArgumen
     }
 
     if (currentArgument.size() > 0) {
-        argumentList->push_back(currentArgument);
+        argumentList.push_back(currentArgument);
     }
 
     return argumentList;

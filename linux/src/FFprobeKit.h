@@ -54,7 +54,7 @@ namespace ffmpegkit {
              * @param arguments FFprobe command options/arguments as string array
              * @return FFprobe session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArguments(const std::shared_ptr<std::list<std::string>> arguments);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArguments(const std::list<std::string>& arguments);
 
             /**
              * <p>Starts an asynchronous FFprobe execution with arguments provided.
@@ -66,7 +66,7 @@ namespace ffmpegkit {
              * @param completeCallback callback that will be called when the execution has completed
              * @return FFprobe session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFprobeSessionCompleteCallback completeCallback);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArgumentsAsync(const std::list<std::string>& arguments, FFprobeSessionCompleteCallback completeCallback);
 
             /**
              * <p>Starts an asynchronous FFprobe execution with arguments provided.
@@ -79,7 +79,7 @@ namespace ffmpegkit {
              * @param logCallback      callback that will receive logs
              * @return FFprobe session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFprobeSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
+            static std::shared_ptr<ffmpegkit::FFprobeSession> executeWithArgumentsAsync(const std::list<std::string>& arguments, FFprobeSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
 
             /**
              * <p>Synchronously executes FFprobe command provided. Space character is used to split command

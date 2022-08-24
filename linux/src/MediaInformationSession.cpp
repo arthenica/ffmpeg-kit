@@ -23,31 +23,31 @@
 
 extern void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> session);
 
-std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::shared_ptr<std::list<std::string>> arguments) {
+std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::list<std::string>& arguments) {
     auto session = std::static_pointer_cast<ffmpegkit::MediaInformationSession>(std::make_shared<ffmpegkit::MediaInformationSession::PublicMediaInformationSession>(arguments, nullptr, nullptr));
     addSessionToSessionHistory(session);
     return session;
 }
 
-std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback) {
+std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback) {
     auto session = std::static_pointer_cast<ffmpegkit::MediaInformationSession>(std::make_shared<ffmpegkit::MediaInformationSession::PublicMediaInformationSession>(arguments, completeCallback, nullptr));
     addSessionToSessionHistory(session);
     return session;
 }
 
-std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) {
+std::shared_ptr<ffmpegkit::MediaInformationSession> ffmpegkit::MediaInformationSession::create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) {
     auto session = std::static_pointer_cast<ffmpegkit::MediaInformationSession>(std::make_shared<ffmpegkit::MediaInformationSession::PublicMediaInformationSession>(arguments, completeCallback, logCallback));
     addSessionToSessionHistory(session);
     return session;
 }
 
 struct ffmpegkit::MediaInformationSession::PublicMediaInformationSession : public ffmpegkit::MediaInformationSession {
-    PublicMediaInformationSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) :
+    PublicMediaInformationSession(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) :
       MediaInformationSession(arguments, completeCallback, logCallback) {
     }
 };
 
-ffmpegkit::MediaInformationSession::MediaInformationSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) :
+ffmpegkit::MediaInformationSession::MediaInformationSession(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) :
     ffmpegkit::AbstractSession(arguments, logCallback, ffmpegkit::LogRedirectionStrategyNeverPrintLogs), _completeCallback{completeCallback}, _mediaInformation{nullptr} {
 }
 

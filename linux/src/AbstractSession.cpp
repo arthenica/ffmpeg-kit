@@ -33,8 +33,8 @@ static std::atomic<long> sessionIdGenerator(1);
 
 extern void addSessionToSessionHistory(const std::shared_ptr<ffmpegkit::Session> session);
 
-ffmpegkit::AbstractSession::AbstractSession(const std::shared_ptr<std::list<std::string>> arguments, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy) :
-  _arguments{arguments},
+ffmpegkit::AbstractSession::AbstractSession(const std::list<std::string>& arguments, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy) :
+  _arguments{std::make_shared<std::list<std::string>>(arguments)},
   _sessionId{sessionIdGenerator++},
   _logCallback{logCallback},
   _createTime{std::chrono::system_clock::now()},

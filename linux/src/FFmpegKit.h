@@ -50,7 +50,7 @@ namespace ffmpegkit {
              * @param arguments FFmpeg command options/arguments as string list
              * @return FFmpeg session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArguments(const std::shared_ptr<std::list<std::string>> arguments);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArguments(const std::list<std::string>& arguments);
 
             /**
              * <p>Starts an asynchronous FFmpeg execution with arguments provided.
@@ -62,7 +62,7 @@ namespace ffmpegkit {
              * @param completeCallback callback that will be called when the execution has completed
              * @return FFmpeg session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArgumentsAsync(const std::list<std::string>& arguments, FFmpegSessionCompleteCallback completeCallback);
 
             /**
              * <p>Starts an asynchronous FFmpeg execution with arguments provided.
@@ -76,7 +76,7 @@ namespace ffmpegkit {
              * @param statisticsCallback  callback that will receive statistics
              * @return FFmpeg session created for this execution
              */
-            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback);
+            static std::shared_ptr<ffmpegkit::FFmpegSession> executeWithArgumentsAsync(const std::list<std::string>& arguments, FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback);
 
             /**
              * <p>Synchronously executes FFmpeg command provided. Space character is used to split command

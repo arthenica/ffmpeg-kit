@@ -43,7 +43,7 @@ namespace ffmpegkit {
              * @param logCallback            session specific log callback
              * @param logRedirectionStrategy session specific log redirection strategy
              */
-            AbstractSession(const std::shared_ptr<std::list<std::string>> arguments, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
+            AbstractSession(const std::list<std::string>& arguments, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
 
             /**
              * Waits for all asynchronous messages to be transmitted until the given timeout.

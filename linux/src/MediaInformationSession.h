@@ -38,7 +38,7 @@ namespace ffmpegkit {
              *
              * @param arguments command arguments
              */
-            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::shared_ptr<std::list<std::string>> arguments);
+            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments);
 
             /**
              * Creates a new media information session.
@@ -46,7 +46,7 @@ namespace ffmpegkit {
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
              */
-            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback);
+            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback);
 
             /**
              * Creates a new media information session.
@@ -55,7 +55,7 @@ namespace ffmpegkit {
              * @param completeCallback session specific complete callback
              * @param logCallback      session specific log callback
              */
-            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
+            static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
 
             /**
              * Returns the media information extracted in this session.
@@ -111,7 +111,7 @@ namespace ffmpegkit {
              * @param completeCallback session specific complete callback
              * @param logCallback      session specific log callback
              */
-            MediaInformationSession(const std::shared_ptr<std::list<std::string>> arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
+            MediaInformationSession(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
 
             ffmpegkit::MediaInformationSessionCompleteCallback _completeCallback;
             std::shared_ptr<ffmpegkit::MediaInformation> _mediaInformation;

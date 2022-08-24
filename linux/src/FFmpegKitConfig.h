@@ -414,7 +414,7 @@ namespace ffmpegkit {
              * @param command string command
              * @return list of arguments
              */
-            static std::shared_ptr<std::list<std::string>> parseArguments(const std::string& command);
+            static std::list<std::string> parseArguments(const std::string& command);
 
             /**
              * <p>Concatenates arguments into a string adding a space character between two arguments.

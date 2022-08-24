@@ -26,34 +26,23 @@ extern void* ffmpegKitInitialize();
 
 const void* _ffprobeKitInitializer{ffmpegKitInitialize()};
 
-static std::shared_ptr<std::list<std::string>> defaultGetMediaInformationCommandArguments(const std::string& path) {
-    std::shared_ptr<std::list<std::string>> arguments = std::make_shared<std::list<std::string>>();
-    arguments->push_back(std::string("-v"));
-    arguments->push_back(std::string("error"));
-    arguments->push_back(std::string("-hide_banner"));
-    arguments->push_back(std::string("-print_format"));
-    arguments->push_back(std::string("json"));
-    arguments->push_back(std::string("-show_format"));
-    arguments->push_back(std::string("-show_streams"));
-    arguments->push_back(std::string("-show_chapters"));
-    arguments->push_back(std::string("-i"));
-    arguments->push_back(path);
-    return arguments;
+static std::list<std::string> defaultGetMediaInformationCommandArguments(const std::string& path) {
+    return std::list<std::string>{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", "-i", path};
 }
 
-std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArguments(const std::shared_ptr<std::list<std::string>> arguments) {
+std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArguments(const std::list<std::string>& arguments) {
     auto session = ffmpegkit::FFprobeSession::create(arguments);
     ffmpegkit::FFmpegKitConfig::ffprobeExecute(session);
     return session;
 }
 
-std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFprobeSessionCompleteCallback completeCallback) {
+std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArgumentsAsync(const std::list<std::string>& arguments, FFprobeSessionCompleteCallback completeCallback) {
     auto session = ffmpegkit::FFprobeSession::create(arguments, completeCallback);
     ffmpegkit::FFmpegKitConfig::asyncFFprobeExecute(session);
     return session;
 }
 
-std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArgumentsAsync(const std::shared_ptr<std::list<std::string>> arguments, FFprobeSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) {
+std::shared_ptr<ffmpegkit::FFprobeSession> ffmpegkit::FFprobeKit::executeWithArgumentsAsync(const std::list<std::string>& arguments, FFprobeSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback) {
     auto session = ffmpegkit::FFprobeSession::create(arguments, completeCallback, logCallback);
     ffmpegkit::FFmpegKitConfig::asyncFFprobeExecute(session);
     return session;
