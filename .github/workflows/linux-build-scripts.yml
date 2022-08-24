@@ -1,4 +1,4 @@
-name: android build scripts
+name: linux build scripts
 
 on:
   push:
