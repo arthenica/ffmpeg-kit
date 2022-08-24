@@ -27,7 +27,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10+ devices" "      --target=ios sdk version\t\t\toverride minimum deployment target [12.1]" "      --mac-catalyst-target=ios sdk version\toverride minimum deployment target for mac catalyst [14.0]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10+ devices" "      --target=ios sdk version\t\t\toverride minimum deployment target [12.1]" "      --mac-catalyst-target=ios sdk version\toverride minimum deployment target for mac catalyst [14.0]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -57,7 +57,7 @@ libraries are created under the prebuilt folder.\n"
   if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
     display_help_advanced_options "  --no-framework\t\tdo not build xcframework bundles [no]"
   else
-    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles and universal libraries [no]"
+    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles [no]"
   fi
 }
 

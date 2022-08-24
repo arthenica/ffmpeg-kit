@@ -20,7 +20,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles and universal libraries" "  -l, --lts			build lts packages to support sdk 10.0+ devices" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10.0+ devices" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -45,7 +45,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
     display_help_advanced_options "  --no-framework\t\tdo not build xcframework bundles [no]"
   else
-    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles and universal libraries [no]"
+    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles [no]"
   fi
 }
 

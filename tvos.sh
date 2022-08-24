@@ -263,7 +263,7 @@ if [[ ${NO_FRAMEWORK} -ne 1 ]]; then
     build_apple_architecture_variant_strings
 
     if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
-      echo -e -n "\nCreating universal libraries and xcframeworks under prebuilt: "
+      echo -e -n "\nCreating xcframeworks under prebuilt: "
 
       create_universal_libraries_for_tvos_xcframeworks
 
@@ -271,7 +271,7 @@ if [[ ${NO_FRAMEWORK} -ne 1 ]]; then
 
       create_tvos_xcframeworks
     else
-      echo -e -n "\nCreating universal libraries and frameworks under prebuilt: "
+      echo -e -n "\nCreating frameworks under prebuilt: "
 
       create_universal_libraries_for_tvos_default_frameworks
 
