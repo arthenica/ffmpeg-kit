@@ -55,7 +55,7 @@ public class FFmpegKit {
      * @return FFmpeg session created for this execution
      */
     public static FFmpegSession executeWithArguments(final String[] arguments) {
-        final FFmpegSession session = new FFmpegSession(arguments);
+        final FFmpegSession session = FFmpegSession.create(arguments);
 
         FFmpegKitConfig.ffmpegExecute(session);
 
@@ -75,7 +75,7 @@ public class FFmpegKit {
      */
     public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
                                                           final FFmpegSessionCompleteCallback completeCallback) {
-        final FFmpegSession session = new FFmpegSession(arguments, completeCallback);
+        final FFmpegSession session = FFmpegSession.create(arguments, completeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -99,7 +99,7 @@ public class FFmpegKit {
                                                           final FFmpegSessionCompleteCallback completeCallback,
                                                           final LogCallback logCallback,
                                                           final StatisticsCallback statisticsCallback) {
-        final FFmpegSession session = new FFmpegSession(arguments, completeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = FFmpegSession.create(arguments, completeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session);
 
@@ -121,7 +121,7 @@ public class FFmpegKit {
     public static FFmpegSession executeWithArgumentsAsync(final String[] arguments,
                                                           final FFmpegSessionCompleteCallback completeCallback,
                                                           final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(arguments, completeCallback);
+        final FFmpegSession session = FFmpegSession.create(arguments, completeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -148,7 +148,7 @@ public class FFmpegKit {
                                                           final LogCallback logCallback,
                                                           final StatisticsCallback statisticsCallback,
                                                           final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(arguments, completeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = FFmpegSession.create(arguments, completeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -224,7 +224,7 @@ public class FFmpegKit {
     public static FFmpegSession executeAsync(final String command,
                                              final FFmpegSessionCompleteCallback completeCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), completeCallback);
+        final FFmpegSession session = FFmpegSession.create(FFmpegKitConfig.parseArguments(command), completeCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 
@@ -252,7 +252,7 @@ public class FFmpegKit {
                                              final LogCallback logCallback,
                                              final StatisticsCallback statisticsCallback,
                                              final ExecutorService executorService) {
-        final FFmpegSession session = new FFmpegSession(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, statisticsCallback);
+        final FFmpegSession session = FFmpegSession.create(FFmpegKitConfig.parseArguments(command), completeCallback, logCallback, statisticsCallback);
 
         FFmpegKitConfig.asyncFFmpegExecute(session, executorService);
 

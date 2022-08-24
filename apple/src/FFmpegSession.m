@@ -33,46 +33,20 @@
     // EMPTY INITIALIZE
 }
 
-- (instancetype)init:(NSArray*)arguments {
-
-    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
-
-    if (self) {
-        _statisticsCallback = nil;
-        _completeCallback = nil;
-        _statistics = [[NSMutableArray alloc] init];
-        _statisticsLock = [[NSRecursiveLock alloc] init];
-    }
-
-    return self;
++ (instancetype)create:(NSArray*)arguments {
+    return [[self alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 }
 
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback {
-
-    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
-
-    if (self) {
-        _statisticsCallback = nil;
-        _completeCallback = completeCallback;
-        _statistics = [[NSMutableArray alloc] init];
-        _statisticsLock = [[NSRecursiveLock alloc] init];
-    }
-
-    return self;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback {
+    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 }
 
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback {
+    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
+}
 
-    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
-
-    if (self) {
-        _statisticsCallback = statisticsCallback;
-        _completeCallback = completeCallback;
-        _statistics = [[NSMutableArray alloc] init];
-        _statisticsLock = [[NSRecursiveLock alloc] init];
-    }
-
-    return self;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback withStatisticsCallback:statisticsCallback withLogRedirectionStrategy:logRedirectionStrategy];
 }
 
 - (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {

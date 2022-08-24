@@ -175,14 +175,14 @@ public class FFmpegKitConfigTest {
         FFmpegKitConfig.setSessionHistorySize(newSize);
 
         for (int i = 1; i <= (newSize + 5); i++) {
-            new FFmpegSession(TEST_ARGUMENTS);
+            FFmpegSession.create(TEST_ARGUMENTS);
             Assert.assertTrue(FFmpegKitConfig.getSessions().size() <= newSize);
         }
 
         newSize = 3;
         FFmpegKitConfig.setSessionHistorySize(newSize);
         for (int i = 1; i <= (newSize + 5); i++) {
-            new FFmpegSession(TEST_ARGUMENTS);
+            FFmpegSession.create(TEST_ARGUMENTS);
             Assert.assertTrue(FFmpegKitConfig.getSessions().size() <= newSize);
         }
     }

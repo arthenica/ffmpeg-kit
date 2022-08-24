@@ -115,7 +115,7 @@ public abstract class AbstractSession implements Session {
      * @param logCallback            session specific log callback
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    public AbstractSession(final String[] arguments,
+    protected AbstractSession(final String[] arguments,
                            final LogCallback logCallback,
                            final LogRedirectionStrategy logRedirectionStrategy) {
         this.sessionId = sessionIdGenerator.getAndIncrement();
