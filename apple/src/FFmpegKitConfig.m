@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -998,12 +998,20 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         ReturnCode* returnCode = [[ReturnCode alloc] init:returnCodeValue];
         [mediaInformationSession complete:returnCode];
         if ([returnCode isValueSuccess]) {
-            MediaInformation* mediaInformation = [MediaInformationJsonParser from:[mediaInformationSession getAllLogsAsStringWithTimeout:waitTimeout]];
+            NSArray* allLogs = [mediaInformationSession getAllLogsWithTimeout:waitTimeout];
+            NSMutableString* ffprobeJsonOutput = [[NSMutableString alloc] init];
+            for (int i=0; i < [allLogs count]; i++) {
+                Log* log = [allLogs objectAtIndex:i];
+                if ([log getLevel] == LevelAVLogStdErr) {
+                    [ffprobeJsonOutput appendString:[log getMessage]];
+                }
+            }
+            MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
             [mediaInformationSession setMediaInformation:mediaInformation];
         }
     } @catch (NSException *exception) {
         [mediaInformationSession fail:exception];
-        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
+        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"\n%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     }
 }
 

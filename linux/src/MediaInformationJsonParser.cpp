@@ -29,24 +29,21 @@ static const char* MediaInformationJsonParserKeyStreams =  "streams";
 static const char* MediaInformationJsonParserKeyChapters = "chapters";
 
 std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::from(const std::string& ffprobeJsonOutput) {
-    std::string error;
-
-    std::shared_ptr<ffmpegkit::MediaInformation> mediaInformation = fromWithError(ffprobeJsonOutput, error);
-    if (mediaInformation == nullptr) {
-        std::cout << "MediaInformation parsing failed: " << error << std::endl;
+    try {
+        return fromWithError(ffprobeJsonOutput);
+    } catch(const std::exception& exception) {
+        std::cout << "MediaInformation parsing failed: " << exception.what() << std::endl;
+        return nullptr;
     }
-
-    return mediaInformation;
 }
 
-std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::fromWithError(const std::string& ffprobeJsonOutput, std::string& error) {
+std::shared_ptr<ffmpegkit::MediaInformation> ffmpegkit::MediaInformationJsonParser::fromWithError(const std::string& ffprobeJsonOutput) {
     std::shared_ptr<rapidjson::Document> document = std::make_shared<rapidjson::Document>();
 
     document->Parse(ffprobeJsonOutput.c_str());
 
     if (document->HasParseError()) {
-        error = GetParseError_En(document->GetParseError());
-        return nullptr;
+        throw std::runtime_error(GetParseError_En(document->GetParseError()));
     } else {
         std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::StreamInformation>>> streams = std::make_shared<std::vector<std::shared_ptr<ffmpegkit::StreamInformation>>>();
         std::shared_ptr<std::vector<std::shared_ptr<ffmpegkit::Chapter>>> chapters = std::make_shared<std::vector<std::shared_ptr<ffmpegkit::Chapter>>>();

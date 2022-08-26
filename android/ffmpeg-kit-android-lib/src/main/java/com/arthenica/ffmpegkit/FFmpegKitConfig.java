@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -696,7 +696,15 @@ public class FFmpegKitConfig {
             final ReturnCode returnCode = new ReturnCode(returnCodeValue);
             mediaInformationSession.complete(returnCode);
             if (returnCode.isValueSuccess()) {
-                MediaInformation mediaInformation = MediaInformationJsonParser.fromWithError(mediaInformationSession.getAllLogsAsString(waitTimeout));
+                List<Log> allLogs = mediaInformationSession.getAllLogs(waitTimeout);
+                final StringBuilder ffprobeJsonOutput = new StringBuilder();
+                for (int i = 0, allLogsSize = allLogs.size(); i < allLogsSize; i++) {
+                    Log log = allLogs.get(i);
+                    if (log.getLevel() == Level.AV_LOG_STDERR) {
+                        ffprobeJsonOutput.append(log.getMessage());
+                    }
+                }
+                MediaInformation mediaInformation = MediaInformationJsonParser.fromWithError(ffprobeJsonOutput.toString());
                 mediaInformationSession.setMediaInformation(mediaInformation);
             }
         } catch (final Exception e) {

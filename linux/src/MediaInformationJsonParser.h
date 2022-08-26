@@ -40,13 +40,13 @@ namespace ffmpegkit {
             static std::shared_ptr<ffmpegkit::MediaInformation> from(const std::string& ffprobeJsonOutput);
 
             /**
-             * Extracts <code>MediaInformation</code> from the given FFprobe json output.
+             * Extracts <code>MediaInformation</code> from the given FFprobe json output. If a parsing error occurs an
+             * std::exception is thrown.
              *
              * @param ffprobeJsonOutput FFprobe json output
-             * @param error error to save the parsing error if a parsing error occurs
              * @return created MediaInformation instance
              */
-            static std::shared_ptr<ffmpegkit::MediaInformation> fromWithError(const std::string& ffprobeJsonOutput, std::string& error);
+            static std::shared_ptr<ffmpegkit::MediaInformation> fromWithError(const std::string& ffprobeJsonOutput);
 
     };
 

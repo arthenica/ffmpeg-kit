@@ -42,6 +42,7 @@ extern "C" {
 #include <condition_variable>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 /**
  * Generates ids for named ffmpeg kit pipes.
@@ -1035,7 +1036,14 @@ void ffmpegkit::FFmpegKitConfig::getMediaInformationExecute(const std::shared_pt
         auto returnCode = std::make_shared<ffmpegkit::ReturnCode>(returnCodeValue);
         mediaInformationSession->complete(returnCode);
         if (returnCode->isValueSuccess()) {
-            auto mediaInformation = ffmpegkit::MediaInformationJsonParser::from(mediaInformationSession->getAllLogsAsStringWithTimeout(waitTimeout).c_str());
+            auto allLogs = mediaInformationSession->getAllLogsWithTimeout(waitTimeout);
+            std::string ffprobeJsonOutput;
+            std::for_each(allLogs->cbegin(), allLogs->cend(), [&](std::shared_ptr<ffmpegkit::Log> log) {
+                if (log->getLevel() == LevelAVLogStdErr) {
+                    ffprobeJsonOutput.append(log->getMessage());
+                }
+            });
+            auto mediaInformation = ffmpegkit::MediaInformationJsonParser::fromWithError(ffprobeJsonOutput.c_str());
             mediaInformationSession->setMediaInformation(mediaInformation);
         }
     } catch(const std::exception& exception) {
