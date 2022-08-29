@@ -407,7 +407,7 @@ static CallbackData *callbackDataRemove() {
  * @param sessionId session id
  */
 static void registerSessionId(long sessionId) {
-    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 1);
+    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], (short)1);
 }
 
 /**
@@ -416,7 +416,7 @@ static void registerSessionId(long sessionId) {
  * @param sessionId session id
  */
 static void removeSession(long sessionId) {
-    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 0);
+    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], (short)0);
 }
 
 #ifdef __cplusplus
@@ -429,7 +429,7 @@ extern "C" {
  * @param sessionId session id
  */
 void cancelSession(long sessionId) {
-    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], 2);
+    std::atomic_store(&sessionMap[sessionId % SESSION_MAP_SIZE], (short)2);
 }
 
 /**
@@ -770,7 +770,7 @@ void* ffmpegKitInitialize() {
         sessionHistorySize = 10;
 
         for(int i = 0; i<SESSION_MAP_SIZE; i++) {
-            std::atomic_init(&sessionMap[i], 0);
+            std::atomic_init(&sessionMap[i], (short)0);
             std::atomic_init(&sessionInTransitMessageCountMap[i], 0);
         }
 

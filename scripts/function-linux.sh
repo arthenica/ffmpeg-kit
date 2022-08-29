@@ -300,40 +300,37 @@ get_cxxflags() {
   fi
 
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
-  local COMMON_FLAGS="${OPTIMIZATION_FLAGS} ${BUILD_DATE} $(get_arch_specific_cflags)"
+  local COMMON_FLAGS="-stdlib=libstdc++ -std=c++11 ${OPTIMIZATION_FLAGS} ${BUILD_DATE} $(get_arch_specific_cflags)"
 
   case $1 in
   ffmpeg)
     if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
-      echo "${LINK_TIME_OPTIMIZATION_FLAGS} -std=c++11 -O2 -ffunction-sections -fdata-sections"
+      echo "${LINK_TIME_OPTIMIZATION_FLAGS} -stdlib=libstdc++ -std=c++11 -O2 -ffunction-sections -fdata-sections"
     else
-      echo "${FFMPEG_KIT_DEBUG} -std=c++11"
+      echo "${FFMPEG_KIT_DEBUG} -stdlib=libstdc++ -std=c++11"
     fi
     ;;
   ffmpeg-kit)
-    echo "-std=c++11 ${COMMON_FLAGS}"
+    echo "${COMMON_FLAGS}"
     ;;
   srt | zimg)
-    echo "${COMMON_FLAGS} -std=c++11 -fcxx-exceptions -fPIC"
+    echo "${COMMON_FLAGS} -fcxx-exceptions -fPIC"
     ;;
   *)
-    echo "-std=c++11 -fno-exceptions -fno-rtti ${COMMON_FLAGS}"
+    echo "${COMMON_FLAGS} -fno-exceptions -fno-rtti"
     ;;
   esac
 }
 
 get_common_linked_libraries() {
-  local COMMON_LIBRARY_PATHS=""
+  local COMMON_LIBRARIES=""
 
   case $1 in
-  ffmpeg)
-    echo "-lc -lm -ldl ${COMMON_LIBRARY_PATHS}"
-    ;;
-  srt)
-    echo "-lc -lm -ldl -lstdc++ ${COMMON_LIBRARY_PATHS}"
+  chromaprint | ffmpeg-kit | kvazaar | srt | zimg)
+    echo "-stdlib=libstdc++ -lstdc++ -lc -lm ${COMMON_LIBRARIES}"
     ;;
   *)
-    echo "-lc -lm -ldl ${COMMON_LIBRARY_PATHS}"
+    echo "-lc -lm -ldl ${COMMON_LIBRARIES}"
     ;;
   esac
 }
