@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux' ]
+        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux', 'r24-linux', 'r25b-linux' ]
     defaults:
       run:
         shell: bash
@@ -39,7 +39,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib --disable-arm-v7a
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -80,7 +80,7 @@ jobs:
     runs-on: macos-10.15
     strategy:
       matrix:
-        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin' ]
+        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin', 'r24-darwin', 'r25b-darwin' ]
     defaults:
       run:
         shell: bash
@@ -97,7 +97,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib --disable-arm-v7a
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log

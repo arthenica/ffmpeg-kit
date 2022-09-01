@@ -31,6 +31,9 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_gnutls} -e
   ./bootstrap || return 1
 fi
 
+# MASKING THE -march=all OPTION WHICH BREAKS THE BUILD ON arm64-v8a
+${SED_INLINE} "s|AM_CCASFLAGS =|#AM_CCASFLAGS=|g" "${BASEDIR}"/src/"${LIB_NAME}"/lib/accelerated/aarch64/Makefile.in
+
 ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
   --with-pic \
