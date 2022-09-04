@@ -1776,6 +1776,7 @@ print_custom_libraries() {
 get_external_library_license_path() {
   case $1 in
   1) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.TXT" ;;
+  12) echo "${BASEDIR}/src/$(get_library_name "$1")/Copyright" ;;
   35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.txt" ;;
   3 | 42) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
   5 | 44) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/COPYING" ;;

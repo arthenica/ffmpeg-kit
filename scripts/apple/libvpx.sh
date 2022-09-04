@@ -66,6 +66,7 @@ esac
   --enable-pic \
   --enable-optimizations \
   --enable-better-hw-compatibility \
+  --enable-vp9-highbitdepth \
   ${ASM_OPTIONS} \
   --enable-vp8 \
   --enable-vp9 \

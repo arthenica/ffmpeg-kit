@@ -53,6 +53,7 @@ overwrite_file "${BASEDIR}"/tools/patch/make/libvpx/configure.sh "${BASEDIR}"/sr
   --enable-optimizations \
   --enable-better-hw-compatibility \
   --enable-runtime-cpu-detect \
+  --enable-vp9-highbitdepth \
   ${ASM_OPTIONS} \
   --enable-vp8 \
   --enable-vp9 \
