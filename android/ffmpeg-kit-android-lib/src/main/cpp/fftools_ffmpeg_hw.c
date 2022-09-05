@@ -1,4 +1,6 @@
 /*
+ * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -17,10 +19,17 @@
  */
 
 /*
- * CHANGES 12.2019
- * - Concurrent execution support
+ * This file is the modified version of ffmpeg_hw.c file living in ffmpeg source code under the fftools folder. We
+ * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
+ * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
  *
- * CHANGES 08.2018
+ * mobile-ffmpeg / ffmpeg-kit changes by Taner Sener
+ *
+ * 12.2019
+ * --------------------------------------------------------
+ * - concurrent execution support ("__thread" specifier added to variables used by multiple threads)
+ *
+ * 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and parent header
  */
@@ -102,6 +111,8 @@ static char *hw_device_default_name(enum AVHWDeviceType type)
 
 int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
 {
+    // "type=name"
+    // "type=name,key=value,key2=value2"
     // "type=name:device,key=value,key2=value2"
     // "type:device,key=value,key2=value2"
     // -> av_hwdevice_ctx_create()
@@ -133,7 +144,7 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
     }
 
     if (*p == '=') {
-        k = strcspn(p + 1, ":@");
+        k = strcspn(p + 1, ":@,");
 
         name = av_strndup(p + 1, k);
         if (!name) {
@@ -167,11 +178,11 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
         q = strchr(p, ',');
         if (q) {
             if (q - p > 0) {
-            device = av_strndup(p, q - p);
-            if (!device) {
-                err = AVERROR(ENOMEM);
-                goto fail;
-            }
+                device = av_strndup(p, q - p);
+                if (!device) {
+                    err = AVERROR(ENOMEM);
+                    goto fail;
+                }
             }
             err = av_dict_parse_string(&options, q + 1, "=", ",", 0);
             if (err < 0) {
@@ -197,6 +208,18 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
 
         err = av_hwdevice_ctx_create_derived(&device_ref, type,
                                              src->device_ref, 0);
+        if (err < 0)
+            goto fail;
+    } else if (*p == ',') {
+        err = av_dict_parse_string(&options, p + 1, "=", ",", 0);
+
+        if (err < 0) {
+            errmsg = "failed to parse options";
+            goto invalid;
+        }
+
+        err = av_hwdevice_ctx_create(&device_ref, type,
+                                     NULL, options, 0);
         if (err < 0)
             goto fail;
     } else {
@@ -548,15 +571,21 @@ int hw_device_setup_for_filter(FilterGraph *fg)
     HWDevice *dev;
     int i;
 
-    // If the user has supplied exactly one hardware device then just
-    // give it straight to every filter for convenience.  If more than
-    // one device is available then the user needs to pick one explcitly
-    // with the filter_hw_device option.
+    // Pick the last hardware device if the user doesn't pick the device for
+    // filters explicitly with the filter_hw_device option.
     if (filter_hw_device)
         dev = filter_hw_device;
-    else if (nb_hw_devices == 1)
-        dev = hw_devices[0];
-    else
+    else if (nb_hw_devices > 0) {
+        dev = hw_devices[nb_hw_devices - 1];
+
+        if (nb_hw_devices > 1)
+            av_log(NULL, AV_LOG_WARNING, "There are %d hardware devices. device "
+                   "%s of type %s is picked for filters by default. Set hardware "
+                   "device explicitly with the filter_hw_device option if device "
+                   "%s is not usable for filters.\n",
+                   nb_hw_devices, dev->name,
+                   av_hwdevice_get_type_name(dev->type), dev->name);
+    } else
         dev = NULL;
 
     if (dev) {

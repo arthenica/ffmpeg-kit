@@ -24,13 +24,14 @@
 #include "config.h"
 #include "libavcodec/jni.h"
 #include "libavutil/bprint.h"
+#include "libavutil/mem.h"
 #include "ffmpegkit.h"
 
 /** Forward declaration for function defined in fftools_ffprobe.c */
 int ffprobe_execute(int argc, char **argv);
 
 extern int configuredLogLevel;
-extern __thread volatile long globalSessionId;
+extern __thread long globalSessionId;
 extern void addSession(long sessionId);
 extern void removeSession(long sessionId);
 extern void resetMessagesInTransmit(long sessionId);

@@ -36,7 +36,7 @@
 #import "SessionState.h"
 
 /** Global library version */
-NSString* const FFmpegKitVersion = @"4.5.1";
+NSString* const FFmpegKitVersion = @"5.1";
 
 /**
  * Prefix of named pipes created by ffmpeg-kit.
@@ -88,7 +88,7 @@ volatile int handleSIGXCPU = 1;
 volatile int handleSIGPIPE = 1;
 
 /** Holds the id of the current execution */
-__thread volatile long globalSessionId = 0;
+__thread long globalSessionId = 0;
 
 /** Holds the default log level */
 int configuredLogLevel = LevelAVLogInfo;

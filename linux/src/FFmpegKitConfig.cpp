@@ -89,7 +89,7 @@ volatile int handleSIGXCPU = 1;
 volatile int handleSIGPIPE = 1;
 
 /** Holds the id of the current execution */
-__thread volatile long globalSessionId = 0;
+__thread long globalSessionId = 0;
 
 /** Holds the default log level */
 int configuredLogLevel = ffmpegkit::LevelAVLogInfo;

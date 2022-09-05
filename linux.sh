@@ -13,7 +13,7 @@ enable_default_linux_architectures
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS
-GPL_ENABLED="no"
+export GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_FULL=""
 BUILD_TYPE_ID=""
@@ -78,7 +78,7 @@ while [ ! $# -eq 0 ]; do
     BUILD_FULL="1"
     ;;
   --enable-gpl)
-    GPL_ENABLED="yes"
+    export GPL_ENABLED="yes"
     ;;
   --enable-custom-library-*)
     CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')

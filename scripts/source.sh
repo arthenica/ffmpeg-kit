@@ -33,9 +33,8 @@ get_library_source() {
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/tanersener/FFmpeg"
-    SOURCE_ID="30322ebe3c55d0fb18bea4ae04d0fcaf1f97d27f"
-    SOURCE_TYPE="COMMIT"
-    SOURCE_GIT_DESCRIBE="n4.5-dev-3393-g30322ebe3c" # git describe --tags
+    SOURCE_ID="n5.1.1"
+    SOURCE_TYPE="TAG"
     ;;
   fontconfig)
     SOURCE_REPO_URL="https://github.com/tanersener/fontconfig"
@@ -278,9 +277,6 @@ get_library_source() {
     ;;
   3)
     echo "${SOURCE_TYPE}"
-    ;;
-  4)
-    echo "${SOURCE_GIT_DESCRIBE}"
     ;;
   esac
 }
