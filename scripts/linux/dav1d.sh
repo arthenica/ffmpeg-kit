@@ -10,7 +10,7 @@ rm -rf "${BUILD_DIR}" || return 1
 
 meson "${BUILD_DIR}" \
   --cross-file="$CROSS_FILE" \
-  -Db_lto=true \
+  -Db_lto=false \
   -Db_ndebug=false \
   -Denable_asm=true \
   -Denable_tools=false \
