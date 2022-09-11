@@ -248,8 +248,8 @@ get_library_source() {
     ;;
   x264)
     SOURCE_REPO_URL="https://github.com/tanersener/x264"
-    SOURCE_ID="5db6aa6cab1b146e07b60cc1736a01f21da01154"
-    SOURCE_TYPE="COMMIT" # COMMIT -> r3027
+    SOURCE_ID="7628a5696f79a1f0421dda99ab37b34481c69821"
+    SOURCE_TYPE="COMMIT"
     ;;
   x265)
     SOURCE_REPO_URL="https://github.com/tanersener/x265"
