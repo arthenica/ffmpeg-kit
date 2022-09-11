@@ -163,7 +163,7 @@ get_library_source() {
     ;;
   libxml2)
     SOURCE_REPO_URL="https://github.com/tanersener/libxml2"
-    SOURCE_ID="v2.10.2"
+    SOURCE_ID="v2.10.1"
     SOURCE_TYPE="TAG"
     ;;
   nettle)
