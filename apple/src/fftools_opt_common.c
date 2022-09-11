@@ -84,7 +84,7 @@ enum show_muxdemuxers {
     SHOW_MUXERS,
 };
 
-static __thread FILE *report_file;
+static __thread FILE *report_file = NULL;
 static __thread int report_file_level = AV_LOG_DEBUG;
 
 extern void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
@@ -1146,7 +1146,7 @@ static void log_callback_report(void *ptr, int level, const char *fmt, va_list v
     }
     av_log_format_line(ptr, level, fmt, vl2, line, sizeof(line), &print_prefix);
     va_end(vl2);
-    if (report_file_level >= level) {
+    if (report_file && report_file_level >= level) {
         fputs(line, report_file);
         fflush(report_file);
     }

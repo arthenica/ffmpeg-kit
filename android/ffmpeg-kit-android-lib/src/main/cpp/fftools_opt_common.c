@@ -31,7 +31,7 @@
  * - printf replaced with av_log statements
  * - libpostproc references dropped
  * - fftools_ prefix added to fftools headers
- * - added __thread modifier to report_file variables
+ * - added __thread modifier to report_file variables and warned_cfg
  * - log_callback_report updated to forward logs via ffmpegkit_log_callback_function
  * - extern program_name declared
  */
@@ -84,7 +84,7 @@ enum show_muxdemuxers {
     SHOW_MUXERS,
 };
 
-static __thread FILE *report_file;
+static __thread FILE *report_file = NULL;
 static __thread int report_file_level = AV_LOG_DEBUG;
 
 extern void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
@@ -94,12 +94,12 @@ extern __thread char *program_name;
 int show_license(void *optctx, const char *opt, const char *arg)
 {
 #if CONFIG_NONFREE
-    printf(
+    av_log(NULL, AV_LOG_ERROR,
     "This version of %s has nonfree parts compiled in.\n"
     "Therefore it is not legally redistributable.\n",
     program_name );
 #elif CONFIG_GPLV3
-    printf(
+    av_log(NULL, AV_LOG_ERROR,
     "%s is free software; you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
     "the Free Software Foundation; either version 3 of the License, or\n"
@@ -114,7 +114,7 @@ int show_license(void *optctx, const char *opt, const char *arg)
     "along with %s.  If not, see <http://www.gnu.org/licenses/>.\n",
     program_name, program_name, program_name );
 #elif CONFIG_GPL
-    printf(
+    av_log(NULL, AV_LOG_ERROR,
     "%s is free software; you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
     "the Free Software Foundation; either version 2 of the License, or\n"
@@ -130,7 +130,7 @@ int show_license(void *optctx, const char *opt, const char *arg)
     "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n",
     program_name, program_name, program_name );
 #elif CONFIG_LGPLV3
-    printf(
+    av_log(NULL, AV_LOG_ERROR,
     "%s is free software; you can redistribute it and/or modify\n"
     "it under the terms of the GNU Lesser General Public License as published by\n"
     "the Free Software Foundation; either version 3 of the License, or\n"
@@ -145,7 +145,7 @@ int show_license(void *optctx, const char *opt, const char *arg)
     "along with %s.  If not, see <http://www.gnu.org/licenses/>.\n",
     program_name, program_name, program_name );
 #else
-    printf(
+    av_log(NULL, AV_LOG_ERROR,
     "%s is free software; you can redistribute it and/or\n"
     "modify it under the terms of the GNU Lesser General Public\n"
     "License as published by the Free Software Foundation; either\n"
@@ -165,7 +165,7 @@ int show_license(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
-static int warned_cfg = 0;
+__thread int warned_cfg = 0;
 
 #define INDENT        1
 #define SHOW_VERSION  2
@@ -717,9 +717,9 @@ int show_codecs(void *optctx, const char *opt, const char *arg)
         av_log(NULL, AV_LOG_ERROR, avcodec_find_encoder(desc->id) ? "E" : ".");
 
         av_log(NULL, AV_LOG_ERROR, "%c", get_media_type_char(desc->type));
-        printf((desc->props & AV_CODEC_PROP_INTRA_ONLY) ? "I" : ".");
-        printf((desc->props & AV_CODEC_PROP_LOSSY)      ? "L" : ".");
-        printf((desc->props & AV_CODEC_PROP_LOSSLESS)   ? "S" : ".");
+        av_log(NULL, AV_LOG_ERROR, (desc->props & AV_CODEC_PROP_INTRA_ONLY) ? "I" : ".");
+        av_log(NULL, AV_LOG_ERROR, (desc->props & AV_CODEC_PROP_LOSSY)      ? "L" : ".");
+        av_log(NULL, AV_LOG_ERROR, (desc->props & AV_CODEC_PROP_LOSSLESS)   ? "S" : ".");
 
         av_log(NULL, AV_LOG_ERROR, " %-20s %s", desc->name, desc->long_name ? desc->long_name : "");
 
@@ -768,11 +768,11 @@ static void print_codecs(int encoder)
 
         while ((codec = next_codec_for_id(desc->id, &iter, encoder))) {
             av_log(NULL, AV_LOG_ERROR, " %c", get_media_type_char(desc->type));
-            printf((codec->capabilities & AV_CODEC_CAP_FRAME_THREADS) ? "F" : ".");
-            printf((codec->capabilities & AV_CODEC_CAP_SLICE_THREADS) ? "S" : ".");
-            printf((codec->capabilities & AV_CODEC_CAP_EXPERIMENTAL)  ? "X" : ".");
-            printf((codec->capabilities & AV_CODEC_CAP_DRAW_HORIZ_BAND)?"B" : ".");
-            printf((codec->capabilities & AV_CODEC_CAP_DR1)           ? "D" : ".");
+            av_log(NULL, AV_LOG_ERROR, (codec->capabilities & AV_CODEC_CAP_FRAME_THREADS) ? "F" : ".");
+            av_log(NULL, AV_LOG_ERROR, (codec->capabilities & AV_CODEC_CAP_SLICE_THREADS) ? "S" : ".");
+            av_log(NULL, AV_LOG_ERROR, (codec->capabilities & AV_CODEC_CAP_EXPERIMENTAL)  ? "X" : ".");
+            av_log(NULL, AV_LOG_ERROR, (codec->capabilities & AV_CODEC_CAP_DRAW_HORIZ_BAND)?"B" : ".");
+            av_log(NULL, AV_LOG_ERROR, (codec->capabilities & AV_CODEC_CAP_DR1)           ? "D" : ".");
 
             av_log(NULL, AV_LOG_ERROR, " %-20s %s", codec->name, codec->long_name ? codec->long_name : "");
             if (strcmp(codec->name, desc->name))
@@ -1146,7 +1146,7 @@ static void log_callback_report(void *ptr, int level, const char *fmt, va_list v
     }
     av_log_format_line(ptr, level, fmt, vl2, line, sizeof(line), &print_prefix);
     va_end(vl2);
-    if (report_file_level >= level) {
+    if (report_file && report_file_level >= level) {
         fputs(line, report_file);
         fflush(report_file);
     }
