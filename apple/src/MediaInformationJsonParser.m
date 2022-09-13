@@ -38,7 +38,7 @@ NSString* const MediaInformationJsonParserKeyChapters = @"chapters";
     NSData *jsonData = [ffprobeJsonOutput dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
     if (error != nil) {
-        @throw [NSException exceptionWithName:@"ParsingException" reason:[NSString stringWithFormat:@"%ld",[error code]] userInfo:[error userInfo]];
+        @throw [NSException exceptionWithName:@"ParsingException" reason:[NSString stringWithFormat:@"%ld",(long)[error code]] userInfo:[error userInfo]];
     }
     if (jsonDictionary == nil) {
         return nil;

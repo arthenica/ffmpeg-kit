@@ -28,6 +28,7 @@
  * --------------------------------------------------------
  * - config.h include added back
  * - volatile dropped from thread local variables
+ * - dropped signatures of ffmpeg_opt.c methods called by both ffmpeg and ffprobe
  *
  * 06.2020
  * --------------------------------------------------------
@@ -740,76 +741,6 @@ void of_write_packet(OutputFile *of, AVPacket *pkt, OutputStream *ost,
                      int unqueue);
 
 void set_report_callback(void (*callback)(int, float, float, int64_t, int, double, double));
-
 void cancel_operation(long id);
-
-int opt_map(void *optctx, const char *opt, const char *arg);
-int opt_map_channel(void *optctx, const char *opt, const char *arg);
-int opt_recording_timestamp(void *optctx, const char *opt, const char *arg);
-int opt_data_frames(void *optctx, const char *opt, const char *arg);
-int opt_progress(void *optctx, const char *opt, const char *arg);
-int opt_target(void *optctx, const char *opt, const char *arg);
-int opt_vsync(void *optctx, const char *opt, const char *arg);
-int opt_abort_on(void *optctx, const char *opt, const char *arg);
-int opt_stats_period(void *optctx, const char *opt, const char *arg);
-int opt_qscale(void *optctx, const char *opt, const char *arg);
-int opt_profile(void *optctx, const char *opt, const char *arg);
-int opt_filter_complex(void *optctx, const char *opt, const char *arg);
-int opt_filter_complex_script(void *optctx, const char *opt, const char *arg);
-int opt_attach(void *optctx, const char *opt, const char *arg);
-int opt_video_frames(void *optctx, const char *opt, const char *arg);
-int opt_video_codec(void *optctx, const char *opt, const char *arg);
-int opt_sameq(void *optctx, const char *opt, const char *arg);
-int opt_timecode(void *optctx, const char *opt, const char *arg);
-
-int opt_vstats_file(void *optctx, const char *opt, const char *arg);
-int opt_vstats(void *optctx, const char *opt, const char *arg);
-int opt_video_frames(void *optctx, const char *opt, const char *arg);
-int opt_old2new(void *optctx, const char *opt, const char *arg);
-int opt_streamid(void *optctx, const char *opt, const char *arg);
-int opt_bitrate(void *optctx, const char *opt, const char *arg);
-int show_hwaccels(void *optctx, const char *opt, const char *arg);
-int opt_video_filters(void *optctx, const char *opt, const char *arg);
-int opt_audio_frames(void *optctx, const char *opt, const char *arg);
-int opt_audio_qscale(void *optctx, const char *opt, const char *arg);
-int opt_audio_codec(void *optctx, const char *opt, const char *arg);
-int opt_channel_layout(void *optctx, const char *opt, const char *arg);
-int opt_preset(void *optctx, const char *opt, const char *arg);
-int opt_audio_filters(void *optctx, const char *opt, const char *arg);
-int opt_subtitle_codec(void *optctx, const char *opt, const char *arg);
-int opt_video_channel(void *optctx, const char *opt, const char *arg);
-int opt_video_standard(void *optctx, const char *opt, const char *arg);
-int opt_sdp_file(void *optctx, const char *opt, const char *arg);
-int opt_data_codec(void *optctx, const char *opt, const char *arg);
-int opt_init_hw_device(void *optctx, const char *opt, const char *arg);
-int opt_filter_hw_device(void *optctx, const char *opt, const char *arg);
-void add_input_streams(OptionsContext *o, AVFormatContext *ic);
-void assert_file_overwrite(const char *filename);
-void dump_attachment(AVStream *st, const char *filename);
-void uninit_options(OptionsContext *o);
-void init_options(OptionsContext *o);
-AVDictionary *strip_specifiers(AVDictionary *dict);
-void parse_meta_type(char *arg, char *type, int *index, const char **stream_spec);
-int fftools_copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o);
-const AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
-const AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
-int open_input_file(OptionsContext *o, const char *filename);
-int get_preset_file_2(const char *preset_name, const char *codec_name, AVIOContext **s);
-int choose_encoder(OptionsContext *o, AVFormatContext *s, OutputStream *ost);
-OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, enum AVMediaType type, int source_index);
-void parse_matrix_coeffs(uint16_t *dest, const char *str);
-char *get_ost_filters(OptionsContext *o, AVFormatContext *oc, OutputStream *ost);
-void check_streamcopy_filters(OptionsContext *o, AVFormatContext *oc, const OutputStream *ost, enum AVMediaType type);
-OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-OutputStream *new_audio_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-OutputStream *new_data_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-OutputStream *new_unknown_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-OutputStream *new_attachment_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-OutputStream *new_subtitle_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
-void init_output_filter(OutputFilter *ofilter, OptionsContext *o, AVFormatContext *oc);
-int init_complex_filters(void);
-int open_output_file(OptionsContext *o, const char *filename);
-int opt_default_new(OptionsContext *o, const char *opt, const char *arg);
-int open_files(OptionGroupList *l, const char *inout, int (*open_file)(OptionsContext*, const char*));
 
 #endif /* FFTOOLS_FFMPEG_H */

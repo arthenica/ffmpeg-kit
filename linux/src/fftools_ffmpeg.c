@@ -35,6 +35,8 @@
  * --------------------------------------------------------
  * - added opt_common.h include
  * - volatile dropped from thread local variables
+ * - setvbuf call dropped
+ * - flushing stderr dropped
  *
  * 08.2020
  * --------------------------------------------------------
@@ -250,6 +252,12 @@ extern int opt_subtitle_codec(void *optctx, const char *opt, const char *arg);
 extern int opt_video_channel(void *optctx, const char *opt, const char *arg);
 extern int opt_video_standard(void *optctx, const char *opt, const char *arg);
 extern int opt_sdp_file(void *optctx, const char *opt, const char *arg);
+#if CONFIG_VAAPI
+extern int opt_vaapi_device(void *optctx, const char *opt, const char *arg);
+#endif
+#if CONFIG_QSV
+extern int opt_qsv_device(void *optctx, const char *opt, const char *arg);
+#endif
 extern int opt_data_codec(void *optctx, const char *opt, const char *arg);
 extern int opt_init_hw_device(void *optctx, const char *opt, const char *arg);
 extern int opt_filter_hw_device(void *optctx, const char *opt, const char *arg);
@@ -1885,8 +1893,6 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
             av_log(NULL, AV_LOG_STDERR, "%s    %c", buf.str, end);
         } else
             av_log(NULL, AV_LOG_INFO, "%s    %c", buf.str, end);
-
-        fflush(stderr);
     }
     av_bprint_finalize(&buf, NULL);
 
@@ -5222,8 +5228,6 @@ int ffmpeg_execute(int argc, char **argv)
         init_dynload();
 
         register_exit(ffmpeg_cleanup);
-
-        setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
 
         av_log_set_flags(AV_LOG_SKIP_REPEATED);
         parse_loglevel(argc, argv, options);

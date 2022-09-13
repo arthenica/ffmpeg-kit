@@ -252,6 +252,12 @@ extern int opt_subtitle_codec(void *optctx, const char *opt, const char *arg);
 extern int opt_video_channel(void *optctx, const char *opt, const char *arg);
 extern int opt_video_standard(void *optctx, const char *opt, const char *arg);
 extern int opt_sdp_file(void *optctx, const char *opt, const char *arg);
+#if CONFIG_VAAPI
+extern int opt_vaapi_device(void *optctx, const char *opt, const char *arg);
+#endif
+#if CONFIG_QSV
+extern int opt_qsv_device(void *optctx, const char *opt, const char *arg);
+#endif
 extern int opt_data_codec(void *optctx, const char *opt, const char *arg);
 extern int opt_init_hw_device(void *optctx, const char *opt, const char *arg);
 extern int opt_filter_hw_device(void *optctx, const char *opt, const char *arg);

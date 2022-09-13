@@ -664,7 +664,7 @@ int opt_vaapi_device(void *optctx, const char *opt, const char *arg)
 #endif
 
 #if CONFIG_QSV
-static int opt_qsv_device(void *optctx, const char *opt, const char *arg)
+int opt_qsv_device(void *optctx, const char *opt, const char *arg)
 {
     const char *prefix = "qsv=__qsv_device:hw_any,child_device=";
     int err;
