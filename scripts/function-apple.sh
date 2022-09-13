@@ -899,8 +899,8 @@ build_info_plist() {
   local FILE_PATH="$1"
   local FRAMEWORK_NAME="$2"
   local FRAMEWORK_ID="$3"
-  local FRAMEWORK_SHORT_VERSION="$4"
-  local FRAMEWORK_VERSION="$5"
+  local FRAMEWORK_SHORT_VERSION="${4/LTS/1000}"
+  local FRAMEWORK_VERSION="${5/LTS/1000}"
   local ARCHITECTURE_VARIANT="$6"
 
   case ${FFMPEG_KIT_BUILD_TYPE} in
