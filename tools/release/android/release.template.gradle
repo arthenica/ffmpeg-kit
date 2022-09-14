@@ -36,8 +36,8 @@ ext {
     libraryVersion = version
     libraryDescription = releaseProjectDescription
 
-    siteUrl = 'https://github.com/tanersener/ffmpeg-kit'
-    gitUrl = 'https://github.com/tanersener/ffmpeg-kit.git'
+    siteUrl = 'https://github.com/arthenica/ffmpeg-kit'
+    gitUrl = 'https://github.com/arthenica/ffmpeg-kit.git'
 
     developerId = 'tanersener'
     developerName = 'Taner Sener'

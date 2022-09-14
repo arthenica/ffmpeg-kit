@@ -107,7 +107,7 @@ All libraries created can be found under the `prebuilt` directory.
 #### 3.1 Objective API
 
 1. Add `FFmpegKit` dependency to your `Podfile` in `ffmpeg-kit-<platform>-<package name>` pattern. Use one of the 
-   `FFmpegKit` package names given in the project [README](https://github.com/tanersener/ffmpeg-kit).
+   `FFmpegKit` package names given in the project [README](https://github.com/arthenica/ffmpeg-kit).
 
     - iOS
     ```yaml
@@ -312,4 +312,4 @@ All libraries created can be found under the `prebuilt` directory.
 ### 4. Test Application
 
 You can see how `FFmpegKit` is used inside an application by running `iOS`, `macOS` and `tvOS` test applications 
-developed under the [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
+developed under the [FFmpegKit Test](https://github.com/arthenica/ffmpeg-kit-test) project.

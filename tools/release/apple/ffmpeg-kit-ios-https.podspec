@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
     DESCRIPTION
     DESC
 
-    s.homepage          = "https://github.com/tanersener/ffmpeg-kit"
+    s.homepage          = "https://github.com/arthenica/ffmpeg-kit"
 
     s.author            = { "Taner Sener" => "tanersener@gmail.com" }
     s.license           = { :type => "LGPL-3.0", :file => "ffmpegkit.framework/LICENSE" }
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
     s.requires_arc      = true
     s.libraries         = 'z', 'bz2', 'c++', 'iconv'
 
-    s.source            = { :http => "https://github.com/tanersener/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-https-VERSION-ios-framework.zip" }
+    s.source            = { :http => "https://github.com/arthenica/ffmpeg-kit/releases/download/vVERSION/ffmpeg-kit-https-VERSION-ios-framework.zip" }
 
     s.ios.deployment_target = '10'
     s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
