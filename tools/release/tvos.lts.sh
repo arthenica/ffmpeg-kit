@@ -37,7 +37,7 @@ fi
 if [[ "${APPLE_FFMPEG_KIT_VERSION}" != "$1" ]]; then
     echo "Error: version mismatch. v$1 requested but v${APPLE_FFMPEG_KIT_VERSION} found. Please perform the following updates and try again."
     echo "1. Update docs"
-    echo "2. Update gradle files under the tools/release/android folder"
+    echo "2. Update gradle files under the tools/android folder"
     echo "3. Update the versions in tools/release/common.sh"
     echo "4. Update podspec links"
     echo "5. Update ffmpegkit.h versions for both android and apple"
