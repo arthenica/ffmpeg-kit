@@ -51,6 +51,7 @@ public class FFmpegSession extends AbstractSession implements Session {
      * Builds a new FFmpeg session.
      *
      * @param arguments command arguments
+     * @return created session
      */
     public static FFmpegSession create(final String[] arguments) {
         return new FFmpegSession(arguments, null, null, null, FFmpegKitConfig.getLogRedirectionStrategy());
@@ -61,6 +62,7 @@ public class FFmpegSession extends AbstractSession implements Session {
      *
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
+     * @return created session
      */
     public static FFmpegSession create(final String[] arguments, final FFmpegSessionCompleteCallback completeCallback) {
         return new FFmpegSession(arguments, completeCallback, null, null, FFmpegKitConfig.getLogRedirectionStrategy());
@@ -73,6 +75,7 @@ public class FFmpegSession extends AbstractSession implements Session {
      * @param completeCallback   session specific complete callback
      * @param logCallback        session specific log callback
      * @param statisticsCallback session specific statistics callback
+     * @return created session
      */
     public static FFmpegSession create(final String[] arguments,
                                        final FFmpegSessionCompleteCallback completeCallback,
@@ -89,6 +92,7 @@ public class FFmpegSession extends AbstractSession implements Session {
      * @param logCallback            session specific log callback
      * @param statisticsCallback     session specific statistics callback
      * @param logRedirectionStrategy session specific log redirection strategy
+     * @return created session
      */
     public static FFmpegSession create(final String[] arguments,
                                        final FFmpegSessionCompleteCallback completeCallback,

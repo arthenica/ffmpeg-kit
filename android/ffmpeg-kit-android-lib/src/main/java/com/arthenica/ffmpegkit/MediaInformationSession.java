@@ -39,6 +39,7 @@ public class MediaInformationSession extends AbstractSession implements Session 
      * Creates a new media information session.
      *
      * @param arguments command arguments
+     * @return created session
      */
     public static MediaInformationSession create(final String[] arguments) {
         return new MediaInformationSession(arguments, null, null);
@@ -49,6 +50,7 @@ public class MediaInformationSession extends AbstractSession implements Session 
      *
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
+     * @return created session
      */
     public static MediaInformationSession create(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback) {
         return new MediaInformationSession(arguments, completeCallback, null);
@@ -60,6 +62,7 @@ public class MediaInformationSession extends AbstractSession implements Session 
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
      * @param logCallback      session specific log callback
+     * @return created session
      */
     public static MediaInformationSession create(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
         return new MediaInformationSession(arguments, completeCallback, logCallback);
