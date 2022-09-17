@@ -12,6 +12,5 @@ var searchData=
   ['removesession_9',['removeSession',['../da/d9e/_f_fmpeg_kit_config_8m.html#a5f236f20079b407567c62072710656b5',1,'FFmpegKitConfig.m']]],
   ['report_5fnew_5fstream_10',['report_new_stream',['../d7/d48/fftools__ffmpeg_8c.html#ab19f077af44d4caa16ecad4d9532715a',1,'fftools_ffmpeg.c']]],
   ['reset_5feagain_11',['reset_eagain',['../d7/d48/fftools__ffmpeg_8c.html#a5e7569f8c8012ff719b112431b1df091',1,'fftools_ffmpeg.c']]],
-  ['reset_5foptions_12',['reset_options',['../d7/db3/fftools__ffmpeg_8h.html#a1801147c99b95a1ae99138795e7cec52',1,'fftools_ffmpeg.h']]],
-  ['resetmessagesintransmit_13',['resetMessagesInTransmit',['../da/d9e/_f_fmpeg_kit_config_8m.html#ab2b13505798c32f04fd3334e399f3a2f',1,'FFmpegKitConfig.m']]]
+  ['resetmessagesintransmit_12',['resetMessagesInTransmit',['../da/d9e/_f_fmpeg_kit_config_8m.html#ab2b13505798c32f04fd3334e399f3a2f',1,'FFmpegKitConfig.m']]]
 ];
