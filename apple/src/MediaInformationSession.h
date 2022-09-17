@@ -35,6 +35,7 @@
  * Creates a new media information session.
  *
  * @param arguments command arguments
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments;
 
@@ -43,6 +44,7 @@
  *
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback;
 
@@ -52,6 +54,7 @@
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
  * @param logCallback      session specific log callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
 

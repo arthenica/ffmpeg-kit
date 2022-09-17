@@ -34,6 +34,7 @@
  * Builds a new FFmpeg session.
  *
  * @param arguments command arguments
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments;
 
@@ -42,6 +43,7 @@
  *
  * @param arguments         command arguments
  * @param completeCallback  session specific complete callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback;
 
@@ -52,6 +54,7 @@
  * @param completeCallback      session specific complete callback
  * @param logCallback           session specific log callback
  * @param statisticsCallback    session specific statistics callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
@@ -63,6 +66,7 @@
  * @param logCallback             session specific log callback
  * @param statisticsCallback      session specific statistics callback
  * @param logRedirectionStrategy  session specific log redirection strategy
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 

@@ -35,6 +35,7 @@ namespace ffmpegkit {
              * Builds a new FFprobe session.
              *
              * @param arguments command arguments
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::list<std::string>& arguments);
 
@@ -43,6 +44,7 @@ namespace ffmpegkit {
              *
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::list<std::string>& arguments, const FFprobeSessionCompleteCallback completeCallback);
 
@@ -52,6 +54,7 @@ namespace ffmpegkit {
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
              * @param logCallback      session specific log callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::list<std::string>& arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback);
 
@@ -62,6 +65,7 @@ namespace ffmpegkit {
              * @param completeCallback        session specific complete callback
              * @param logCallback             session specific log callback
              * @param logRedirectionStrategy  session specific log redirection strategy
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFprobeSession> create(const std::list<std::string>& arguments, const FFprobeSessionCompleteCallback completeCallback, const ffmpegkit::LogCallback logCallback, const LogRedirectionStrategy logRedirectionStrategy);
 

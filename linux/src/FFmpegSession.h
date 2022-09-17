@@ -36,6 +36,7 @@ namespace ffmpegkit {
              * Builds a new FFmpeg session.
              *
              * @param arguments command arguments
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::list<std::string>& arguments);
 
@@ -44,6 +45,7 @@ namespace ffmpegkit {
              *
              * @param arguments         command arguments
              * @param completeCallback  session specific complete callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::list<std::string>& arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback);
 
@@ -54,6 +56,7 @@ namespace ffmpegkit {
              * @param completeCallback      session specific complete callback
              * @param logCallback           session specific log callback
              * @param statisticsCallback    session specific statistics callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::list<std::string>& arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback);
 
@@ -65,6 +68,7 @@ namespace ffmpegkit {
              * @param logCallback             session specific log callback
              * @param statisticsCallback      session specific statistics callback
              * @param logRedirectionStrategy  session specific log redirection strategy
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::FFmpegSession> create(const std::list<std::string>& arguments, ffmpegkit::FFmpegSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback, ffmpegkit::StatisticsCallback statisticsCallback, ffmpegkit::LogRedirectionStrategy logRedirectionStrategy);
 

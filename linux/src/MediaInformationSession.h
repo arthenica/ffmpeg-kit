@@ -37,6 +37,7 @@ namespace ffmpegkit {
              * Creates a new media information session.
              *
              * @param arguments command arguments
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments);
 
@@ -45,6 +46,7 @@ namespace ffmpegkit {
              *
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback);
 
@@ -54,6 +56,7 @@ namespace ffmpegkit {
              * @param arguments        command arguments
              * @param completeCallback session specific complete callback
              * @param logCallback      session specific log callback
+             * @return created session
              */
             static std::shared_ptr<ffmpegkit::MediaInformationSession> create(const std::list<std::string>& arguments, ffmpegkit::MediaInformationSessionCompleteCallback completeCallback, ffmpegkit::LogCallback logCallback);
 

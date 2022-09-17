@@ -33,6 +33,7 @@
  * Builds a new FFprobe session.
  *
  * @param arguments command arguments
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments;
 
@@ -41,6 +42,7 @@
  *
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback;
 
@@ -50,6 +52,7 @@
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
  * @param logCallback      session specific log callback
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
 
@@ -60,6 +63,7 @@
  * @param completeCallback        session specific complete callback
  * @param logCallback             session specific log callback
  * @param logRedirectionStrategy  session specific log redirection strategy
+ * @return created session
  */
 + (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
