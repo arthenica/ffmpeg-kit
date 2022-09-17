@@ -19,11 +19,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ matrix.branches }}
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: prerequisites
         run: sudo apt-get install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build ragel
       - name: upgrade meson
@@ -55,11 +55,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ matrix.branches }}
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: prerequisites
         run: sudo apt-get install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build ragel
       - name: upgrade meson

@@ -28,11 +28,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -57,11 +57,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -86,11 +86,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -115,11 +115,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
