@@ -36,6 +36,7 @@
  * - implemented writer_printf_printf using av_vlog
  * - printf statements replaced with av_log
  * - volatile dropped from thread local variables
+ * - sections cleaned before starting a new execution
  *
  * 01.2020
  * --------------------------------------------------------
@@ -4045,6 +4046,10 @@ void ffprobe_var_cleanup() {
 
     log_buffer = NULL;
     log_buffer_size = 0;
+
+    for (int i = 0; i < FF_ARRAY_ELEMS(sections); i++) {
+        sections[i].show_all_entries = 0;
+    }
 }
 
 int ffprobe_execute(int argc, char **argv)
