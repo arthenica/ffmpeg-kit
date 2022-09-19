@@ -209,8 +209,8 @@ create_ffmpeg_universal_library() {
   local FFMPEG_DEFAULT_BUILD_PATH="${BASEDIR}/prebuilt/$(get_default_build_directory)/ffmpeg"
 
   # COPY HEADER FILES
-  cp -r "${FFMPEG_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
-  cp "${FFMPEG_DEFAULT_BUILD_PATH}"/include/config.h "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
+  cp -r "${FFMPEG_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+  cp "${FFMPEG_DEFAULT_BUILD_PATH}"/include/config.h "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   for FFMPEG_LIB in "${FFMPEG_LIBS[@]}"; do
     local FFMPEG_LIB_UNIVERSAL_LIBRARY_PATH="${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}/lib/${FFMPEG_LIB}.dylib"
@@ -234,9 +234,9 @@ create_ffmpeg_universal_library() {
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
   for library in {0..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
@@ -300,7 +300,7 @@ create_ffmpeg_kit_universal_library() {
   local FFMPEG_KIT_DEFAULT_BUILD_PATH="${BASEDIR}/prebuilt/$(get_default_build_directory)/ffmpeg-kit"
 
   # COPY HEADER FILES
-  cp -r "${FFMPEG_KIT_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1
+  cp -r "${FFMPEG_KIT_DEFAULT_BUILD_PATH}"/include/* "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   local FFMPEG_KIT_UNIVERSAL_LIBRARY_PATH="${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib"
 
@@ -321,9 +321,9 @@ create_ffmpeg_kit_universal_library() {
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -365,16 +365,16 @@ create_ffmpeg_framework() {
       initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Resources"
 
       # LINK CURRENT VERSION
-      ln -s "A" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1
-      ln -s "Versions/Current/Headers" "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
-      ln -s "Versions/Current/Resources" "${FFMPEG_LIB_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1
-      ln -s "Versions/Current/${FFMPEG_LIB}" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+      ln -s "A" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      ln -s "Versions/Current/Headers" "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      ln -s "Versions/Current/Resources" "${FFMPEG_LIB_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      ln -s "Versions/Current/${FFMPEG_LIB}" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
       # COPY HEADER FILES
-      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
       # COPY LIBRARY FILE
-      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/Versions/A/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
     else
 
@@ -385,18 +385,18 @@ create_ffmpeg_framework() {
       initialize_folder "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers"
 
       # COPY HEADER FILES
-      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+      cp -r "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/include/${FFMPEG_LIB}"/* "${FFMPEG_LIB_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
       # COPY LIBRARY FILE
-      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${FFMPEG_UNIVERSAL_LIBRARY_PATH}/lib/${FFMPEG_LIB}.dylib" "${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
     fi
 
     # COPY FRAMEWORK LICENSES
     if [[ "${GPL_ENABLED}" == "yes" ]]; then
-      cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
     else
-      cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+      cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
     fi
 
     # COPY EXTERNAL LIBRARY LICENSES
@@ -472,17 +472,17 @@ create_ffmpeg_kit_framework() {
     initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Resources"
 
     # LINK CURRENT VERSION
-    ln -s "A" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1
-    ln -s "Versions/Current/Headers" "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1
-    ln -s "Versions/Current/Modules" "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules" 1>>"${BASEDIR}"/build.log 2>&1
-    ln -s "Versions/Current/Resources" "${FFMPEG_KIT_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1
-    ln -s "Versions/Current/ffmpegkit" "${FFMPEG_KIT_FRAMEWORK_PATH}/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1
+    ln -s "A" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/Current" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    ln -s "Versions/Current/Headers" "${FFMPEG_KIT_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    ln -s "Versions/Current/Modules" "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    ln -s "Versions/Current/Resources" "${FFMPEG_KIT_FRAMEWORK_PATH}/Resources" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    ln -s "Versions/Current/ffmpegkit" "${FFMPEG_KIT_FRAMEWORK_PATH}/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
     # COPY HEADER FILES
-    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1
+    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/Headers" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
     # COPY LIBRARY FILE
-    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}/Versions/A/ffmpegkit" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   else
 
@@ -494,22 +494,22 @@ create_ffmpeg_kit_framework() {
     initialize_folder "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules"
 
     # COPY HEADER FILES
-    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1
+    cp -r "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/include/* "${FFMPEG_KIT_FRAMEWORK_PATH}"/Headers 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
     # COPY LIBRARY FILE
-    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}/lib/libffmpegkit.dylib" "${FFMPEG_KIT_FRAMEWORK_PATH}"/ffmpegkit 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   fi
 
   # COPY FRAMEWORK LICENSES
   if [[ "${GPL_ENABLED}" == "yes" ]]; then
-    cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   # COPYING STRIP SCRIPT FOR SHARED LIBRARY
-  cp ${BASEDIR}/tools/release/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1
+  cp ${BASEDIR}/tools/release/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1 || exit 1
 
   build_info_plist "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}" "${ARCHITECTURE_VARIANT}"
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
