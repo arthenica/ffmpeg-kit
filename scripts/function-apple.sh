@@ -509,7 +509,7 @@ create_ffmpeg_kit_framework() {
   fi
 
   # COPYING STRIP SCRIPT FOR SHARED LIBRARY
-  cp ${BASEDIR}/tools/release/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1 || exit 1
+  cp ${BASEDIR}/tools/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1 || exit 1
 
   build_info_plist "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/Info.plist" "ffmpegkit" "com.arthenica.ffmpegkit.FFmpegKit" "${FFMPEG_KIT_VERSION}" "${FFMPEG_KIT_VERSION}" "${ARCHITECTURE_VARIANT}"
   build_modulemap "${FFMPEG_KIT_FRAMEWORK_PATH}/Modules/module.modulemap"
