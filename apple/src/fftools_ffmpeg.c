@@ -37,6 +37,7 @@
  * - volatile dropped from thread local variables
  * - setvbuf call dropped
  * - flushing stderr dropped
+ * - muxing overhead printed in single line
  *
  * 08.2020
  * --------------------------------------------------------
@@ -1531,6 +1532,7 @@ static void print_final_stats(int64_t total_size)
     float percent = -1.0;
     int i, j;
     int pass1_used = 1;
+    char percentString[50] = {0};
 
     for (i = 0; i < nb_output_streams; i++) {
         OutputStream *ost = output_streams[i];
@@ -1550,17 +1552,18 @@ static void print_final_stats(int64_t total_size)
     if (data_size && total_size>0 && total_size >= data_size)
         percent = 100.0 * (total_size - data_size) / data_size;
 
-    av_log(NULL, AV_LOG_INFO, "video:%1.0fkB audio:%1.0fkB subtitle:%1.0fkB other streams:%1.0fkB global headers:%1.0fkB muxing overhead: ",
+    if (percent >= 0.0)
+        sprintf(percentString, "%f%%", percent);
+    else
+        sprintf(percentString, "unknown");
+
+    av_log(NULL, AV_LOG_INFO, "video:%1.0fkB audio:%1.0fkB subtitle:%1.0fkB other streams:%1.0fkB global headers:%1.0fkB muxing overhead: %s\n",
            video_size / 1024.0,
            audio_size / 1024.0,
            subtitle_size / 1024.0,
            other_size / 1024.0,
-           extra_size / 1024.0);
-    if (percent >= 0.0)
-        av_log(NULL, AV_LOG_INFO, "%f%%", percent);
-    else
-        av_log(NULL, AV_LOG_INFO, "unknown");
-    av_log(NULL, AV_LOG_INFO, "\n");
+           extra_size / 1024.0,
+           percentString);
 
     /* print verbose per-stream stats */
     for (i = 0; i < nb_input_files; i++) {
