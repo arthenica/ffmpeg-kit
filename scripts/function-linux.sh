@@ -154,7 +154,7 @@ create_linux_bundle() {
   install_pkg_config_file "libavutil.pc"
   install_pkg_config_file "ffmpeg-kit.pc"
 
-  # COPY LIBRARY LICENSES
+  # COPY EXTERNAL LIBRARY LICENSES
   LICENSE_BASEDIR="${BASEDIR}/prebuilt/$(get_bundle_directory)/ffmpeg-kit/lib"
   rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   for library in {0..49}; do
@@ -174,12 +174,34 @@ create_linux_bundle() {
     fi
   done
 
+  # COPY CUSTOM LIBRARY LICENSES
+  for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
+    library_name="CUSTOM_LIBRARY_${custom_library_index}_NAME"
+    relative_license_path="CUSTOM_LIBRARY_${custom_library_index}_LICENSE_FILE"
+
+    destination_license_path="${LICENSE_BASEDIR}/license_${!library_name}.txt"
+
+    cp "${BASEDIR}/src/${!library_name}/${!relative_license_path}" "${destination_license_path}" 1>>"${BASEDIR}"/build.log 2>&1
+
+    RC=$?
+
+    if [[ ${RC} -ne 0 ]]; then
+      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
+      echo -e "failed\n\nSee build.log for details\n"
+      exit 1
+    fi
+
+    echo -e "DEBUG: Copied the license file of custom library ${!library_name} successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+  done
+
   # COPY LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
+
+  cp "${BASEDIR}"/tools/source/SOURCE "${LICENSE_BASEDIR}"/source.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   echo -e "DEBUG: Copied the ffmpeg-kit license successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }

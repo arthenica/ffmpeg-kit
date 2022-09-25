@@ -326,6 +326,8 @@ create_ffmpeg_kit_universal_library() {
     cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
+  cp "${BASEDIR}"/tools/source/SOURCE "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/SOURCE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
   echo -e "DEBUG: ${LIBRARY_NAME} universal library built for $(get_apple_architecture_variant "${ARCHITECTURE_VARIANT}") platform successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
 
@@ -507,6 +509,8 @@ create_ffmpeg_kit_framework() {
   else
     cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
+
+  cp "${BASEDIR}/tools/source/SOURCE" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/SOURCE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
   # COPYING STRIP SCRIPT FOR SHARED LIBRARY
   cp ${BASEDIR}/tools/apple/strip-frameworks.sh ${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1 || exit 1

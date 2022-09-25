@@ -289,7 +289,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   cd "${BASEDIR}"/android 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
 
-  # COPY LIBRARY LICENSES
+  # COPY EXTERNAL LIBRARY LICENSES
   LICENSE_BASEDIR="${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/res/raw
   rm -f "${LICENSE_BASEDIR}"/*.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   for library in {0..49}; do
@@ -331,12 +331,16 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   # COPY LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1
+    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   echo -e "DEBUG: Copied the ffmpeg-kit license successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+  overwrite_file "${BASEDIR}"/tools/source/SOURCE "${LICENSE_BASEDIR}"/source.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+
+  echo -e "DEBUG: Copied source.txt successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   # BUILD NATIVE LIBRARY
   if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
