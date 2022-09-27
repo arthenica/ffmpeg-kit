@@ -40,7 +40,7 @@ a `ffmpeg-kit-react-native` package with `libvpx` inside.
 
 `ffmpeg-kit` provides eight packages that include different sets of external libraries. These packages are
 named according to the external libraries included in them. Refer to
-[Packages](https://github.com/tanersener/ffmpeg-kit#8-packages) section of the project README to see the names
+[Packages](https://github.com/arthenica/ffmpeg-kit#8-packages) section of the project README to see the names
 of those packages and external libraries included in each of them.
 
 ##### 2.1.1 Package Names
@@ -186,7 +186,7 @@ the package name you are using.
 
 `ffmpeg-kit-react-native` is published in two different variants: `Main Release` and `LTS Release`. Both releases
 share the same source code but is built with different settings (Architectures, API Level, iOS Min SDK, etc.). Refer to
-[LTS Releases](https://github.com/tanersener/ffmpeg-kit#9-lts-releases) section of the project README to see how they
+[LTS Releases](https://github.com/arthenica/ffmpeg-kit#9-lts-releases) section of the project README to see how they
 compare to each other.
 
 ### 3. Using
@@ -397,16 +397,16 @@ compare to each other.
 ### 4. Test Application
 
 You can see how `FFmpegKit` is used inside an application by running `react-native` test applications developed under
-the [FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
+the [FFmpegKit Test](https://github.com/arthenica/ffmpeg-kit-test) project.
 
 ### 5. Tips
 
-See [Tips](https://github.com/tanersener/ffmpeg-kit/wiki/Tips) wiki page.
+See [Tips](https://github.com/arthenica/ffmpeg-kit/wiki/Tips) wiki page.
 
 ### 6. License
 
-See [License](https://github.com/tanersener/ffmpeg-kit/wiki/License) wiki page.
+See [License](https://github.com/arthenica/ffmpeg-kit/wiki/License) wiki page.
 
 ### 7. Patents
 
-See [Patents](https://github.com/tanersener/ffmpeg-kit/wiki/Patents) wiki page.
+See [Patents](https://github.com/arthenica/ffmpeg-kit/wiki/Patents) wiki page.

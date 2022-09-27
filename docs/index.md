@@ -1,11 +1,11 @@
 # FFmpegKit
 
-<img src="https://github.com/tanersener/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
+<img src="https://github.com/arthenica/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
 
 `FFmpegKit` is a collection of tools to use `FFmpeg` in `Android`, `iOS`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
 
 It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
-applications and 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases),
+applications and 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases),
 [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com).
 
 ### 1. Features
@@ -14,27 +14,27 @@ applications and 8 prebuilt binary packages available at [Github](https://github
 - Supports native platforms: Android, iOS, macOS and tvOS
 - Supports hybrid platforms: Flutter, React Native
 - Based on FFmpeg `v4.5-dev` with optional system and external libraries
-- 8 prebuilt binary packages available at [Github](https://github.com/tanersener/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com)
+- 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com)
 - Licensed under `LGPL 3.0`, or `GPL v3.0` if GPL licensed libraries are enabled
 
 ### 2. Android
 
-See [Android](https://github.com/tanersener/ffmpeg-kit/tree/development/android) to learn more about `FFmpegKit` for
+See [Android](https://github.com/arthenica/ffmpeg-kit/tree/development/android) to learn more about `FFmpegKit` for
 `Android`.
 
 ### 3. iOS, macOS, tvOS
 
-See [Apple](https://github.com/tanersener/ffmpeg-kit/tree/development/apple) to use `FFmpegKit` on `Apple` platforms
+See [Apple](https://github.com/arthenica/ffmpeg-kit/tree/development/apple) to use `FFmpegKit` on `Apple` platforms
 (`iOS`, `macOS`, `tvOS`).
 
 ### 4. Flutter
 
-See [Flutter](https://github.com/tanersener/ffmpeg-kit/tree/main/flutter/flutter) to learn more about `FFmpegKit` for
+See [Flutter](https://github.com/arthenica/ffmpeg-kit/tree/main/flutter/flutter) to learn more about `FFmpegKit` for
 `Flutter`.
 
 ### 5. React Native
 
-See [React Native](https://github.com/tanersener/ffmpeg-kit/tree/main/react-native) to learn more about `FFmpegKit` for
+See [React Native](https://github.com/arthenica/ffmpeg-kit/tree/main/react-native) to learn more about `FFmpegKit` for
 `React Native`.
 
 ### 6. Build Scripts
@@ -42,7 +42,7 @@ See [React Native](https://github.com/tanersener/ffmpeg-kit/tree/main/react-nati
 Use `android.sh`, `ios.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each native platform.
 
 All scripts support additional options to enable optional libraries and disable platform architectures. See
-[Building](https://github.com/tanersener/ffmpeg-kit/wiki/Building) wiki page for the details.
+[Building](https://github.com/arthenica/ffmpeg-kit/wiki/Building) wiki page for the details.
 
 ### 7. FFmpegKit Library
 
@@ -57,7 +57,7 @@ identical in terms of features and capabilities.
 ### 8. Packages
 
 There are eight different `ffmpeg-kit` packages distributed on
-[Github](https://github.com/tanersener/ffmpeg-kit/releases),
+[Github](https://github.com/arthenica/ffmpeg-kit/releases),
 [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and
 [npm](https://www.npmjs.com).
 Below you can see which system libraries and external libraries are enabled in each one of them.
@@ -107,14 +107,14 @@ indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch.
 
 |    Platforms     |                                      FFmpegKit Version                                       | FFmpeg Version | Release Date |
 |:----------------:|:--------------------------------------------------------------------------------------------:| :------------: |:------------:|
-|     Flutter      |        [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.1)         | 4.5-dev-3393 | Jan 02, 2022 |
-|   React Native   |     [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.1)       | 4.5-dev-3393 | Jan 02, 2022 |
-|     Android      |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Jan 01, 2022 |
-|      Apple       |            [4.5.1](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Dec 30, 2021 |
-|     Flutter      |        [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/flutter.v4.5.0)         | 4.5-dev-2008 | Oct 05, 2021 |
-|   React Native   |      [4.5.0](https://github.com/tanersener/ffmpeg-kit/releases/tag/react.native.v4.5.0)      | 4.5-dev-2008 | Oct 01, 2021 |
-| Android<br>Apple |              [4.5](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.5)               | 4.5-dev-2008 | Sep 18, 2021 |
-| Android<br>Apple |              [4.4](https://github.com/tanersener/ffmpeg-kit/releases/tag/v4.4)               | 4.4-dev-3015 | Mar 03, 2021 |
+|     Flutter      |        [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.1)         | 4.5-dev-3393 | Jan 02, 2022 |
+|   React Native   |     [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.1)       | 4.5-dev-3393 | Jan 02, 2022 |
+|     Android      |            [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Jan 01, 2022 |
+|      Apple       |            [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)             | 4.5-dev-3393 | Dec 30, 2021 |
+|     Flutter      |        [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.0)         | 4.5-dev-2008 | Oct 05, 2021 |
+|   React Native   |      [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.0)      | 4.5-dev-2008 | Oct 01, 2021 |
+| Android<br>Apple |              [4.5](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5)               | 4.5-dev-2008 | Sep 18, 2021 |
+| Android<br>Apple |              [4.4](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.4)               | 4.4-dev-3015 | Mar 03, 2021 |
 
 ### 10. LTS Releases
 
@@ -148,12 +148,12 @@ This table shows the differences between two variants.
 
 ### 11. Documentation
 
-A more detailed documentation is available under [Wiki](https://github.com/tanersener/ffmpeg-kit/wiki).
+A more detailed documentation is available under [Wiki](https://github.com/arthenica/ffmpeg-kit/wiki).
 
 ### 12. Test Applications
 
 You can see how `FFmpegKit` is used inside an application by running test applications created under
-[FFmpegKit Test](https://github.com/tanersener/ffmpeg-kit-test) project.
+[FFmpegKit Test](https://github.com/arthenica/ffmpeg-kit-test) project.
 
 All applications are identical and supports command execution, video encoding, accessing https urls, encoding audio,
 burning subtitles, video stabilisation, pipe operations and concurrent command execution.
