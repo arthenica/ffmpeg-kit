@@ -39,9 +39,9 @@ ext {
     siteUrl = 'https://github.com/arthenica/ffmpeg-kit'
     gitUrl = 'https://github.com/arthenica/ffmpeg-kit.git'
 
-    developerId = 'tanersener'
-    developerName = 'Taner Sener'
-    developerEmail = 'tanersener@gmail.com'
+    developerId = 'arthenica'
+    developerName = 'ARTHENICA'
+    developerEmail = 'open-source@arthenica.com'
 
     if (Project.hasProperty('releaseGPL')) {
         licenseName = 'GNU General Public License version 3'
