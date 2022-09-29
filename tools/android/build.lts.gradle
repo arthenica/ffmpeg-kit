@@ -50,7 +50,7 @@ task javadoc(type: Javadoc) {
 }
 
 dependencies {
-    implementation 'com.arthenica:smart-exception-java:0.2.1'
+    api 'com.arthenica:smart-exception-java:0.2.1'
     testImplementation "androidx.test.ext:junit:1.1.3"
     testImplementation 'org.json:json:20220320'
 }
