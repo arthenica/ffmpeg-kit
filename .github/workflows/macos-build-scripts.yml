@@ -15,7 +15,16 @@ on:
       - 'macos.sh'
   pull_request:
     branches:
+      - development
       - main
+    paths:
+      - '.github/workflows/macos-build-scripts.yml'
+      - 'apple/**'
+      - '!apple/README.md'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'apple.sh'
+      - 'macos.sh'
 
 jobs:
   build-main-on-macos-bigsur:

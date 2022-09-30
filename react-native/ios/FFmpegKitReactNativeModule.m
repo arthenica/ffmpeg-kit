@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -695,6 +695,10 @@ RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve rejecter:
     resolve([Packages getExternalLibraries]);
 }
 
+RCT_EXPORT_METHOD(uninit:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    resolve(nil);
+}
+
 - (void)enableLogs {
     logsEnabled = true;
 }
@@ -724,16 +728,14 @@ RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve rejecter:
         dictionary[KEY_SESSION_START_TIME] = [NSNumber numberWithDouble:[[session getStartTime] timeIntervalSince1970]*1000];
         dictionary[KEY_SESSION_COMMAND] = [session getCommand];
 
-        if ([session isFFprobe]) {
-          if ([session isMediaInformation]) {
-            MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
-            dictionary[KEY_SESSION_MEDIA_INFORMATION] = [FFmpegKitReactNativeModule toMediaInformationDictionary:[mediaInformationSession getMediaInformation]];
-            dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_MEDIA_INFORMATION];
-          } else {
-            dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFPROBE];
-          }
-        } else {
+        if ([session isFFmpeg]) {
           dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFMPEG];
+        } else if ([session isFFprobe]) {
+          dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_FFPROBE];
+        } else if ([session isMediaInformation]) {
+          MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
+          dictionary[KEY_SESSION_MEDIA_INFORMATION] = [FFmpegKitReactNativeModule toMediaInformationDictionary:[mediaInformationSession getMediaInformation]];
+          dictionary[KEY_SESSION_TYPE] = [NSNumber numberWithInt:SESSION_TYPE_MEDIA_INFORMATION];
         }
 
         return dictionary;

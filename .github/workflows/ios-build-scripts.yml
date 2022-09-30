@@ -15,10 +15,12 @@ on:
       - 'ios.sh'
   pull_request:
     branches:
+      - development
       - main
     paths:
       - '.github/workflows/ios-build-scripts.yml'
       - 'apple/**'
+      - '!apple/README.md'
       - 'scripts/**'
       - 'tools/**'
       - 'apple.sh'
