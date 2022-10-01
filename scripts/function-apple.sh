@@ -234,9 +234,9 @@ create_ffmpeg_universal_library() {
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/tools/license/LICENSE.GPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/LICENSE "${FFMPEG_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
   for library in {0..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
@@ -321,9 +321,9 @@ create_ffmpeg_kit_universal_library() {
 
   # COPY UNIVERSAL LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/tools/license/LICENSE.GPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/LICENSE "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/LICENSE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   cp "${BASEDIR}"/tools/source/SOURCE "${FFMPEG_KIT_UNIVERSAL_LIBRARY_DIRECTORY}"/SOURCE 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
@@ -396,9 +396,9 @@ create_ffmpeg_framework() {
 
     # COPY FRAMEWORK LICENSES
     if [[ "${GPL_ENABLED}" == "yes" ]]; then
-      cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      cp "${BASEDIR}"/tools/license/LICENSE.GPLv3 "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
     else
-      cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+      cp "${BASEDIR}"/LICENSE "${FFMPEG_LIB_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
     fi
 
     # COPY EXTERNAL LIBRARY LICENSES
@@ -505,9 +505,9 @@ create_ffmpeg_kit_framework() {
 
   # COPY FRAMEWORK LICENSES
   if [[ "${GPL_ENABLED}" == "yes" ]]; then
-    cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/tools/license/LICENSE.GPLv3 "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/LICENSE "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/LICENSE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   cp "${BASEDIR}/tools/source/SOURCE" "${FFMPEG_KIT_FRAMEWORK_RESOURCE_PATH}/SOURCE" 1>>"${BASEDIR}"/build.log 2>&1 || exit 1

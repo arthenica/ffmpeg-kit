@@ -331,9 +331,9 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   # COPY LIBRARY LICENSES
   if [[ ${GPL_ENABLED} == "yes" ]]; then
-    cp "${BASEDIR}"/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/tools/license/LICENSE.GPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   else
-    cp "${BASEDIR}"/LICENSE.LGPLv3 "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
+    cp "${BASEDIR}"/LICENSE "${LICENSE_BASEDIR}"/license.txt 1>>"${BASEDIR}"/build.log 2>&1 || exit 1
   fi
 
   echo -e "DEBUG: Copied the ffmpeg-kit license successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
