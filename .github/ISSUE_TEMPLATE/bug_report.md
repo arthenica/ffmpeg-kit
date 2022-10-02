@@ -27,14 +27,14 @@ Post logs here or paste them to [Ghostbin](https://ghostbin.co) and insert the l
 
 **Environment**
 
-- Platform: `Android`/`Flutter`/`iOS`/`macOS`/`ReactNative`/`tvOS`
+- Platform: `Android`/`Flutter`/`iOS`/`Linux`/`macOS`/`ReactNative`/`tvOS`
 - Architecture: `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86`, `x86_64`, `armv7`, `armv7s`, `arm64`, `arm64-mac-catalyst`, `arm64-simulator`, `arm64e`, `i386`, `x86-64`, `x86-64-mac-catalyst`
-- Version: `v4.5`/`v4.5.LTS`
+- Version: `v5.1`/`v5.1.LTS`
 - Source branch: `main`, `development`
-- Xcode version: `12.4.1`
-- Cocoapods version: `1.10.1`
+- Xcode version: `13.4.1`
+- Cocoapods version: `1.10.3`
 - Android Studio version: `4.0`
-- Android NDK version: `r22b`
+- Android NDK version: `r25b`
 - flutter doctor: ` `
 - react-native info: ` `
 

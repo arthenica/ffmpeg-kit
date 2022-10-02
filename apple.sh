@@ -141,7 +141,6 @@ echo -e "INFO: Using iOS SDK: ${DETECTED_IOS_SDK_VERSION}, tvOS SDK: ${DETECTED_
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS
-GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_TYPE_ID=""
 BUILD_FULL=""

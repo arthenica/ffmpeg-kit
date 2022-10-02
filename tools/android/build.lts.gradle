@@ -1,0 +1,60 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.arthenica.ffmpegkit'
+    compileSdk 31
+    ndkVersion "22.1.7171670"
+
+    defaultConfig {
+        minSdk 16
+        targetSdk 31
+        versionCode 160510
+        versionName "5.1.LTS"
+        project.archivesBaseName = "ffmpeg-kit"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["../libs"]
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            systemProperty 'enable.ffmpeg.kit.test.mode', 'true'
+        }
+    }
+}
+
+task javadoc(type: Javadoc) {
+    title = 'FFmpegKit'
+    destinationDir = file("${projectDir}/../../docs/android/javadoc")
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    source = android.sourceSets.main.java.srcDirs
+    configurations.implementation.setCanBeResolved(true)
+    classpath += configurations.implementation
+}
+
+dependencies {
+    api 'com.arthenica:smart-exception-java:0.2.1'
+    testImplementation "androidx.test.ext:junit:1.1.3"
+    testImplementation 'org.json:json:20220320'
+}
+
+if (System.properties.containsKey('releaseFFmpegKit')) {
+    apply from: "${rootProject.projectDir}/../tools/android/release.template.gradle"
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -29,7 +29,7 @@ import java.util.List;
 public class MediaInformation {
 
     /* COMMON KEYS */
-    public static final String KEY_MEDIA_PROPERTIES = "format";
+    public static final String KEY_FORMAT_PROPERTIES = "format";
     public static final String KEY_FILENAME = "filename";
     public static final String KEY_FORMAT = "format_name";
     public static final String KEY_FORMAT_LONG = "format_long_name";
@@ -66,7 +66,7 @@ public class MediaInformation {
      * @return media file name
      */
     public String getFilename() {
-        return getStringProperty(KEY_FILENAME);
+        return getStringFormatProperty(KEY_FILENAME);
     }
 
     /**
@@ -75,7 +75,7 @@ public class MediaInformation {
      * @return media format
      */
     public String getFormat() {
-        return getStringProperty(KEY_FORMAT);
+        return getStringFormatProperty(KEY_FORMAT);
     }
 
     /**
@@ -84,16 +84,16 @@ public class MediaInformation {
      * @return media long format
      */
     public String getLongFormat() {
-        return getStringProperty(KEY_FORMAT_LONG);
+        return getStringFormatProperty(KEY_FORMAT_LONG);
     }
 
     /**
      * Returns duration.
      *
-     * @return media duration in milliseconds
+     * @return media duration in "seconds.microseconds" format
      */
     public String getDuration() {
-        return getStringProperty(KEY_DURATION);
+        return getStringFormatProperty(KEY_DURATION);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MediaInformation {
      * @return media start time in milliseconds
      */
     public String getStartTime() {
-        return getStringProperty(KEY_START_TIME);
+        return getStringFormatProperty(KEY_START_TIME);
     }
 
     /**
@@ -111,7 +111,7 @@ public class MediaInformation {
      * @return media size in bytes
      */
     public String getSize() {
-        return getStringProperty(KEY_SIZE);
+        return getStringFormatProperty(KEY_SIZE);
     }
 
     /**
@@ -120,16 +120,16 @@ public class MediaInformation {
      * @return media bitrate in kb/s
      */
     public String getBitrate() {
-        return getStringProperty(KEY_BIT_RATE);
+        return getStringFormatProperty(KEY_BIT_RATE);
     }
 
     /**
      * Returns all tags.
      *
-     * @return tags dictionary
+     * @return tags as a JSONObject
      */
     public JSONObject getTags() {
-        return getProperties(KEY_TAGS);
+        return getFormatProperty(KEY_TAGS);
     }
 
     /**
@@ -151,65 +151,118 @@ public class MediaInformation {
     }
 
     /**
-     * Returns the media property associated with the key.
+     * Returns the property associated with the key.
      *
      * @param key property key
-     * @return media property as string or null if the key is not found
+     * @return property as string or null if the key is not found
      */
     public String getStringProperty(final String key) {
-        JSONObject mediaProperties = getMediaProperties();
-        if (mediaProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (mediaProperties.has(key)) {
-            return mediaProperties.optString(key);
+        if (allProperties.has(key)) {
+            return allProperties.optString(key);
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the media property associated with the key.
+     * Returns the property associated with the key.
      *
      * @param key property key
-     * @return media property as Long or null if the key is not found
+     * @return property as Long or null if the key is not found
      */
     public Long getNumberProperty(String key) {
-        JSONObject mediaProperties = getMediaProperties();
-        if (mediaProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (mediaProperties.has(key)) {
-            return mediaProperties.optLong(key);
+        if (allProperties.has(key)) {
+            return allProperties.optLong(key);
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the media properties associated with the key.
+     * Returns the property associated with the key.
      *
-     * @param key properties key
-     * @return media properties as a JSONObject or null if the key is not found
+     * @param key property key
+     * @return property as a JSONObject or null if the key is not found
      */
-    public JSONObject getProperties(String key) {
-        JSONObject mediaProperties = getMediaProperties();
-        if (mediaProperties == null) {
+    public JSONObject getProperty(String key) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        return mediaProperties.optJSONObject(key);
+        return allProperties.optJSONObject(key);
     }
 
     /**
-     * Returns all media properties.
+     * Returns the format property associated with the key.
      *
-     * @return all media properties as a JSONObject or null if no media properties are defined
+     * @param key property key
+     * @return format property as string or null if the key is not found
      */
-    public JSONObject getMediaProperties() {
-        return jsonObject.optJSONObject(KEY_MEDIA_PROPERTIES);
+    public String getStringFormatProperty(final String key) {
+        JSONObject formatProperties = getFormatProperties();
+        if (formatProperties == null) {
+            return null;
+        }
+
+        if (formatProperties.has(key)) {
+            return formatProperties.optString(key);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the format property associated with the key.
+     *
+     * @param key property key
+     * @return format property as Long or null if the key is not found
+     */
+    public Long getNumberFormatProperty(String key) {
+        JSONObject formatProperties = getFormatProperties();
+        if (formatProperties == null) {
+            return null;
+        }
+
+        if (formatProperties.has(key)) {
+            return formatProperties.optLong(key);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the format property associated with the key.
+     *
+     * @param key property key
+     * @return format property as a JSONObject or null if the key is not found
+     */
+    public JSONObject getFormatProperty(String key) {
+        JSONObject formatProperties = getFormatProperties();
+        if (formatProperties == null) {
+            return null;
+        }
+
+        return formatProperties.optJSONObject(key);
+    }
+
+    /**
+     * Returns all format properties defined.
+     *
+     * @return all format properties as a JSONObject or null if no format properties are defined
+     */
+    public JSONObject getFormatProperties() {
+        return jsonObject.optJSONObject(KEY_FORMAT_PROPERTIES);
     }
 
     /**

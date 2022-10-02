@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Taner Sener
+ * Copyright (c) 2020-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -33,121 +33,121 @@
 }
 
 + (FFprobeSession*)executeWithArguments:(NSArray*)arguments {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments];
+    FFprobeSession* session = [FFprobeSession create:arguments];
     [FFmpegKitConfig ffprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:completeCallback];
+    FFprobeSession* session = [FFprobeSession create:arguments withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
+    FFprobeSession* session = [FFprobeSession create:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:completeCallback];
+    FFprobeSession* session = [FFprobeSession create:arguments withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
 + (FFprobeSession*)executeWithArgumentsAsync:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
+    FFprobeSession* session = [FFprobeSession create:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
 + (FFprobeSession*)execute:(NSString*)command {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKitConfig parseArguments:command]];
+    FFprobeSession* session = [FFprobeSession create:[FFmpegKitConfig parseArguments:command]];
     [FFmpegKitConfig ffprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeAsync:(NSString*)command withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback];
+    FFprobeSession* session = [FFprobeSession create:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeAsync:(NSString*)command withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
+    FFprobeSession* session = [FFprobeSession create:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session];
     return session;
 }
 
 + (FFprobeSession*)executeAsync:(NSString*)command withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback];
+    FFprobeSession* session = [FFprobeSession create:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
 + (FFprobeSession*)executeAsync:(NSString*)command withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue {
-    FFprobeSession* session = [[FFprobeSession alloc] init:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
+    FFprobeSession* session = [FFprobeSession create:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncFFprobeExecute:session onDispatchQueue:queue];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformation:(NSString*)path {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
+    MediaInformationSession* session = [MediaInformationSession create:arguments];
     [FFmpegKitConfig getMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformation:(NSString*)path withTimeout:(int)waitTimeout {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments];
+    MediaInformationSession* session = [MediaInformationSession create:arguments];
     [FFmpegKitConfig getMediaInformationExecute:session withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:completeCallback];
+    MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withTimeout:(int)waitTimeout {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
+    MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback onDispatchQueue:(dispatch_queue_t)queue {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:completeCallback];
+    MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationAsync:(NSString*)path withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
     NSArray* arguments = [FFprobeKit defaultGetMediaInformationCommandArguments:path];
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:completeCallback];
+    MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:completeCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationFromCommand:(NSString*)command {
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:[FFmpegKitConfig parseArguments:command]];
+    MediaInformationSession* session = [MediaInformationSession create:[FFmpegKitConfig parseArguments:command]];
     [FFmpegKitConfig getMediaInformationExecute:session withTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationFromCommandAsync:(NSString*)command withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
+    MediaInformationSession* session = [MediaInformationSession create:[FFmpegKitConfig parseArguments:command] withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
 }
 
 + (MediaInformationSession*)getMediaInformationFromCommandArgumentsAsync:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout {
-    MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
+    MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
     [FFmpegKitConfig asyncGetMediaInformationExecute:session onDispatchQueue:queue withTimeout:waitTimeout];
     return session;
 }

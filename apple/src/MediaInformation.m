@@ -19,7 +19,7 @@
 
 #import "MediaInformation.h"
 
-NSString* const MediaKeyMediaProperties =  @"format";
+NSString* const MediaKeyFormatProperties =  @"format";
 NSString* const MediaKeyFilename = @"filename";
 NSString* const MediaKeyFormat = @"format_name";
 NSString* const MediaKeyFormatLong = @"format_long_name";
@@ -60,35 +60,35 @@ NSString* const MediaKeyTags = @"tags";
 }
 
 - (NSString*)getFilename {
-    return [self getStringProperty:MediaKeyFilename];
+    return [self getStringFormatProperty:MediaKeyFilename];
 }
 
 - (NSString*)getFormat {
-    return [self getStringProperty:MediaKeyFormat];
+    return [self getStringFormatProperty:MediaKeyFormat];
 }
 
 - (NSString*)getLongFormat {
-    return [self getStringProperty:MediaKeyFormatLong];
+    return [self getStringFormatProperty:MediaKeyFormatLong];
 }
 
 - (NSString*)getStartTime {
-    return [self getStringProperty:MediaKeyStartTime];
+    return [self getStringFormatProperty:MediaKeyStartTime];
 }
 
 - (NSString*)getDuration {
-    return [self getStringProperty:MediaKeyDuration];
+    return [self getStringFormatProperty:MediaKeyDuration];
 }
 
 - (NSString*)getSize {
-    return [self getStringProperty:MediaKeySize];
+    return [self getStringFormatProperty:MediaKeySize];
 }
 
 - (NSString*)getBitrate {
-    return [self getStringProperty:MediaKeyBitRate];
+    return [self getStringFormatProperty:MediaKeyBitRate];
 }
 
 - (NSDictionary*)getTags {
-    return [self getProperties:MediaKeyTags];
+    return [self getFormatProperty:MediaKeyTags];
 }
 
 - (NSArray*)getStreams {
@@ -100,34 +100,61 @@ NSString* const MediaKeyTags = @"tags";
 }
 
 - (NSString*)getStringProperty:(NSString*)key {
-    NSDictionary* mediaProperties = [self getMediaProperties];
-    if (mediaProperties == nil) {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
         return nil;
     }
 
-    return mediaProperties[key];
+    return allProperties[key];
 }
 
 - (NSNumber*)getNumberProperty:(NSString*)key {
-    NSDictionary* mediaProperties = [self getMediaProperties];
-    if (mediaProperties == nil) {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
         return nil;
     }
 
-    return mediaProperties[key];
+    return allProperties[key];
 }
 
-- (NSDictionary*)getProperties:(NSString*)key {
-    NSDictionary* mediaProperties = [self getMediaProperties];
-    if (mediaProperties == nil) {
+- (id)getProperty:(NSString*)key {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
         return nil;
     }
 
-    return mediaProperties[key];
+    return allProperties[key];
 }
 
-- (NSDictionary*)getMediaProperties {
-    return dictionary[MediaKeyMediaProperties];
+- (NSString*)getStringFormatProperty:(NSString*)key {
+    NSDictionary* formatProperties = [self getFormatProperties];
+    if (formatProperties == nil) {
+        return nil;
+    }
+
+    return formatProperties[key];
+}
+
+- (NSNumber*)getNumberFormatProperty:(NSString*)key {
+    NSDictionary* formatProperties = [self getFormatProperties];
+    if (formatProperties == nil) {
+        return nil;
+    }
+
+    return formatProperties[key];
+}
+
+- (id)getFormatProperty:(NSString*)key {
+    NSDictionary* formatProperties = [self getFormatProperties];
+    if (formatProperties == nil) {
+        return nil;
+    }
+
+    return formatProperties[key];
+}
+
+- (NSDictionary*)getFormatProperties {
+    return dictionary[MediaKeyFormatProperties];
 }
 
 - (NSDictionary*)getAllProperties {

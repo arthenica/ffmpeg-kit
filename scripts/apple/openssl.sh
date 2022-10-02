@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [[ ${ARCH} == "i386" ]] || [[ ${ARCH} == "armv7"* ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+if [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
 
-  # openssl does not support 32-bit apple architectures and tvos yet
-  echo -e "ERROR: openssl is not supported on $ARCH architecture for $FFMPEG_KIT_BUILD_TYPE platform.\n" 1>>"${BASEDIR}"/build.log 2>&1
+  # openssl does not support tvos yet
+  echo -e "ERROR: openssl is not supported on $FFMPEG_KIT_BUILD_TYPE platform.\n" 1>>"${BASEDIR}"/build.log 2>&1
   return 200
 fi
 

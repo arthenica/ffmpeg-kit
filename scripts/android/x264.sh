@@ -2,6 +2,7 @@
 
 # SET BUILD OPTIONS
 ASM_OPTIONS=""
+DEBUG_OPTIONS=""
 case ${ARCH} in
 x86)
 
@@ -22,6 +23,9 @@ x86-64)
   export CFLAGS="${CFLAGS} -mno-stackrealign"
   ;;
 esac
+if [[ -n ${FFMPEG_KIT_DEBUG} ]]; then
+  DEBUG_OPTIONS="--enable-debug"
+fi
 
 # ALWAYS CLEAN THE PREVIOUS BUILD
 make distclean 2>/dev/null 1>/dev/null
@@ -38,6 +42,7 @@ fi
   --enable-static \
   --disable-cli \
   ${ASM_OPTIONS} \
+  ${DEBUG_OPTIONS} \
   --host="${HOST}" || return 1
 
 make -j$(get_cpu_count) || return 1

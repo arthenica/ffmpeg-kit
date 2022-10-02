@@ -37,7 +37,11 @@ LOCAL_PATH := $(MY_LOCAL_PATH)/../ffmpeg-kit-android-lib/src/main/cpp
 # DEFINE ARCH FLAGS
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     MY_ARCH_FLAGS := ARM_V7A
-    MY_ARM_NEON := false
+    ifeq ("$(shell test -e $(MY_LOCAL_PATH)/../build/.lts && echo lts)","lts")
+        MY_ARM_NEON := false
+    else
+        MY_ARM_NEON := true
+    endif
 endif
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
     MY_ARCH_FLAGS := ARM64_V8A
@@ -45,9 +49,11 @@ ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
 endif
 ifeq ($(TARGET_ARCH_ABI), x86)
     MY_ARCH_FLAGS := X86
+    MY_ARM_NEON := true
 endif
 ifeq ($(TARGET_ARCH_ABI), x86_64)
     MY_ARCH_FLAGS := X86_64
+    MY_ARM_NEON := true
 endif
 
 include $(CLEAR_VARS)
@@ -63,7 +69,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module, cpu-features)
 
-MY_SRC_FILES := ffmpegkit.c ffprobekit.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
+MY_SRC_FILES := ffmpegkit.c ffprobekit.c ffmpegkit_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_mux.c fftools_ffmpeg_opt.c fftools_opt_common.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
 
 ifeq ($(TARGET_PLATFORM),android-16)
     MY_SRC_FILES += android_lts_support.c

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -66,11 +66,11 @@ extern NSString* const ChapterKeyTags;
 - (NSNumber*)getNumberProperty:(NSString*)key;
 
 /**
- * Returns the chapter properties associated with the key.
+ * Returns the chapter property associated with the key.
  *
- * @return chapter properties in a dictionary or nil if the key is not found
+ * @return chapter property as id or nil if the key is not found
 */
-- (NSDictionary*)getProperties:(NSString*)key;
+- (id)getProperty:(NSString*)key;
 
 /**
  * Returns all chapter properties defined.

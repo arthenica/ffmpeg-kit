@@ -1,0 +1,97 @@
+name: linux build scripts
+
+on:
+  push:
+    branches:
+      - development
+      - main
+    paths:
+      - '.github/workflows/linux-build-scripts.yml'
+      - 'linux/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'linux.sh'
+  pull_request:
+    branches:
+      - development
+      - main
+    paths:
+      - '.github/workflows/linux-build-scripts.yml'
+      - 'linux/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'linux.sh'
+
+jobs:
+  build-main-on-ubuntu-2204:
+    name: linux main on ubuntu-22.04
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
+      - name: run the build script
+        run: ./linux.sh -d
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-lts-on-ubuntu-2204:
+    name: linux lts on ubuntu 22.04
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
+      - name: run the build script
+        run: ./linux.sh -d --lts
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-main-on-ubuntu-2004:
+    name: linux main on ubuntu-20.04
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
+      - name: run the build script
+        run: ./linux.sh -d
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-lts-on-ubuntu-2004:
+    name: linux lts on ubuntu 20.04
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: prerequisites
+        run: sudo apt-get install clang llvm lld libclang-11-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
+      - name: run the build script
+        run: ./linux.sh -d --lts
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'

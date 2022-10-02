@@ -1,6 +1,6 @@
-# ffmpeg-kit 4.5.1 configure.ac
+# ffmpeg-kit 5.1 configure.ac
 
-AC_INIT([ffmpeg-kit], [4.5.1], [https://github.com/tanersener/ffmpeg-kit/issues/new])
+AC_INIT([ffmpeg-kit], [5.1], [https://github.com/arthenica/ffmpeg-kit/issues/new])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FFmpegKit.m])
 
@@ -34,15 +34,6 @@ AC_CHECK_HEADERS([libavformat/avformat.h libavcodec/avcodec.h libavfilter/avfilt
   AC_MSG_ERROR([unable to find ffmpeg headers])
 ])
 AC_CHECK_HEADERS([fcntl.h limits.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h])
-
-AC_ARG_ENABLE([videotoolbox],
-[  --enable-videotoolbox   enable videotoolbox support],
-[case "${enableval}" in
-  yes) videotoolbox=true ;;
-  no)  videotoolbox=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-videotoolbox]) ;;
-esac],[videotoolbox=false])
-AM_CONDITIONAL([FFMPEGKIT_VIDEOTOOLBOX], [test x$videotoolbox = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
