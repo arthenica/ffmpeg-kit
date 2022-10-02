@@ -299,23 +299,21 @@ RCT_EXPORT_METHOD(mediaInformationSession:(NSArray*)arguments resolver:(RCTPromi
 // MediaInformationJsonParser
 
 RCT_EXPORT_METHOD(mediaInformationJsonParserFrom:(NSString*)ffprobeJsonOutput resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    NSError *error;
-    MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-    if (error == nil) {
+    @try {
+        MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
         resolve([FFmpegKitReactNativeModule toMediaInformationDictionary:mediaInformation]);
-    } else {
-        NSLog(@"MediaInformation parsing failed: %@.\n", error);
+    } @catch (NSException *exception) {
+        NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
         resolve(nil);
     }
 }
 
 RCT_EXPORT_METHOD(mediaInformationJsonParserFromWithError:(NSString*)ffprobeJsonOutput resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    NSError *error;
-    MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-    if (error == nil) {
+    @try {
+        MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
         resolve([FFmpegKitReactNativeModule toMediaInformationDictionary:mediaInformation]);
-    } else {
-        NSLog(@"MediaInformation parsing failed: %@.\n", error);
+    } @catch (NSException *exception) {
+        NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
         reject(@"PARSE_FAILED", @"Parsing MediaInformation failed with JSON error.", nil);
     }
 }

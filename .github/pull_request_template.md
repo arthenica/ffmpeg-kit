@@ -8,7 +8,7 @@ Please also include the context and motivation about the changes introduced.
 - Documentation
 
 ## Checks
-- [ ] Changes support all platforms (`Android`, `iOS`, `Linux`, macOS`, `tvOS`)
+- [ ] Changes support all platforms (`Android`, `iOS`, `Linux`, `macOS`, `tvOS`)
 - [ ] Breaks existing functionality
 - [ ] Implementation is completed, not half-done 
 - [ ] Is there another PR already created for this feature/bug fix

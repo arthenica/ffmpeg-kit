@@ -1,11 +1,11 @@
 buildscript {
   repositories {
     google()
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.2'
+    classpath 'com.android.tools.build:gradle:7.3.0'
   }
 }
 
@@ -26,13 +26,13 @@ def safeExtGet(String prop, String fallback) {
 }
 
 android {
-  compileSdkVersion 30
+  compileSdkVersion 31
 
   defaultConfig {
     minSdkVersion safeExtGet('ffmpegKitPackage', 'https').contains("-lts") ? 16 : 24
-    targetSdkVersion 30
-    versionCode 452
-    versionName "4.5.2"
+    targetSdkVersion 31
+    versionCode 510
+    versionName "5.1.0"
   }
 
   buildTypes {
@@ -44,14 +44,13 @@ android {
     disable 'GradleCompatible'
   }
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
   }
 }
 
 repositories {
   mavenCentral()
-  jcenter()
   google()
 
   def found = false

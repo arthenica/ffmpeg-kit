@@ -1611,7 +1611,7 @@ class FFmpegKitFactory {
   }
 
   static getVersion() {
-    return "4.5.2";
+    return "5.1.0";
   }
 
   static getLogRedirectionStrategy(sessionId) {
@@ -3091,7 +3091,7 @@ export class StreamInformation {
    * @return tags object
    */
   getTags() {
-    return this.getProperties(StreamInformation.KEY_TAGS);
+    return this.getProperty(StreamInformation.KEY_TAGS);
   }
 
   /**
@@ -3123,12 +3123,12 @@ export class StreamInformation {
   }
 
   /**
-   * Returns the stream properties associated with the key.
+   * Returns the stream property associated with the key.
    *
-   * @param key properties key
-   * @return stream properties as an object or undefined if the key is not found
+   * @param key property key
+   * @return stream property as an object or undefined if the key is not found
    */
-  getProperties(key) {
+  getProperty(key) {
     if (this.#allProperties !== undefined) {
       return this.#allProperties[key];
     } else {
@@ -3225,7 +3225,7 @@ export class Chapter {
    * @return tags object
    */
   getTags() {
-    return this.getProperties(StreamInformation.KEY_TAGS);
+    return this.getProperty(StreamInformation.KEY_TAGS);
   }
 
   /**
@@ -3257,12 +3257,12 @@ export class Chapter {
   }
 
   /**
-   * Returns the chapter properties associated with the key.
+   * Returns the chapter property associated with the key.
    *
-   * @param key properties key
-   * @return chapter properties as an object or undefined if the key is not found
+   * @param key property key
+   * @return chapter property as an object or undefined if the key is not found
    */
-  getProperties(key) {
+  getProperty(key) {
     if (this.#allProperties !== undefined) {
       return this.#allProperties[key];
     } else {
