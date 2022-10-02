@@ -13,17 +13,17 @@ arm-v7a)
   # NEON disabled explicitly because
   # --enable-runtime-cpu-detect enables NEON for armv7 cpu
   ASM_OPTIONS="--disable-neon"
-  unset ASFLAGS
+  export ASFLAGS="-c"
   ;;
 arm-v7a-neon)
   # NEON IS ENABLED BY --enable-runtime-cpu-detect
   TARGET_CPU="armv7"
-  unset ASFLAGS
+  export ASFLAGS="-c"
   ;;
 arm64-v8a)
   # NEON IS ENABLED BY --enable-runtime-cpu-detect
   TARGET_CPU="arm64"
-  unset ASFLAGS
+  export ASFLAGS="-c"
   ;;
 *)
   # INTEL CPU EXTENSIONS ENABLED BY --enable-runtime-cpu-detect
@@ -53,6 +53,7 @@ overwrite_file "${BASEDIR}"/tools/patch/make/libvpx/configure.sh "${BASEDIR}"/sr
   --enable-optimizations \
   --enable-better-hw-compatibility \
   --enable-runtime-cpu-detect \
+  --enable-vp9-highbitdepth \
   ${ASM_OPTIONS} \
   --enable-vp8 \
   --enable-vp9 \

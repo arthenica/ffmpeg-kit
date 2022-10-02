@@ -8,9 +8,10 @@ create_mason_cross_file "$CROSS_FILE" || return 1
 # ALWAYS CLEAN THE PREVIOUS BUILD
 rm -rf "${BUILD_DIR}" || return 1
 
+# ENABLING LTO CAUSES SYMBOL NOT FOUND ERRORS ON NDKS >= 23b
 meson "${BUILD_DIR}" \
   --cross-file="$CROSS_FILE" \
-  -Db_lto=true \
+  -Db_lto=false \
   -Db_ndebug=false \
   -Denable_asm=false \
   -Denable_tools=false \

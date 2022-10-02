@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -189,11 +189,11 @@ extern NSString* const StreamKeyTags;
 - (NSNumber*)getNumberProperty:(NSString*)key;
 
 /**
- * Returns the stream properties associated with the key.
+ * Returns the stream property associated with the key.
  *
- * @return stream properties in a dictionary or nil if the key is not found
+ * @return stream property as id or nil if the key is not found
 */
-- (NSDictionary*)getProperties:(NSString*)key;
+- (id)getProperty:(NSString*)key;
 
 /**
  * Returns all stream properties defined.

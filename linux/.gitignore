@@ -1,0 +1,17 @@
+/autom4te.cache/
+/Makefile
+/config.status
+/configure.tmp
+/configure~
+/.deps/
+/.libs/
+*.trs
+/unittests
+/test-driver
+/config.log
+/*.tmp
+/configure
+/libtool
+/ltmain.sh
+/m4/l*
+/Makefile.in

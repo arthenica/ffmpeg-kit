@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -25,21 +25,22 @@ NSString* const MediaInformationJsonParserKeyChapters = @"chapters";
 @implementation MediaInformationJsonParser
 
 + (MediaInformation*)from:(NSString*)ffprobeJsonOutput {
-    NSError *error;
-
-    MediaInformation* mediaInformation = [self from: ffprobeJsonOutput with: error];
-
-    if (error != nil) {
-        NSLog(@"MediaInformation parsing failed: %@.\n", error);
+    @try {
+        return [self fromWithError:ffprobeJsonOutput];
+    } @catch (NSException *exception) {
+        NSLog(@"MediaInformation parsing failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
+        return nil;
     }
-
-    return mediaInformation;
 }
 
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error {
++ (MediaInformation*)fromWithError:(NSString*)ffprobeJsonOutput {
+    NSError* error = nil;
     NSData *jsonData = [ffprobeJsonOutput dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
-    if (error != nil || jsonDictionary == nil) {
+    if (error != nil) {
+        @throw [NSException exceptionWithName:@"ParsingException" reason:[NSString stringWithFormat:@"%ld",(long)[error code]] userInfo:[error userInfo]];
+    }
+    if (jsonDictionary == nil) {
         return nil;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -30,26 +30,16 @@
     // EMPTY INITIALIZE
 }
 
-- (instancetype)init:(NSArray*)arguments {
-
-    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
-
-    if (self) {
-        _completeCallback = nil;
-    }
-
-    return self;
++ (instancetype)create:(NSArray*)arguments {
+    return [[self alloc] init:arguments withCompleteCallback:nil withLogCallback:nil];
 }
 
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback {
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback {
+    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:nil];
+}
 
-    self = [super init:arguments withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
-
-    if (self) {
-        _completeCallback = completeCallback;
-    }
-
-    return self;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
+    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
 }
 
 - (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {

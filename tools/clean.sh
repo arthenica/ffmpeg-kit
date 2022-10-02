@@ -10,3 +10,9 @@ rm -rf ../android/obj
 rm -rf ../android/libs
 
 rm -rf ../src/*
+
+rm -rf ../apple/src/.deps
+rm -rf ../apple/src/.libs
+
+rm -rf ../linux/src/.deps
+rm -rf ../linux/src/.libs

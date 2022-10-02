@@ -39,9 +39,10 @@ public class MediaInformationSession extends AbstractSession implements Session 
      * Creates a new media information session.
      *
      * @param arguments command arguments
+     * @return created session
      */
-    public MediaInformationSession(final String[] arguments) {
-        this(arguments, null);
+    public static MediaInformationSession create(final String[] arguments) {
+        return new MediaInformationSession(arguments, null, null);
     }
 
     /**
@@ -49,9 +50,22 @@ public class MediaInformationSession extends AbstractSession implements Session 
      *
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
+     * @return created session
      */
-    public MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback) {
-        this(arguments, completeCallback, null);
+    public static MediaInformationSession create(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback) {
+        return new MediaInformationSession(arguments, completeCallback, null);
+    }
+
+    /**
+     * Creates a new media information session.
+     *
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
+     * @param logCallback      session specific log callback
+     * @return created session
+     */
+    public static MediaInformationSession create(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
+        return new MediaInformationSession(arguments, completeCallback, logCallback);
     }
 
     /**
@@ -61,7 +75,7 @@ public class MediaInformationSession extends AbstractSession implements Session 
      * @param completeCallback session specific complete callback
      * @param logCallback      session specific log callback
      */
-    public MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
+    private MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
         super(arguments, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
 
         this.completeCallback = completeCallback;

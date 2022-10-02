@@ -73,7 +73,6 @@ static NSMutableArray *supportedExternalLibraries;
     Boolean gnutls = [enabledLibraryArray containsObject:@"gnutls"];
     Boolean xvid = [enabledLibraryArray containsObject:@"xvid"];
 
-    Boolean min = false;
     Boolean minGpl = false;
     Boolean https = false;
     Boolean httpsGpl = false;
@@ -101,8 +100,6 @@ static NSMutableArray *supportedExternalLibraries;
     } else {
         if (gnutls) {
             https = true;
-        } else {
-            min = true;
         }
     }
 

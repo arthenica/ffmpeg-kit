@@ -1,8 +1,8 @@
 name: ffmpeg_kit_flutter
 description: FFmpeg Kit for Flutter. Supports Android, iOS and macOS platforms.
-repository: https://github.com/tanersener/ffmpeg-kit
-issue_tracker: https://github.com/tanersener/ffmpeg-kit/issues
-homepage: https://github.com/tanersener/ffmpeg-kit
+repository: https://github.com/arthenica/ffmpeg-kit
+issue_tracker: https://github.com/arthenica/ffmpeg-kit/issues
+homepage: https://github.com/arthenica/ffmpeg-kit
 version: 4.5.1
 
 environment:

@@ -70,7 +70,7 @@ NSString* const ChapterKeyTags = @"tags";
 }
 
 - (NSDictionary*)getTags {
-    return [self getProperties:ChapterKeyTags];
+    return [self getProperty:ChapterKeyTags];
 }
 
 - (NSString*)getStringProperty:(NSString*)key {
@@ -83,15 +83,15 @@ NSString* const ChapterKeyTags = @"tags";
 }
 
 - (NSNumber*)getNumberProperty:(NSString*)key {
-    NSDictionary* mediaProperties = [self getAllProperties];
-    if (mediaProperties == nil) {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
         return nil;
     }
 
-    return mediaProperties[key];
+    return allProperties[key];
 }
 
-- (NSDictionary*)getProperties:(NSString*)key {
+- (id)getProperty:(NSString*)key {
     NSDictionary* allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;

@@ -34,4 +34,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libxml2_package_config "2.9.12" || return 1
+create_libxml2_package_config "2.10.1" || return 1

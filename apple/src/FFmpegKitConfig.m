@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -36,7 +36,7 @@
 #import "SessionState.h"
 
 /** Global library version */
-NSString* const FFmpegKitVersion = @"4.5.1";
+NSString* const FFmpegKitVersion = @"5.1";
 
 /**
  * Prefix of named pipes created by ffmpeg-kit.
@@ -88,7 +88,7 @@ volatile int handleSIGXCPU = 1;
 volatile int handleSIGPIPE = 1;
 
 /** Holds the id of the current execution */
-__thread volatile long globalSessionId = 0;
+__thread long globalSessionId = 0;
 
 /** Holds the default log level */
 int configuredLogLevel = LevelAVLogInfo;
@@ -104,6 +104,16 @@ typedef NS_ENUM(NSUInteger, CallbackType) {
     StatisticsType
 };
 
+void deleteExpiredSessions() {
+    while ([sessionHistoryList count] > sessionHistorySize) {
+        id<Session> first = [sessionHistoryList firstObject];
+        if (first != nil) {
+            [sessionHistoryList removeObjectAtIndex:0];
+            [sessionHistoryMap removeObjectForKey:[NSNumber numberWithLong:[first getSessionId]]];
+        }
+    }
+}
+
 void addSessionToSessionHistory(id<Session> session) {
     NSNumber* sessionIdNumber = [NSNumber numberWithLong:[session getSessionId]];
 
@@ -111,19 +121,12 @@ void addSessionToSessionHistory(id<Session> session) {
 
     /*
      * ASYNC SESSIONS CALL THIS METHOD TWICE
-     * THIS CHECK PREVENTS ADDING THE SAME SESSION TWICE
+     * THIS CHECK PREVENTS ADDING THE SAME SESSION AGAIN
      */
     if ([sessionHistoryMap objectForKey:sessionIdNumber] == nil) {
         [sessionHistoryMap setObject:session forKey:sessionIdNumber];
         [sessionHistoryList addObject:session];
-        if ([sessionHistoryList count] > sessionHistorySize) {
-            id<Session> first = [sessionHistoryList firstObject];
-            if (first != nil) {
-                NSNumber* key = [NSNumber numberWithLong:[first getSessionId]];
-                [sessionHistoryList removeObject:key];
-                [sessionHistoryMap removeObjectForKey:key];
-            }
-        }
+        deleteExpiredSessions();
     }
 
     [sessionHistoryLock unlock];
@@ -840,14 +843,14 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         if ((fontName != nil) && (mappedFontName != nil) && ([fontName length] > 0) && ([mappedFontName length] > 0)) {
 
             fontNameMappingBlock = [NSString stringWithFormat:@"%@\n%@\n%@%@%@\n%@\n%@\n%@%@%@\n%@\n%@\n",
-                @"        <match target=\"pattern\">",
-                @"                <test qual=\"any\" name=\"family\">",
-                @"                        <string>", fontName, @"</string>",
-                @"                </test>",
-                @"                <edit name=\"family\" mode=\"assign\" binding=\"same\">",
-                @"                        <string>", mappedFontName, @"</string>",
-                @"                </edit>",
-                @"        </match>"];
+                @"    <match target=\"pattern\">",
+                @"        <test qual=\"any\" name=\"family\">",
+                @"            <string>", fontName, @"</string>",
+                @"        </test>",
+                @"        <edit name=\"family\" mode=\"assign\" binding=\"same\">",
+                @"            <string>", mappedFontName, @"</string>",
+                @"        </edit>",
+                @"    </match>"];
 
             validFontNameMappingCount++;
         }
@@ -862,10 +865,10 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         NSString *fontDirectoryPath = [fontDirectoryArray objectAtIndex:i];
         [fontConfiguration appendString: @"    <dir>"];
         [fontConfiguration appendString: fontDirectoryPath];
-        [fontConfiguration appendString: @"</dir>"];
+        [fontConfiguration appendString: @"</dir>\n"];
     }
     [fontConfiguration appendString:fontNameMappingBlock];
-    [fontConfiguration appendString:@"</fontconfig>"];
+    [fontConfiguration appendString:@"</fontconfig>\n"];
 
     if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
         NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
@@ -995,12 +998,20 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         ReturnCode* returnCode = [[ReturnCode alloc] init:returnCodeValue];
         [mediaInformationSession complete:returnCode];
         if ([returnCode isValueSuccess]) {
-            MediaInformation* mediaInformation = [MediaInformationJsonParser from:[mediaInformationSession getAllLogsAsStringWithTimeout:waitTimeout]];
+            NSArray* allLogs = [mediaInformationSession getAllLogsWithTimeout:waitTimeout];
+            NSMutableString* ffprobeJsonOutput = [[NSMutableString alloc] init];
+            for (int i=0; i < [allLogs count]; i++) {
+                Log* log = [allLogs objectAtIndex:i];
+                if ([log getLevel] == LevelAVLogStdErr) {
+                    [ffprobeJsonOutput appendString:[log getMessage]];
+                }
+            }
+            MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
             [mediaInformationSession setMediaInformation:mediaInformation];
         }
     } @catch (NSException *exception) {
         [mediaInformationSession fail:exception];
-        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"%@", [exception callStackSymbols]]);
+        NSLog(@"Get media information execute failed: %@.%@", [FFmpegKitConfig argumentsToString:[mediaInformationSession getArguments]], [NSString stringWithFormat:@"\n%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     }
 }
 
@@ -1169,6 +1180,7 @@ int executeFFprobe(long sessionId, NSArray* arguments) {
         @throw([NSException exceptionWithName:NSInvalidArgumentException reason:@"Session history size must not exceed the hard limit!" userInfo:nil]);
     } else if (pSessionHistorySize > 0) {
         sessionHistorySize = pSessionHistorySize;
+        deleteExpiredSessions();
     }
 }
 

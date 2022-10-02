@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -208,7 +208,7 @@ extern void addSessionToSessionHistory(id<Session> session);
 }
 
 - (void)fail:(NSException*)exception {
-    _failStackTrace = [NSString stringWithFormat:@"%@", [exception callStackSymbols]];
+    _failStackTrace = [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]];
     _state = SessionStateFailed;
     _endTime = [NSDate date];
 }
