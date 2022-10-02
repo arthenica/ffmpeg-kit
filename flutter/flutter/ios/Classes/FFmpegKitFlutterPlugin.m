@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -112,30 +112,40 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 - (void)registerGlobalCallbacks {
   [FFmpegKitConfig enableFFmpegSessionCompleteCallback:^(FFmpegSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableFFprobeSessionCompleteCallback:^(FFprobeSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableMediaInformationSessionCompleteCallback:^(MediaInformationSession* session){
     NSDictionary *dictionary = [FFmpegKitFlutterPlugin toSessionDictionary:session];
-    self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    dispatch_async(dispatch_get_main_queue(), ^() {
+      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_COMPLETE_CALLBACK_EVENT withDictionary:dictionary]);
+    });
   }];
 
   [FFmpegKitConfig enableLogCallback: ^(Log* log){
     if (self->logsEnabled) {
       NSDictionary *dictionary = [FFmpegKitFlutterPlugin toLogDictionary:log];
-      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_LOG_CALLBACK_EVENT withDictionary:dictionary]);
+      dispatch_async(dispatch_get_main_queue(), ^() {
+        self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_LOG_CALLBACK_EVENT withDictionary:dictionary]);
+      });
     }
   }];
 
   [FFmpegKitConfig enableStatisticsCallback:^(Statistics* statistics){
     if (self->statisticsEnabled) {
       NSDictionary *dictionary = [FFmpegKitFlutterPlugin toStatisticsDictionary:statistics];
-      self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_STATISTICS_CALLBACK_EVENT withDictionary:dictionary]);
+      dispatch_async(dispatch_get_main_queue(), ^() {
+        self->_eventSink([FFmpegKitFlutterPlugin toStringDictionary:EVENT_STATISTICS_CALLBACK_EVENT withDictionary:dictionary]);
+      });
     }
   }];
 }
@@ -563,7 +573,7 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 // FFmpegSession
 
 - (void)ffmpegSession:(NSArray*)arguments result:(FlutterResult)result {
-  FFmpegSession* session = [[FFmpegSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+  FFmpegSession* session = [FFmpegSession create:arguments withCompleteCallback:nil withLogCallback:nil withStatisticsCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
   result([FFmpegKitFlutterPlugin toSessionDictionary:session]);
 }
 
@@ -604,14 +614,14 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 // FFprobeSession
 
 - (void)ffprobeSession:(NSArray*)arguments result:(FlutterResult)result {
-  FFprobeSession* session = [[FFprobeSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+  FFprobeSession* session = [FFprobeSession create:arguments withCompleteCallback:nil withLogCallback:nil withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
   result([FFmpegKitFlutterPlugin toSessionDictionary:session]);
 }
 
 // MediaInformationSession
 
 - (void)mediaInformationSession:(NSArray*)arguments result:(FlutterResult)result {
-  MediaInformationSession* session = [[MediaInformationSession alloc] init:arguments withCompleteCallback:nil withLogCallback:nil];
+  MediaInformationSession* session = [MediaInformationSession create:arguments withCompleteCallback:nil withLogCallback:nil];
   result([FFmpegKitFlutterPlugin toSessionDictionary:session]);
 }
 
@@ -632,23 +642,21 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 // MediaInformationJsonParser
 
 - (void)mediaInformationJsonParserFrom:(NSString*)ffprobeJsonOutput result:(FlutterResult)result {
-  NSError *error;
-  MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-  if (error == nil) {
+  @try {
+    MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
     result([FFmpegKitFlutterPlugin toMediaInformationDictionary:mediaInformation]);
-  } else {
-    NSLog(@"Parsing MediaInformation failed: %@.\n", error);
+  } @catch (NSException *exception) {
+    NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     result(nil);
   }
 }
 
 - (void)mediaInformationJsonParserFromWithError:(NSString*)ffprobeJsonOutput result:(FlutterResult)result {
-  NSError *error;
-  MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-  if (error == nil) {
+  @try {
+    MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
     result([FFmpegKitFlutterPlugin toMediaInformationDictionary:mediaInformation]);
-  } else {
-    NSLog(@"Parsing MediaInformation failed: %@.\n", error);
+  } @catch (NSException *exception) {
+    NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     result([FlutterError errorWithCode:@"PARSE_FAILED" message:@"Parsing MediaInformation failed with JSON error." details:nil]);
   }
 }

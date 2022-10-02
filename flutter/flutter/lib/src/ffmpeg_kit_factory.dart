@@ -17,15 +17,13 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '../ffmpeg_session.dart';
+import '../abstract_session.dart';
 import '../ffmpeg_session_complete_callback.dart';
-import '../ffprobe_session.dart';
 import '../ffprobe_session_complete_callback.dart';
 import '../log.dart';
 import '../log_callback.dart';
 import '../log_redirection_strategy.dart';
 import '../media_information.dart';
-import '../media_information_session.dart';
 import '../media_information_session_complete_callback.dart';
 import '../session.dart';
 import '../statistics.dart';
@@ -66,12 +64,12 @@ class FFmpegKitFactory {
   static Session mapToSession(Map<dynamic, dynamic> sessionMap) {
     switch (sessionMap["type"]) {
       case 2:
-        return FFprobeSession.fromMap(sessionMap);
+        return AbstractSession.createFFprobeSessionFromMap(sessionMap);
       case 3:
-        return MediaInformationSession.fromMap(sessionMap);
+        return AbstractSession.createMediaInformationSessionFromMap(sessionMap);
       case 1:
       default:
-        return FFmpegSession.fromMap(sessionMap);
+        return AbstractSession.createFFmpegSessionFromMap(sessionMap);
     }
   }
 
@@ -79,12 +77,13 @@ class FFmpegKitFactory {
     if (sessionMap != null) {
       switch (sessionMap["type"]) {
         case 2:
-          return FFprobeSession.fromMap(sessionMap);
+          return AbstractSession.createFFprobeSessionFromMap(sessionMap);
         case 3:
-          return MediaInformationSession.fromMap(sessionMap);
+          return AbstractSession.createMediaInformationSessionFromMap(
+              sessionMap);
         case 1:
         default:
-          return FFmpegSession.fromMap(sessionMap);
+          return AbstractSession.createFFmpegSessionFromMap(sessionMap);
       }
     } else {
       return null;
@@ -100,7 +99,7 @@ class FFmpegKitFactory {
     }
   }
 
-  static String getVersion() => "4.5.1";
+  static String getVersion() => "5.1.0";
 
   static LogRedirectionStrategy? getLogRedirectionStrategy(int? sessionId) =>
       logRedirectionStrategyMap[sessionId];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -48,11 +48,6 @@ class FFmpegSession extends AbstractSession {
 
     return session;
   }
-
-  /// Creates a new FFmpeg session from [sessionMap], which includes session
-  /// fields as map keys.
-  static FFmpegSession fromMap(Map<dynamic, dynamic> sessionMap) =>
-      AbstractSession.createFFmpegSessionFromMap(sessionMap);
 
   /// Returns the session specific statistics callback.
   StatisticsCallback? getStatisticsCallback() =>

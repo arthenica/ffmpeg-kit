@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -831,7 +831,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     // FFmpegSession
 
     protected void ffmpegSession(@NonNull final List<String> arguments, @NonNull final Result result) {
-        final FFmpegSession session = new FFmpegSession(arguments.toArray(new String[0]), null, null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+        final FFmpegSession session = FFmpegSession.create(arguments.toArray(new String[0]), null, null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS);
         resultHandler.successAsync(result, toMap(session));
     }
 
@@ -872,14 +872,14 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     // FFprobeSession
 
     protected void ffprobeSession(@NonNull final List<String> arguments, @NonNull final Result result) {
-        final FFprobeSession session = new FFprobeSession(arguments.toArray(new String[0]), null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+        final FFprobeSession session = FFprobeSession.create(arguments.toArray(new String[0]), null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS);
         resultHandler.successAsync(result, toMap(session));
     }
 
     // MediaInformationSession
 
     protected void mediaInformationSession(@NonNull final List<String> arguments, @NonNull final Result result) {
-        final MediaInformationSession session = new MediaInformationSession(arguments.toArray(new String[0]), null, null);
+        final MediaInformationSession session = MediaInformationSession.create(arguments.toArray(new String[0]), null, null);
         resultHandler.successAsync(result, toMap(session));
     }
 
