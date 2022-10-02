@@ -669,11 +669,12 @@ export class AbstractSession extends Session {
   }
 
   /**
-   * Cancels running the session.
+   * Cancels running the session. Only starts cancellation. Does not guarantee that session is cancelled when promise resolves.
    */
-  cancel() {
+  async cancel() {
+    const sessionId = this.getSessionId();
     if (sessionId === undefined) {
-      return FFmpegKitReactNativeModule.cancel();
+      return Promise.reject(new Error('sessionId is not defined'));
     } else {
       return FFmpegKitReactNativeModule.cancelSession(sessionId);
     }
@@ -809,6 +810,15 @@ export class FFmpegKitConfig {
    */
   static async init() {
     await FFmpegKitInitializer.initialize();
+  }
+
+  /**
+   * Uninitializes the library.
+   *
+   * Calling this method before application termination is recommended but not required.
+   */
+  static async uninit() {
+    return FFmpegKitReactNativeModule.uninit();
   }
 
   /**
@@ -1608,7 +1618,7 @@ class FFmpegKitFactory {
   }
 
   static getVersion() {
-    return "4.5.1";
+    return "4.5.2";
   }
 
   static getLogRedirectionStrategy(sessionId) {
@@ -2474,7 +2484,7 @@ export class MediaInformation {
   /**
    * Returns duration.
    *
-   * @return media duration in milliseconds
+   * @return media duration in "seconds.microseconds" format
    */
   getDuration() {
     return this.getStringProperty(MediaInformation.KEY_DURATION);

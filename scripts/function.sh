@@ -13,7 +13,7 @@ get_arch_name() {
   6) echo "arm64e" ;; # ios
   7) echo "i386" ;; # ios
   8) echo "x86" ;; # android
-  9) echo "x86-64" ;; # android, ios, macos, tvos
+  9) echo "x86-64" ;; # android, ios, linux, macos, tvos
   10) echo "x86-64-mac-catalyst" ;; # ios
   11) echo "arm64-mac-catalyst" ;; # ios
   12) echo "arm64-simulator" ;; # ios, tvos
@@ -39,7 +39,7 @@ from_arch_name() {
   arm64e) echo 6 ;; # ios
   i386) echo 7 ;; # ios
   x86) echo 8 ;; # android
-  x86-64) echo 9 ;; # android, ios, macos, tvos
+  x86-64) echo 9 ;; # android, ios, linux, macos, tvos
   x86-64-mac-catalyst) echo 10 ;; # ios
   arm64-mac-catalyst) echo 11 ;; # ios
   arm64-simulator) echo 12 ;; # ios
@@ -98,17 +98,21 @@ get_library_name() {
   47) echo "libsamplerate" ;;
   48) echo "harfbuzz" ;;
   49) echo "cpu-features" ;;
-  50) echo "android-zlib" ;;
-  51) echo "android-media-codec" ;;
-  52)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
+  50)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo "android-zlib"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
       echo "ios-zlib"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
+      echo "linux-zlib"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "macos-zlib"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
       echo "tvos-zlib"
     fi
     ;;
+  51) echo "linux-alsa" ;;
+  52) echo "android-media-codec" ;;
   53)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
       echo "ios-audiotoolbox"
@@ -176,6 +180,36 @@ get_library_name() {
       echo "macos-opengl"
     fi
     ;;
+  62) echo "linux-fontconfig" ;;
+  63) echo "linux-freetype" ;;
+  64) echo "linux-fribidi" ;;
+  65) echo "linux-gmp" ;;
+  66) echo "linux-gnutls" ;;
+  67) echo "linux-lame" ;;
+  68) echo "linux-libass" ;;
+  69) echo "linux-libiconv" ;;
+  70) echo "linux-libtheora" ;;
+  71) echo "linux-libvorbis" ;;
+  72) echo "linux-libvpx" ;;
+  73) echo "linux-libwebp" ;;
+  74) echo "linux-libxml2" ;;
+  75) echo "linux-opencore-amr" ;;
+  76) echo "linux-shine" ;;
+  77) echo "linux-speex" ;;
+  78) echo "linux-opencl" ;;
+  79) echo "linux-xvidcore" ;;
+  80) echo "linux-x265" ;;
+  81) echo "linux-libvidstab" ;;
+  82) echo "linux-rubberband" ;;
+  83) echo "linux-v4l2" ;;
+  84) echo "linux-opus" ;;
+  85) echo "linux-snappy" ;;
+  86) echo "linux-soxr" ;;
+  87) echo "linux-twolame" ;;
+  88) echo "linux-sdl" ;;
+  89) echo "linux-tesseract" ;;
+  90) echo "linux-vaapi" ;;
+  91) echo "linux-vo-amrwbenc" ;;
   esac
 }
 
@@ -231,9 +265,9 @@ from_library_name() {
   libsamplerate) echo 47 ;;
   harfbuzz) echo 48 ;;
   cpu-features) echo 49 ;;
-  android-zlib) echo 50 ;;
-  android-media-codec) echo 51 ;;
-  ios-zlib | macos-zlib | tvos-zlib) echo 52 ;;
+  android-zlib | ios-zlib | linux-zlib | macos-zlib | tvos-zlib) echo 50 ;;
+  linux-alsa) echo 51 ;;
+  android-media-codec) echo 52 ;;
   ios-audiotoolbox | macos-audiotoolbox | tvos-audiotoolbox) echo 53 ;;
   ios-bzip2 | macos-bzip2 | tvos-bzip2) echo 54 ;;
   ios-videotoolbox | macos-videotoolbox | tvos-videotoolbox) echo 55 ;;
@@ -243,6 +277,36 @@ from_library_name() {
   macos-coreimage) echo 59 ;;
   macos-opencl) echo 60 ;;
   macos-opengl) echo 61 ;;
+  linux-fontconfig) echo 62 ;;
+  linux-freetype) echo 63 ;;
+  linux-fribidi) echo 64 ;;
+  linux-gmp) echo 65 ;;
+  linux-gnutls) echo 66 ;;
+  linux-lame) echo 67 ;;
+  linux-libass) echo 68 ;;
+  linux-libiconv) echo 69 ;;
+  linux-libtheora) echo 70 ;;
+  linux-libvorbis) echo 71 ;;
+  linux-libvpx) echo 72 ;;
+  linux-libwebp) echo 73 ;;
+  linux-libxml2) echo 74 ;;
+  linux-opencore-amr) echo 75 ;;
+  linux-shine) echo 76 ;;
+  linux-speex) echo 77 ;;
+  linux-opencl) echo 78 ;;
+  linux-xvidcore) echo 79 ;;
+  linux-x265) echo 80 ;;
+  linux-libvidstab) echo 81 ;;
+  linux-rubberband) echo 82 ;;
+  linux-v4l2) echo 83 ;;
+  linux-opus) echo 84 ;;
+  linux-snappy) echo 85 ;;
+  linux-soxr) echo 86 ;;
+  linux-twolame) echo 87 ;;
+  linux-sdl) echo 88 ;;
+  linux-tesseract) echo 89 ;;
+  linux-vaapi) echo 90 ;;
+  linux-vo-amrwbenc) echo 91 ;;
   esac
 }
 
@@ -252,19 +316,32 @@ from_library_name() {
 is_library_supported_on_platform() {
   local library_index=$(from_library_name "$1")
   case ${library_index} in
-  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20)
-    echo "0"
-    ;;
-  21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40)
-    echo "0"
-    ;;
-  42 | 43 | 44 | 45 | 46 | 47 | 48)
+  # ALL
+  16 | 17 | 18 | 23 | 27 | 28 | 32 | 34 | 35 | 36 | 50)
     echo "0"
     ;;
 
+  # ALL EXCEPT LINUX
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 19 | 20 | 21 | 22 | 24 | 25 | 26 | 29 | 30 | 31 | 33 | 37 | 38 | 39 | 40 | 42 | 43 | 44 | 45 | 46 | 47 | 48)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
+      echo "1"
+    else
+      echo "0"
+    fi
+    ;;
+
   # ANDROID
-  7 | 41 | 49 | 50 | 51)
+  7 | 41 | 49 | 52)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "android" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
+
+  # ONLY LINUX
+  51)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
       echo "0"
     else
       echo "1"
@@ -283,7 +360,7 @@ is_library_supported_on_platform() {
     ;;
 
   # IOS, MACOS AND TVOS
-  52 | 53 | 54 | 55 | 57 | 58)
+  53 | 54 | 55 | 57 | 58)
     if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "0"
     else
@@ -299,6 +376,15 @@ is_library_supported_on_platform() {
       echo "1"
     fi
     ;;
+
+  # ONLY LINUX
+  62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92)
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
+      echo "0"
+    else
+      echo "1"
+    fi
+    ;;
   *)
     echo "1"
     ;;
@@ -306,7 +392,7 @@ is_library_supported_on_platform() {
 }
 
 #
-# 1. <library name>
+# 1. <arch name>
 #
 is_arch_supported_on_platform() {
   local arch_index=$(from_arch_name "$1")
@@ -344,7 +430,7 @@ is_arch_supported_on_platform() {
 
     # IOS, MACOS OR TVOS
   $ARCH_ARM64)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
       echo 1
     else
       echo 0
@@ -384,6 +470,9 @@ get_meson_target_host_family() {
   case ${FFMPEG_KIT_BUILD_TYPE} in
   android)
     echo "android"
+    ;;
+  linux)
+    echo "linux"
     ;;
   *)
     echo "darwin"
@@ -440,6 +529,8 @@ get_target() {
       echo "x86_64-linux-android"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
       echo "$(get_target_cpu)-apple-ios$(get_min_sdk_version)-simulator"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
+      echo "$(get_target_cpu)-linux-gnu"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "$(get_target_cpu)-apple-darwin$(get_min_sdk_version)"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
@@ -487,6 +578,8 @@ get_host() {
       echo "x86_64-linux-android"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]]; then
       echo "$(get_target_cpu)-ios-darwin"
+    elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "linux" ]]; then
+      echo "$(get_target_cpu)-linux-gnu"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]]; then
       echo "$(get_target_cpu)-apple-darwin"
     elif [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
@@ -578,7 +671,7 @@ either version 3 of the License, or (at your option) any later version."
 }
 
 get_ffmpeg_libavcodec_version() {
-  local MAJOR=$(grep -Eo ' LIBAVCODEC_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version.h | sed -e 's|LIBAVCODEC_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVCODEC_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version_major.h | sed -e 's|LIBAVCODEC_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBAVCODEC_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version.h | sed -e 's|LIBAVCODEC_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBAVCODEC_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version.h | sed -e 's|LIBAVCODEC_VERSION_MICRO||g;s| ||g')
 
@@ -586,13 +679,13 @@ get_ffmpeg_libavcodec_version() {
 }
 
 get_ffmpeg_libavcodec_major_version() {
-  local MAJOR=$(grep -Eo ' LIBAVCODEC_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version.h | sed -e 's|LIBAVCODEC_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVCODEC_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavcodec/version_major.h | sed -e 's|LIBAVCODEC_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
 
 get_ffmpeg_libavdevice_version() {
-  local MAJOR=$(grep -Eo ' LIBAVDEVICE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version.h | sed -e 's|LIBAVDEVICE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVDEVICE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version_major.h | sed -e 's|LIBAVDEVICE_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBAVDEVICE_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version.h | sed -e 's|LIBAVDEVICE_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBAVDEVICE_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version.h | sed -e 's|LIBAVDEVICE_VERSION_MICRO||g;s| ||g')
 
@@ -600,13 +693,13 @@ get_ffmpeg_libavdevice_version() {
 }
 
 get_ffmpeg_libavdevice_major_version() {
-  local MAJOR=$(grep -Eo ' LIBAVDEVICE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version.h | sed -e 's|LIBAVDEVICE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVDEVICE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavdevice/version_major.h | sed -e 's|LIBAVDEVICE_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
 
 get_ffmpeg_libavfilter_version() {
-  local MAJOR=$(grep -Eo ' LIBAVFILTER_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version.h | sed -e 's|LIBAVFILTER_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVFILTER_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version_major.h | sed -e 's|LIBAVFILTER_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBAVFILTER_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version.h | sed -e 's|LIBAVFILTER_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBAVFILTER_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version.h | sed -e 's|LIBAVFILTER_VERSION_MICRO||g;s| ||g')
 
@@ -614,13 +707,13 @@ get_ffmpeg_libavfilter_version() {
 }
 
 get_ffmpeg_libavfilter_major_version() {
-  local MAJOR=$(grep -Eo ' LIBAVFILTER_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version.h | sed -e 's|LIBAVFILTER_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVFILTER_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavfilter/version_major.h | sed -e 's|LIBAVFILTER_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
 
 get_ffmpeg_libavformat_version() {
-  local MAJOR=$(grep -Eo ' LIBAVFORMAT_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavformat/version.h | sed -e 's|LIBAVFORMAT_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVFORMAT_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavformat/version_major.h | sed -e 's|LIBAVFORMAT_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBAVFORMAT_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libavformat/version.h | sed -e 's|LIBAVFORMAT_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBAVFORMAT_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libavformat/version.h | sed -e 's|LIBAVFORMAT_VERSION_MICRO||g;s| ||g')
 
@@ -628,7 +721,7 @@ get_ffmpeg_libavformat_version() {
 }
 
 get_ffmpeg_libavformat_major_version() {
-  local MAJOR=$(grep -Eo ' LIBAVFORMAT_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavformat/version.h | sed -e 's|LIBAVFORMAT_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVFORMAT_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavformat/version_major.h | sed -e 's|LIBAVFORMAT_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
@@ -642,13 +735,13 @@ get_ffmpeg_libavutil_version() {
 }
 
 get_ffmpeg_libavutil_major_version() {
-  local MAJOR=$(grep -Eo ' LIBAVUTIL_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavutil/version.h | sed -e 's|LIBAVUTIL_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBAVUTIL_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libavutil/version_major.h | sed -e 's|LIBAVUTIL_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
 
 get_ffmpeg_libswresample_version() {
-  local MAJOR=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswresample/version.h | sed -e 's|LIBSWRESAMPLE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswresample/version_major.h | sed -e 's|LIBSWRESAMPLE_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libswresample/version.h | sed -e 's|LIBSWRESAMPLE_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libswresample/version.h | sed -e 's|LIBSWRESAMPLE_VERSION_MICRO||g;s| ||g')
 
@@ -656,13 +749,13 @@ get_ffmpeg_libswresample_version() {
 }
 
 get_ffmpeg_libswresample_major_version() {
-  local MAJOR=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswresample/version.h | sed -e 's|LIBSWRESAMPLE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBSWRESAMPLE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswresample/version_major.h | sed -e 's|LIBSWRESAMPLE_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
 
 get_ffmpeg_libswscale_version() {
-  local MAJOR=$(grep -Eo ' LIBSWSCALE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswscale/version.h | sed -e 's|LIBSWSCALE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBSWSCALE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswscale/version_major.h | sed -e 's|LIBSWSCALE_VERSION_MAJOR||g;s| ||g')
   local MINOR=$(grep -Eo ' LIBSWSCALE_VERSION_MINOR .*' "${BASEDIR}"/src/ffmpeg/libswscale/version.h | sed -e 's|LIBSWSCALE_VERSION_MINOR||g;s| ||g')
   local MICRO=$(grep -Eo ' LIBSWSCALE_VERSION_MICRO .*' "${BASEDIR}"/src/ffmpeg/libswscale/version.h | sed -e 's|LIBSWSCALE_VERSION_MICRO||g;s| ||g')
 
@@ -670,7 +763,7 @@ get_ffmpeg_libswscale_version() {
 }
 
 get_ffmpeg_libswscale_major_version() {
-  local MAJOR=$(grep -Eo ' LIBSWSCALE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswscale/version.h | sed -e 's|LIBSWSCALE_VERSION_MAJOR||g;s| ||g')
+  local MAJOR=$(grep -Eo ' LIBSWSCALE_VERSION_MAJOR .*' "${BASEDIR}"/src/ffmpeg/libswscale/version_major.h | sed -e 's|LIBSWSCALE_VERSION_MAJOR||g;s| ||g')
 
   echo "${MAJOR}"
 }
@@ -950,14 +1043,14 @@ set_library() {
   fi
 
   case $1 in
-  android-zlib)
-    ENABLED_LIBRARIES[LIBRARY_ANDROID_ZLIB]=$2
+  android-zlib | ios-zlib | linux-zlib | macos-zlib | tvos-zlib)
+    ENABLED_LIBRARIES[LIBRARY_SYSTEM_ZLIB]=$2
+    ;;
+  linux-alsa)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_ALSA]=$2
     ;;
   android-media-codec)
     ENABLED_LIBRARIES[LIBRARY_ANDROID_MEDIA_CODEC]=$2
-    ;;
-  ios-zlib | macos-zlib | tvos-zlib)
-    ENABLED_LIBRARIES[LIBRARY_APPLE_ZLIB]=$2
     ;;
   ios-audiotoolbox | macos-audiotoolbox | tvos-audiotoolbox)
     ENABLED_LIBRARIES[LIBRARY_APPLE_AUDIOTOOLBOX]=$2
@@ -1161,6 +1254,113 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
     ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
     ;;
+  linux-fontconfig)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_FONTCONFIG]=$2
+    set_library "linux-libiconv" $2
+    set_library "linux-freetype" $2
+    ;;
+  linux-freetype)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_FREETYPE]=$2
+    set_virtual_library "zlib" $2
+    ;;
+  linux-fribidi)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_FRIBIDI]=$2
+    ;;
+  linux-gmp)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_GMP]=$2
+    ;;
+  linux-gnutls)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_GNUTLS]=$2
+    set_virtual_library "zlib" $2
+    set_library "linux-gmp" $2
+    set_library "linux-libiconv" $2
+    ;;
+  linux-lame)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LAME]=$2
+    set_library "linux-libiconv" $2
+    ;;
+  linux-libass)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBASS]=$2
+    set_library "linux-freetype" $2
+    set_library "linux-fribidi" $2
+    set_library "linux-fontconfig" $2
+    set_library "linux-libiconv" $2
+    ;;
+  linux-libiconv)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBICONV]=$2
+    ;;
+  linux-libtheora)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBTHEORA]=$2
+    set_library "linux-libvorbis" $2
+    ;;
+  linux-libvidstab)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBVIDSTAB]=$2
+    ;;
+  linux-libvorbis)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBVORBIS]=$2
+    ;;
+  linux-libvpx)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBVPX]=$2
+    ;;
+  linux-libwebp)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBWEBP]=$2
+    set_virtual_library "zlib" $2
+    ;;
+  linux-libxml2)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBXML2]=$2
+    set_library "linux-libiconv" $2
+    ;;
+  linux-vaapi)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_VAAPI]=$2
+    ;;
+  linux-opencl)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_OPENCL]=$2
+    ;;
+  linux-opencore-amr)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_OPENCOREAMR]=$2
+    ;;
+  linux-opus)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_OPUS]=$2
+    ;;
+  linux-rubberband)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_RUBBERBAND]=$2
+    ;;
+  linux-sdl)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_SDL]=$2
+    ;;
+  linux-shine)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_SHINE]=$2
+    ;;
+  linux-snappy)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_SNAPPY]=$2
+    set_virtual_library "zlib" $2
+    ;;
+  linux-soxr)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_SOXR]=$2
+    ;;
+  linux-speex)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_SPEEX]=$2
+    ;;
+  linux-tesseract)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_TESSERACT]=$2
+    ENABLED_LIBRARIES[LIBRARY_LINUX_LIBWEBP]=$2
+    set_virtual_library "zlib" $2
+    ;;
+  linux-twolame)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_TWOLAME]=$2
+    ;;
+  linux-v4l2)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_V4L2]=$2
+    ;;
+  linux-vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_VO_AMRWBENC]=$2
+    ;;
+  linux-x265)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_X265]=$2
+    ;;
+  linux-xvidcore)
+    ENABLED_LIBRARIES[LIBRARY_LINUX_XVIDCORE]=$2
+    ;;
   *)
     print_unknown_library $1
     ;;
@@ -1190,11 +1390,7 @@ set_virtual_library() {
     fi
     ;;
   zlib)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "apple" ]]; then
-      ENABLED_LIBRARIES[LIBRARY_APPLE_ZLIB]=$2
-    else
-      ENABLED_LIBRARIES[LIBRARY_ANDROID_ZLIB]=$2
-    fi
+    ENABLED_LIBRARIES[LIBRARY_SYSTEM_ZLIB]=$2
     ;;
   *)
     print_unknown_virtual_library $1
@@ -1403,7 +1599,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # SUPPLEMENTARY LIBRARIES NOT PRINTED
-  for library in {50..57} {59..61} {0..36}; do
+  for library in {50..57} {59..91} {0..36}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -1580,6 +1776,7 @@ print_custom_libraries() {
 get_external_library_license_path() {
   case $1 in
   1) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.TXT" ;;
+  12) echo "${BASEDIR}/src/$(get_library_name "$1")/Copyright" ;;
   35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.txt" ;;
   3 | 42) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
   5 | 44) echo "${BASEDIR}/src/$(get_library_name "$1")/$(get_library_name "$1")/COPYING" ;;
@@ -1822,7 +2019,7 @@ clone_git_repository_with_tag() {
 # 1. library index
 #
 is_gpl_licensed() {
-  for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND}; do
+  for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVIDSTAB,$LIBRARY_RUBBERBAND,$LIBRARY_LINUX_XVIDCORE,$LIBRARY_LINUX_X265,$LIBRARY_LINUX_LIBVIDSTAB,$LIBRARY_LINUX_RUBBERBAND}; do
     if [[ $gpl_library -eq $1 ]]; then
       echo 0
       return
@@ -2034,11 +2231,6 @@ is_gnu_config_files_up_to_date() {
   echo $(grep aarch64-apple-darwin config.guess | wc -l 2>>"${BASEDIR}"/build.log)
 }
 
-get_user_friendly_ffmpeg_version() {
-  local USER_FRIENDLY_NAME=$(get_library_source "ffmpeg" 4)
-  echo ${USER_FRIENDLY_NAME:1}
-}
-
 get_cpu_count() {
   if [ "$(uname)" == "Darwin" ]; then
     echo $(sysctl -n hw.logicalcpu)
@@ -2099,8 +2291,8 @@ library_is_installed() {
     return
   fi
 
-  if [ ! -d "${INSTALL_PATH}"/"${LIB_NAME}"/lib ]; then
-    echo -e "INFO: ${INSTALL_PATH}/${LIB_NAME}/lib directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
+  if [ ! -d "${INSTALL_PATH}/${LIB_NAME}/lib" ] && [ ! -d "${INSTALL_PATH}/${LIB_NAME}/lib64" ]; then
+    echo -e "INFO: ${INSTALL_PATH}/${LIB_NAME}/lib{lib64} directory not found\n" 1>>"${BASEDIR}"/build.log 2>&1
     echo 0
     return
   fi
@@ -2112,7 +2304,7 @@ library_is_installed() {
   fi
 
   HEADER_COUNT=$(ls -l "${INSTALL_PATH}"/"${LIB_NAME}"/include | wc -l)
-  LIB_COUNT=$(ls -l ${INSTALL_PATH}/${LIB_NAME}/lib | wc -l)
+  LIB_COUNT=$(ls -l ${INSTALL_PATH}/${LIB_NAME}/lib* | wc -l)
 
   if [[ ${HEADER_COUNT} -eq 0 ]]; then
     echo -e "INFO: No headers found under ${INSTALL_PATH}/${LIB_NAME}/include\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -2121,7 +2313,7 @@ library_is_installed() {
   fi
 
   if [[ ${LIB_COUNT} -eq 0 ]]; then
-    echo -e "INFO: No libraries found under ${INSTALL_PATH}/${LIB_NAME}/lib\n" 1>>"${BASEDIR}"/build.log 2>&1
+    echo -e "INFO: No libraries found under ${INSTALL_PATH}/${LIB_NAME}/lib{lib64}\n" 1>>"${BASEDIR}"/build.log 2>&1
     echo 0
     return
   fi
@@ -2147,8 +2339,8 @@ to_capital_case() {
 # 2. destination file
 #
 overwrite_file() {
-  rm -f "$2"
-  cp "$1" "$2"
+  rm -f "$2" 2>>"${BASEDIR}"/build.log
+  cp "$1" "$2" 2>>"${BASEDIR}"/build.log
 }
 
 #
@@ -2188,4 +2380,33 @@ compare_versions() {
 
   echo "0"
   return;
+}
+
+#
+# 1. command
+#
+command_exists() {
+  local COMMAND=$1
+  if [[ -n "$(command -v $COMMAND)" ]]; then
+    echo 0
+  else
+    echo 1
+  fi
+}
+
+#
+# 1. folder path
+#
+initialize_folder() {
+  rm -rf "$1" 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ $? -ne 0 ]]; then
+    return 1
+  fi
+
+  mkdir -p "$1" 1>>"${BASEDIR}"/build.log 2>&1
+  if [[ $? -ne 0 ]]; then
+    return 1
+  fi
+
+  return 0
 }

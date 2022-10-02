@@ -5,9 +5,24 @@ on:
     branches:
       - development
       - main
+    paths:
+      - '.github/workflows/android-build-scripts.yml'
+      - 'android/**'
+      - '!android/README.md'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'android.sh'
   pull_request:
     branches:
+      - development
       - main
+    paths:
+      - '.github/workflows/android-build-scripts.yml'
+      - 'android/**'
+      - '!android/README.md'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'android.sh'
 
 jobs:
   build-main-on-linux:
@@ -15,24 +30,24 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux' ]
+        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux', 'r24-linux', 'r25b-linux' ]
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib --disable-arm-v7a
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -50,11 +65,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -73,24 +88,24 @@ jobs:
     runs-on: macos-10.15
     strategy:
       matrix:
-        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin' ]
+        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin', 'r24-darwin', 'r25b-darwin' ]
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --enable-android-media-codec --enable-android-zlib --disable-arm-v7a
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -108,11 +123,11 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: set up adopt jdk 8
-        uses: actions/setup-java@v2.2.0
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -120,6 +135,35 @@ jobs:
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
         run: ./android.sh -d --lts --enable-android-media-codec --enable-android-zlib
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-main-without-ffmpeg-kit-protocols-on-linux:
+    name: build without ffmpeg-kit protocols
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ndk-version: [ 'r22b-linux-x86_64' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up adopt jdk 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - name: set up android ndk
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk
+          echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
+      - name: run the build script
+        run: ./android.sh --no-ffmpeg-kit-protocols --disable-x86 --disable-x86-64 --disable-arm-v7a --disable-arm-v7a-neon
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log

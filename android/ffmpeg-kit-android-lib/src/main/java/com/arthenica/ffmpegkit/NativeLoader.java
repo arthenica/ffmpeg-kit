@@ -36,7 +36,7 @@ public class NativeLoader {
 
     static final String[] FFMPEG_LIBRARIES = {"avutil", "swscale", "swresample", "avcodec", "avformat", "avfilter", "avdevice"};
 
-    static final String[] LIBRARIES_LINKED_WITH_CXX = {"openh264", "rubberband", "snappy", "srt", "tesseract", "x265", "zimg"};
+    static final String[] LIBRARIES_LINKED_WITH_CXX = {"chromaprint", "openh264", "rubberband", "snappy", "srt", "tesseract", "x265", "zimg"};
 
     static boolean isTestModeDisabled() {
         return (System.getProperty("enable.ffmpeg.kit.test.mode") == null);
@@ -85,7 +85,7 @@ public class NativeLoader {
     }
 
     static String loadVersion() {
-        final String version = "4.5.1";
+        final String version = "5.1";
 
         if (isTestModeDisabled()) {
             return FFmpegKitConfig.getVersion();

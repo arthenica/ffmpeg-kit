@@ -33,7 +33,7 @@ echo -e "\nINFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xc
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS
-GPL_ENABLED="no"
+export GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_TYPE_ID=""
 BUILD_FULL=""
@@ -114,7 +114,7 @@ while [ ! $# -eq 0 ]; do
     BUILD_FULL="1"
     ;;
   --enable-gpl)
-    GPL_ENABLED="yes"
+    export GPL_ENABLED="yes"
     ;;
   --enable-custom-library-*)
     CUSTOM_LIBRARY_OPTION_KEY=$(echo $1 | sed -e 's/^--enable-custom-//g;s/=.*$//g')
@@ -283,7 +283,7 @@ if [[ ${NO_FRAMEWORK} -ne 1 ]]; then
     build_apple_architecture_variant_strings
 
     if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
-      echo -e -n "\nCreating universal libraries and xcframeworks under prebuilt: "
+      echo -e -n "\nCreating xcframeworks under prebuilt: "
 
       create_universal_libraries_for_ios_xcframeworks
 
@@ -291,7 +291,7 @@ if [[ ${NO_FRAMEWORK} -ne 1 ]]; then
 
       create_ios_xcframeworks
     else
-      echo -e -n "\nCreating universal libraries and frameworks under prebuilt: "
+      echo -e -n "\nCreating frameworks under prebuilt: "
 
       create_universal_libraries_for_ios_default_frameworks
 

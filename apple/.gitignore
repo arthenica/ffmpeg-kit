@@ -10,3 +10,8 @@
 /test-driver
 /config.log
 /*.tmp
+/m4/
+/configure
+/libtool
+/ltmain.sh
+/Makefile.in

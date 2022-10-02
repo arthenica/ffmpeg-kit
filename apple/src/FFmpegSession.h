@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -34,16 +34,18 @@
  * Builds a new FFmpeg session.
  *
  * @param arguments command arguments
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments;
++ (instancetype)create:(NSArray*)arguments;
 
 /**
  * Builds a new FFmpeg session.
  *
  * @param arguments         command arguments
  * @param completeCallback  session specific complete callback
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback;
 
 /**
  * Builds a new FFmpeg session.
@@ -52,8 +54,9 @@
  * @param completeCallback      session specific complete callback
  * @param logCallback           session specific log callback
  * @param statisticsCallback    session specific statistics callback
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
  * Builds a new FFmpeg session.
@@ -63,8 +66,9 @@
  * @param logCallback             session specific log callback
  * @param statisticsCallback      session specific statistics callback
  * @param logRedirectionStrategy  session specific log redirection strategy
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFmpegSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withStatisticsCallback:(StatisticsCallback)statisticsCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
  * Returns the session specific statistics callback.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2021-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -35,16 +35,18 @@
  * Creates a new media information session.
  *
  * @param arguments command arguments
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments;
++ (instancetype)create:(NSArray*)arguments;
 
 /**
  * Creates a new media information session.
  *
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback;
 
 /**
  * Creates a new media information session.
@@ -52,8 +54,9 @@
  * @param arguments        command arguments
  * @param completeCallback session specific complete callback
  * @param logCallback      session specific log callback
+ * @return created session
  */
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
++ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
 
 /**
  * Returns the media information extracted in this session.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -37,13 +37,13 @@
 + (MediaInformation*)from:(NSString*)ffprobeJsonOutput;
 
 /**
- * Extracts <code>MediaInformation</code> from the given FFprobe json output.
+ * Extracts <code>MediaInformation</code> from the given FFprobe json output. If a parsing error occurs an NSException
+ * is thrown.
  *
  * @param ffprobeJsonOutput FFprobe json output
- * @param error error to save the parsing error if a parsing error occurs
  * @return created MediaInformation instance
  */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error;
++ (MediaInformation*)fromWithError:(NSString*)ffprobeJsonOutput;
 
 @end
 

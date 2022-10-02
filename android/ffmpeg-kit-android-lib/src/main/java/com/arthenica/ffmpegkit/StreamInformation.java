@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -214,7 +214,7 @@ public class StreamInformation {
      * @return tags object
      */
     public JSONObject getTags() {
-        return getProperties(KEY_TAGS);
+        return getProperty(KEY_TAGS);
     }
 
     /**
@@ -224,13 +224,13 @@ public class StreamInformation {
      * @return stream property as string or null if the key is not found
      */
     public String getStringProperty(final String key) {
-        JSONObject mediaProperties = getAllProperties();
-        if (mediaProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (mediaProperties.has(key)) {
-            return mediaProperties.optString(key);
+        if (allProperties.has(key)) {
+            return allProperties.optString(key);
         } else {
             return null;
         }
@@ -243,31 +243,31 @@ public class StreamInformation {
      * @return stream property as Long or null if the key is not found
      */
     public Long getNumberProperty(String key) {
-        JSONObject mediaProperties = getAllProperties();
-        if (mediaProperties == null) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        if (mediaProperties.has(key)) {
-            return mediaProperties.optLong(key);
+        if (allProperties.has(key)) {
+            return allProperties.optLong(key);
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the stream properties associated with the key.
+     * Returns the stream property associated with the key.
      *
-     * @param key properties key
-     * @return stream properties as a JSONObject or null if the key is not found
+     * @param key property key
+     * @return stream property as a JSONObject or null if the key is not found
      */
-    public JSONObject getProperties(String key) {
-        JSONObject mediaProperties = getAllProperties();
-        if (mediaProperties == null) {
+    public JSONObject getProperty(String key) {
+        JSONObject allProperties = getAllProperties();
+        if (allProperties == null) {
             return null;
         }
 
-        return mediaProperties.optJSONObject(key);
+        return allProperties.optJSONObject(key);
     }
 
     /**

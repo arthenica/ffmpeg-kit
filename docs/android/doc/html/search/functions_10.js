@@ -10,6 +10,5 @@ var searchData=
   ['removesession_7',['removeSession',['../dc/dd3/ffmpegkit_8c.html#afec70e0490b0f2e2ccd750f64a13668a',1,'removeSession(long id):&#160;ffmpegkit.c'],['../d1/ddd/ffprobekit_8c.html#a5f236f20079b407567c62072710656b5',1,'removeSession(long sessionId):&#160;ffmpegkit.c']]],
   ['report_5fnew_5fstream_8',['report_new_stream',['../d7/d48/fftools__ffmpeg_8c.html#ab19f077af44d4caa16ecad4d9532715a',1,'fftools_ffmpeg.c']]],
   ['reset_5feagain_9',['reset_eagain',['../d7/d48/fftools__ffmpeg_8c.html#a5e7569f8c8012ff719b112431b1df091',1,'fftools_ffmpeg.c']]],
-  ['reset_5foptions_10',['reset_options',['../d7/db3/fftools__ffmpeg_8h.html#a1801147c99b95a1ae99138795e7cec52',1,'fftools_ffmpeg.h']]],
-  ['resetmessagesintransmit_11',['resetMessagesInTransmit',['../dc/dd3/ffmpegkit_8c.html#adde752dd2b1262203a88cab573383d47',1,'resetMessagesInTransmit(long id):&#160;ffmpegkit.c'],['../d1/ddd/ffprobekit_8c.html#ab2b13505798c32f04fd3334e399f3a2f',1,'resetMessagesInTransmit(long sessionId):&#160;ffmpegkit.c']]]
+  ['resetmessagesintransmit_10',['resetMessagesInTransmit',['../dc/dd3/ffmpegkit_8c.html#adde752dd2b1262203a88cab573383d47',1,'resetMessagesInTransmit(long id):&#160;ffmpegkit.c'],['../d1/ddd/ffprobekit_8c.html#ab2b13505798c32f04fd3334e399f3a2f',1,'resetMessagesInTransmit(long sessionId):&#160;ffmpegkit.c']]]
 ];

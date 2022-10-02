@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Taner Sener
+ * Copyright (c) 2020-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -33,9 +33,10 @@ public class FFprobeSession extends AbstractSession implements Session {
      * Builds a new FFprobe session.
      *
      * @param arguments command arguments
+     * @return created session
      */
-    public FFprobeSession(final String[] arguments) {
-        this(arguments, null);
+    public static FFprobeSession create(final String[] arguments) {
+        return new FFprobeSession(arguments, null, null, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
     /**
@@ -43,9 +44,10 @@ public class FFprobeSession extends AbstractSession implements Session {
      *
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
+     * @return created session
      */
-    public FFprobeSession(final String[] arguments, final FFprobeSessionCompleteCallback completeCallback) {
-        this(arguments, completeCallback, null);
+    public static FFprobeSession create(final String[] arguments, final FFprobeSessionCompleteCallback completeCallback) {
+        return new FFprobeSession(arguments, completeCallback, null, FFmpegKitConfig.getLogRedirectionStrategy());
     }
 
     /**
@@ -54,11 +56,28 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param arguments        command arguments
      * @param completeCallback session specific complete callback
      * @param logCallback      session specific log callback
+     * @return created session
      */
-    public FFprobeSession(final String[] arguments,
-                          final FFprobeSessionCompleteCallback completeCallback,
-                          final LogCallback logCallback) {
-        this(arguments, completeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+    public static FFprobeSession create(final String[] arguments,
+                                        final FFprobeSessionCompleteCallback completeCallback,
+                                        final LogCallback logCallback) {
+        return new FFprobeSession(arguments, completeCallback, logCallback, FFmpegKitConfig.getLogRedirectionStrategy());
+    }
+
+    /**
+     * Builds a new FFprobe session.
+     *
+     * @param arguments              command arguments
+     * @param completeCallback       session specific complete callback
+     * @param logCallback            session specific log callback
+     * @param logRedirectionStrategy session specific log redirection strategy
+     * @return created session
+     */
+    public static FFprobeSession create(final String[] arguments,
+                                        final FFprobeSessionCompleteCallback completeCallback,
+                                        final LogCallback logCallback,
+                                        final LogRedirectionStrategy logRedirectionStrategy) {
+        return new FFprobeSession(arguments, completeCallback, logCallback, logRedirectionStrategy);
     }
 
     /**
@@ -69,10 +88,10 @@ public class FFprobeSession extends AbstractSession implements Session {
      * @param logCallback            session specific log callback
      * @param logRedirectionStrategy session specific log redirection strategy
      */
-    public FFprobeSession(final String[] arguments,
-                          final FFprobeSessionCompleteCallback completeCallback,
-                          final LogCallback logCallback,
-                          final LogRedirectionStrategy logRedirectionStrategy) {
+    private FFprobeSession(final String[] arguments,
+                           final FFprobeSessionCompleteCallback completeCallback,
+                           final LogCallback logCallback,
+                           final LogRedirectionStrategy logRedirectionStrategy) {
         super(arguments, logCallback, logRedirectionStrategy);
 
         this.completeCallback = completeCallback;

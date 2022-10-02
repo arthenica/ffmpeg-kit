@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Taner Sener
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -125,7 +125,7 @@ NSString* const StreamKeyTags = @"tags";
 }
 
 - (NSDictionary*)getTags {
-    return [self getProperties:StreamKeyTags];
+    return [self getProperty:StreamKeyTags];
 }
 
 - (NSString*)getStringProperty:(NSString*)key {
@@ -138,15 +138,15 @@ NSString* const StreamKeyTags = @"tags";
 }
 
 - (NSNumber*)getNumberProperty:(NSString*)key {
-    NSDictionary* mediaProperties = [self getAllProperties];
-    if (mediaProperties == nil) {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
         return nil;
     }
 
-    return mediaProperties[key];
+    return allProperties[key];
 }
 
-- (NSDictionary*)getProperties:(NSString*)key {
+- (id)getProperty:(NSString*)key {
     NSDictionary* allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;

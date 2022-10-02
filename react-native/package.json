@@ -1,6 +1,6 @@
 {
   "name": "ffmpeg-kit-react-native",
-  "version": "4.5.1",
+  "version": "4.5.2",
   "description": "FFmpeg Kit for React Native",
   "main": "src/index",
   "types": "src/index.d.ts",
@@ -18,13 +18,13 @@
     "ffmpeg-kit",
     "ios"
   ],
-  "repository": "https://github.com/tanersener/ffmpeg-kit",
-  "author": "Taner Sener <tanersener@gmail.com> (https://github.com/tanersener)",
+  "repository": "https://github.com/arthenica/ffmpeg-kit",
+  "author": "ARTHENICA <open-source@arthenica.com> (https://github.com/arthenica)",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/tanersener/ffmpeg-kit/issues"
+    "url": "https://github.com/arthenica/ffmpeg-kit/issues"
   },
-  "homepage": "https://github.com/tanersener/ffmpeg-kit",
+  "homepage": "https://github.com/arthenica/ffmpeg-kit",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

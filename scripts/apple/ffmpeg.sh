@@ -99,6 +99,7 @@ x86-64-mac-catalyst)
 esac
 
 CONFIGURE_POSTFIX=""
+HIGH_PRIORITY_LDFLAGS=""
 
 # SET CONFIGURE OPTIONS
 for library in {0..61}; do
@@ -294,6 +295,7 @@ for library in {0..61}; do
     expat)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags expat 2>>"${BASEDIR}"/build.log)"
       FFMPEG_LDFLAGS+=" $(pkg-config --libs --static expat 2>>"${BASEDIR}"/build.log)"
+      HIGH_PRIORITY_LDFLAGS+=" $(pkg-config --libs --static expat 2>>"${BASEDIR}"/build.log)"
       ;;
     libogg)
       FFMPEG_CFLAGS+=" $(pkg-config --cflags ogg 2>>"${BASEDIR}"/build.log)"
@@ -381,7 +383,7 @@ for library in {0..61}; do
       CONFIGURE_POSTFIX+=" --disable-opengl"
     elif [[ ${library} -eq ${LIBRARY_APPLE_VIDEOTOOLBOX} ]]; then
       CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-    elif [[ ${library} -eq ${LIBRARY_APPLE_ZLIB} ]]; then
+    elif [[ ${library} -eq ${LIBRARY_SYSTEM_ZLIB} ]]; then
       CONFIGURE_POSTFIX+=" --disable-zlib"
     elif [[ ${library} -eq ${LIBRARY_OPENSSL} ]]; then
       CONFIGURE_POSTFIX+=" --disable-openssl"
@@ -449,7 +451,7 @@ COMMON_LDFLAGS=$(get_common_ldflags)
 # UPDATE BUILD FLAGS
 export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS}${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
 export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
-export LDFLAGS="${ARCH_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
+export LDFLAGS="${ARCH_LDFLAGS}${HIGH_PRIORITY_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
 
 echo -n -e "\n${LIB_NAME}: "
 
@@ -482,10 +484,6 @@ fi
 
 # 3. Use thread local log levels
 ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR}"/src/${LIB_NAME}/libavutil/log.c 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-
-# 4. Set friendly ffmpeg version
-FFMPEG_VERSION="v$(get_user_friendly_ffmpeg_version)"
-${SED_INLINE} "s/\$version/$FFMPEG_VERSION/g" "${BASEDIR}"/src/"${LIB_NAME}"/ffbuild/version.sh 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 ###################################################################
 
@@ -623,9 +621,8 @@ create_temporary_framework "libswresample"
 create_temporary_framework "libswscale"
 
 ${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-${SED_INLINE} "s|^ALLFFLIBS = .*|ALLFFLIBS = ${FFMPEG_LIBRARY_PATH}/framework|g" ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 ${SED_INLINE} 's|$(LD_LIB)|-framework lib% |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-${SED_INLINE} 's|$(LD_PATH)lib|-F |g' ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+${SED_INLINE} "s|\$(LD_PATH)lib%|-F ${FFMPEG_LIBRARY_PATH}/framework|g" ${BASEDIR}/src/ffmpeg/ffbuild/common.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # BUILD FRAMEWORKS AS DYNAMIC LIBRARIES
 build_ffmpeg
@@ -644,6 +641,8 @@ overwrite_file "${BASEDIR}"/src/ffmpeg/libavcodec/arm/mathops.h "${FFMPEG_LIBRAR
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/network.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/network.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/os_support.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/os_support.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/url.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/url.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/bprint.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/bprint.h 1>>"${BASEDIR}"/build.log 2>&1
+overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/getenv_utf8.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/getenv_utf8.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/internal.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/internal.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/libm.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/libm.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/reverse.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/reverse.h 1>>"${BASEDIR}"/build.log 2>&1

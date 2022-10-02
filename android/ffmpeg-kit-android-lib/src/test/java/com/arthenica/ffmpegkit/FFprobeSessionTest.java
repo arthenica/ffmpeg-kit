@@ -30,7 +30,7 @@ public class FFprobeSessionTest {
 
     @Test
     public void constructorTest() {
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         // 1. getCompleteCallback
         Assert.assertNull(ffprobeSession.getCompleteCallback());
@@ -97,7 +97,7 @@ public class FFprobeSessionTest {
             }
         };
 
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, completeCallback);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS, completeCallback);
 
         // 1. getCompleteCallback
         Assert.assertEquals(ffprobeSession.getCompleteCallback(), completeCallback);
@@ -171,7 +171,7 @@ public class FFprobeSessionTest {
             }
         };
 
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS, completeCallback, logCallback);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS, completeCallback, logCallback);
 
         // 1. getCompleteCallback
         Assert.assertEquals(ffprobeSession.getCompleteCallback(), completeCallback);
@@ -231,9 +231,9 @@ public class FFprobeSessionTest {
 
     @Test
     public void getSessionIdTest() {
-        FFprobeSession ffprobeSession1 = new FFprobeSession(TEST_ARGUMENTS);
-        FFprobeSession ffprobeSession2 = new FFprobeSession(TEST_ARGUMENTS);
-        FFprobeSession ffprobeSession3 = new FFprobeSession(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession1 = FFprobeSession.create(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession2 = FFprobeSession.create(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession3 = FFprobeSession.create(TEST_ARGUMENTS);
 
         Assert.assertTrue(ffprobeSession3.getSessionId() > ffprobeSession2.getSessionId());
         Assert.assertTrue(ffprobeSession3.getSessionId() > ffprobeSession1.getSessionId());
@@ -246,7 +246,7 @@ public class FFprobeSessionTest {
 
     @Test
     public void getLogs() {
-        final FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        final FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         String logMessage1 = "i am log one";
         String logMessage2 = "i am log two";
@@ -263,7 +263,7 @@ public class FFprobeSessionTest {
 
     @Test
     public void getLogsAsStringTest() {
-        final FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        final FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         String logMessage1 = "i am log one";
         String logMessage2 = "i am log two";
@@ -280,18 +280,18 @@ public class FFprobeSessionTest {
     public void getLogRedirectionStrategy() {
         FFmpegKitConfig.setLogRedirectionStrategy(LogRedirectionStrategy.NEVER_PRINT_LOGS);
 
-        final FFprobeSession ffprobeSession1 = new FFprobeSession(TEST_ARGUMENTS);
+        final FFprobeSession ffprobeSession1 = FFprobeSession.create(TEST_ARGUMENTS);
         Assert.assertEquals(FFmpegKitConfig.getLogRedirectionStrategy(), ffprobeSession1.getLogRedirectionStrategy());
 
         FFmpegKitConfig.setLogRedirectionStrategy(LogRedirectionStrategy.PRINT_LOGS_WHEN_SESSION_CALLBACK_NOT_DEFINED);
 
-        final FFprobeSession ffprobeSession2 = new FFprobeSession(TEST_ARGUMENTS);
+        final FFprobeSession ffprobeSession2 = FFprobeSession.create(TEST_ARGUMENTS);
         Assert.assertEquals(FFmpegKitConfig.getLogRedirectionStrategy(), ffprobeSession2.getLogRedirectionStrategy());
     }
 
     @Test
     public void startRunningTest() {
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         ffprobeSession.startRunning();
 
@@ -302,7 +302,7 @@ public class FFprobeSessionTest {
 
     @Test
     public void completeTest() {
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         ffprobeSession.startRunning();
         ffprobeSession.complete(new ReturnCode(100));
@@ -315,7 +315,7 @@ public class FFprobeSessionTest {
 
     @Test
     public void failTest() {
-        FFprobeSession ffprobeSession = new FFprobeSession(TEST_ARGUMENTS);
+        FFprobeSession ffprobeSession = FFprobeSession.create(TEST_ARGUMENTS);
 
         ffprobeSession.startRunning();
         ffprobeSession.fail(new Exception(""));
