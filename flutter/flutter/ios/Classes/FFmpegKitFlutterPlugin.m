@@ -642,23 +642,21 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 // MediaInformationJsonParser
 
 - (void)mediaInformationJsonParserFrom:(NSString*)ffprobeJsonOutput result:(FlutterResult)result {
-  NSError *error;
-  MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-  if (error == nil) {
+  @try {
+    MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
     result([FFmpegKitFlutterPlugin toMediaInformationDictionary:mediaInformation]);
-  } else {
-    NSLog(@"Parsing MediaInformation failed: %@.\n", error);
+  } @catch (NSException *exception) {
+    NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     result(nil);
   }
 }
 
 - (void)mediaInformationJsonParserFromWithError:(NSString*)ffprobeJsonOutput result:(FlutterResult)result {
-  NSError *error;
-  MediaInformation* mediaInformation = [MediaInformationJsonParser from:ffprobeJsonOutput with:error];
-  if (error == nil) {
+  @try {
+    MediaInformation* mediaInformation = [MediaInformationJsonParser fromWithError:ffprobeJsonOutput];
     result([FFmpegKitFlutterPlugin toMediaInformationDictionary:mediaInformation]);
-  } else {
-    NSLog(@"Parsing MediaInformation failed: %@.\n", error);
+  } @catch (NSException *exception) {
+    NSLog(@"Parsing MediaInformation failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
     result([FlutterError errorWithCode:@"PARSE_FAILED" message:@"Parsing MediaInformation failed with JSON error." details:nil]);
   }
 }

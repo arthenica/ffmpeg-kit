@@ -79,7 +79,8 @@ class FFmpegKitFactory {
         case 2:
           return AbstractSession.createFFprobeSessionFromMap(sessionMap);
         case 3:
-          return AbstractSession.createMediaInformationSessionFromMap(sessionMap);
+          return AbstractSession.createMediaInformationSessionFromMap(
+              sessionMap);
         case 1:
         default:
           return AbstractSession.createFFmpegSessionFromMap(sessionMap);
@@ -98,7 +99,7 @@ class FFmpegKitFactory {
     }
   }
 
-  static String getVersion() => "4.5.1";
+  static String getVersion() => "5.1.0";
 
   static LogRedirectionStrategy? getLogRedirectionStrategy(int? sessionId) =>
       logRedirectionStrategyMap[sessionId];
