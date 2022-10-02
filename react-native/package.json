@@ -1,6 +1,6 @@
 {
   "name": "ffmpeg-kit-react-native",
-  "version": "4.5.2",
+  "version": "5.1.0",
   "description": "FFmpeg Kit for React Native",
   "main": "src/index",
   "types": "src/index.d.ts",
@@ -19,7 +19,7 @@
     "ios"
   ],
   "repository": "https://github.com/arthenica/ffmpeg-kit",
-  "author": "ARTHENICA <open-source@arthenica.com> (https://github.com/arthenica)",
+  "author": "ARTHENICA <open-source@arthenica.com> (https://www.arthenica.com)",
   "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/arthenica/ffmpeg-kit/issues"

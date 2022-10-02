@@ -344,7 +344,7 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void ffmpegSession(final ReadableArray readableArray, final Promise promise) {
-    promise.resolve(toMap(new FFmpegSession(toArgumentsArray(readableArray), null, null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS)));
+    promise.resolve(toMap(FFmpegSession.create(toArgumentsArray(readableArray), null, null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS)));
   }
 
   @ReactMethod
@@ -395,14 +395,14 @@ public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void ffprobeSession(final ReadableArray readableArray, final Promise promise) {
-    promise.resolve(toMap(new FFprobeSession(toArgumentsArray(readableArray), null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS)));
+    promise.resolve(toMap(FFprobeSession.create(toArgumentsArray(readableArray), null, null, LogRedirectionStrategy.NEVER_PRINT_LOGS)));
   }
 
   // MediaInformationSession
 
   @ReactMethod
   public void mediaInformationSession(final ReadableArray readableArray, final Promise promise) {
-    promise.resolve(toMap(new MediaInformationSession(toArgumentsArray(readableArray), null, null)));
+    promise.resolve(toMap(MediaInformationSession.create(toArgumentsArray(readableArray), null, null)));
   }
 
   // MediaInformationJsonParser
