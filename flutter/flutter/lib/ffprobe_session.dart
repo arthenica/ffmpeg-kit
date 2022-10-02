@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -40,11 +40,6 @@ class FFprobeSession extends AbstractSession {
 
     return session;
   }
-
-  /// Creates a new FFprobe session from [sessionMap], which includes session
-  /// fields as map keys.
-  static FFprobeSession fromMap(Map<dynamic, dynamic> sessionMap) =>
-      AbstractSession.createFFprobeSessionFromMap(sessionMap);
 
   /// Returns the session specific complete callback.
   FFprobeSessionCompleteCallback? getCompleteCallback() =>

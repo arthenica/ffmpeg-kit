@@ -106,5 +106,5 @@ abstract class Session {
   bool isMediaInformation();
 
   /// Cancels running the session.
-  void cancel();
+  Future<void> cancel();
 }

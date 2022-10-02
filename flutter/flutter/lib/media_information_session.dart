@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -42,11 +42,6 @@ class MediaInformationSession extends AbstractSession {
 
     return session;
   }
-
-  /// Creates a new MediaInformation session from [sessionMap], which includes
-  /// session fields as map keys.
-  static MediaInformationSession fromMap(Map<dynamic, dynamic> sessionMap) =>
-      AbstractSession.createMediaInformationSessionFromMap(sessionMap);
 
   /// Returns the media information extracted in this session.
   MediaInformation? getMediaInformation() => this._mediaInformation;

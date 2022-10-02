@@ -1,24 +1,31 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.1.2'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 30
-        versionCode 451
-        versionName "4.5.1"
+        targetSdkVersion 31
+        versionCode 510
+        versionName "5.1.0"
     }
 
     buildTypes {
@@ -35,14 +42,7 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-    jcenter()
-    google()
-}
-
 dependencies {
     implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'com.arthenica:ffmpeg-kit-https:4.5.1-1'
+    implementation 'com.arthenica:ffmpeg-kit-https:5.1'
 }
-
