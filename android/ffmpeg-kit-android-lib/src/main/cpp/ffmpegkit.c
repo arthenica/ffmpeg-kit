@@ -582,6 +582,30 @@ int saf_close(int fd) {
 }
 
 /**
+ * Used by JNI methods to enable redirection.
+ */
+static void enableNativeRedirection() {
+    mutexLock();
+
+    if (redirectionEnabled != 0) {
+        mutexUnlock();
+        return;
+    }
+    redirectionEnabled = 1;
+
+    mutexUnlock();
+
+    int rc = pthread_create(&callbackThread, 0, callbackThreadFunction, 0);
+    if (rc != 0) {
+        LOGE("Failed to create callback thread (rc=%d).\n", rc);
+        return;
+    }
+
+    av_log_set_callback(ffmpegkit_log_callback_function);
+    set_report_callback(ffmpegkit_statistics_callback_function);
+}
+
+/**
  * Called when 'ffmpegkit' native library is loaded.
  *
  * @param vm pointer to the running virtual machine
@@ -665,6 +689,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     av_set_saf_open(saf_open);
     av_set_saf_close(saf_close);
 
+    enableNativeRedirection();
+
     return JNI_VERSION_1_6;
 }
 
@@ -696,24 +722,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLog
  * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(JNIEnv *env, jclass object) {
-    mutexLock();
-
-    if (redirectionEnabled != 0) {
-        mutexUnlock();
-        return;
-    }
-    redirectionEnabled = 1;
-
-    mutexUnlock();
-
-    int rc = pthread_create(&callbackThread, 0, callbackThreadFunction, 0);
-    if (rc != 0) {
-        LOGE("Failed to create callback thread (rc=%d).\n", rc);
-        return;
-    }
-
-    av_log_set_callback(ffmpegkit_log_callback_function);
-    set_report_callback(ffmpegkit_statistics_callback_function);
+    enableNativeRedirection();
 }
 
 /**
