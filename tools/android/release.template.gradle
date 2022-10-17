@@ -43,7 +43,8 @@ ext {
     developerName = 'ARTHENICA'
     developerEmail = 'open-source@arthenica.com'
 
-    if (Project.hasProperty('releaseGPL')) {
+    gplLicensed = findProperty('releaseGPL') ?: '0'
+    if (gplLicensed == "1") {
         licenseName = 'GNU General Public License version 3'
         licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.txt'
     } else {
