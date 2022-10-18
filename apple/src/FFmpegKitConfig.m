@@ -487,7 +487,12 @@ void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float qu
 
 void process_log(long sessionId, int levelValue, AVBPrint* logMessage) {
     int activeLogLevel = av_log_get_level();
-    Log* log = [[Log alloc] init:sessionId:levelValue:[NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding]];
+    NSString* message = [NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding];
+    if (message == nil) {
+        // WE DROP LOGS THAT WE CANNOT DISPLAY
+        return;
+    }
+    Log* log = [[Log alloc] init:sessionId:levelValue:message];
     BOOL globalCallbackDefined = false;
     BOOL sessionCallbackDefined = false;
     LogRedirectionStrategy activeLogRedirectionStrategy = globalLogRedirectionStrategy;
