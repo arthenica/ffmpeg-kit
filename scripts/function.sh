@@ -1921,53 +1921,53 @@ autoreconf_library() {
 clone_git_repository_with_commit_id() {
   local RC
 
-  (mkdir -p $2 1>>"${BASEDIR}"/build.log 2>&1)
+  (mkdir -p "$2" 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to create local directory $2\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$2" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
 
   echo -e "INFO: Cloning commit id $3 from repository $1 into local directory $2\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  (git clone $1 $2 --depth 1 1>>"${BASEDIR}"/build.log 2>&1)
+  (git clone "$1" "$2" --depth 1 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to clone $1\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$2" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
 
-  cd $2 1>>"${BASEDIR}"/build.log 2>&1
+  cd "$2" 1>>"${BASEDIR}"/build.log 2>&1
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to cd into $2\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$2" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
 
-  (git fetch --depth 1 origin $3 1>>"${BASEDIR}"/build.log 2>&1)
+  (git fetch --depth 1 origin "$3" 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to fetch commit id $3 from $1\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $2 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$2" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
 
-  (git checkout $3 1>>"${BASEDIR}"/build.log 2>&1)
+  (git checkout "$3" 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
@@ -1988,26 +1988,26 @@ clone_git_repository_with_commit_id() {
 clone_git_repository_with_tag() {
   local RC
 
-  (mkdir -p $3 1>>"${BASEDIR}"/build.log 2>&1)
+  (mkdir -p "$3" 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to create local directory $3\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $3 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$3" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
 
   echo -e "INFO: Cloning tag $2 from repository $1 into local directory $3\n" 1>>"${BASEDIR}"/build.log 2>&1
 
-  (git clone --depth 1 --branch $2 $1 $3 1>>"${BASEDIR}"/build.log 2>&1)
+  (git clone --depth 1 --branch "$2" "$1" "$3" 1>>"${BASEDIR}"/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
     echo -e "\nINFO: Failed to clone $1 -> $2\n" 1>>"${BASEDIR}"/build.log 2>&1
-    rm -rf $3 1>>"${BASEDIR}"/build.log 2>&1
+    rm -rf "$3" 1>>"${BASEDIR}"/build.log 2>&1
     echo ${RC}
     return
   fi
