@@ -31,9 +31,9 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-ios-lts-on-macos-catalina:
-    name: ios lts on catalina
-    runs-on: macos-10.15
+  build-ios-lts-on-macos-bigsur:
+    name: ios lts on big sur
+    runs-on: macos-11
     strategy:
       matrix:
         xcode: [ '12.4' ]
@@ -83,9 +83,9 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-macos-lts-on-macos-catalina:
-    name: macos lts on catalina
-    runs-on: macos-10.15
+  build-macos-lts-on-macos-bigsur:
+    name: macos lts on big sur
+    runs-on: macos-11
     strategy:
       matrix:
         xcode: [ '12.4' ]
@@ -135,9 +135,9 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-tvos-lts-on-macos-catalina:
-    name: tvos lts on catalina
-    runs-on: macos-10.15
+  build-tvos-lts-on-macos-bigsur:
+    name: tvos lts on big sur
+    runs-on: macos-11
     strategy:
       matrix:
         xcode: [ '12.4' ]
