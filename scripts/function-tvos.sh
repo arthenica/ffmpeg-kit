@@ -43,9 +43,9 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   display_help_gpl_libraries
   display_help_custom_libraries
   if [[ -n ${FFMPEG_KIT_XCF_BUILD} ]]; then
-    display_help_advanced_options "  --no-framework\t\tdo not build xcframework bundles [no]"
+    display_help_advanced_options "  --no-framework\t\tdo not build xcframework bundles [no]"  "  --no-bitcode\t\t\tdo not enable bitcode in bundles [no]"
   else
-    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles [no]"
+    display_help_advanced_options "  --no-framework\t\tdo not build framework bundles [no]"  "  --no-bitcode\t\t\tdo not enable bitcode in bundles [no]"
   fi
 }
 
@@ -79,10 +79,13 @@ get_common_cflags() {
   fi
 
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
+  if [ -z $NO_BITCODE ]; then
+    local BITCODE_FLAGS="-fembed-bitcode"
+  fi
 
   case ${ARCH} in
   arm64)
-    echo "-fstrict-aliasing -fembed-bitcode -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing ${BITCODE_FLAGS} -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
     ;;
   x86-64 | arm64-simulator)
     echo "-fstrict-aliasing -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
@@ -254,7 +257,9 @@ get_cxxflags() {
   local BITCODE_FLAGS=""
   case ${ARCH} in
   arm64)
-    local BITCODE_FLAGS="-fembed-bitcode"
+    if [ -z $NO_BITCODE ]; then
+      local BITCODE_FLAGS="-fembed-bitcode"
+    fi
     ;;
   esac
 
@@ -320,9 +325,13 @@ get_size_optimization_ldflags() {
 }
 
 get_arch_specific_ldflags() {
+  if [ -z $NO_BITCODE ]; then
+    local BITCODE_FLAGS="-fembed-bitcode"
+  fi
+
   case ${ARCH} in
   arm64)
-    echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
+    echo "-arch arm64 -march=armv8-a+crc+crypto ${BITCODE_FLAGS}"
     ;;
   arm64-simulator)
     echo "-arch arm64 -march=armv8-a+crc+crypto"
@@ -342,12 +351,15 @@ get_ldflags() {
     local OPTIMIZATION_FLAGS="${FFMPEG_KIT_DEBUG}"
   fi
   local COMMON_FLAGS=$(get_common_ldflags)
+  if [ -z $NO_BITCODE ]; then
+    local BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
+  fi
 
   case $1 in
   ffmpeg-kit)
     case ${ARCH} in
     arm64)
-      echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
+      echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
       ;;
     *)
       echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
