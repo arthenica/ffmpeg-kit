@@ -927,6 +927,9 @@ display_help_advanced_options() {
   if [ -n "$1" ]; then
     echo -e "$1"
   fi
+  if [ -n "$2" ]; then
+    echo -e "$2"
+  fi
   echo -e ""
 }
 
