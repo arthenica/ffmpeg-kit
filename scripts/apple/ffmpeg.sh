@@ -98,6 +98,10 @@ x86-64-mac-catalyst)
   ;;
 esac
 
+if [ ! -z $NO_BITCODE ]; then
+  BITCODE_FLAGS=""
+fi
+
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_LDFLAGS=""
 

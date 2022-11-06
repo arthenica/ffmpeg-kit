@@ -71,6 +71,9 @@ while [ ! $# -eq 0 ]; do
 
     skip_library "${SKIP_LIBRARY}"
     ;;
+  --no-bitcode)
+    export NO_BITCODE="1"
+    ;;
   --no-framework)
     NO_FRAMEWORK="1"
     ;;
