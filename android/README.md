@@ -102,7 +102,7 @@ NOTE - FILTER_COMPLEX can not be used. (IDK why, if you have solution tell me pl
 
 
 
-#EXAMPLES
+EXAMPLES
 1) FFMPEG
 ```
 from jnius import autoclass
@@ -118,9 +118,6 @@ d = FFMPEG.Run(str("-i video.mp4 -ab 160k -ac 2 -ar 44100 -vn TEMP/audio.wav"))
 print(d) 
 
 ```
-
-
-
 
 
 2) FFProbe
