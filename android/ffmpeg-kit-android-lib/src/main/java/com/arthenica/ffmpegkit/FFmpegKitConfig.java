@@ -111,7 +111,7 @@ public class FFmpegKitConfig {
     private static Level activeLogLevel;
 
     /* Session history variables */
-    private static int sessionHistorySize;
+    public static int sessionHistorySize;
     private static final Map<Long, Session> sessionHistoryMap;
     private static final List<Session> sessionHistoryList;
     private static final Object sessionHistoryLock;
