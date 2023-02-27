@@ -24,6 +24,12 @@ It includes scripts to build `FFmpeg` native libraries, a wrapper library to run
 
 See [Android](android) to learn more about `FFmpegKit` for `Android`.
 
+
+
+
+###ANYTHING UNDER IS USELESS FOR PYTHON, Use the one by Arthentica for better support.
+
+
 ### 3. iOS, macOS, tvOS
 
 See [Apple](apple) to use `FFmpegKit` on `Apple` platforms (`iOS`, `macOS`, `tvOS`).
