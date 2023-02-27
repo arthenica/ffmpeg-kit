@@ -8,7 +8,7 @@
 - Builds shared native libraries (.so)
 - Creates Android archive with .aar extension
 
-### 2) BUILDING (Is after `Using with Python`)                                                         
+### 2. BUILDING (Is after `Using with Python`)                                                         
 ### USE PREBUILT PACKAGE FROM RELEASES SECTION      
 
 ### 3. Using With Python
