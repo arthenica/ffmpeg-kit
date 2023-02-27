@@ -22,12 +22,12 @@ It includes scripts to build `FFmpeg` native libraries, a wrapper library to run
 
 ### 2. Android (+Python)
 
-See [Android](android) to learn more about `FFmpegKit` for `Android`.
+See [Android](android) to learn more about `FFmpegKit` for `Android`.        
 
 
 
 
-### ANYTHING UNDER IS USELESS FOR PYTHON, Use the one by Arthentica for better support.
+# ANYTHING UNDER IS USELESS FOR PYTHON, Use the one by Arthentica for better support.                    
 
 
 ### 3. iOS, macOS, tvOS
