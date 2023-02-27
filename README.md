@@ -1,12 +1,7 @@
-# wait pls
 
 
 
-
-
-
-
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v5.1-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
+# FFmpegKit for Python
 
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
@@ -25,7 +20,7 @@ It includes scripts to build `FFmpeg` native libraries, a wrapper library to run
 - 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com)
 - Licensed under `LGPL 3.0` by default, `GPL v3.0` if GPL licensed libraries are enabled
 
-### 2. Android
+### 2. Android (+Python)
 
 See [Android](android) to learn more about `FFmpegKit` for `Android`.
 
