@@ -79,7 +79,7 @@ from jnius import *
 FFMPEG = autoclass('com.sahib.pyff.ffpy')
 ```
 
-BOTH (FFMPEG and FFPROBE) RETURN OUTPUT OF THE COMMAND
+BOTH (FFMPEG and FFPROBE) RETURN OUTPUT OF THE COMMAND         
 4) To Use FFMPEG 
 ```
 #EXECUTED FFMPEG COMMAND, COMMAND IS STRING
@@ -98,12 +98,12 @@ probeCommand = FFMPEG.RunProbe("Command")
 print(probeCommand)
 
 ```
-NOTE - FILTER_COMPLEX can not be used. (IDK why, if you have solution tell me please)
+NOTE - FILTER_COMPLEX can not be used. (IDK why, if you have solution tell me please)      
 
 
 
-EXAMPLES
-1) FFMPEG
+EXAMPLES      
+1) FFMPEG     
 ```
 from jnius import autoclass
 from jnius import * 
@@ -139,12 +139,12 @@ frameRate = int(frameRate)
 print(frameRate)
 #Converts framerate to integer and prints it
 
-```
+```    
 
 
 
 
-#END OF DOCUMENTATION FOR PYTHON
+#END OF DOCUMENTATION FOR PYTHON         
 
 
 
