@@ -6,8 +6,7 @@
 `FFmpegKit` is a collection of tools to use `FFmpeg` in `Android` applications.
 
 It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
- applications and 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases),
- [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com).
+ applications.
 
 ### 1. Features
 - Scripts to build FFmpeg native libraries
