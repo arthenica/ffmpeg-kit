@@ -3,8 +3,6 @@
 
 # FFmpegKit for Python
 
-<img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
-
 `FFmpegKit` is a collection of tools to use `FFmpeg` in `Android` applications.
 
 It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
