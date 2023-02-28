@@ -8,6 +8,9 @@
 It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
  applications.
 
+#### VIDEO TUTORIAL - https://youtu.be/F8yJwRof948
+
+
 ### 1. Features
 - Scripts to build FFmpeg native libraries
 - `FFmpegKit` wrapper library to run `FFmpeg`/`FFprobe` commands in applications
