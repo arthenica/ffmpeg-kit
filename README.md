@@ -163,7 +163,7 @@ Run `--help` to see all available build options.
 
 #### 2.3 LTS Binaries
 
-Use `--lts` option to build lts binaries for each architecture.
+NOT SUPPORTED FOR PYTHON
 
 #### 2.4 Build Output
 
