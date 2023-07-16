@@ -1448,7 +1448,7 @@ URL: https://github.com/tesseract-ocr/tesseract
 Version: ${TESSERACT_VERSION}
 
 Requires: lept
-Libs: -L\${libdir} -ltesseract
+Libs: -L\${libdir} -ltesseract -framework Accelerate
 Cflags: -I\${includedir}
 EOF
 }

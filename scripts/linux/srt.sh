@@ -46,4 +46,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_srt_package_config "1.5.1" || return 1
+create_srt_package_config "1.5.2" || return 1
