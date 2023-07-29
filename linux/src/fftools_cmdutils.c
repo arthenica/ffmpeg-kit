@@ -1,7 +1,7 @@
 /*
  * Various utilities for command line tools
  * Copyright (c) 2000-2003 Fabrice Bellard
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018 Taner Sener
  *
  * This file is part of FFmpeg.
  *

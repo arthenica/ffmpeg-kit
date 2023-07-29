@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2007-2010 Stefano Sabatini
- * Copyright (c) 2020 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2020-2022 Taner Sener
  *
  * This file is part of FFmpeg.
  *

@@ -1,6 +1,6 @@
 /*
  * This file is part of FFmpeg.
- * Copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018 Taner Sener
  *
  * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

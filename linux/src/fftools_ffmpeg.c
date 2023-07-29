@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2000-2003 Fabrice Bellard
- * Copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018-2022 Taner Sener
  *
  * This file is part of FFmpeg.
  *

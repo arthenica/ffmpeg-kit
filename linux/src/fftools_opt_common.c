@@ -1,6 +1,6 @@
 /*
  * Option handlers shared between the tools.
- * copyright (c) 2022 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2022 Taner Sener
  *
  * This file is part of FFmpeg.
  *

@@ -1,5 +1,5 @@
 /*
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018-2019 Taner Sener
  *
  * This file is part of FFmpeg.
  *
