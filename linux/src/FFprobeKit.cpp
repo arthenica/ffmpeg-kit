@@ -17,7 +17,6 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "fftools_ffmpeg.h"
 #include "FFmpegKit.h"
 #include "FFmpegKitConfig.h"
 #include "FFprobeKit.h"

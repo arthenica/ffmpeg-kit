@@ -45,7 +45,7 @@ struct CallbackData {
   float statisticsFps;              // statistics fps
   float statisticsQuality;          // statistics quality
   int64_t statisticsSize;           // statistics size
-  int statisticsTime;               // statistics time
+  double statisticsTime;            // statistics time
   double statisticsBitrate;         // statistics bitrate
   double statisticsSpeed;           // statistics speed
 
@@ -312,7 +312,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
 /**
  * Adds statistics data to the end of callback data list.
  */
-void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
@@ -491,7 +491,7 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
  * @param bitrate output bit rate in kbits/s
  * @param speed processing speed = processed duration / operation duration
  */
-void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
@@ -644,7 +644,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJIDD)V");
+    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJDDD)V");
     if (statisticsMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
         return JNI_FALSE;

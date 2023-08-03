@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # INIT SUBMODULES
-${SED_INLINE} 's|git://git.savannah.gnu.org|https://github.com/tanersener|g' "${BASEDIR}"/src/"${LIB_NAME}"/.gitmodules || return 1
+${SED_INLINE} 's|git://git.savannah.gnu.org|https://github.com/arthenica|g' "${BASEDIR}"/src/"${LIB_NAME}"/.gitmodules || return 1
 ./gitsub.sh pull || return 1
 
 # ALWAYS CLEAN THE PREVIOUS BUILD

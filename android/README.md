@@ -77,7 +77,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     }
 
     dependencies {
-        implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+        implementation 'com.arthenica:ffmpeg-kit-full:6.0'
     }
     ```
 

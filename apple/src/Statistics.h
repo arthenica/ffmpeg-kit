@@ -27,7 +27,7 @@
  */
 @interface Statistics : NSObject
 
-- (instancetype)init:(long)sessionId videoFrameNumber:(int)videoFrameNumber videoFps:(float)videoFps videoQuality:(float)videoQuality size:(int64_t)size time:(int)time bitrate:(double)bitrate speed:(double)speed;
+- (instancetype)init:(long)sessionId videoFrameNumber:(int)videoFrameNumber videoFps:(float)videoFps videoQuality:(float)videoQuality size:(int64_t)size time:(double)time bitrate:(double)bitrate speed:(double)speed;
 
 - (long)getSessionId;
 
@@ -39,7 +39,7 @@
 
 - (long)getSize;
 
-- (int)getTime;
+- (double)getTime;
 
 - (double)getBitrate;
 
