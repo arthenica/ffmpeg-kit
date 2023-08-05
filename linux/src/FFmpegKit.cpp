@@ -22,7 +22,9 @@
 #include "FFmpegKitConfig.h"
 #include "Packages.h"
 
-extern void cancel_operation(long id);
+extern "C" {
+    void cancel_operation(long id);
+}
 
 extern void* ffmpegKitInitialize();
 

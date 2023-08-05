@@ -23,8 +23,7 @@ cmake -Wno-dev \
   -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_system_processor) \
   -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
   -DUNIX=1 \
-  -DENABLE_STATIC=1 \
-  -DENABLE_SHARED=0 \
+  -DBUILD_SHARED_LIBS=0 \
   "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 
 make -j$(get_cpu_count) || return 1

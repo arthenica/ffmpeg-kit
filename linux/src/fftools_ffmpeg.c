@@ -35,6 +35,7 @@
  * 07.2023
  * --------------------------------------------------------
  * - FFmpeg 6.0 changes migrated
+ * - cherry-picked commit 7357012bb5205e0d03634aff48fc0167a9248190
  * - vstats_file, received_sigterm and received_nb_signals updated as thread-local
  * - forward_report method signature updated
  * - time field in report_callback/forward_report/set_report_callback updated as double
@@ -460,8 +461,8 @@ void term_exit(void)
     term_exit_sigsafe();
 }
 
-__thread int received_sigterm = 0;
-__thread int received_nb_signals = 0;
+static volatile int received_sigterm = 0;
+static volatile int received_nb_signals = 0;
 __thread atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
 __thread int ffmpeg_exited = 0;
 __thread int main_ffmpeg_return_code = 0;
@@ -1724,7 +1725,7 @@ static void print_final_stats(int64_t total_size)
     }
 }
 
-static void forward_report(uint64_t frame_number, float fps, float quality, int64_t total_size, int64_t seconds, int64_t microseconds, double bitrate, double speed)
+static void forward_report(uint64_t frame_number, float fps, float quality, int64_t total_size, int seconds, int microseconds, double bitrate, double speed)
 {
     // FORWARD DATA
     if (report_callback != NULL) {
@@ -1739,8 +1740,9 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     int vid;
     double bitrate;
     double speed;
-    int64_t pts = INT64_MIN + 1;
-    int hours, mins, secs, us;
+    int64_t pts = AV_NOPTS_VALUE;
+    int mins, secs, us;
+    int64_t hours;
     const char *hours_sign;
     int ret;
     float t;
@@ -1838,7 +1840,8 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
         }
         /* compute min output value */
         if (ost->last_mux_dts != AV_NOPTS_VALUE) {
-            pts = FFMAX(pts, ost->last_mux_dts);
+            if (pts == AV_NOPTS_VALUE || ost->last_mux_dts > pts)
+                pts = ost->last_mux_dts;
             if (copy_ts) {
                 if (copy_ts_first_pts == AV_NOPTS_VALUE && pts > 1)
                     copy_ts_first_pts = pts;
@@ -1851,19 +1854,21 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
             nb_frames_drop += ost->last_dropped;
     }
 
-    secs = FFABS(pts) / AV_TIME_BASE;
-    us = FFABS(pts) % AV_TIME_BASE;
-    mins = secs / 60;
-    secs %= 60;
-    hours = mins / 60;
-    mins %= 60;
+    us    = FFABS64U(pts) % AV_TIME_BASE;
+    secs  = FFABS64U(pts) / AV_TIME_BASE % 60;
+    mins  = FFABS64U(pts) / AV_TIME_BASE / 60 % 60;
+    hours = FFABS64U(pts) / AV_TIME_BASE / 3600;
     hours_sign = (pts < 0) ? "-" : "";
 
-    bitrate = pts && total_size >= 0 ? total_size * 8 / (pts / 1000.0) : -1;
-    speed = t != 0.0 ? (double)pts / AV_TIME_BASE / t : -1;
+    bitrate = pts != AV_NOPTS_VALUE && pts && total_size >= 0 ? total_size * 8 / (pts / 1000.0) : -1;
+    speed   = pts != AV_NOPTS_VALUE && t != 0.0 ? (double)pts / AV_TIME_BASE / t : -1;
 
     // FFmpegKit forward report
-    forward_report(frame_number, fps, q, total_size, secs, us, bitrate, speed);
+    if (pts == AV_NOPTS_VALUE) {
+        forward_report(frame_number, fps, q, total_size, 0, 0, bitrate, speed);
+    } else {
+        forward_report(frame_number, fps, q, total_size, secs, us, bitrate, speed);
+    }
 
     if (local_print_stats) {
         if (total_size < 0) av_bprintf(&buf, "size=N/A time=");
@@ -1871,7 +1876,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
         if (pts == AV_NOPTS_VALUE) {
             av_bprintf(&buf, "N/A ");
         } else {
-            av_bprintf(&buf, "%s%02d:%02d:%02d.%02d ",
+            av_bprintf(&buf, "%s%02"PRId64":%02d:%02d.%02d ",
                        hours_sign, hours, mins, secs, (100 * us) / AV_TIME_BASE);
         }
 
@@ -1892,7 +1897,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
         } else {
             av_bprintf(&buf_script, "out_time_us=%"PRId64"\n", pts);
             av_bprintf(&buf_script, "out_time_ms=%"PRId64"\n", pts);
-            av_bprintf(&buf_script, "out_time=%s%02d:%02d:%02d.%06d\n",
+            av_bprintf(&buf_script, "out_time=%s%02"PRId64":%02d:%02d.%06d\n",
                        hours_sign, hours, mins, secs, us);
         }
 

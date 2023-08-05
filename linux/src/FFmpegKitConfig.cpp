@@ -44,9 +44,10 @@ extern "C" {
 #include <fstream>
 #include <algorithm>
 
-extern void set_report_callback(void (*callback)(int, float, float, int64_t, double, double, double));
-
-extern void cancel_operation(long id);
+extern "C" {
+    void set_report_callback(void (*callback)(int, float, float, int64_t, double, double, double));
+    void cancel_operation(long id);
+}
 
 /**
  * Generates ids for named ffmpeg kit pipes.
