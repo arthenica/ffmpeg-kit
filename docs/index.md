@@ -112,10 +112,14 @@ the same `FFmpeg` release branch.
 `dev` part in the version string indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch and
 the exact version number of `FFmpeg` is obtained using the `git describe --tags` command.
 
-|    Platforms     |                                 FFmpegKit Version                                  | FFmpeg Version | Release Date |
-|:----------------:|:----------------------------------------------------------------------------------:|:--------------:|:------------:|
+|    Platforms     |                                 FFmpegKit Version                                 | FFmpeg Version | Release Date |
+|:----------------:|:---------------------------------------------------------------------------------:|:--------------:|:------------:|
+|     Android      |         [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)          |      6.0       | Aug 21, 2023 |
+|      Apple       |         [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)          |      6.0       | Aug 21, 2023 |
+|   React Native   | [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v5.1.0) |     5.1.2      | Oct 03, 2022 |
+|     Flutter      |   [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v5.1.0)    |     5.1.2      | Oct 02, 2022 |
 |     Android      |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |
-|      Apple       |    [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)               |     5.1.2      | Sep 29, 2022 |
+|      Apple       |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |
 |   React Native   | [4.5.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.2) |  4.5-dev-3393  | May 25, 2022 |
 |     Flutter      |   [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.1)    |  4.5-dev-3393  | Jan 02, 2022 |
 |   React Native   | [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.1) |  4.5-dev-3393  | Jan 02, 2022 |

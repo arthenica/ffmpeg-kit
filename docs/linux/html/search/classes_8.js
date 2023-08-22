@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['log_0',['Log',['../db/d1c/classffmpegkit_1_1_log.html',1,'ffmpegkit']]],
-  ['logbuffer_1',['LogBuffer',['../dd/d15/struct_log_buffer.html',1,'']]]
+  ['jsoncontext_0',['JSONContext',['../d6/d53/struct_j_s_o_n_context.html',1,'']]]
 ];
