@@ -1,5 +1,6 @@
 /*
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018-2019 Taner Sener
+ * Copyright (c) 2023 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -22,6 +23,12 @@
  * This file is the modified version of ffmpeg_hw.c file living in ffmpeg source code under the fftools folder. We
  * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
+ *
+ * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 07.2023
+ * --------------------------------------------------------
+ * - FFmpeg 6.0 changes migrated
  *
  * mobile-ffmpeg / ffmpeg-kit changes by Taner Sener
  *
@@ -357,7 +364,7 @@ int hw_device_setup_for_decode(InputStream *ist)
             if (ist->hwaccel_id == HWACCEL_AUTO) {
                 ist->hwaccel_device_type = dev->type;
             } else if (ist->hwaccel_device_type != dev->type) {
-                av_log(ist->dec_ctx, AV_LOG_ERROR, "Invalid hwaccel device "
+                av_log(NULL, AV_LOG_ERROR, "Invalid hwaccel device "
                        "specified for decoder: device %s of type %s is not "
                        "usable with hwaccel %s.\n", dev->name,
                        av_hwdevice_get_type_name(dev->type),
@@ -408,7 +415,7 @@ int hw_device_setup_for_decode(InputStream *ist)
             type = config->device_type;
             dev = hw_device_get_by_type(type);
             if (dev) {
-                av_log(ist->dec_ctx, AV_LOG_INFO, "Using auto "
+                av_log(NULL, AV_LOG_INFO, "Using auto "
                        "hwaccel type %s with existing device %s.\n",
                        av_hwdevice_get_type_name(type), dev->name);
             }
@@ -426,12 +433,12 @@ int hw_device_setup_for_decode(InputStream *ist)
                 continue;
             }
             if (ist->hwaccel_device) {
-                av_log(ist->dec_ctx, AV_LOG_INFO, "Using auto "
+                av_log(NULL, AV_LOG_INFO, "Using auto "
                        "hwaccel type %s with new device created "
                        "from %s.\n", av_hwdevice_get_type_name(type),
                        ist->hwaccel_device);
             } else {
-                av_log(ist->dec_ctx, AV_LOG_INFO, "Using auto "
+                av_log(NULL, AV_LOG_INFO, "Using auto "
                        "hwaccel type %s with new default device.\n",
                        av_hwdevice_get_type_name(type));
             }
@@ -439,7 +446,7 @@ int hw_device_setup_for_decode(InputStream *ist)
         if (dev) {
             ist->hwaccel_device_type = type;
         } else {
-            av_log(ist->dec_ctx, AV_LOG_INFO, "Auto hwaccel "
+            av_log(NULL, AV_LOG_INFO, "Auto hwaccel "
                    "disabled: no device found.\n");
             ist->hwaccel_id = HWACCEL_NONE;
             return 0;
@@ -447,7 +454,7 @@ int hw_device_setup_for_decode(InputStream *ist)
     }
 
     if (!dev) {
-        av_log(ist->dec_ctx, AV_LOG_ERROR, "No device available "
+        av_log(NULL, AV_LOG_ERROR, "No device available "
                "for decoder: device type %s needed for codec %s.\n",
                av_hwdevice_get_type_name(type), ist->dec->name);
         return err;
@@ -479,7 +486,7 @@ int hw_device_setup_for_encode(OutputStream *ost)
     }
 
     for (i = 0;; i++) {
-        config = avcodec_get_hw_config(ost->enc, i);
+        config = avcodec_get_hw_config(ost->enc_ctx->codec, i);
         if (!config)
             break;
 
@@ -490,7 +497,7 @@ int hw_device_setup_for_encode(OutputStream *ost)
             av_log(ost->enc_ctx, AV_LOG_VERBOSE, "Using input "
                    "frames context (format %s) with %s encoder.\n",
                    av_get_pix_fmt_name(ost->enc_ctx->pix_fmt),
-                   ost->enc->name);
+                   ost->enc_ctx->codec->name);
             ost->enc_ctx->hw_frames_ctx = av_buffer_ref(frames_ref);
             if (!ost->enc_ctx->hw_frames_ctx)
                 return AVERROR(ENOMEM);
@@ -505,7 +512,7 @@ int hw_device_setup_for_encode(OutputStream *ost)
     if (dev) {
         av_log(ost->enc_ctx, AV_LOG_VERBOSE, "Using device %s "
                "(type %s) with %s encoder.\n", dev->name,
-               av_hwdevice_get_type_name(dev->type), ost->enc->name);
+               av_hwdevice_get_type_name(dev->type), ost->enc_ctx->codec->name);
         ost->enc_ctx->hw_device_ctx = av_buffer_ref(dev->device_ref);
         if (!ost->enc_ctx->hw_device_ctx)
             return AVERROR(ENOMEM);

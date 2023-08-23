@@ -3,7 +3,7 @@
 # SET BUILD OPTIONS
 ASM_OPTIONS="--enable-asm"
 case ${ARCH} in
-x86-64 | x86-64-mac-catalyst)
+arm* | x86-64 | x86-64-mac-catalyst)
   ASM_OPTIONS="--disable-asm"
   ;;
 esac

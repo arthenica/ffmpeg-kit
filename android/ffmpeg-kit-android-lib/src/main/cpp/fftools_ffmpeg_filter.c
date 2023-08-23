@@ -1,6 +1,7 @@
 /*
  * ffmpeg filter configuration
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2023 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -23,6 +24,12 @@
  * This file is the modified version of ffmpeg_filter.c file living in ffmpeg source code under the fftools folder.
  * We manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
+ *
+ * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 07.2023
+ * --------------------------------------------------------
+ * - FFmpeg 6.0 changes migrated
  *
  * mobile-ffmpeg / ffmpeg-kit changes by Taner Sener
  *
@@ -69,8 +76,9 @@ static const enum AVPixelFormat *get_compliance_normal_pix_fmts(const AVCodec *c
     }
 }
 
-enum AVPixelFormat choose_pixel_fmt(AVStream *st, AVCodecContext *enc_ctx,
-                                    const AVCodec *codec, enum AVPixelFormat target)
+enum AVPixelFormat
+choose_pixel_fmt(const AVCodec *codec, enum AVPixelFormat target,
+                 int strict_std_compliance)
 {
     if (codec && codec->pix_fmts) {
         const enum AVPixelFormat *p = codec->pix_fmts;
@@ -79,7 +87,7 @@ enum AVPixelFormat choose_pixel_fmt(AVStream *st, AVCodecContext *enc_ctx,
         int has_alpha = desc ? desc->nb_components % 2 == 0 : 0;
         enum AVPixelFormat best= AV_PIX_FMT_NONE;
 
-        if (enc_ctx->strict_std_compliance > FF_COMPLIANCE_UNOFFICIAL) {
+        if (strict_std_compliance > FF_COMPLIANCE_UNOFFICIAL) {
             p = get_compliance_normal_pix_fmts(codec, p);
         }
         for (; *p != AV_PIX_FMT_NONE; p++) {
@@ -106,6 +114,7 @@ enum AVPixelFormat choose_pixel_fmt(AVStream *st, AVCodecContext *enc_ctx,
 static const char *choose_pix_fmts(OutputFilter *ofilter, AVBPrint *bprint)
 {
     OutputStream *ost = ofilter->ost;
+    AVCodecContext *enc = ost->enc_ctx;
     const AVDictionaryEntry *strict_dict = av_dict_get(ost->encoder_opts, "strict", NULL, 0);
     if (strict_dict)
         // used by choose_pixel_fmt() and below
@@ -119,13 +128,14 @@ static const char *choose_pix_fmts(OutputFilter *ofilter, AVBPrint *bprint)
         return av_get_pix_fmt_name(ost->enc_ctx->pix_fmt);
     }
     if (ost->enc_ctx->pix_fmt != AV_PIX_FMT_NONE) {
-        return av_get_pix_fmt_name(choose_pixel_fmt(ost->st, ost->enc_ctx, ost->enc, ost->enc_ctx->pix_fmt));
-    } else if (ost->enc && ost->enc->pix_fmts) {
+        return av_get_pix_fmt_name(choose_pixel_fmt(enc->codec, enc->pix_fmt,
+                                                    ost->enc_ctx->strict_std_compliance));
+    } else if (enc->codec->pix_fmts) {
         const enum AVPixelFormat *p;
 
-        p = ost->enc->pix_fmts;
+        p = enc->codec->pix_fmts;
         if (ost->enc_ctx->strict_std_compliance > FF_COMPLIANCE_UNOFFICIAL) {
-            p = get_compliance_normal_pix_fmts(ost->enc, p);
+            p = get_compliance_normal_pix_fmts(enc->codec, p);
         }
 
         for (; *p != AV_PIX_FMT_NONE; p++) {
@@ -133,7 +143,7 @@ static const char *choose_pix_fmts(OutputFilter *ofilter, AVBPrint *bprint)
             av_bprintf(bprint, "%s%c", name, p[1] == AV_PIX_FMT_NONE ? '\0' : '|');
         }
         if (!av_bprint_is_complete(bprint))
-            exit_program(1);
+            report_and_exit(AVERROR(ENOMEM));
         return bprint->str;
     } else
         return NULL;
@@ -197,7 +207,7 @@ int init_simple_filtergraph(InputStream *ist, OutputStream *ost)
     InputFilter  *ifilter;
 
     if (!fg)
-        exit_program(1);
+        report_and_exit(AVERROR(ENOMEM));
     fg->index = nb_filtergraphs;
 
     ofilter = ALLOC_ARRAY_ELEM(fg->outputs, fg->nb_outputs);
@@ -214,7 +224,7 @@ int init_simple_filtergraph(InputStream *ist, OutputStream *ost)
 
     ifilter->frame_queue = av_fifo_alloc2(8, sizeof(AVFrame*), AV_FIFO_FLAG_AUTO_GROW);
     if (!ifilter->frame_queue)
-        exit_program(1);
+        report_and_exit(AVERROR(ENOMEM));
 
     GROW_ARRAY(ist->filters, ist->nb_filters);
     ist->filters[ist->nb_filters - 1] = ifilter;
@@ -238,7 +248,7 @@ static char *describe_filter_link(FilterGraph *fg, AVFilterInOut *inout, int in)
         res = av_asprintf("%s:%s", ctx->filter->name,
                           avfilter_pad_get_name(pads, inout->pad_idx));
     if (!res)
-        exit_program(1);
+        report_and_exit(AVERROR(ENOMEM));
     return res;
 }
 
@@ -285,7 +295,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
                    "matches no streams.\n", p, fg->graph_desc);
             exit_program(1);
         }
-        ist = input_streams[input_files[file_idx]->ist_index + st->index];
+        ist = input_files[file_idx]->streams[st->index];
         if (ist->user_set_discard == AVDISCARD_ALL) {
             av_log(NULL, AV_LOG_FATAL, "Stream specifier '%s' in filtergraph description %s "
                    "matches a disabled input stream.\n", p, fg->graph_desc);
@@ -293,14 +303,13 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
         }
     } else {
         /* find the first unused stream of corresponding type */
-        for (i = 0; i < nb_input_streams; i++) {
-            ist = input_streams[i];
+        for (ist = ist_iter(NULL); ist; ist = ist_iter(ist)) {
             if (ist->user_set_discard == AVDISCARD_ALL)
                 continue;
             if (ist->dec_ctx->codec_type == type && ist->discard)
                 break;
         }
-        if (i == nb_input_streams) {
+        if (!ist) {
             av_log(NULL, AV_LOG_FATAL, "Cannot find a matching stream for "
                    "unlabeled input pad %d on filter %s\n", in->pad_idx,
                    in->filter_ctx->name);
@@ -323,10 +332,160 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
 
     ifilter->frame_queue = av_fifo_alloc2(8, sizeof(AVFrame*), AV_FIFO_FLAG_AUTO_GROW);
     if (!ifilter->frame_queue)
-        exit_program(1);
+        report_and_exit(AVERROR(ENOMEM));
 
     GROW_ARRAY(ist->filters, ist->nb_filters);
     ist->filters[ist->nb_filters - 1] = ifilter;
+}
+
+static int read_binary(const char *path, uint8_t **data, int *len)
+{
+    AVIOContext *io = NULL;
+    int64_t fsize;
+    int ret;
+
+    *data = NULL;
+    *len  = 0;
+
+    ret = avio_open2(&io, path, AVIO_FLAG_READ, &int_cb, NULL);
+    if (ret < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot open file '%s': %s\n",
+               path, av_err2str(ret));
+        return ret;
+    }
+
+    fsize = avio_size(io);
+    if (fsize < 0 || fsize > INT_MAX) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot obtain size of file %s\n", path);
+        ret = AVERROR(EIO);
+        goto fail;
+    }
+
+    *data = av_malloc(fsize);
+    if (!*data) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    ret = avio_read(io, *data, fsize);
+    if (ret != fsize) {
+        av_log(NULL, AV_LOG_ERROR, "Error reading file %s\n", path);
+        ret = ret < 0 ? ret : AVERROR(EIO);
+        goto fail;
+    }
+
+    *len = fsize;
+
+    return 0;
+fail:
+    avio_close(io);
+    av_freep(data);
+    *len = 0;
+    return ret;
+}
+
+static int filter_opt_apply(AVFilterContext *f, const char *key, const char *val)
+{
+    const AVOption *o = NULL;
+    int ret;
+
+    ret = av_opt_set(f, key, val, AV_OPT_SEARCH_CHILDREN);
+    if (ret >= 0)
+        return 0;
+
+    if (ret == AVERROR_OPTION_NOT_FOUND && key[0] == '/')
+        o = av_opt_find(f, key + 1, NULL, 0, AV_OPT_SEARCH_CHILDREN);
+    if (!o)
+        goto err_apply;
+
+    // key is a valid option name prefixed with '/'
+    // interpret value as a path from which to load the actual option value
+    key++;
+
+    if (o->type == AV_OPT_TYPE_BINARY) {
+        uint8_t *data;
+        int      len;
+
+        ret = read_binary(val, &data, &len);
+        if (ret < 0)
+            goto err_load;
+
+        ret = av_opt_set_bin(f, key, data, len, AV_OPT_SEARCH_CHILDREN);
+        av_freep(&data);
+    } else {
+        char *data = file_read(val);
+        if (!data) {
+            ret = AVERROR(EIO);
+            goto err_load;
+        }
+
+        ret = av_opt_set(f, key, data, AV_OPT_SEARCH_CHILDREN);
+        av_freep(&data);
+    }
+    if (ret < 0)
+        goto err_apply;
+
+    return 0;
+
+err_apply:
+    av_log(NULL, AV_LOG_ERROR,
+           "Error applying option '%s' to filter '%s': %s\n",
+           key, f->filter->name, av_err2str(ret));
+    return ret;
+err_load:
+    av_log(NULL, AV_LOG_ERROR,
+           "Error loading value for option '%s' from file '%s'\n",
+           key, val);
+    return ret;
+}
+
+static int graph_opts_apply(AVFilterGraphSegment *seg)
+{
+    for (size_t i = 0; i < seg->nb_chains; i++) {
+        AVFilterChain *ch = seg->chains[i];
+
+        for (size_t j = 0; j < ch->nb_filters; j++) {
+            AVFilterParams *p = ch->filters[j];
+            const AVDictionaryEntry *e = NULL;
+
+            av_assert0(p->filter);
+
+            while ((e = av_dict_iterate(p->opts, e))) {
+                int ret = filter_opt_apply(p->filter, e->key, e->value);
+                if (ret < 0)
+                    return ret;
+            }
+
+            av_dict_free(&p->opts);
+        }
+    }
+
+    return 0;
+}
+
+static int graph_parse(AVFilterGraph *graph, const char *desc,
+                       AVFilterInOut **inputs, AVFilterInOut **outputs)
+{
+    AVFilterGraphSegment *seg;
+    int ret;
+
+    ret = avfilter_graph_segment_parse(graph, desc, 0, &seg);
+    if (ret < 0)
+        return ret;
+
+    ret = avfilter_graph_segment_create_filters(seg, 0);
+    if (ret < 0)
+        goto fail;
+
+    ret = graph_opts_apply(seg);
+    if (ret < 0)
+        goto fail;
+
+    ret = avfilter_graph_segment_apply(seg, 0, inputs, outputs);
+
+fail:
+    avfilter_graph_segment_free(&seg);
+    return ret;
 }
 
 int init_complex_filtergraph(FilterGraph *fg)
@@ -342,7 +501,7 @@ int init_complex_filtergraph(FilterGraph *fg)
         return AVERROR(ENOMEM);
     graph->nb_threads = 1;
 
-    ret = avfilter_graph_parse2(graph, fg->graph_desc, &inputs, &outputs);
+    ret = graph_parse(graph, fg->graph_desc, &inputs, &outputs);
     if (ret < 0)
         goto fail;
 
@@ -467,8 +626,7 @@ static int configure_output_video_filter(FilterGraph *fg, OutputFilter *ofilter,
         snprintf(args, sizeof(args), "%d:%d",
                  ofilter->width, ofilter->height);
 
-        while ((e = av_dict_get(ost->sws_dict, "", e,
-                                AV_DICT_IGNORE_SUFFIX))) {
+        while ((e = av_dict_iterate(ost->sws_dict, e))) {
             av_strlcatf(args, sizeof(args), ":%s=%s", e->key, e->value);
         }
 
@@ -575,6 +733,7 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
     pad_idx = 0;                                                            \
 } while (0)
     av_bprint_init(&args, 0, AV_BPRINT_SIZE_UNLIMITED);
+#if FFMPEG_OPT_MAP_CHANNEL
     if (ost->audio_channels_mapped) {
         AVChannelLayout mapped_layout = { 0 };
         int i;
@@ -587,6 +746,7 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
         AUTO_INSERT_FILTER("-map_channel", "pan", args.str);
         av_bprint_clear(&args);
     }
+#endif
 
     if (codec->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC)
         av_channel_layout_default(&codec->ch_layout, codec->ch_layout.nb_channels);
@@ -620,11 +780,11 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
     if (ost->apad && of->shortest) {
         int i;
 
-        for (i=0; i<of->ctx->nb_streams; i++)
-            if (of->ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+        for (i = 0; i < of->nb_streams; i++)
+            if (of->streams[i]->st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
                 break;
 
-        if (i<of->ctx->nb_streams) {
+        if (i < of->nb_streams) {
             AUTO_INSERT_FILTER("-apad", "apad", ost->apad);
         }
     }
@@ -751,7 +911,7 @@ static int configure_input_video_filter(FilterGraph *fg, InputFilter *ifilter,
     }
 
     if (!fr.num)
-        fr = av_guess_frame_rate(input_files[ist->file_index]->ctx, ist->st, NULL);
+        fr = ist->framerate_guessed;
 
     if (ist->dec_ctx->codec_type == AVMEDIA_TYPE_SUBTITLE) {
         ret = sub2video_prepare(ist, ifilter);
@@ -904,40 +1064,6 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
     last_filter = filt_ctx;                                                 \
 } while (0)
 
-    if (audio_sync_method > 0) {
-        char args[256] = {0};
-
-        av_strlcatf(args, sizeof(args), "async=%d", audio_sync_method);
-        if (audio_drift_threshold != 0.1)
-            av_strlcatf(args, sizeof(args), ":min_hard_comp=%f", audio_drift_threshold);
-        if (!fg->reconfiguration)
-            av_strlcatf(args, sizeof(args), ":first_pts=0");
-        AUTO_INSERT_FILTER_INPUT("-async", "aresample", args);
-    }
-
-//     if (ost->audio_channels_mapped) {
-//         int i;
-//         AVBPrint pan_buf;
-//         av_bprint_init(&pan_buf, 256, 8192);
-//         av_bprintf(&pan_buf, "0x%"PRIx64,
-//                    av_get_default_channel_layout(ost->audio_channels_mapped));
-//         for (i = 0; i < ost->audio_channels_mapped; i++)
-//             if (ost->audio_channels_map[i] != -1)
-//                 av_bprintf(&pan_buf, ":c%d=c%d", i, ost->audio_channels_map[i]);
-//         AUTO_INSERT_FILTER_INPUT("-map_channel", "pan", pan_buf.str);
-//         av_bprint_finalize(&pan_buf, NULL);
-//     }
-
-    if (audio_volume != 256) {
-        char args[256];
-
-        av_log(NULL, AV_LOG_WARNING, "-vol has been deprecated. Use the volume "
-               "audio filter instead.\n");
-
-        snprintf(args, sizeof(args), "%f", audio_volume / 256.);
-        AUTO_INSERT_FILTER_INPUT("-vol", "volume", args);
-    }
-
     snprintf(name, sizeof(name), "trim for input stream %d:%d",
              ist->file_index, ist->st->index);
     if (copy_ts) {
@@ -1020,44 +1146,39 @@ int configure_filtergraph(FilterGraph *fg)
 
     if (simple) {
         OutputStream *ost = fg->outputs[0]->ost;
-        char args[512];
-        const AVDictionaryEntry *e = NULL;
 
         if (filter_nbthreads) {
             ret = av_opt_set(fg->graph, "threads", filter_nbthreads, 0);
             if (ret < 0)
                 goto fail;
         } else {
+            const AVDictionaryEntry *e = NULL;
             e = av_dict_get(ost->encoder_opts, "threads", NULL, 0);
             if (e)
                 av_opt_set(fg->graph, "threads", e->value, 0);
         }
 
-        args[0] = 0;
-        e       = NULL;
-        while ((e = av_dict_get(ost->sws_dict, "", e,
-                                AV_DICT_IGNORE_SUFFIX))) {
-            av_strlcatf(args, sizeof(args), "%s=%s:", e->key, e->value);
-        }
-        if (strlen(args)) {
-            args[strlen(args)-1] = 0;
-            fg->graph->scale_sws_opts = av_strdup(args);
+        if (av_dict_count(ost->sws_dict)) {
+            ret = av_dict_get_string(ost->sws_dict,
+                                     &fg->graph->scale_sws_opts,
+                                     '=', ':');
+            if (ret < 0)
+                goto fail;
         }
 
-        args[0] = 0;
-        e       = NULL;
-        while ((e = av_dict_get(ost->swr_opts, "", e,
-                                AV_DICT_IGNORE_SUFFIX))) {
-            av_strlcatf(args, sizeof(args), "%s=%s:", e->key, e->value);
+        if (av_dict_count(ost->swr_opts)) {
+            char *args;
+            ret = av_dict_get_string(ost->swr_opts, &args, '=', ':');
+            if (ret < 0)
+                goto fail;
+            av_opt_set(fg->graph, "aresample_swr_opts", args, 0);
+            av_free(args);
         }
-        if (strlen(args))
-            args[strlen(args)-1] = 0;
-        av_opt_set(fg->graph, "aresample_swr_opts", args, 0);
     } else {
         fg->graph->nb_threads = filter_complex_nbthreads;
     }
 
-    if ((ret = avfilter_graph_parse2(fg->graph, graph_desc, &inputs, &outputs)) < 0)
+    if ((ret = graph_parse(fg->graph, graph_desc, &inputs, &outputs)) < 0)
         goto fail;
 
     ret = hw_device_setup_for_filter(fg);
@@ -1131,16 +1252,8 @@ int configure_filtergraph(FilterGraph *fg)
 
     for (i = 0; i < fg->nb_outputs; i++) {
         OutputStream *ost = fg->outputs[i]->ost;
-        if (!ost->enc) {
-            /* identical to the same check in ffmpeg.c, needed because
-               complex filter graphs are initialized earlier */
-            av_log(NULL, AV_LOG_ERROR, "Encoder (codec %s) not found for output stream #%d:%d\n",
-                     avcodec_get_name(ost->st->codecpar->codec_id), ost->file_index, ost->index);
-            ret = AVERROR(EINVAL);
-            goto fail;
-        }
-        if (ost->enc->type == AVMEDIA_TYPE_AUDIO &&
-            !(ost->enc->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE))
+        if (ost->enc_ctx->codec_type == AVMEDIA_TYPE_AUDIO &&
+            !(ost->enc_ctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE))
             av_buffersink_set_frame_size(ost->filter->filter,
                                          ost->enc_ctx->frame_size);
     }

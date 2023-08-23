@@ -1,7 +1,8 @@
 /*
  * Various utilities for command line tools
  * copyright (c) 2003 Fabrice Bellard
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * copyright (c) 2018-2022 Taner Sener
+ * copyright (c) 2023 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -24,6 +25,12 @@
  * This file is the modified version of cmdutils.h file living in ffmpeg source code under the fftools folder. We
  * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
+ *
+ * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 07.2023
+ * --------------------------------------------------------
+ * - FFmpeg 6.0 changes migrated
  *
  * mobile-ffmpeg / ffmpeg-kit changes by Taner Sener
  *
@@ -94,6 +101,17 @@ extern __thread int find_stream_info;
  * Register a program-specific cleanup routine.
  */
 void register_exit(void (*cb)(int ret));
+
+/**
+ * Reports an error corresponding to the provided
+ * AVERROR code and calls exit_program() with the
+ * corresponding POSIX error code.
+ * @note ret must be an AVERROR-value of a POSIX error code
+ *       (i.e. AVERROR(EFOO) and not AVERROR_FOO).
+ *       library functions can return both, so call this only
+ *       with AVERROR(EFOO) of your own.
+ */
+void report_and_exit(int ret) av_noreturn;
 
 /**
  * Wraps exit with a program-specific cleanup routine.
@@ -231,11 +249,6 @@ void show_help_children(const AVClass *clazz, int flags);
  */
 void show_help_default_ffmpeg(const char *opt, const char *arg);
 void show_help_default_ffprobe(const char *opt, const char *arg);
-
-/**
- * Generic -h handler common to all fftools.
- */
-int show_help(void *optctx, const char *opt, const char *arg);
 
 /**
  * Parse the command line arguments.

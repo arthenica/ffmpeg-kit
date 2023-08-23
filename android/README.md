@@ -22,14 +22,14 @@ external libraries enabled.
 
 ##### 2.1.1 Android Tools
    - Android SDK Build Tools
-   - Android NDK r22b or later with LLDB and CMake (See [#292](https://github.com/arthenica/ffmpeg-kit/issues/292) if you want to use NDK r23b)
+   - Android NDK r22b or later with LLDB and CMake (See [#292](https://github.com/arthenica/ffmpeg-kit/issues/292) if you want to use NDK r23b or later)
 
 ##### 2.1.2 Packages
 
 Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
 ```
-autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget autopoint meson ninja
+autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja ragel groff gtk-doc-tools libtasn1
 ```
 
 ##### 2.1.3 Environment Variables 
@@ -77,7 +77,7 @@ All libraries created by `android.sh` can be found under the `prebuilt` director
     }
 
     dependencies {
-        implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+        implementation 'com.arthenica:ffmpeg-kit-full:6.0'
     }
     ```
 

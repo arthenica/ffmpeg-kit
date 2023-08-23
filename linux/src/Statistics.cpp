@@ -19,7 +19,7 @@
 
 #include "Statistics.h"
 
-ffmpegkit::Statistics::Statistics(const long sessionId, const int videoFrameNumber, const float videoFps, const float videoQuality, const int64_t size, const int time, const double bitrate, const double speed) :
+ffmpegkit::Statistics::Statistics(const long sessionId, const int videoFrameNumber, const float videoFps, const float videoQuality, const int64_t size, const double time, const double bitrate, const double speed) :
     _sessionId{sessionId}, _videoFrameNumber{videoFrameNumber}, _videoFps{videoFps}, _videoQuality{videoQuality}, _size{size}, _time{time}, _bitrate{bitrate}, _speed{speed} {
 }
 
@@ -43,7 +43,7 @@ int64_t ffmpegkit::Statistics::getSize() {
     return _size;
 }
 
-int ffmpegkit::Statistics::getTime() {
+double ffmpegkit::Statistics::getTime() {
     return _time;
 }
 

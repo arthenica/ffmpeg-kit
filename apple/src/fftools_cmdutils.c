@@ -1,7 +1,8 @@
 /*
  * Various utilities for command line tools
  * Copyright (c) 2000-2003 Fabrice Bellard
- * copyright (c) 2018 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2018-2022 Taner Sener
+ * Copyright (c) 2023 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -24,6 +25,12 @@
  * This file is the modified version of cmdutils.c file living in ffmpeg source code under the fftools folder. We
  * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
+ *
+ * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 07.2023
+ * --------------------------------------------------------
+ * - FFmpeg 6.0 changes migrated
  *
  * mobile-ffmpeg / ffmpeg-kit changes by Taner Sener
  *
@@ -129,11 +136,18 @@ void register_exit(void (*cb)(int ret))
     program_exit = cb;
 }
 
+void report_and_exit(int ret)
+{
+    av_log(NULL, AV_LOG_FATAL, "%s\n", av_err2str(ret));
+    exit_program(AVUNERROR(ret));
+}
+
 void exit_program(int ret)
 {
     if (program_exit)
         program_exit(ret);
 
+    // FFmpegKit
     // exit disabled and replaced with longjmp, exit value stored in longjmp_value
     // exit(ret);
     longjmp_value = ret;
@@ -696,7 +710,7 @@ static void init_parse_context(OptionParseContext *octx,
     octx->nb_groups = nb_groups;
     octx->groups    = av_calloc(octx->nb_groups, sizeof(*octx->groups));
     if (!octx->groups)
-        exit_program(1);
+        report_and_exit(AVERROR(ENOMEM));
 
     for (i = 0; i < octx->nb_groups; i++)
         octx->groups[i].group_def = &groups[i];
@@ -843,12 +857,7 @@ do {                                                                           \
 
 void print_error(const char *filename, int err)
 {
-    char errbuf[128];
-    const char *errbuf_ptr = errbuf;
-
-    if (av_strerror(err, errbuf, sizeof(errbuf)) < 0)
-        errbuf_ptr = strerror(AVUNERROR(err));
-    av_log(NULL, AV_LOG_ERROR, "%s: %s\n", filename, errbuf_ptr);
+    av_log(NULL, AV_LOG_ERROR, "%s: %s\n", filename, av_err2str(err));
 }
 
 int read_yesno(void)
@@ -971,7 +980,7 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
         break;
     }
 
-    while ((t = av_dict_get(opts, "", t, AV_DICT_IGNORE_SUFFIX))) {
+    while ((t = av_dict_iterate(opts, t))) {
         const AVClass *priv_class;
         char *p = strchr(t->key, ':');
 
@@ -1009,11 +1018,8 @@ AVDictionary **setup_find_stream_info_opts(AVFormatContext *s,
     if (!s->nb_streams)
         return NULL;
     opts = av_calloc(s->nb_streams, sizeof(*opts));
-    if (!opts) {
-        av_log(NULL, AV_LOG_ERROR,
-               "Could not alloc memory for stream options.\n");
-        exit_program(1);
-    }
+    if (!opts)
+        report_and_exit(AVERROR(ENOMEM));
     for (i = 0; i < s->nb_streams; i++)
         opts[i] = filter_codec_opts(codec_opts, s->streams[i]->codecpar->codec_id,
                                     s, s->streams[i], NULL);
@@ -1028,10 +1034,8 @@ void *grow_array(void *array, int elem_size, int *size, int new_size)
     }
     if (*size < new_size) {
         uint8_t *tmp = av_realloc_array(array, new_size, elem_size);
-        if (!tmp) {
-            av_log(NULL, AV_LOG_ERROR, "Could not alloc buffer.\n");
-            exit_program(1);
-        }
+        if (!tmp)
+            report_and_exit(AVERROR(ENOMEM));
         memset(tmp + *size*elem_size, 0, (new_size-*size) * elem_size);
         *size = new_size;
         return tmp;
@@ -1044,10 +1048,8 @@ void *allocate_array_elem(void *ptr, size_t elem_size, int *nb_elems)
     void *new_elem;
 
     if (!(new_elem = av_mallocz(elem_size)) ||
-        av_dynarray_add_nofree(ptr, nb_elems, new_elem) < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Could not alloc buffer.\n");
-        exit_program(1);
-    }
+        av_dynarray_add_nofree(ptr, nb_elems, new_elem) < 0)
+        report_and_exit(AVERROR(ENOMEM));
     return new_elem;
 }
 

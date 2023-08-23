@@ -662,7 +662,7 @@ display_version() {
 
   echo -e "\
 $COMMAND v$(get_ffmpeg_kit_version)
-Copyright (c) 2018-2021 Taner Sener\n\
+Copyright (c) 2018-2022 Taner Sener\n\
 License LGPLv3.0: GNU LGPL version 3 or later\n\
 <https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\
 This is free software: you can redistribute it and/or modify it under the terms of the \

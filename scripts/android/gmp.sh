@@ -24,4 +24,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gmp_package_config "6.2.0" || return 1
+create_gmp_package_config "6.2.1" || return 1

@@ -317,6 +317,9 @@ get_app_specific_cflags() {
   ffmpeg)
     APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
     ;;
+  gnutls)
+    APP_FLAGS="-std=c99 -Wno-unused-function -D_GL_USE_STDLIB_ALLOC=1"
+    ;;
   kvazaar)
     APP_FLAGS="-std=gnu99 -Wno-unused-function"
     ;;
@@ -384,7 +387,7 @@ get_cxxflags() {
   x265)
     echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
     ;;
-  rubberband | srt | zimg)
+  rubberband | srt | tesseract | zimg)
     echo "-std=c++11 ${OPTIMIZATION_FLAGS}"
     ;;
   *)

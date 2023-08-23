@@ -36,7 +36,7 @@
 #import "SessionState.h"
 
 /** Global library version */
-NSString* const FFmpegKitVersion = @"5.1";
+NSString* const FFmpegKitVersion = @"6.0";
 
 /**
  * Prefix of named pipes created by ffmpeg-kit.
@@ -150,7 +150,7 @@ void addSessionToSessionHistory(id<Session> session) {
     float _statisticsFps;               // statistics fps
     float _statisticsQuality;           // statistics quality
     int64_t _statisticsSize;            // statistics size
-    int _statisticsTime;                // statistics time
+    double _statisticsTime;             // statistics time
     double _statisticsBitrate;          // statistics bitrate
     double _statisticsSpeed;            // statistics speed
 }
@@ -173,7 +173,7 @@ void addSessionToSessionHistory(id<Session> session) {
                             fps:(float)videoFps
                             quality:(float)videoQuality
                             size:(int64_t)size
-                            time:(int)time
+                            time:(double)time
                             bitrate:(double)bitrate
                             speed:(double)speed {
     self = [super init];
@@ -224,7 +224,7 @@ void addSessionToSessionHistory(id<Session> session) {
     return _statisticsSize;
 }
 
-- (int)getStatisticsTime {
+- (double)getStatisticsTime {
     return _statisticsTime;
 }
 
@@ -340,7 +340,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
 /**
  * Adds statistics data to the end of callback data list.
  */
-void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
     CallbackData *callbackData = [[CallbackData alloc] init:globalSessionId videoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
 
     [lock lock];
@@ -481,13 +481,18 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
  * @param bitrate output bit rate in kbits/s
  * @param speed processing speed = processed duration / operation duration
  */
-void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
 void process_log(long sessionId, int levelValue, AVBPrint* logMessage) {
     int activeLogLevel = av_log_get_level();
-    Log* log = [[Log alloc] init:sessionId:levelValue:[NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding]];
+    NSString* message = [NSString stringWithCString:logMessage->str encoding:NSUTF8StringEncoding];
+    if (message == nil) {
+        // WE DROP LOGS THAT WE CANNOT DISPLAY
+        return;
+    }
+    Log* log = [[Log alloc] init:sessionId:levelValue:message];
     BOOL globalCallbackDefined = false;
     BOOL sessionCallbackDefined = false;
     LogRedirectionStrategy activeLogRedirectionStrategy = globalLogRedirectionStrategy;
@@ -570,7 +575,7 @@ void process_log(long sessionId, int levelValue, AVBPrint* logMessage) {
     }
 }
 
-void process_statistics(long sessionId, int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+void process_statistics(long sessionId, int videoFrameNumber, float videoFps, float videoQuality, long size, double time, double bitrate, double speed) {
     
     Statistics *statistics = [[Statistics alloc] init:sessionId videoFrameNumber:videoFrameNumber videoFps:videoFps videoQuality:videoQuality size:size time:time bitrate:bitrate speed:speed];
 

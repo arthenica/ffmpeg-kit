@@ -17,13 +17,14 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C" {
-    #include "fftools_ffmpeg.h"
-}
 #include "ArchDetect.h"
 #include "FFmpegKit.h"
 #include "FFmpegKitConfig.h"
 #include "Packages.h"
+
+extern "C" {
+    void cancel_operation(long id);
+}
 
 extern void* ffmpegKitInitialize();
 

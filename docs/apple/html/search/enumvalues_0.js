@@ -1,4 +1,22 @@
 var searchData=
 [
-  ['encoder_5ffinished_0',['ENCODER_FINISHED',['../d7/db3/fftools__ffmpeg_8h.html#a54e97364f74d8bf15062a8ea185f1c31acd6c6d4f0864009dfe2fb65c496f39a7',1,'fftools_ffmpeg.h']]]
+  ['enc_5fstats_5favg_5fbitrate_0',['ENC_STATS_AVG_BITRATE',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a18755d86da2b9bed2608a5726bf965c0',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fbitrate_1',['ENC_STATS_BITRATE',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491ad5e92a74e1ba2c1a585d48ee9cf4d142',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fdts_2',['ENC_STATS_DTS',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491ac7548a2352bc66f02033e5b7dd089875',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fdts_5ftime_3',['ENC_STATS_DTS_TIME',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a8bfe64444a29f1df6e844e4b0b634a72',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5ffile_5fidx_4',['ENC_STATS_FILE_IDX',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491abf6c4f90e9fe7c33818688220c3a88a0',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fframe_5fnum_5',['ENC_STATS_FRAME_NUM',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491aad00637568cd7c49f4fefe3347a8a02b',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fframe_5fnum_5fin_6',['ENC_STATS_FRAME_NUM_IN',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491aa8a8532620d36bc0755aa975b3e241b3',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fliteral_7',['ENC_STATS_LITERAL',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a641f94f23e1372be2e22304754d271a8',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fnb_5fsamples_8',['ENC_STATS_NB_SAMPLES',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491afdf86d5403425c849d15a6afc4bc7cf6',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fpkt_5fsize_9',['ENC_STATS_PKT_SIZE',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a9e2ec6653396dd4befa5a77ec91fe4e9',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fpts_10',['ENC_STATS_PTS',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491aabaa9c9bfb8dd8c1db4735423e258d25',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fpts_5fin_11',['ENC_STATS_PTS_IN',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491af70985529f5ec59c12fe0e8475d14551',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fpts_5ftime_12',['ENC_STATS_PTS_TIME',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a05626d5941aec26804d242927e4f8a78',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fpts_5ftime_5fin_13',['ENC_STATS_PTS_TIME_IN',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491afd9222e328394ff11e2e3bf13f28c675',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fsample_5fnum_14',['ENC_STATS_SAMPLE_NUM',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a1672a006c8244bbd4ac58b016932b115',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5fstream_5fidx_15',['ENC_STATS_STREAM_IDX',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a051062cf3b10962bcc661d3042b70c02',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5ftimebase_16',['ENC_STATS_TIMEBASE',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491a6cbf117d394a490309ab3575ecac3828',1,'fftools_ffmpeg.h']]],
+  ['enc_5fstats_5ftimebase_5fin_17',['ENC_STATS_TIMEBASE_IN',['../d7/db3/fftools__ffmpeg_8h.html#af9f682bb68fbfe6e68615cedc526f491af84e9004e64a37d83ea779e70b74b834',1,'fftools_ffmpeg.h']]],
+  ['encoder_5ffinished_18',['ENCODER_FINISHED',['../d7/db3/fftools__ffmpeg_8h.html#a54e97364f74d8bf15062a8ea185f1c31acd6c6d4f0864009dfe2fb65c496f39a7',1,'fftools_ffmpeg.h']]]
 ];
