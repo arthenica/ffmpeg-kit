@@ -15,7 +15,7 @@ applications and 8 prebuilt binary packages available at [Github](https://github
 - Supports hybrid platforms: Flutter, React Native
 - Based on FFmpeg `v4.5-dev` or later with optional system and external libraries
 - 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com)
-- Licensed under `LGPL 3.0`, or `GPL v3.0` if GPL licensed libraries are enabled
+- Licensed under `LGPL 3.0` by default, some packages licensed by `GPL v3.0` effectively
 
 ### 2. Android
 
@@ -116,7 +116,7 @@ the exact version number of `FFmpeg` is obtained using the `git describe --tags`
 |:----------------:|:---------------------------------------------------------------------------------:|:--------------:|:------------:|
 |     Android      |         [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)          |      6.0       | Aug 21, 2023 |
 |      Apple       |         [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)          |      6.0       | Aug 21, 2023 |
-|   React Native   | [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v5.1.0) |     5.1.2      | Oct 03, 2022 |
+|   React Native   | [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v5.1.0) |     5.1.2      | Oct 02, 2022 |
 |     Flutter      |   [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v5.1.0)    |     5.1.2      | Oct 02, 2022 |
 |     Android      |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |
 |      Apple       |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |

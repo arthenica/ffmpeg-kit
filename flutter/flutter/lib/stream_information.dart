@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Taner Sener
+ * Copyright (c) 2019-2022 Taner Sener
  *
  * This file is part of FFmpegKit.
  *
@@ -108,7 +108,7 @@ class StreamInformation {
 
   /// Returns all tags.
   Map<dynamic, dynamic>? getTags() =>
-      this.getProperties(StreamInformation.keyTags);
+      this.getProperty(StreamInformation.keyTags);
 
   /// Returns the stream property associated with the key.
   String? getStringProperty(String key) => this._allProperties?[key];
@@ -116,8 +116,8 @@ class StreamInformation {
   /// Returns the stream property associated with the key.
   num? getNumberProperty(String key) => this._allProperties?[key];
 
-  /// Returns the stream properties associated with the key.
-  dynamic getProperties(String key) => this._allProperties?[key];
+  /// Returns the stream property associated with the key.
+  dynamic getProperty(String key) => this._allProperties?[key];
 
   /// Returns all properties found.
   Map<dynamic, dynamic>? getAllProperties() => this._allProperties;

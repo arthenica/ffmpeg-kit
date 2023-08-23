@@ -4,11 +4,13 @@
 - Includes both `FFmpeg` and `FFprobe`
 - Supports
   - Both `Android` and `iOS`
-  - FFmpeg `v4.5-dev` releases
+  - FFmpeg `v5.1.2`
   - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
-  - `Android API Level 16` or later
+  - `Android API Level 24` or later
+    - `API Level 16` on LTS releases
   - `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `i386`, `x86_64`, `x86_64-mac-catalyst` and `arm64-mac-catalyst` architectures on iOS
-  - `iOS SDK 10` or later
+  - `iOS SDK 12.1` or later
+    - `iOS SDK 10` on LTS releases
   - Can process Storage Access Framework (SAF) Uris on Android
   - 25 external libraries
 
@@ -22,7 +24,7 @@
   - `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` system frameworks on iOS
 
 - Includes Typescript definitions
-- Licensed under LGPL 3.0, can be customized to support GPL v3.0
+- Licensed under `LGPL 3.0` by default, some packages licensed by `GPL v3.0` effectively
 
 ### 2. Installation
 
@@ -32,16 +34,16 @@ yarn add ffmpeg-kit-react-native
 
 #### 2.1 Packages
 
-`ffmpeg` includes built-in encoders for some popular formats. However, there are certain external libraries that needs
+`FFmpeg` includes built-in encoders for some popular formats. However, there are certain external libraries that needs
 to be enabled in order to encode specific formats/codecs. For example, to encode an `mp3` file you need `lame` or
 `shine` library enabled. You have to install a `ffmpeg-kit-react-native` package that has at least one of them inside.
 To encode an `h264` video, you need to install a package with `x264` inside. To encode `vp8` or `vp9` videos, you need
 a `ffmpeg-kit-react-native` package with `libvpx` inside.
 
-`ffmpeg-kit` provides eight packages that include different sets of external libraries. These packages are
-named according to the external libraries included in them. Refer to
-[Packages](https://github.com/arthenica/ffmpeg-kit#8-packages) section of the project README to see the names
-of those packages and external libraries included in each of them.
+`ffmpeg-kit` provides eight packages that include different sets of external libraries. These packages are named
+according to the external libraries included. Refer to the
+[Packages](https://github.com/arthenica/ffmpeg-kit/wiki/Packages) wiki page to see the names of those
+packages and external libraries included in each one of them.
 
 ##### 2.1.1 Package Names
 
@@ -184,10 +186,10 @@ the package name you are using.
 
 #### 2.4 LTS Releases
 
-`ffmpeg-kit-react-native` is published in two different variants: `Main Release` and `LTS Release`. Both releases
-share the same source code but is built with different settings (Architectures, API Level, iOS Min SDK, etc.). Refer to
-[LTS Releases](https://github.com/arthenica/ffmpeg-kit#9-lts-releases) section of the project README to see how they
-compare to each other.
+`ffmpeg-kit-react-native` is published in two variants: `Main Release` and `LTS Release`. Both releases share the
+same source code but is built with different settings (Architectures, API Level, iOS Min SDK, etc.). Refer to the
+[LTS Releases](https://github.com/arthenica/ffmpeg-kit/wiki/LTS-Releases) wiki page to see how they differ from each
+other.
 
 ### 3. Using
 
