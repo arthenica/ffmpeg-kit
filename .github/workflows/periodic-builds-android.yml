@@ -7,7 +7,7 @@ on:
 jobs:
   build-android-main-on-linux:
     name: android main on linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux', 'r24-linux', 'r25b-linux' ]
@@ -19,13 +19,13 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ matrix.branches }}
-      - name: set up adopt jdk 11
+      - name: set up adopt jdk 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - name: prerequisites
-        run: sudo apt-get install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build ragel
+        run: sudo apt-get install autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja ragel groff gtk-doc-tools libtasn1
       - name: upgrade meson
         run: pip install meson --upgrade
       - name: set up android ndk
@@ -43,7 +43,7 @@ jobs:
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
   build-android-lts-on-linux:
     name: android lts on linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux' ]
@@ -55,13 +55,13 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ matrix.branches }}
-      - name: set up adopt jdk 11
+      - name: set up adopt jdk 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - name: prerequisites
-        run: sudo apt-get install autoconf automake libtool pkg-config curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build ragel
+        run: sudo apt-get install autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja ragel groff gtk-doc-tools libtasn1
       - name: upgrade meson
         run: pip install meson --upgrade
       - name: set up android ndk
