@@ -21,4 +21,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_zimg_package_config "3.0.4" || return 1
+create_zimg_package_config "3.0.5" || return 1

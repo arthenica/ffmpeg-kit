@@ -147,12 +147,17 @@ am_libffmpegkit_la_OBJECTS = libffmpegkit_la-AbstractSession.lo \
 	libffmpegkit_la-ffmpegkit_exception.lo \
 	libffmpegkit_la-fftools_cmdutils.lo \
 	libffmpegkit_la-fftools_ffmpeg.lo \
+	libffmpegkit_la-fftools_ffmpeg_demux.lo \
 	libffmpegkit_la-fftools_ffmpeg_filter.lo \
 	libffmpegkit_la-fftools_ffmpeg_hw.lo \
 	libffmpegkit_la-fftools_ffmpeg_mux.lo \
+	libffmpegkit_la-fftools_ffmpeg_mux_init.lo \
 	libffmpegkit_la-fftools_ffmpeg_opt.lo \
 	libffmpegkit_la-fftools_ffprobe.lo \
-	libffmpegkit_la-fftools_opt_common.lo
+	libffmpegkit_la-fftools_objpool.lo \
+	libffmpegkit_la-fftools_opt_common.lo \
+	libffmpegkit_la-fftools_sync_queue.lo \
+	libffmpegkit_la-fftools_thread_queue.lo
 libffmpegkit_la_OBJECTS = $(am_libffmpegkit_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -197,12 +202,17 @@ am__depfiles_remade = ./$(DEPDIR)/libffmpegkit_la-AbstractSession.Plo \
 	./$(DEPDIR)/libffmpegkit_la-ffmpegkit_exception.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_cmdutils.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg.Plo \
+	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_hw.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux.Plo \
+	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Plo \
 	./$(DEPDIR)/libffmpegkit_la-fftools_ffprobe.Plo \
-	./$(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo
+	./$(DEPDIR)/libffmpegkit_la-fftools_objpool.Plo \
+	./$(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo \
+	./$(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Plo \
+	./$(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -415,12 +425,17 @@ libffmpegkit_la_SOURCES = \
     ffmpegkit_exception.m \
     fftools_cmdutils.c \
     fftools_ffmpeg.c \
+    fftools_ffmpeg_demux.c \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_mux.c \
+    fftools_ffmpeg_mux_init.c \
     fftools_ffmpeg_opt.c \
     fftools_ffprobe.c \
-    fftools_opt_common.c
+    fftools_objpool.c \
+    fftools_opt_common.c \
+    fftools_sync_queue.c \
+    fftools_thread_queue.c
 
 include_HEADERS = \
     AbstractSession.h \
@@ -452,8 +467,12 @@ include_HEADERS = \
     ffmpegkit_exception.h \
     fftools_cmdutils.h \
     fftools_ffmpeg.h \
+    fftools_ffmpeg_mux.h \
     fftools_fopen_utf8.h \
-    fftools_opt_common.h
+    fftools_objpool.h \
+    fftools_opt_common.h \
+    fftools_sync_queue.h \
+    fftools_thread_queue.h
 
 libffmpegkit_la_CFLAGS = $(CFLAGS)
 libffmpegkit_la_OBJCFLAGS = $(CFLAGS)
@@ -557,12 +576,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-ffmpegkit_exception.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_cmdutils.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_hw.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_ffprobe.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_objpool.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -608,6 +632,13 @@ libffmpegkit_la-fftools_ffmpeg.lo: fftools_ffmpeg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_ffmpeg.lo `test -f 'fftools_ffmpeg.c' || echo '$(srcdir)/'`fftools_ffmpeg.c
 
+libffmpegkit_la-fftools_ffmpeg_demux.lo: fftools_ffmpeg_demux.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_ffmpeg_demux.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Tpo -c -o libffmpegkit_la-fftools_ffmpeg_demux.lo `test -f 'fftools_ffmpeg_demux.c' || echo '$(srcdir)/'`fftools_ffmpeg_demux.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Tpo $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_ffmpeg_demux.c' object='libffmpegkit_la-fftools_ffmpeg_demux.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_ffmpeg_demux.lo `test -f 'fftools_ffmpeg_demux.c' || echo '$(srcdir)/'`fftools_ffmpeg_demux.c
+
 libffmpegkit_la-fftools_ffmpeg_filter.lo: fftools_ffmpeg_filter.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_ffmpeg_filter.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Tpo -c -o libffmpegkit_la-fftools_ffmpeg_filter.lo `test -f 'fftools_ffmpeg_filter.c' || echo '$(srcdir)/'`fftools_ffmpeg_filter.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Tpo $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Plo
@@ -629,6 +660,13 @@ libffmpegkit_la-fftools_ffmpeg_mux.lo: fftools_ffmpeg_mux.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_ffmpeg_mux.lo `test -f 'fftools_ffmpeg_mux.c' || echo '$(srcdir)/'`fftools_ffmpeg_mux.c
 
+libffmpegkit_la-fftools_ffmpeg_mux_init.lo: fftools_ffmpeg_mux_init.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_ffmpeg_mux_init.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Tpo -c -o libffmpegkit_la-fftools_ffmpeg_mux_init.lo `test -f 'fftools_ffmpeg_mux_init.c' || echo '$(srcdir)/'`fftools_ffmpeg_mux_init.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Tpo $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_ffmpeg_mux_init.c' object='libffmpegkit_la-fftools_ffmpeg_mux_init.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_ffmpeg_mux_init.lo `test -f 'fftools_ffmpeg_mux_init.c' || echo '$(srcdir)/'`fftools_ffmpeg_mux_init.c
+
 libffmpegkit_la-fftools_ffmpeg_opt.lo: fftools_ffmpeg_opt.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_ffmpeg_opt.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Tpo -c -o libffmpegkit_la-fftools_ffmpeg_opt.lo `test -f 'fftools_ffmpeg_opt.c' || echo '$(srcdir)/'`fftools_ffmpeg_opt.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Tpo $(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Plo
@@ -643,12 +681,33 @@ libffmpegkit_la-fftools_ffprobe.lo: fftools_ffprobe.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_ffprobe.lo `test -f 'fftools_ffprobe.c' || echo '$(srcdir)/'`fftools_ffprobe.c
 
+libffmpegkit_la-fftools_objpool.lo: fftools_objpool.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_objpool.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_objpool.Tpo -c -o libffmpegkit_la-fftools_objpool.lo `test -f 'fftools_objpool.c' || echo '$(srcdir)/'`fftools_objpool.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_objpool.Tpo $(DEPDIR)/libffmpegkit_la-fftools_objpool.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_objpool.c' object='libffmpegkit_la-fftools_objpool.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_objpool.lo `test -f 'fftools_objpool.c' || echo '$(srcdir)/'`fftools_objpool.c
+
 libffmpegkit_la-fftools_opt_common.lo: fftools_opt_common.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_opt_common.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_opt_common.Tpo -c -o libffmpegkit_la-fftools_opt_common.lo `test -f 'fftools_opt_common.c' || echo '$(srcdir)/'`fftools_opt_common.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_opt_common.Tpo $(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_opt_common.c' object='libffmpegkit_la-fftools_opt_common.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_opt_common.lo `test -f 'fftools_opt_common.c' || echo '$(srcdir)/'`fftools_opt_common.c
+
+libffmpegkit_la-fftools_sync_queue.lo: fftools_sync_queue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_sync_queue.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Tpo -c -o libffmpegkit_la-fftools_sync_queue.lo `test -f 'fftools_sync_queue.c' || echo '$(srcdir)/'`fftools_sync_queue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Tpo $(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_sync_queue.c' object='libffmpegkit_la-fftools_sync_queue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_sync_queue.lo `test -f 'fftools_sync_queue.c' || echo '$(srcdir)/'`fftools_sync_queue.c
+
+libffmpegkit_la-fftools_thread_queue.lo: fftools_thread_queue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -MT libffmpegkit_la-fftools_thread_queue.lo -MD -MP -MF $(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Tpo -c -o libffmpegkit_la-fftools_thread_queue.lo `test -f 'fftools_thread_queue.c' || echo '$(srcdir)/'`fftools_thread_queue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Tpo $(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_thread_queue.c' object='libffmpegkit_la-fftools_thread_queue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libffmpegkit_la_CFLAGS) $(CFLAGS) -c -o libffmpegkit_la-fftools_thread_queue.lo `test -f 'fftools_thread_queue.c' || echo '$(srcdir)/'`fftools_thread_queue.c
 
 .m.o:
 @am__fastdepOBJC_TRUE@	$(AM_V_OBJC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -974,12 +1033,17 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-ffmpegkit_exception.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffprobe.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_objpool.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1045,12 +1109,17 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-ffmpegkit_exception.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_demux.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_mux_init.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffmpeg_opt.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_ffprobe.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_objpool.Plo
 	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_opt_common.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_sync_queue.Plo
+	-rm -f ./$(DEPDIR)/libffmpegkit_la-fftools_thread_queue.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

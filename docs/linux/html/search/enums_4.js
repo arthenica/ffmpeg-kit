@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['optgroup_0',['OptGroup',['../da/d66/fftools__ffmpeg__opt_8c.html#a87b22b8c9213bcf6c0fae14e67950b2b',1,'fftools_ffmpeg_opt.c']]],
-  ['ostfinished_1',['OSTFinished',['../d7/db3/fftools__ffmpeg_8h.html#a54e97364f74d8bf15062a8ea185f1c31',1,'fftools_ffmpeg.h']]]
+  ['level_0',['Level',['../d2/d25/namespaceffmpegkit.html#a3726dad678d38ecd08f9af2f142156a4',1,'ffmpegkit']]],
+  ['logredirectionstrategy_1',['LogRedirectionStrategy',['../d2/d25/namespaceffmpegkit.html#a11bee89be98423d1dc425a2849001ebe',1,'ffmpegkit']]]
 ];

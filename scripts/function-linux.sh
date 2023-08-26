@@ -335,7 +335,7 @@ get_cxxflags() {
   ffmpeg-kit)
     echo "${COMMON_FLAGS}"
     ;;
-  srt | zimg)
+  srt | tesseract | zimg)
     echo "${COMMON_FLAGS} -fcxx-exceptions -fPIC"
     ;;
   *)

@@ -28,13 +28,13 @@ valid for Debian/Ubuntu. Some packages may have a different name if you are on a
 - The following packages are required by the build scripts.
 
   ```
-  clang llvm lld libclang-11-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
+  clang llvm lld libclang-14-dev libstdc++6 nasm autoconf automake libtool pkg-config curl git doxygen rapidjson-dev
   ```
 
 - These optional packages should be installed only if you want to build corresponding external libraries.
   
   ```
-  cmake libasound2-dev libass-dev libfontconfig1-dev libfreetype-dev libfribidi-dev libgmp-dev libgnutls28-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libopus-dev librubberband-dev libsdl2-dev libshine-dev libsnappy-dev libsoxr-dev libspeex-dev libtesseract-dev libtheora-dev libtwolame-dev libva-dev libvidstab-dev libvorbis-dev libvo-amrwbenc-dev libvpx-dev libv4l-dev libwebp-dev libxml2-dev libxvidcore-dev libx265-dev meson ocl-icd-opencl-dev opencl-headers tcl zlib1g-dev
+  cmake libasound2-dev libass-dev libfontconfig1-dev libfreetype-dev libfribidi-dev libgmp-dev libgnutls28-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libopus-dev librubberband-dev libsdl2-dev libshine-dev libsnappy-dev libsoxr-dev libspeex-dev libtesseract-dev libtheora-dev libtwolame-dev libva-dev libvidstab-dev libvorbis-dev libvo-amrwbenc-dev libvpx-dev libv4l-dev libwebp-dev libxml2-dev libxvidcore-dev libx265-dev meson ocl-icd-opencl-dev opencl-headers tcl zlib1g-dev groff gtk-doc-tools libtasn1
   ```
 
 #### 2.2 Options

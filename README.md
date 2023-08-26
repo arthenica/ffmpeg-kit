@@ -1,4 +1,4 @@
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v5.1-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
+# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v6.0-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
 
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
@@ -124,20 +124,21 @@ the same `FFmpeg` release branch.
 `dev` part in the version string indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch and
 the exact version number of `FFmpeg` is obtained using the `git describe --tags` command.
 
-|    Platforms     |                                 FFmpegKit Version                                  | FFmpeg Version | Release Date |
-|:----------------:|:----------------------------------------------------------------------------------:|:--------------:|:------------:|
-|     Flutter      |   [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v5.1.0)    |     5.1.2      | Oct 02, 2022 |
-|     Android      |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |
-|      Apple       |    [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)               |     5.1.2      | Sep 29, 2022 |
-|   React Native   | [4.5.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.2) |  4.5-dev-3393  | May 25, 2022 |
-|     Flutter      |   [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.1)    |  4.5-dev-3393  | Jan 02, 2022 |
-|   React Native   | [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.1) |  4.5-dev-3393  | Jan 02, 2022 |
-|     Android      |       [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)        |  4.5-dev-3393  | Jan 01, 2022 |
-|      Apple       |       [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)        |  4.5-dev-3393  | Dec 30, 2021 |
-|     Flutter      |   [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.0)    |  4.5-dev-2008  | Oct 05, 2021 |
-|   React Native   | [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.0) |  4.5-dev-2008  | Oct 01, 2021 |
-| Android<br>Apple |         [4.5](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5)          |  4.5-dev-2008  | Sep 18, 2021 |
-| Android<br>Apple |         [4.4](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.4)          |  4.4-dev-3015  | Mar 03, 2021 |
+|    Platforms     |                                  FFmpegKit Version                                  | FFmpeg Version | Release Date |
+|:----------------:|:-----------------------------------------------------------------------------------:|:--------------:|:------------:|
+|      Android<br>Apple       |          [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)           |      6.0       | Aug 21, 2023 |
+|   React Native   |  [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v5.1.0)  |     5.1.2      | Oct 02, 2022 |
+|     Flutter      |    [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v5.1.0)     |     5.1.2      | Oct 02, 2022 |
+|     Android<br>Apple      |          [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)           |     5.1.2      | Sep 29, 2022 |
+|   React Native   |  [4.5.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.2)  |  4.5-dev-3393  | May 25, 2022 |
+|     Flutter      |    [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.1)     |  4.5-dev-3393  | Jan 02, 2022 |
+|   React Native   |  [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.1)  |  4.5-dev-3393  | Jan 02, 2022 |
+|     Android      |        [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)         |  4.5-dev-3393  | Jan 01, 2022 |
+|      Apple       |        [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)         |  4.5-dev-3393  | Dec 30, 2021 |
+|     Flutter      |    [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.0)     |  4.5-dev-2008  | Oct 05, 2021 |
+|   React Native   |  [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.0)  |  4.5-dev-2008  | Oct 01, 2021 |
+| Android<br>Apple |          [4.5](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5)           |  4.5-dev-2008  | Sep 18, 2021 |
+| Android<br>Apple |          [4.4](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.4)           |  4.4-dev-3015  | Mar 03, 2021 |
 
 ### 11. LTS Releases
 

@@ -28,11 +28,11 @@ public class Statistics {
     private float videoFps;
     private float videoQuality;
     private long size;
-    private int time;
+    private double time;
     private double bitrate;
     private double speed;
 
-    public Statistics(final long sessionId, final int videoFrameNumber, final float videoFps, final float videoQuality, final long size, final int time, final double bitrate, final double speed) {
+    public Statistics(final long sessionId, final int videoFrameNumber, final float videoFps, final float videoQuality, final long size, final double time, final double bitrate, final double speed) {
         this.sessionId = sessionId;
         this.videoFrameNumber = videoFrameNumber;
         this.videoFps = videoFps;
@@ -83,11 +83,11 @@ public class Statistics {
         this.size = size;
     }
 
-    public int getTime() {
+    public double getTime() {
         return time;
     }
 
-    public void setTime(int time) {
+    public void setTime(double time) {
         this.time = time;
     }
 

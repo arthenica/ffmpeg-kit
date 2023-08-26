@@ -144,8 +144,6 @@ public class FFmpegKitConfig {
 
         NativeLoader.loadFFmpegKit(nativeFFmpegTriedAndFailed);
 
-        android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadBuildDate()));
-
         uniqueIdGenerator = new AtomicInteger(1);
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
@@ -175,7 +173,7 @@ public class FFmpegKitConfig {
         safFileDescriptorMap = new SparseArray<>();
         globalLogRedirectionStrategy = LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED;
 
-        NativeLoader.enableRedirection();
+        android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadBuildDate()));
     }
 
     /**
@@ -336,7 +334,7 @@ public class FFmpegKitConfig {
      */
     private static void statistics(final long sessionId, final int videoFrameNumber,
                                    final float videoFps, final float videoQuality, final long size,
-                                   final int time, final double bitrate, final double speed) {
+                                   final double time, final double bitrate, final double speed) {
         final Statistics statistics = new Statistics(sessionId, videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
 
         final Session session = getSession(sessionId);

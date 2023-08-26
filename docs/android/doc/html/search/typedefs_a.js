@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['specifieropt_0',['SpecifierOpt',['../d8/d4e/fftools__cmdutils_8h.html#a44cde5d18cef91556a91e1e2903bb25a',1,'fftools_cmdutils.h']]],
-  ['streammap_1',['StreamMap',['../d7/db3/fftools__ffmpeg_8h.html#ab186ed6c2bbe1ddb9f0da92e20d05018',1,'fftools_ffmpeg.h']]]
+  ['muxer_0',['Muxer',['../df/d2b/fftools__ffmpeg__mux_8h.html#aed3930e65d2d03572bff0c569f869666',1,'fftools_ffmpeg_mux.h']]],
+  ['muxstream_1',['MuxStream',['../df/d2b/fftools__ffmpeg__mux_8h.html#a610bfa570eb186bedbe85d1e3d995046',1,'fftools_ffmpeg_mux.h']]]
 ];

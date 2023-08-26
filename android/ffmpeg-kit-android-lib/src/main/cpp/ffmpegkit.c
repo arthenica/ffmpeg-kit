@@ -45,7 +45,7 @@ struct CallbackData {
   float statisticsFps;              // statistics fps
   float statisticsQuality;          // statistics quality
   int64_t statisticsSize;           // statistics size
-  int statisticsTime;               // statistics time
+  double statisticsTime;            // statistics time
   double statisticsBitrate;         // statistics bitrate
   double statisticsSpeed;           // statistics speed
 
@@ -312,7 +312,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
 /**
  * Adds statistics data to the end of callback data list.
  */
-void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
@@ -491,7 +491,7 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
  * @param bitrate output bit rate in kbits/s
  * @param speed processing speed = processed duration / operation duration
  */
-void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
@@ -582,6 +582,30 @@ int saf_close(int fd) {
 }
 
 /**
+ * Used by JNI methods to enable redirection.
+ */
+static void enableNativeRedirection() {
+    mutexLock();
+
+    if (redirectionEnabled != 0) {
+        mutexUnlock();
+        return;
+    }
+    redirectionEnabled = 1;
+
+    mutexUnlock();
+
+    int rc = pthread_create(&callbackThread, 0, callbackThreadFunction, 0);
+    if (rc != 0) {
+        LOGE("Failed to create callback thread (rc=%d).\n", rc);
+        return;
+    }
+
+    av_log_set_callback(ffmpegkit_log_callback_function);
+    set_report_callback(ffmpegkit_statistics_callback_function);
+}
+
+/**
  * Called when 'ffmpegkit' native library is loaded.
  *
  * @param vm pointer to the running virtual machine
@@ -620,7 +644,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJIDD)V");
+    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJDDD)V");
     if (statisticsMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
         return JNI_FALSE;
@@ -665,6 +689,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     av_set_saf_open(saf_open);
     av_set_saf_close(saf_close);
 
+    enableNativeRedirection();
+
     return JNI_VERSION_1_6;
 }
 
@@ -696,24 +722,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLog
  * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(JNIEnv *env, jclass object) {
-    mutexLock();
-
-    if (redirectionEnabled != 0) {
-        mutexUnlock();
-        return;
-    }
-    redirectionEnabled = 1;
-
-    mutexUnlock();
-
-    int rc = pthread_create(&callbackThread, 0, callbackThreadFunction, 0);
-    if (rc != 0) {
-        LOGE("Failed to create callback thread (rc=%d).\n", rc);
-        return;
-    }
-
-    av_log_set_callback(ffmpegkit_log_callback_function);
-    set_report_callback(ffmpegkit_statistics_callback_function);
+    enableNativeRedirection();
 }
 
 /**
