@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['unit_5fvalue_0',['unit_value',['../d9/d6d/structunit__value.html',1,'']]]
+  ['readinterval_0',['ReadInterval',['../d8/dee/struct_read_interval.html',1,'']]],
+  ['returncode_1',['ReturnCode',['../db/d76/interface_return_code.html',1,'']]]
 ];

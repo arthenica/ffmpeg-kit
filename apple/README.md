@@ -8,7 +8,7 @@
 - Objective-C API
 - Camera access
 - `ARC` enabled library
-- Built with `-fembed-bitcode` flag
+- Can be built with `-fembed-bitcode` flag
 - Creates shared `frameworks` and `xcframeworks`
 
 #### 1.2 macOS
@@ -17,7 +17,6 @@
 - Objective-C API
 - Camera access
 - `ARC` enabled library
-- Built with `-fembed-bitcode` flag
 - Creates shared `frameworks` and `xcframeworks`
 
 #### 1.3 tvOS
@@ -25,7 +24,7 @@
 - Includes `arm64`, `arm64-simulator` and `x86_64` architectures
 - Objective-C API
 - `ARC` enabled library
-- Built with `-fembed-bitcode` flag
+- Can be built with `-fembed-bitcode` flag
 - Creates shared `frameworks` and `xcframeworks`
 
 ### 2. Building
@@ -66,7 +65,7 @@ Please note that `FFmpegKit` project repository includes the source code of `FFm
 Use your package manager (brew, etc.) to install the following packages.
 
 ```
-autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen git wget gettext meson ninja
+autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget gettext meson ninja ragel groff gtk-doc-tools libtasn1
 ```
 
 #### 2.2 Options
@@ -111,17 +110,17 @@ All libraries created can be found under the `prebuilt` directory.
 
     - iOS
     ```yaml
-    pod 'ffmpeg-kit-ios-full', '~> 5.1'
+    pod 'ffmpeg-kit-ios-full', '~> 6.0'
     ```
 
     - macOS
     ```yaml
-    pod 'ffmpeg-kit-macos-full', '~> 5.1'
+    pod 'ffmpeg-kit-macos-full', '~> 6.0'
     ```
 
     - tvOS
     ```yaml
-    pod 'ffmpeg-kit-tvos-full', '~> 5.1'
+    pod 'ffmpeg-kit-tvos-full', '~> 6.0'
     ```
 
 2. Execute synchronous `FFmpeg` commands.

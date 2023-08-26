@@ -1,6 +1,6 @@
-# ffmpeg-kit 5.1 configure.ac
+# ffmpeg-kit 6.0 configure.ac
 
-AC_INIT([ffmpeg-kit], [5.1], [https://github.com/arthenica/ffmpeg-kit/issues/new])
+AC_INIT([ffmpeg-kit], [6.0], [https://github.com/arthenica/ffmpeg-kit/issues/new])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FFmpegKit.cpp])
 
@@ -28,7 +28,8 @@ CFLAGS="$cflags_bckup"
 FFMPEG_LIBS="-lavcodec -lavfilter -lavformat -lavutil -lswscale -lswresample"
 AC_SUBST(FFMPEG_LIBS)
 
-VERSION_INFO="9:1:5"
+# CURRENT INTERFACE:REVISION:AGE
+VERSION_INFO="11:0:6"
 AC_SUBST(VERSION_INFO)
 
 LT_INIT

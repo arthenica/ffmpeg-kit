@@ -23,7 +23,7 @@
 extern "C" {
     #include "libavutil/ffversion.h"
     #include "libavutil/bprint.h"
-    #include "fftools_ffmpeg.h"
+    #include "fftools_cmdutils.h"
 }
 #include "ArchDetect.h"
 #include "FFmpegKit.h"
@@ -43,6 +43,11 @@ extern "C" {
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+
+extern "C" {
+    void set_report_callback(void (*callback)(int, float, float, int64_t, double, double, double));
+    void cancel_operation(long id);
+}
 
 /**
  * Generates ids for named ffmpeg kit pipes.
@@ -193,7 +198,7 @@ class CallbackData {
                      const float videoFps,
                      const float videoQuality,
                      const int64_t size,
-                     const int time,
+                     const double time,
                      const double bitrate,
                      const double speed) :
                         _type{StatisticsType},
@@ -239,7 +244,7 @@ class CallbackData {
             return _statisticsSize;
         }
 
-        int getStatisticsTime() {
+        double getStatisticsTime() {
             return _statisticsTime;
         }
 
@@ -262,7 +267,7 @@ class CallbackData {
         float _statisticsFps;               // statistics fps
         float _statisticsQuality;           // statistics quality
         int64_t _statisticsSize;            // statistics size
-        int _statisticsTime;                // statistics time
+        double _statisticsTime;             // statistics time
         double _statisticsBitrate;          // statistics bitrate
         double _statisticsSpeed;            // statistics speed
 };
@@ -516,7 +521,7 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
  * @param bitrate output bit rate in kbits/s
  * @param speed processing speed = processed duration / operation duration
  */
-void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
@@ -604,7 +609,7 @@ static void process_log(long sessionId, int levelValueInt, AVBPrint* logMessage)
     }
 }
 
-void process_statistics(long sessionId, int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+void process_statistics(long sessionId, int videoFrameNumber, float videoFps, float videoQuality, long size, double time, double bitrate, double speed) {
     std::shared_ptr<ffmpegkit::Statistics> statistics = std::make_shared<ffmpegkit::Statistics>(sessionId, videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
 
     auto session = ffmpegkit::FFmpegKitConfig::getSession(sessionId);

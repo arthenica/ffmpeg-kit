@@ -49,5 +49,6 @@ make install || return 1
 cp ${BASEDIR}/src/${LIB_NAME}/src/*.pc "${INSTALL_PKG_CONFIG_DIR}" || return 1
 cp ${BASEDIR}/src/${LIB_NAME}/src/demux/*.pc "${INSTALL_PKG_CONFIG_DIR}" || return 1
 cp ${BASEDIR}/src/${LIB_NAME}/src/mux/*.pc "${INSTALL_PKG_CONFIG_DIR}" || return 1
+cp ${BASEDIR}/src/${LIB_NAME}/sharpyuv/*.pc "${INSTALL_PKG_CONFIG_DIR}" || return 1
 
 make install || return 1
