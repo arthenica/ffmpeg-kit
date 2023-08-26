@@ -24,7 +24,7 @@ class Statistics {
   double _videoFps;
   double _videoQuality;
   int _size;
-  int _time;
+  double _time;
   double _bitrate;
   double _speed;
 
@@ -61,9 +61,9 @@ class Statistics {
     this._size = size;
   }
 
-  int getTime() => this._time;
+  double getTime() => this._time;
 
-  void setTime(int time) {
+  void setTime(double time) {
     this._time = time;
   }
 
