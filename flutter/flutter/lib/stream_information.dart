@@ -53,7 +53,7 @@ class StreamInformation {
   String? getCodec() => this.getStringProperty(StreamInformation.keyCodec);
 
   /// Returns stream codec in long format.
-  String? getFullCodec() =>
+  String? getCodecLong() =>
       this.getStringProperty(StreamInformation.keyCodecLong);
 
   /// Returns stream format.

@@ -5,7 +5,7 @@
 - Includes both `FFmpeg` and `FFprobe`
 - Supports
     - `Android`, `iOS` and `macOS`
-    - FFmpeg `v5.1.2`
+    - FFmpeg `v6.0`
     - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
     - `Android API Level 24` or later
       - `API Level 16` on LTS releases
@@ -35,7 +35,7 @@ Add `ffmpeg_kit_flutter` as a dependency in your `pubspec.yaml file`.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: 5.1.0
+  ffmpeg_kit_flutter: 6.0.0
 ```
 
 #### 2.1 Packages
@@ -58,7 +58,7 @@ using the following dependency format.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter_<package name>: 5.1.0
+  ffmpeg_kit_flutter_<package name>: 6.0.0
 ```
 
 Note that hyphens in the package name must be replaced with underscores. Additionally, do not forget to use the package
@@ -70,7 +70,7 @@ In order to install the `LTS` variant, append `-LTS` to the version you have for
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: 5.1.0-LTS
+  ffmpeg_kit_flutter: 6.0.0-LTS
 ```
 
 #### 2.4 LTS Releases

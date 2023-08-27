@@ -1,3 +1,13 @@
+## 6.0.0
+- Feature release based on native v6.0
+- Renames StreamInformation.getFullCodec() method to getCodecLong()
+- Improves Statistics.getTime() method to return milliseconds as double
+
+## 6.0.0-LTS
+- Feature release based on native v6.0.LTS
+- Renames StreamInformation.getFullCodec() method to getCodecLong()
+- Improves Statistics.getTime() method to return milliseconds as double
+
 ## 5.1.0
 - Feature release based on native v5.1
 - Implements AbstractSession.cancel() method
