@@ -4,7 +4,7 @@
 - Includes both `FFmpeg` and `FFprobe`
 - Supports
   - Both `Android` and `iOS`
-  - FFmpeg `v5.1.2`
+  - FFmpeg `v6.0`
   - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
   - `Android API Level 24` or later
     - `API Level 16` on LTS releases
