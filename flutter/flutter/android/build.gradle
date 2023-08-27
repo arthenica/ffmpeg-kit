@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 }
 
@@ -24,13 +24,13 @@ android {
         namespace 'com.arthenica.ffmpegkit.flutter'
     }
 
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 31
-        versionCode 510
-        versionName "5.1.0"
+        targetSdkVersion 33
+        versionCode 600
+        versionName "6.0.0"
     }
 
     buildTypes {
@@ -48,6 +48,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'com.arthenica:ffmpeg-kit-https:5.1'
+    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'com.arthenica:ffmpeg-kit-https:6.0'
 }

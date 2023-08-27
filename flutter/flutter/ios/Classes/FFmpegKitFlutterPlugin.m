@@ -1128,7 +1128,7 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
     dictionary[KEY_STATISTICS_VIDEO_FPS] = [NSNumber numberWithFloat: [statistics getVideoFps]];
     dictionary[KEY_STATISTICS_VIDEO_QUALITY] = [NSNumber numberWithFloat: [statistics getVideoQuality]];
     dictionary[KEY_STATISTICS_SIZE] = [NSNumber numberWithLong: [statistics getSize]];
-    dictionary[KEY_STATISTICS_TIME] = [NSNumber numberWithInt: [statistics getTime]];
+    dictionary[KEY_STATISTICS_TIME] = [NSNumber numberWithDouble: [statistics getTime]];
     dictionary[KEY_STATISTICS_BITRATE] = [NSNumber numberWithDouble: [statistics getBitrate]];
     dictionary[KEY_STATISTICS_SPEED] = [NSNumber numberWithDouble: [statistics getSpeed]];
 
