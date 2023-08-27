@@ -25,12 +25,12 @@
     float _videoFps;
     float _videoQuality;
     long _size;
-    int _time;
+    double _time;
     double _bitrate;
     double _speed;
 }
 
-- (instancetype)init:(long)sessionId videoFrameNumber:(int)videoFrameNumber videoFps:(float)videoFps videoQuality:(float)videoQuality size:(int64_t)size time:(int)time bitrate:(double)bitrate speed:(double)speed {
+- (instancetype)init:(long)sessionId videoFrameNumber:(int)videoFrameNumber videoFps:(float)videoFps videoQuality:(float)videoQuality size:(int64_t)size time:(double)time bitrate:(double)bitrate speed:(double)speed {
     self = [super init];
     if (self) {
         _sessionId = sessionId;
@@ -66,7 +66,7 @@
     return _size;
 }
 
-- (int)getTime {
+- (double)getTime {
     return _time;
 }
 

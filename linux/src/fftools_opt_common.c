@@ -1,6 +1,7 @@
 /*
  * Option handlers shared between the tools.
- * copyright (c) 2022 Taner Sener ( tanersener gmail com )
+ * Copyright (c) 2022 Taner Sener
+ * Copyright (c) 2023 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -23,6 +24,12 @@
  * This file is the modified version of opt_common.c file living in ffmpeg source code under the fftools folder. We
  * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop the ffmpeg-kit library.
+ *
+ * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 07.2023
+ * --------------------------------------------------------
+ * - time field in report_callback updated as double
  *
  * ffmpeg-kit changes by Taner Sener
  *
@@ -88,7 +95,7 @@ static __thread FILE *report_file = NULL;
 static __thread int report_file_level = AV_LOG_DEBUG;
 
 extern void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
-extern void (*report_callback)(int, float, float, int64_t, int, double, double);
+extern void (*report_callback)(int, float, float, int64_t, double, double, double);
 extern __thread char *program_name;
 
 int show_license(void *optctx, const char *opt, const char *arg)

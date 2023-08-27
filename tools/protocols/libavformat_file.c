@@ -19,7 +19,7 @@
 
 #include "libavutil/file.h"
 
-static int64_t fd_seek(URLContext *h, int64_t pos, int whence)
+static int64_t saf_seek(URLContext *h, int64_t pos, int whence)
 {
     FileContext *c = h->priv_data;
     int64_t ret;
@@ -35,7 +35,7 @@ static int64_t fd_seek(URLContext *h, int64_t pos, int whence)
     return ret < 0 ? AVERROR(errno) : ret;
 }
 
-static int fd_open(URLContext *h, const char *filename, int flags)
+static int saf_open(URLContext *h, const char *filename, int flags)
 {
     FileContext *c = h->priv_data;
     int saf_id;
@@ -79,7 +79,7 @@ static int fd_open(URLContext *h, const char *filename, int flags)
     return 0;
 }
 
-static int fd_check(URLContext *h, int mask)
+static int saf_check(URLContext *h, int mask)
 {
     int ret = 0;
     const char *filename = h->filename;
@@ -112,7 +112,7 @@ static int fd_check(URLContext *h, int mask)
     return ret;
 }
 
-static int fd_delete(URLContext *h)
+static int saf_delete(URLContext *h)
 {
 #if HAVE_UNISTD_H
     int ret;
@@ -135,7 +135,7 @@ static int fd_delete(URLContext *h)
 #endif /* HAVE_UNISTD_H */
 }
 
-static int fd_move(URLContext *h_src, URLContext *h_dst)
+static int saf_move(URLContext *h_src, URLContext *h_dst)
 {
     const char *filename_src = h_src->filename;
     const char *filename_dst = h_dst->filename;
@@ -148,7 +148,7 @@ static int fd_move(URLContext *h_src, URLContext *h_dst)
     return 0;
 }
 
-static int fd_close(URLContext *h)
+static int saf_close(URLContext *h)
 {
     FileContext *c = h->priv_data;
 
@@ -169,15 +169,15 @@ static const AVClass saf_class = {
 
 const URLProtocol ff_saf_protocol = {
     .name                = "saf",
-    .url_open            = fd_open,
+    .url_open            = saf_open,
     .url_read            = file_read,
     .url_write           = file_write,
-    .url_seek            = fd_seek,
-    .url_close           = fd_close,
+    .url_seek            = saf_seek,
+    .url_close           = saf_close,
     .url_get_file_handle = file_get_handle,
-    .url_check           = fd_check,
-    .url_delete          = fd_delete,
-    .url_move            = fd_move,
+    .url_check           = saf_check,
+    .url_delete          = saf_delete,
+    .url_move            = saf_move,
     .priv_data_size      = sizeof(FileContext),
     .priv_data_class     = &saf_class,
     .default_whitelist   = "saf,crypto,data"

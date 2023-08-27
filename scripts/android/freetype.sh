@@ -37,4 +37,4 @@ make -j$(get_cpu_count) || return 1
 make install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_freetype_package_config "24.3.18" || return 1
+create_freetype_package_config "25.0.19" || return 1

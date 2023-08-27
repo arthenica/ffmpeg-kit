@@ -3,7 +3,7 @@
 # SET BUILD OPTIONS
 ASM_OPTIONS=""
 case ${ARCH} in
-x86)
+arm* | x86)
 
   # please note that asm is disabled
   # enabling asm for x86 causes text relocations in libavfilter.so

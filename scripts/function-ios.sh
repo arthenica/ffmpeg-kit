@@ -208,6 +208,9 @@ get_app_specific_cflags() {
   ffmpeg-kit)
     APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
     ;;
+  gnutls)
+    APP_FLAGS="-std=c99 -Wno-unused-function -D_GL_USE_STDLIB_ALLOC=1"
+    ;;
   jpeg)
     APP_FLAGS="-Wno-nullability-completeness"
     ;;
@@ -221,7 +224,7 @@ get_app_specific_cflags() {
     APP_FLAGS="-fno-common -DPIC"
     ;;
   sdl)
-    APP_FLAGS="-DPIC -Wno-unused-function -D__IPHONEOS__"
+    APP_FLAGS="-DPIC -Wno-declaration-after-statement -Wno-unused-function -D__IPHONEOS__"
     ;;
   shine)
     APP_FLAGS="-Wno-unused-function"
@@ -294,11 +297,14 @@ get_cxxflags() {
   gnutls)
     echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
-  libwebp | xvidcore)
-    echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
-    ;;
   libaom)
     echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    ;;
+  libilbc)
+    echo "-std=c++14 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    ;;
+  libwebp | xvidcore)
+    echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   opencore-amr)
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
@@ -306,7 +312,7 @@ get_cxxflags() {
   rubberband)
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
-  srt | zimg)
+  srt | tesseract | zimg)
     echo "-std=c++11 ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   *)
@@ -437,7 +443,7 @@ set_toolchain_paths() {
   LOCAL_ASMFLAGS="$(get_asmflags $1)"
   case ${ARCH} in
   armv7*)
-    if [ "$1" == "x265" ]; then
+    if [ "$1" == "x265" ] || [ "$1" == "libilbc" ]; then
       export AS="${LOCAL_GAS_PREPROCESSOR}"
       export AS_ARGUMENTS="-arch arm"
       export ASM_FLAGS="${LOCAL_ASMFLAGS}"
@@ -446,7 +452,7 @@ set_toolchain_paths() {
     fi
     ;;
   arm64*)
-    if [ "$1" == "x265" ]; then
+    if [ "$1" == "x265" ] || [ "$1" == "libilbc" ]; then
       export AS="${LOCAL_GAS_PREPROCESSOR}"
       export AS_ARGUMENTS="-arch aarch64"
       export ASM_FLAGS="${LOCAL_ASMFLAGS}"
