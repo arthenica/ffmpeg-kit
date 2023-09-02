@@ -32,6 +32,10 @@
  *
  * ffmpeg-kit changes by ARTHENICA LTD
  *
+ * 09.2023
+ * --------------------------------------------------------
+ * - forward_report method signature accepts pts to calculate the time
+ *
  * 07.2023
  * --------------------------------------------------------
  * - FFmpeg 6.0 changes migrated
@@ -1725,11 +1729,19 @@ static void print_final_stats(int64_t total_size)
     }
 }
 
-static void forward_report(uint64_t frame_number, float fps, float quality, int64_t total_size, int seconds, int microseconds, double bitrate, double speed)
+static void forward_report(uint64_t frame_number, float fps, float quality, int64_t total_size, int64_t pts, double bitrate, double speed)
 {
     // FORWARD DATA
     if (report_callback != NULL) {
-        report_callback(frame_number, fps, quality, total_size, ((double)seconds*1000) + ((double)microseconds)/1000, bitrate, speed);
+        double milliseconds = 0;
+        if (pts != AV_NOPTS_VALUE) {
+            milliseconds = ((double)FFABS64U(pts)) / 1000;
+        }
+        if (pts < 0) {
+            report_callback(frame_number, fps, quality, total_size, 0 - milliseconds, bitrate, speed);
+        } else {
+            report_callback(frame_number, fps, quality, total_size, milliseconds, bitrate, speed);
+        }
     }
 }
 
@@ -1864,11 +1876,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     speed   = pts != AV_NOPTS_VALUE && t != 0.0 ? (double)pts / AV_TIME_BASE / t : -1;
 
     // FFmpegKit forward report
-    if (pts == AV_NOPTS_VALUE) {
-        forward_report(frame_number, fps, q, total_size, 0, 0, bitrate, speed);
-    } else {
-        forward_report(frame_number, fps, q, total_size, secs, us, bitrate, speed);
-    }
+    forward_report(frame_number, fps, q, total_size, pts, bitrate, speed);
 
     if (local_print_stats) {
         if (total_size < 0) av_bprintf(&buf, "size=N/A time=");
