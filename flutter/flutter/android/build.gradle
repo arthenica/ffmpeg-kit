@@ -29,8 +29,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode 600
-        versionName "6.0.0"
+        versionCode 602
+        versionName "6.0.2"
     }
 
     buildTypes {
