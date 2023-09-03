@@ -404,9 +404,9 @@ get_common_linked_libraries() {
 
     # SUPPORTED ON API LEVEL 24 AND LATER
     if [[ ${API} -ge 24 ]]; then
-      echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS}"
+      echo "-lc -lm -ldl -llog -landroid -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS}"
     else
-      echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
+      echo "-lc -lm -ldl -llog -landroid ${COMMON_LIBRARY_PATHS}"
       echo -e "INFO: Building ffmpeg without native camera API which is not supported on Android API Level ${API}\n" 1>>"${BASEDIR}"/build.log 2>&1
     fi
     ;;
