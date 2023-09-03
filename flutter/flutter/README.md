@@ -35,7 +35,7 @@ Add `ffmpeg_kit_flutter` as a dependency in your `pubspec.yaml file`.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: 6.0.0
+  ffmpeg_kit_flutter: 6.0.1
 ```
 
 #### 2.1 Packages
@@ -58,7 +58,7 @@ using the following dependency format.
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter_<package name>: 6.0.0
+  ffmpeg_kit_flutter_<package name>: 6.0.1
 ```
 
 Note that hyphens in the package name must be replaced with underscores. Additionally, do not forget to use the package
@@ -70,7 +70,7 @@ In order to install the `LTS` variant, append `-LTS` to the version you have for
 
 ```yaml
 dependencies:
-  ffmpeg_kit_flutter: 6.0.0-LTS
+  ffmpeg_kit_flutter: 6.0.1-LTS
 ```
 
 #### 2.4 LTS Releases
