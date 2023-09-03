@@ -1,3 +1,19 @@
+## 6.0.2
+- Bug fix release based on native v6.0
+- Fixes version information in podspec and gradle files 
+
+## 6.0.2-LTS
+- Bug fix release based on native v6.0.LTS
+- Fixes version information in podspec and gradle files
+
+## 6.0.1
+- Bug fix release based on native v6.0
+- Fixes issues 804 and 809
+
+## 6.0.1-LTS
+- Bug fix release based on native v6.0.LTS
+- Fixes issues 804 and 809
+
 ## 6.0.0
 - Feature release based on native v6.0
 - Renames StreamInformation.getFullCodec() method to getCodecLong()
