@@ -211,7 +211,7 @@ The following table shows Android API level, iOS deployment target and macOS dep
     FFprobeKit.getMediaInformation('<file path or url>').then((session) async {
       final information = await session.getMediaInformation();
 
-      if (information == null) {
+      if (information != null) {
 
         // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
         final state = FFmpegKitConfig.sessionStateToString(await session.getState());
