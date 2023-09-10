@@ -11,7 +11,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/stale@v5
+      - uses: actions/stale@v8
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: 60
@@ -21,6 +21,6 @@ jobs:
           close-pr-message: 'This PR was closed because it has been stalled for 7 days with no activity.'
           stale-issue-label: 'no-issue-activity'
           stale-pr-label: 'no-pr-activity'
-          exempt-issue-labels: 'enhancement,unreleased'
+          exempt-issue-labels: 'enhancement,ffmpeg-bug,unreleased'
           exempt-pr-labels: 'enhancement,unreleased'
           exempt-all-assignees: 'true'
