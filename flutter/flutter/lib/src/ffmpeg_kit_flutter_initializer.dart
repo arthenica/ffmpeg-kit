@@ -17,6 +17,7 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
@@ -47,12 +48,14 @@ class FFmpegKitInitializer {
   static FFmpegKitInitializer _instance = new FFmpegKitInitializer();
 
   static bool _initialized = false;
+  StreamSubscription? _eventSubscription;
 
   static Future<bool> initialize() async {
     if (!_initialized) {
       _initialized = true;
       await _instance._initialize();
     }
+    _instance._updateEventSubscription();
     return _initialized;
   }
 
@@ -308,8 +311,6 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
-    _eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
-
     final logLevel = await _getLogLevel();
     if (logLevel != null) {
       FFmpegKitConfig.setLogLevel(logLevel);
@@ -323,5 +324,11 @@ class FFmpegKitInitializer {
 
     final fullVersion = "$platform-$packageName-$arch-$version$isLTSPostfix";
     print("Loaded ffmpeg-kit-flutter-$fullVersion.");
+  }
+
+  void _updateEventSubscription() {
+    _eventSubscription?.cancel();
+    _eventSubscription = _eventChannel.receiveBroadcastStream().listen(_onEvent,
+        onError: _onError);
   }
 }

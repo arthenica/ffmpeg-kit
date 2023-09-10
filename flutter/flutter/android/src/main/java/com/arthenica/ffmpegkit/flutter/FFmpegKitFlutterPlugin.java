@@ -222,6 +222,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     @Override
     public void onListen(final Object o, final EventChannel.EventSink eventSink) {
         this.eventSink = eventSink;
+        registerGlobalCallbacks();
         Log.d(LIBRARY_NAME, String.format("FFmpegKitFlutterPlugin %s started listening to events on %s.", this, eventSink));
     }
 
