@@ -1,8 +1,4 @@
 analyzer:
-  enable-experiment:
-    - non-nullable
-  strong-mode:
-    implicit-dynamic: false
   errors:
     missing_required_param: warning
     missing_return: warning
@@ -27,10 +23,8 @@ linter:
     - file_names
     - hash_and_equals
     - implementation_imports
-    - iterable_contains_unrelated_type
     - join_return_with_assignment
-    - lines_longer_than_80_chars
-    - list_remove_unrelated_type
+    - collection_methods_unrelated_type
     - missing_whitespace_between_adjacent_strings
     - no_runtimeType_toString
     - non_constant_identifier_names

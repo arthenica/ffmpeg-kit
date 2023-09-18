@@ -64,7 +64,7 @@ abstract class AbstractSession extends Session {
   ///
   /// Returns FFmpeg session created.
   static Future<FFmpegSession> createFFmpegSession(List<String> argumentsArray,
-      [LogRedirectionStrategy? logRedirectionStrategy = null]) async {
+      [LogRedirectionStrategy? logRedirectionStrategy]) async {
     try {
       await FFmpegKitConfig.init();
       final Map<dynamic, dynamic>? nativeSession =
@@ -118,7 +118,7 @@ abstract class AbstractSession extends Session {
   /// Returns FFprobe session created.
   static Future<FFprobeSession> createFFprobeSession(
       List<String> argumentsArray,
-      [LogRedirectionStrategy? logRedirectionStrategy = null]) async {
+      [LogRedirectionStrategy? logRedirectionStrategy]) async {
     try {
       await FFmpegKitConfig.init();
       final Map<dynamic, dynamic>? nativeSession =
