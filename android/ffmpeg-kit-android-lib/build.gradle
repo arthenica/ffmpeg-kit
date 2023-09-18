@@ -49,6 +49,15 @@ android {
     }
 }
 
+task javadoc(type: Javadoc) {
+    title = 'FFmpegKit'
+    destinationDir = file("${projectDir}/../../docs/android/javadoc")
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    source = android.sourceSets.main.java.srcDirs
+    configurations.implementation.setCanBeResolved(true)
+    classpath += configurations.implementation
+}
+
 dependencies {
     api 'com.arthenica:smart-exception-java:0.2.1'
     testImplementation "androidx.test.ext:junit:1.1.5"

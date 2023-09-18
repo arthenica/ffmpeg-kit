@@ -40,6 +40,14 @@ android {
             systemProperty 'enable.ffmpeg.kit.test.mode', 'true'
         }
     }
+
+
+    publishing {
+        singleVariant('release') {
+            withJavadocJar()
+            withSourcesJar()
+        }
+    }
 }
 
 task javadoc(type: Javadoc) {

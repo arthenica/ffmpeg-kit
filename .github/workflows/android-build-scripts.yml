@@ -41,6 +41,8 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+      - name: prerequisites
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -70,6 +72,8 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+      - name: prerequisites
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
@@ -157,6 +161,8 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+      - name: prerequisites
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
       - name: set up android ndk
         run: |
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
