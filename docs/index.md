@@ -114,6 +114,8 @@ the exact version number of `FFmpeg` is obtained using the `git describe --tags`
 
 |    Platforms     |                                  FFmpegKit Version                                  | FFmpeg Version | Release Date |
 |:----------------:|:-----------------------------------------------------------------------------------:|:--------------:|:------------:|
+|     Flutter      |   [6.0.3](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.3)    |      6.0       | Sep 19, 2023 |
+|   React Native   | [6.0.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v6.0.2) |      6.0       | Sep 19, 2023 |
 |     Flutter      |   [6.0.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.2)    |      6.0       | Sep 03, 2023 |
 |   React Native   | [6.0.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v6.0.1) |      6.0       | Sep 03, 2023  |
 |     Flutter      |   [6.0.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.1)    |      6.0       | Sep 03, 2023 |

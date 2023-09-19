@@ -26,6 +26,8 @@ jobs:
           java-version: '17'
       - name: prerequisites
         run: sudo apt-get install autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja-build ragel groff gtk-doc-tools libtasn1-bin
+      - name: prerequisites 2
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
       - name: upgrade meson
         run: pip install meson --upgrade
       - name: set up android ndk
@@ -62,6 +64,8 @@ jobs:
           java-version: '17'
       - name: prerequisites
         run: sudo apt-get install autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja-build ragel groff gtk-doc-tools libtasn1-bin
+      - name: prerequisites 2
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
       - name: upgrade meson
         run: pip install meson --upgrade
       - name: set up android ndk
