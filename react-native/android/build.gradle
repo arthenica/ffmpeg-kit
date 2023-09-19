@@ -35,8 +35,8 @@ android {
   defaultConfig {
     minSdkVersion safeExtGet('ffmpegKitPackage', 'https').contains("-lts") ? 16 : 24
     targetSdkVersion 33
-    versionCode 601
-    versionName "6.0.1"
+    versionCode 602
+    versionName "6.0.2"
   }
 
   buildTypes {
