@@ -99,7 +99,7 @@ class FFmpegKitFactory {
     }
   }
 
-  static String getVersion() => "6.0.2";
+  static String getVersion() => "6.0.3";
 
   static LogRedirectionStrategy? getLogRedirectionStrategy(int? sessionId) =>
       logRedirectionStrategyMap[sessionId];

@@ -29,8 +29,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode 602
-        versionName "6.0.2"
+        versionCode 603
+        versionName "6.0.3"
     }
 
     buildTypes {
@@ -49,5 +49,5 @@ android {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
-    implementation 'com.arthenica:ffmpeg-kit-https:6.0-1'
+    implementation 'com.arthenica:ffmpeg-kit-https:6.0-2'
 }
