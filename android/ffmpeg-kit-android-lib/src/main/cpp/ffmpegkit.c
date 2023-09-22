@@ -564,21 +564,58 @@ void *callbackThreadFunction() {
 }
 
 /**
- * Used by saf protocol; is expected to be called from a Java thread, therefore we don't need attach/detach
+ * Used by saf protocol; If it is called from a Java thread, we don't need attach/detach.
+ * However it can be called from other threads as well (as it happens for concat demuxer),
+ * in that case we perform attach & detach.
+ * Returns file descriptor created for this SAF id or 0 if an error occurs.
  */
 int saf_open(int safId) {
     JNIEnv *env = NULL;
-    (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
-    return (*env)->CallStaticIntMethod(env, configClass, safOpenMethod, safId);
+    bool attached = false;
+    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    if (getEnvRc != JNI_OK) {
+        if (getEnvRc != JNI_EDETACHED) {
+            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            return 0;
+        }
+        if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
+            LOGE("Callback thread failed to AttachCurrentThread for class %s.\n", configClassName);
+            return 0;
+        } else {
+          attached = true;
+        }
+    }
+    int result = (*env)->CallStaticIntMethod(env, configClass, safOpenMethod, safId);
+    if (attached) (*globalVm)->DetachCurrentThread(globalVm);
+    return result;
 }
 
 /**
- * Used by saf protocol; is expected to be called from a Java thread, therefore we don't need attach/detach
+ * Used by saf protocol; If it is called from a Java thread, we don't need attach/detach.
+ * However it can be called from other threads as well (as it happens for concat demuxer),
+ * in that case we perform attach & detach.
+ * Returns 1 if the given file descriptor is closed successfully, 0 if an error occurs.
  */
 int saf_close(int fd) {
     JNIEnv *env = NULL;
-    (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
-    return (*env)->CallStaticIntMethod(env, configClass, safCloseMethod, fd);
+    bool attached = false;
+    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    if (getEnvRc != JNI_OK) {
+        if (getEnvRc != JNI_EDETACHED) {
+            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            return 0;
+        }
+
+        if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
+            LOGE("Callback thread failed to AttachCurrentThread for class %s.\n", configClassName);
+            return 0;
+        } else {
+          attached = true;
+        }
+    }
+    int result = (*env)->CallStaticIntMethod(env, configClass, safCloseMethod, fd);
+    if (attached) (*globalVm)->DetachCurrentThread(globalVm);
+    return result;
 }
 
 /**
