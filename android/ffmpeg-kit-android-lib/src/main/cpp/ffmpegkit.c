@@ -575,11 +575,11 @@ int saf_open(int safId) {
     jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
-            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            LOGE("saf_open failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
             return 0;
         }
         if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
-            LOGE("Callback thread failed to AttachCurrentThread for class %s.\n", configClassName);
+            LOGE("saf_open failed to AttachCurrentThread for class %s.\n", configClassName);
             return 0;
         } else {
           attached = true;
@@ -602,12 +602,12 @@ int saf_close(int fd) {
     jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
-            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            LOGE("saf_close failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
             return 0;
         }
 
         if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
-            LOGE("Callback thread failed to AttachCurrentThread for class %s.\n", configClassName);
+            LOGE("saf_close failed to AttachCurrentThread for class %s.\n", configClassName);
             return 0;
         } else {
           attached = true;
