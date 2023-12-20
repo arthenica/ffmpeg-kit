@@ -508,7 +508,7 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR
   --ranlib="${RANLIB}" \
   --strip="${STRIP}" \
   --nm="${NM}" \
-  --extra-ldflags="$(get_min_version_cflags)" \
+  --extra-ldflags="-Wl -ld_classic $(get_min_version_cflags)" \
   --disable-autodetect \
   --enable-cross-compile \
   --enable-pic \
