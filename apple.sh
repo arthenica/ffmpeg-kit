@@ -6,6 +6,8 @@ enable_default_architecture_variants() {
   ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_MAC_CATALYST]=1
   ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_APPLETVOS]=1
   ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_APPLETVSIMULATOR]=1
+  ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_XROS]=1
+  ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_XRSIMULATOR]=1
   ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_MACOS]=1
 }
 
@@ -98,6 +100,12 @@ disable_arch_variant() {
   appletvsimulator)
     ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_APPLETVSIMULATOR]=0
     ;;
+  xros)
+    ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_XROS]=0
+    ;;
+  xrsimulator)
+    ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_XRSIMULATOR]=0
+    ;;
   macosx)
     ENABLED_ARCHITECTURE_VARIANTS[ARCH_VAR_MACOS]=0
     ;;
@@ -136,6 +144,7 @@ fi
 # DETECT SDK VERSIONS
 DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
 DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
+DETECTED_XROS_SDK_VERSION="$(xcrun --sdk xros --show-sdk-version 2>>"${BASEDIR}"/build.log)"
 DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>"${BASEDIR}"/build.log)"
 echo -e "INFO: Using iOS SDK: ${DETECTED_IOS_SDK_VERSION}, tvOS SDK: ${DETECTED_TVOS_SDK_VERSION}, macOS SDK: ${DETECTED_MACOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
