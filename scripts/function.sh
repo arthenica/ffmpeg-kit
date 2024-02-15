@@ -421,7 +421,7 @@ is_arch_supported_on_platform() {
 
     # IOS OR TVOS
   $ARCH_ARM64_SIMULATOR)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "xros" ]]; then
       echo 1
     else
       echo 0
@@ -430,7 +430,7 @@ is_arch_supported_on_platform() {
 
     # IOS, MACOS OR TVOS
   $ARCH_ARM64)
-    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]]; then
+    if [[ ${FFMPEG_KIT_BUILD_TYPE} == "ios" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "macos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "tvos" ]] || [[ ${FFMPEG_KIT_BUILD_TYPE} == "xros" ]]; then
       echo 1
     else
       echo 0
@@ -1827,6 +1827,9 @@ get_apple_cmake_system_name() {
   case ${FFMPEG_KIT_BUILD_TYPE} in
   macos)
     echo "Darwin"
+    ;;
+  xros)
+    echo "visionOS"
     ;;
   tvos)
     echo "tvOS"

@@ -117,6 +117,35 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
 #
 # 1. architecture index
 #
+disable_xros_architecture_not_supported_on_detected_sdk_version() {
+  local ARCH_NAME=$(get_arch_name $1)
+
+  case ${ARCH_NAME} in
+  arm64-simulator)
+
+    # INTRODUCED IN TVOS SDK 14.0
+    if [[ $(compare_versions "$DETECTED_XROS_SDK_VERSION" "1.0") -ge 1 ]]; then
+      local SUPPORTED=1
+    else
+      local SUPPORTED=0
+    fi
+    ;;
+  *)
+    local SUPPORTED=1
+    ;;
+  esac
+
+  if [[ ${SUPPORTED} -ne 1 ]]; then
+    if [[ -z ${BUILD_FORCE} ]]; then
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on visionOS SDK $DETECTED_XROS_SDK_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+      disable_arch "${ARCH_NAME}"
+    fi
+  fi
+}
+
+#
+# 1. architecture index
+#
 disable_macos_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
 
@@ -160,6 +189,8 @@ build_apple_architecture_variant_strings() {
   export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_TVOS}")"
   export APPLETVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVOS}")"
   export APPLETV_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVSIMULATOR}")"
+  export XROS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_XROS}")"
+  export XR_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_XRSIMULATOR}")"
   export MACOSX_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MACOS}")"
 }
 
@@ -996,6 +1027,9 @@ get_sdk_name() {
     tvos)
       echo "appletvos"
       ;;
+    xros)
+      echo "xros"
+      ;;
     macos)
       echo "macosx"
       ;;
@@ -1008,6 +1042,9 @@ get_sdk_name() {
       ;;
     tvos)
       echo "appletvsimulator"
+      ;;
+    xros)
+      echo "xrsimulator"
       ;;
     macos)
       echo "macosx"
@@ -1024,6 +1061,9 @@ get_sdk_name() {
       ;;
     tvos)
       echo "appletvsimulator"
+      ;;
+    xros)
+      echo "xrsimulator"
       ;;
     esac
     ;;
@@ -1095,6 +1135,9 @@ get_min_sdk_version() {
       ;;
     tvos)
       echo "${TVOS_MIN_VERSION}"
+      ;;
+    xros)
+      echo "${XROS_MIN_VERSION}"
       ;;
     macos)
       echo "${MACOS_MIN_VERSION}"
