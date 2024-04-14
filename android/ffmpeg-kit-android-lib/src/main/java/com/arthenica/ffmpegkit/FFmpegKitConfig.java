@@ -34,6 +34,8 @@ import com.arthenica.smartexception.java.Exceptions;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +48,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -128,6 +131,7 @@ public class FFmpegKitConfig {
     private static final SparseArray<SAFProtocolUrl> safIdMap;
     private static final SparseArray<SAFProtocolUrl> safFileDescriptorMap;
     private static LogRedirectionStrategy globalLogRedirectionStrategy;
+    private static final AtomicBoolean safUrlsReusable;
 
     static {
 
@@ -172,6 +176,7 @@ public class FFmpegKitConfig {
         safIdMap = new SparseArray<>();
         safFileDescriptorMap = new SparseArray<>();
         globalLogRedirectionStrategy = LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED;
+        safUrlsReusable = new AtomicBoolean(false);
 
         android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadBuildDate()));
     }
@@ -487,7 +492,8 @@ public class FFmpegKitConfig {
     /**
      * <p>Creates a new named pipe to use in <code>FFmpeg</code> operations.
      *
-     * <p>Please note that creator is responsible of closing created pipes.
+     * <p>Please note that creator is responsible of closing created pipes via the
+     * {@link #closeFFmpegPipe} method.
      *
      * @param context application context
      * @return the full path of the named pipe
@@ -1029,6 +1035,7 @@ public class FFmpegKitConfig {
                 safUrl.setParcelFileDescriptor(parcelFileDescriptor);
                 final int fd = parcelFileDescriptor.getFd();
                 safFileDescriptorMap.put(fd, safUrl);
+                android.util.Log.d(TAG, String.format("Generated fd %d for SAF id %d.", fd, safId));
                 return fd;
             } else {
                 android.util.Log.e(TAG, String.format("SAF id %d not found.", safId));
@@ -1050,11 +1057,15 @@ public class FFmpegKitConfig {
         try {
             final SAFProtocolUrl safProtocolUrl = safFileDescriptorMap.get(fileDescriptor);
             if (safProtocolUrl != null) {
+                final int safId = safProtocolUrl.getSafId();
                 ParcelFileDescriptor parcelFileDescriptor = safProtocolUrl.getParcelFileDescriptor();
                 if (parcelFileDescriptor != null) {
                     safFileDescriptorMap.delete(fileDescriptor);
-                    safIdMap.delete(safProtocolUrl.getSafId());
                     parcelFileDescriptor.close();
+                    if (!safUrlsReusable.get()) {
+                        safIdMap.delete(safId);
+                    }
+                    android.util.Log.d(TAG, String.format("Closed fd %d for SAF id %d.", fileDescriptor, safId));
                     return 1;
                 } else {
                     android.util.Log.e(TAG, String.format("ParcelFileDescriptor for SAF fd %d not found.", fileDescriptor));
@@ -1067,6 +1078,31 @@ public class FFmpegKitConfig {
         }
 
         return 0;
+    }
+
+    /**
+     * Unregisters saf protocol urls and cleans up the resources associated with them.
+     *
+     * @param safUrl saf protocol url e.g. saf:1.mp4
+     */
+    public static void unregisterSafProtocolUrl(final String safUrl) {
+        if (safUrl != null) {
+            try {
+                URI uri = new URI(safUrl);
+                String path = uri.getSchemeSpecificPart();
+                int index = path.indexOf(".");
+                if (index > -1) {
+                    String safIdString = path.substring(0, index);
+                    int safId = Integer.parseInt(safIdString);
+                    safIdMap.delete(safId);
+                    android.util.Log.d(TAG, String.format("Unregistered safUrl %s successfully.", safUrl));
+                } else {
+                    android.util.Log.w(FFmpegKitConfig.TAG, String.format("Cannot unregister safUrl %s. Failed to drop extension!", safUrl));
+                }
+            } catch (URISyntaxException | NumberFormatException e) {
+                android.util.Log.w(FFmpegKitConfig.TAG, String.format("Cannot unregister safUrl %s. Failed to extract saf id!", safUrl));
+            }
+        }
     }
 
     /**
@@ -1293,6 +1329,31 @@ public class FFmpegKitConfig {
      */
     public static void setLogRedirectionStrategy(final LogRedirectionStrategy logRedirectionStrategy) {
         FFmpegKitConfig.globalLogRedirectionStrategy = logRedirectionStrategy;
+    }
+
+    /**
+     * Returns if SAF protocol urls are reusable or not.
+     *
+     * @return true if SAF protocol urls are reusable, false otherwise
+     */
+    public static boolean getSafUrlsReusable() {
+        return safUrlsReusable.get();
+    }
+
+    /**
+     * Defines whether the generated SAF protocol urls will be reusable or not.
+     *
+     * <p>Note that SAF protocol urls are not reusable by default and are automatically
+     * unregistered when the file associated with them is closed.
+     *
+     * <p>If they are set to be reused using this method, automatic unregistration will be
+     * disabled. Therefore, it will be the developer's responsibility to unregister them via the
+     * {@link #unregisterSafProtocolUrl} method.
+     *
+     * @param safUrlsReusable set to true to enable the reuse of SAF protocol urls
+     */
+    public static void setSafUrlsReusable(final boolean safUrlsReusable) {
+        FFmpegKitConfig.safUrlsReusable.compareAndSet(!safUrlsReusable, safUrlsReusable);
     }
 
     /**

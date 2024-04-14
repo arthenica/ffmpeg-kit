@@ -187,6 +187,11 @@ public class FFmpegKitConfigTest {
         }
     }
 
+    @Test
+    public void unregisterSafProtocolUrl() {
+        FFmpegKitConfig.unregisterSafProtocolUrl("saf:1.mp4");
+    }
+
     private String listToPackageName(final List<String> externalLibraryList) {
         boolean speex = externalLibraryList.contains("speex");
         boolean fribidi = externalLibraryList.contains("fribidi");
