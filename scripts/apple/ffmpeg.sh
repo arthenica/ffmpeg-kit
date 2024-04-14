@@ -473,6 +473,7 @@ fi
 
 ########################### CUSTOMIZATIONS #######################
 git checkout libavformat/file.c 1>>"${BASEDIR}"/build.log 2>&1
+git checkout libavformat/hls.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavformat/protocols.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavutil 1>>"${BASEDIR}"/build.log 2>&1
 
