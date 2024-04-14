@@ -723,8 +723,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     redirectionEnabled = 0;
 
+#ifdef _USES_FFMPEG_KIT_PROTOCOLS
     av_set_saf_open(saf_open);
     av_set_saf_close(saf_close);
+#endif
 
     enableNativeRedirection();
 

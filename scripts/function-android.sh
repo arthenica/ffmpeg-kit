@@ -77,6 +77,9 @@ build_application_mk() {
   fi
 
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
+  if [[ -z ${NO_FFMPEG_KIT_PROTOCOLS} ]]; then
+    local USES_FFMPEG_KIT_PROTOCOLS="-D_USES_FFMPEG_KIT_PROTOCOLS"
+  fi
 
   rm -f "${BASEDIR}/android/jni/Application.mk"
 
@@ -87,9 +90,11 @@ APP_ABI := ${ANDROID_ARCHITECTURES}
 
 APP_STL := ${APP_STL}
 
+APP_ALLOW_MISSING_DEPS := true
+
 APP_PLATFORM := android-${API}
 
-APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
+APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable ${USES_FFMPEG_KIT_PROTOCOLS}
 
 APP_LDFLAGS := -Wl,--hash-style=both
 EOF
@@ -219,7 +224,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-  echo ""
+  echo "-I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include"
 }
 
 get_common_cflags() {
@@ -311,9 +316,6 @@ get_size_optimization_cflags() {
 get_app_specific_cflags() {
   local APP_FLAGS=""
   case $1 in
-  xvidcore)
-    APP_FLAGS=""
-    ;;
   ffmpeg)
     APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
     ;;
@@ -323,17 +325,29 @@ get_app_specific_cflags() {
   kvazaar)
     APP_FLAGS="-std=gnu99 -Wno-unused-function"
     ;;
+  libaom)
+    APP_FLAGS="-std=gnu99 -Wno-unused-function -Wno-implicit-function-declaration"
+    ;;
+  libuuid)
+    APP_FLAGS="-std=gnu99 -Wno-unused-function -DHAVE_SYS_FILE_H=1"
+    ;;
+  libvpx | openssl | shine | srt)
+    APP_FLAGS="-Wno-unused-function"
+    ;;
   openh264)
     APP_FLAGS="-std=gnu99 -Wno-unused-function -fstack-protector-all"
     ;;
   rubberband)
     APP_FLAGS="-std=c99 -Wno-unused-function"
     ;;
-  libvpx | openssl | shine | srt)
-    APP_FLAGS="-Wno-unused-function"
+  sdl)
+    APP_FLAGS="-std=c99 -Wno-unused-function -Wno-incompatible-function-pointer-types"
     ;;
   soxr | snappy | libwebp)
     APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
+    ;;
+  xvidcore)
+    APP_FLAGS=""
     ;;
   *)
     APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -352,6 +366,7 @@ get_cflags() {
   else
     local OPTIMIZATION_FLAGS="${FFMPEG_KIT_DEBUG}"
   fi
+
   local COMMON_INCLUDES=$(get_common_includes)
 
   echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
@@ -397,7 +412,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-  local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
+  local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${HOST}/${API}"
 
   case $1 in
   ffmpeg)

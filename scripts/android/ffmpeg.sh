@@ -390,8 +390,6 @@ ulimit -n 2048 1>>"${BASEDIR}"/build.log 2>&1
 
 ########################### CUSTOMIZATIONS #######################
 cd "${BASEDIR}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-git checkout android/ffmpeg-kit-android-lib/src/main/cpp/fftools_ffmpeg_demux.c 1>>"${BASEDIR}"/build.log 2>&1
-git checkout android/ffmpeg-kit-android-lib/src/main/cpp/ffmpegkit.c 1>>"${BASEDIR}"/build.log 2>&1
 cd "${BASEDIR}"/src/"${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 git checkout libavformat/file.c 1>>"${BASEDIR}"/build.log 2>&1
 git checkout libavformat/hls.c 1>>"${BASEDIR}"/build.log 2>&1
@@ -403,7 +401,6 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' "${BASEDIR
 
 # 2. Enable ffmpeg-kit protocols
 if [[ ${NO_FFMPEG_KIT_PROTOCOLS} == "1" ]]; then
-  ${SED_INLINE} "s| av_set_saf|//av_set_saf|g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/ffmpegkit.c 1>>"${BASEDIR}"/build.log 2>&1
   echo -e "\nINFO: Disabled custom ffmpeg-kit protocols\n" 1>>"${BASEDIR}"/build.log 2>&1
 else
   cat ../../tools/protocols/libavformat_file.c >> libavformat/file.c
@@ -412,7 +409,6 @@ else
   awk '{gsub(/ff_file_protocol;/,"ff_file_protocol;\nextern const URLProtocol ff_saf_protocol;")}1' libavformat/protocols.c > libavformat/protocols.c.tmp
   cat libavformat/protocols.c.tmp > libavformat/protocols.c
   ${SED_INLINE} "s|av_strstart(proto_name, \"file\", NULL))|av_strstart(proto_name, \"file\", NULL) \|\| av_strstart(proto_name, \"saf\", NULL))|g" libavformat/hls.c 1>>"${BASEDIR}"/build.log 2>&1
-  ${SED_INLINE} "s| assert_avoptions|//assert_avoptions|g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/fftools_ffmpeg_demux.c 1>>"${BASEDIR}"/build.log 2>&1
   echo -e "\nINFO: Enabled custom ffmpeg-kit protocols\n" 1>>"${BASEDIR}"/build.log 2>&1
 fi
 
