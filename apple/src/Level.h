@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021 Taner Sener
+ * Copyright (c) 2024 ARTHENICA LTD
  *
  * This file is part of FFmpegKit.
  *
@@ -23,7 +24,7 @@
 /**
  * <p>Enumeration type for log levels.
  */
-typedef NS_ENUM(NSUInteger, Level) {
+typedef NS_ENUM(NSInteger, Level) {
     
     /**
      * This log level is defined by FFmpegKit. It is used to specify logs printed to stderr by
