@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2007-2010 Stefano Sabatini
  * Copyright (c) 2020-2022 Taner Sener
- * Copyright (c) 2023 ARTHENICA LTD
+ * Copyright (c) 2023-2024 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 ARTHENICA LTD
+ * Copyright (c) 2023-2024 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *

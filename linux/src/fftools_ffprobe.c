@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2007-2010 Stefano Sabatini
  * Copyright (c) 2020-2022 Taner Sener
- * Copyright (c) 2023 ARTHENICA LTD
+ * Copyright (c) 2023-2024 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -3383,8 +3383,10 @@ static int open_input_file(InputFile *ifile, const char *filename,
     av_dump_format(fmt_ctx, 0, filename, 0);
 
     ifile->streams = av_calloc(fmt_ctx->nb_streams, sizeof(*ifile->streams));
-    if (!ifile->streams)
-        exit(1);
+    if (!ifile->streams) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory\n");
+        exit_program(1);
+    }
     ifile->nb_streams = fmt_ctx->nb_streams;
 
     /* bind a decoder to each input stream */
@@ -3414,12 +3416,16 @@ static int open_input_file(InputFile *ifile, const char *filename,
                                                    fmt_ctx, stream, codec);
 
             ist->dec_ctx = avcodec_alloc_context3(codec);
-            if (!ist->dec_ctx)
-                exit(1);
+            if (!ist->dec_ctx) {
+                av_log(NULL, AV_LOG_ERROR, "Cannot allocate an AVCodecContext\n");
+                exit_program(1);
+            }
 
             err = avcodec_parameters_to_context(ist->dec_ctx, stream->codecpar);
-            if (err < 0)
-                exit(1);
+            if (err < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Cannot fill the codec context\n");
+                exit_program(1);
+            }
 
             if (do_show_log) {
                 // For loging it is needed to disable at least frame threads as otherwise
@@ -3433,7 +3439,7 @@ static int open_input_file(InputFile *ifile, const char *filename,
             if (avcodec_open2(ist->dec_ctx, codec, &opts) < 0) {
                 av_log(NULL, AV_LOG_WARNING, "Could not open codec for input stream %d\n",
                        stream->index);
-                exit(1);
+                exit_program(1);
             }
 
             if ((t = av_dict_get(opts, "", NULL, AV_DICT_IGNORE_SUFFIX))) {

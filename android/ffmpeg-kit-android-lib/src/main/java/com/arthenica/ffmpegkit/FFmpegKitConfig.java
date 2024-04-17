@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018-2022 Taner Sener
+ * Copyright (c) 2024 ARTHENICA LTD
  *
  * This file is part of FFmpegKit.
  *
