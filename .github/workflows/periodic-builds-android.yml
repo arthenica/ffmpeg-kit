@@ -16,7 +16,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: set up adopt jdk 17
@@ -54,7 +54,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: set up adopt jdk 17
