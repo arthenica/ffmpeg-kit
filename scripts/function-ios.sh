@@ -223,6 +223,9 @@ get_app_specific_cflags() {
   libwebp | xvidcore)
     APP_FLAGS="-fno-common -DPIC"
     ;;
+  openh264 | openssl | x265)
+    APP_FLAGS="-Wno-unused-function"
+    ;;
   sdl)
     APP_FLAGS="-DPIC -Wno-declaration-after-statement -Wno-unused-function -D__IPHONEOS__"
     ;;
@@ -231,9 +234,6 @@ get_app_specific_cflags() {
     ;;
   soxr | snappy)
     APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-    ;;
-  openh264 | openssl | x265)
-    APP_FLAGS="-Wno-unused-function"
     ;;
   *)
     APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -310,7 +310,7 @@ get_cxxflags() {
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   rubberband)
-    echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    echo "-fno-rtti -Wno-c++11-narrowing ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   srt | tesseract | zimg)
     echo "-std=c++11 ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
