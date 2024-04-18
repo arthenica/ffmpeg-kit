@@ -10,12 +10,9 @@ ${SED_INLINE} 's/\-mno-ieee-fp//g' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac |
 # ALWAYS REGENERATE BUILD FILES - NECESSARY TO APPLY THE WORKAROUNDS
 autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
-if [[ ${FFMPEG_KIT_BUILD_TYPE} != "macos" ]]; then
-
-  # WORKAROUND TO REMOVE -force_cpusubtype_ALL FLAG DUE TO THE FOLLOWING ERROR
-  # ld: -force_cpusubtype_ALL and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-  ${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
-fi
+# WORKAROUND TO REMOVE -force_cpusubtype_ALL FLAG DUE TO THE FOLLOWING ERROR
+# ld: -force_cpusubtype_ALL and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
+${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
 
 PKG_CONFIG= ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
