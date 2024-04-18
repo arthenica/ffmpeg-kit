@@ -302,7 +302,13 @@ get_common_linked_libraries() {
 }
 
 get_common_ldflags() {
-  echo "-isysroot ${SDK_PATH} $(get_min_version_cflags)"
+
+  # WORKAROUND FOR XCODE 15.0/15.0.1
+  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "17.0") -eq 0 ]]; then
+    echo "-isysroot ${SDK_PATH} $(get_min_version_cflags) -Wl,-ld_classic"
+  else
+    echo "-isysroot ${SDK_PATH} $(get_min_version_cflags)"
+  fi
 }
 
 get_size_optimization_ldflags() {
