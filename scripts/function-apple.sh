@@ -1287,6 +1287,15 @@ EOF
 create_libiconv_system_package_config() {
   local LIB_ICONV_VERSION=$(grep '_LIBICONV_VERSION' "${SDK_PATH}"/usr/include/iconv.h | grep -Eo '0x.*' | grep -Eo '.*    ')
 
+  # AFTER XCODE 15.0, libcharset DOES NOT CONTAIN ALL ARCHITECTURES WE SUPPORT
+  if [[ -n "$DETECTED_IOS_SDK_VERSION" && $(compare_versions "$DETECTED_IOS_SDK_VERSION" "17.0") -ge 0 ]] ||
+   [[ -n "$DETECTED_MACOS_SDK_VERSION" && $(compare_versions "$DETECTED_MACOS_SDK_VERSION" "14.0") -ge 0 ]] ||
+   [[ -n "$DETECTED_TVOS_SDK_VERSION" && $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "17.0") -ge 0 ]]; then
+    local _REQUIRES_LIBS="-liconv"
+  else
+    local _REQUIRES_LIBS="-liconv -lcharset"
+  fi
+
   cat >"${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" <<EOF
 prefix=${SDK_PATH}/usr
 exec_prefix=\${prefix}
@@ -1298,7 +1307,7 @@ Description: Character set conversion library
 Version: ${LIB_ICONV_VERSION}
 
 Requires:
-Libs: -L\${libdir} -liconv -lcharset
+Libs: -L\${libdir} ${_REQUIRES_LIBS}
 Cflags: -I\${includedir}
 EOF
 }

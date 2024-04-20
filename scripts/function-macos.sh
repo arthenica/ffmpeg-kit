@@ -82,10 +82,10 @@ get_common_cflags() {
 
   case ${ARCH} in
   arm64)
-    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   *)
-    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   esac
 }
@@ -102,7 +102,6 @@ get_arch_specific_cflags() {
 }
 
 get_size_optimization_cflags() {
-
   local ARCH_OPTIMIZATION=""
   case ${ARCH} in
   arm64)
@@ -117,7 +116,6 @@ get_size_optimization_cflags() {
 }
 
 get_size_optimization_asm_cflags() {
-
   local ARCH_OPTIMIZATION=""
   case $1 in
   jpeg | ffmpeg)
@@ -139,20 +137,19 @@ get_size_optimization_asm_cflags() {
 }
 
 get_app_specific_cflags() {
-
   local APP_FLAGS=""
   case $1 in
-  fontconfig)
-    APP_FLAGS="-std=c99 -Wno-unused-function"
-    ;;
   ffmpeg)
     APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations"
     ;;
   ffmpeg-kit)
     APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
     ;;
+  fontconfig)
+    APP_FLAGS="-std=c99 -Wno-unused-function"
+    ;;
   gnutls)
-    APP_FLAGS="-std=c99 -Wno-unused-function -D_GL_USE_STDLIB_ALLOC=1"
+    APP_FLAGS="-std=c99 -Wno-unused-function -Wno-implicit-int -D_GL_USE_STDLIB_ALLOC=1"
     ;;
   jpeg)
     APP_FLAGS="-Wno-nullability-completeness"
@@ -166,6 +163,9 @@ get_app_specific_cflags() {
   libwebp | xvidcore)
     APP_FLAGS="-fno-common -DPIC"
     ;;
+  openh264 | x265)
+    APP_FLAGS="-Wno-unused-function"
+    ;;
   sdl)
     APP_FLAGS="-DPIC -Wno-unused-function -D__MACOSX__"
     ;;
@@ -174,9 +174,6 @@ get_app_specific_cflags() {
     ;;
   soxr | snappy)
     APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-    ;;
-  openh264 | x265)
-    APP_FLAGS="-Wno-unused-function"
     ;;
   *)
     APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -227,9 +224,6 @@ get_cxxflags() {
   local BITCODE_FLAGS=""
 
   case $1 in
-  x265)
-    echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
-    ;;
   gnutls)
     echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
@@ -246,10 +240,13 @@ get_cxxflags() {
     echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   rubberband)
-    echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    echo "-fno-rtti -Wno-c++11-narrowing ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
     ;;
   srt | tesseract | zimg)
     echo "-std=c++11 ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+    ;;
+  x265)
+    echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
     ;;
   *)
     echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
