@@ -6,8 +6,7 @@ DEBUG_OPTIONS=""
 case ${ARCH} in
 x86)
 
-  # please note that asm is disabled
-  # enabling asm for x86 causes text relocations in libavfilter.so
+  # ENABLING ASM FOR X86 CAUSES TEXT RELOCATIONS IN libavfilter.so
   ASM_OPTIONS="--disable-asm"
   ;;
 x86-64)
@@ -18,9 +17,12 @@ x86-64)
 
   export AS="$(command -v nasm)"
 
-  # WORKAROUND TO ENABLE X86 ASM
-  # https://github.com/android-ndk/ndk/issues/693
-  export CFLAGS="${CFLAGS} -mno-stackrealign"
+  if [[ ${API} -lt 24 ]]; then
+
+    # WORKAROUND TO ENABLE X86 ASM ON API LEVEL < 24
+    # https://github.com/android-ndk/ndk/issues/693
+    export CFLAGS="${CFLAGS} -mno-stackrealign"
+  fi
   ;;
 esac
 if [[ -n ${FFMPEG_KIT_DEBUG} ]]; then
