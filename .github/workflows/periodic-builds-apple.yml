@@ -5,18 +5,18 @@ on:
     - cron:  '0 1 * * 0'
 
 jobs:
-  build-ios-main-on-macos-ventura:
-    name: ios main on ventura
-    runs-on: macos-13
+  build-ios-main-on-macos-sonoma:
+    name: ios main on sonoma
+    runs-on: macos-14
     strategy:
       matrix:
-        xcode: [ '14.3.1' ]
+        xcode: [ '14.3.1', '15.3' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
@@ -36,13 +36,13 @@ jobs:
     runs-on: macos-12
     strategy:
       matrix:
-        xcode: [ '14.2' ]
+        xcode: [ '13.4.1' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
@@ -57,18 +57,18 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-macos-main-on-macos-ventura:
-    name: macos main on ventura
-    runs-on: macos-13
+  build-macos-main-on-macos-sonoma:
+    name: macos main on sonoma
+    runs-on: macos-14
     strategy:
       matrix:
-        xcode: [ '14.3.1' ]
+        xcode: [ '14.3.1', '15.3' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
@@ -88,13 +88,13 @@ jobs:
     runs-on: macos-12
     strategy:
       matrix:
-        xcode: [ '14.2' ]
+        xcode: [ '13.4.1' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
@@ -109,18 +109,18 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-tvos-main-on-macos-ventura:
-    name: tvos main on ventura
-    runs-on: macos-13
+  build-tvos-main-on-macos-sonoma:
+    name: tvos main on sonoma
+    runs-on: macos-14
     strategy:
       matrix:
-        xcode: [ '14.3.1' ]
+        xcode: [ '14.3.1', '15.3' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites
@@ -140,13 +140,13 @@ jobs:
     runs-on: macos-12
     strategy:
       matrix:
-        xcode: [ '14.2' ]
+        xcode: [ '13.4.1' ]
         branches: [ 'main', 'development' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branches }}
       - name: prerequisites

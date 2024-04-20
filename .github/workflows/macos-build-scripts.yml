@@ -27,63 +27,63 @@ on:
       - 'macos.sh'
 
 jobs:
-  build-main-on-macos-monterey:
-    name: macos main on monterey
+  build-main-on-macos-sonoma:
+    name: macos main on sonoma
+    runs-on: macos-14
+    strategy:
+      matrix:
+        xcode: [ '14.3.1', '15.3' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: prerequisites
+        run: brew install autoconf automake libtool pkg-config curl git cmake nasm
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./macos.sh --xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-main-on-macos-ventura:
+    name: macos main on ventura
+    runs-on: macos-13
+    strategy:
+      matrix:
+        xcode: [ '14.3.1', '15.2' ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: prerequisites
+        run: brew install autoconf automake libtool pkg-config curl git cmake nasm
+      - name: set up xcode
+        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
+      - name: run the build script
+        run: ./macos.sh --xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
+      - name: print build logs
+        if: ${{ always() }}
+        run: cat build.log
+      - name: print ffbuild logs
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
+  build-lts-on-macos-monterey:
+    name: macos lts on monterey
     runs-on: macos-12
     strategy:
       matrix:
-        xcode: [ '13.4.1', '14.0.1' ]
+        xcode: [ '13.4.1', '14.2' ]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
-      - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake nasm
-      - name: set up xcode
-        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
-      - name: run the build script
-        run: ./macos.sh --xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
-      - name: print build logs
-        if: ${{ always() }}
-        run: cat build.log
-      - name: print ffbuild logs
-        if: ${{ failure() }}
-        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-main-on-macos-bigsur:
-    name: macos main on big sur
-    runs-on: macos-11
-    strategy:
-      matrix:
-        xcode: [ '12.5.1', '13.2.1' ]
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: prerequisites
-        run: brew install autoconf automake libtool pkg-config curl git cmake nasm
-      - name: set up xcode
-        run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
-      - name: run the build script
-        run: ./macos.sh --xcframework --enable-macos-audiotoolbox --enable-macos-avfoundation --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
-      - name: print build logs
-        if: ${{ always() }}
-        run: cat build.log
-      - name: print ffbuild logs
-        if: ${{ failure() }}
-        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-lts-on-macos-bigsur:
-    name: macos lts on big sur
-    runs-on: macos-11
-    strategy:
-      matrix:
-        xcode: [ '11.7', '12.4' ]
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: prerequisites
         run: brew install autoconf automake libtool pkg-config curl git cmake nasm
       - name: set up xcode
