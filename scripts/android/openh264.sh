@@ -6,16 +6,28 @@ export LDFLAGS="$LDFLAGS $(pkg-config --libs --static libiconv) $(pkg-config --l
 
 # SET BUILD OPTIONS
 case ${ARCH} in
+arm-v7a)
+  BUILD_ARCH=arm
+  CFLAGS+=" -DANDROID_NDK"
+  ;;
 arm-v7a-neon)
   ASM_OPTIONS=arm
+  BUILD_ARCH=arm
   CFLAGS+=" -DHAVE_NEON -DANDROID_NDK"
   ;;
 arm64-v8a)
   ASM_OPTIONS=arm64
+  BUILD_ARCH=arm64
   CFLAGS+=" -DHAVE_NEON_AARCH64 -DANDROID_NDK"
   ;;
-x86*)
+x86)
   ASM_OPTIONS=x86
+  BUILD_ARCH=x86
+  CFLAGS+=" -DHAVE_AVX2 -DANDROID_NDK"
+  ;;
+x86-64)
+  ASM_OPTIONS=x86
+  BUILD_ARCH=x86_64
   CFLAGS+=" -DHAVE_AVX2 -DANDROID_NDK"
   ;;
 esac
@@ -33,10 +45,11 @@ ${SED_INLINE} 's/^COMMON_OBJS +=/# COMMON_OBJS +=/' "${BASEDIR}"/src/"${LIB_NAME
 ${SED_INLINE} 's/^COMMON_CFLAGS +=/# COMMON_CFLAGS +=/' "${BASEDIR}"/src/"${LIB_NAME}"/build/platform-android.mk
 
 make -j$(get_cpu_count) \
-  ARCH="$(get_toolchain_arch)" \
-  CC="$CC" \
-  CFLAGS="$CFLAGS" \
-  CXX="$CXX" \
+  ARCH="${BUILD_ARCH}" \
+  CC="${CC}" \
+  CFLAGS="${CFLAGS}" \
+  CXX="${CXX}" \
+  AR="${AR}" \
   CXXFLAGS="${CXXFLAGS}" \
   LDFLAGS="${LDFLAGS}" \
   OS=android \
@@ -44,7 +57,6 @@ make -j$(get_cpu_count) \
   NDKLEVEL="${API}" \
   NDKROOT="${ANDROID_NDK_ROOT}" \
   NDK_TOOLCHAIN_VERSION=clang \
-  AR="$AR" \
   ASM_OPTIONS=${ASM_OPTIONS} \
   TARGET="android-${API}" install-static || return 1
 

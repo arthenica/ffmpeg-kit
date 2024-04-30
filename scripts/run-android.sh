@@ -33,7 +33,7 @@ echo -e "----------------------------------------------------------------\n"
 cd "${BASEDIR}"/src/"${LIB_NAME}" || return 1
 
 LIB_INSTALL_PREFIX="${ENABLED_LIBRARY_PATH}"
-ANDROID_SYSROOT="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot
+ANDROID_SYSROOT="${ANDROID_TOOLCHAIN}"/sysroot
 BUILD_DIR=$(get_cmake_build_directory)
 
 rm -rf "${LIB_INSTALL_PREFIX}" || return 1

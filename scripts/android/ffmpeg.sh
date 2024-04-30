@@ -17,7 +17,7 @@ echo -e "INFO: $(uname -a)\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "----------------------------------------------------------------\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 FFMPEG_LIBRARY_PATH="${LIB_INSTALL_BASE}/${LIB_NAME}"
-ANDROID_SYSROOT="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot
+ANDROID_SYSROOT="${ANDROID_TOOLCHAIN}"/sysroot
 
 # SET PATHS
 set_toolchain_paths "${LIB_NAME}"

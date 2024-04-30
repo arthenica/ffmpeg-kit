@@ -253,7 +253,7 @@ get_library_source() {
     ;;
   x265)
     SOURCE_REPO_URL="https://github.com/arthenica/x265"
-    SOURCE_ID="3.4"
+    SOURCE_ID="3.6"
     SOURCE_TYPE="TAG"
     ;;
   xvidcore)

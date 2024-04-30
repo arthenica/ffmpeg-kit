@@ -33,7 +33,7 @@ under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices" "      --api-level=api\t\toverride Android api level" "      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (saf)"
+  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices\n      --api-level=api\t\toverride Android api level\n      --toolchain=path\t\toverride the default (llvm) toolchain path\n      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (saf)"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -155,13 +155,13 @@ get_toolchain() {
 get_cmake_system_processor() {
   case ${ARCH} in
   arm-v7a | arm-v7a-neon)
-    echo "arm"
+    echo "armv7-a"
     ;;
   arm64-v8a)
     echo "aarch64"
     ;;
   x86)
-    echo "x86"
+    echo "i686"
     ;;
   x86-64)
     echo "x86_64"
@@ -192,16 +192,16 @@ get_target_cpu() {
 get_toolchain_arch() {
   case ${ARCH} in
   arm-v7a | arm-v7a-neon)
-    echo "arm"
+    echo "arm-linux-androideabi"
     ;;
   arm64-v8a)
-    echo "arm64"
+    echo "aarch64-linux-android"
     ;;
   x86)
-    echo "x86"
+    echo "i686-linux-android"
     ;;
   x86-64)
-    echo "x86_64"
+    echo "x86_64-linux-android"
     ;;
   esac
 }
@@ -224,7 +224,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-  echo "-I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include"
+  echo "-I${ANDROID_TOOLCHAIN}/sysroot/usr/include"
 }
 
 get_common_cflags() {
@@ -412,7 +412,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-  local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${HOST}/${API}"
+  local COMMON_LIBRARY_PATHS="-L${ANDROID_TOOLCHAIN}/sysroot/usr/lib/${HOST}/${API}"
 
   case $1 in
   ffmpeg)
@@ -931,12 +931,12 @@ EOF
 }
 
 create_zlib_system_package_config() {
-  ZLIB_VERSION=$(grep '#define ZLIB_VERSION' "${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+  ZLIB_VERSION=$(grep '#define ZLIB_VERSION' "${ANDROID_TOOLCHAIN}"/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/zlib.pc" <<EOF
 prefix="${ANDROID_SYSROOT}"/usr
 exec_prefix=\${prefix}
-libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
+libdir=${ANDROID_SYSROOT}/usr/lib/$(get_toolchain_arch)
 includedir=\${prefix}/include
 
 Name: zlib
@@ -1039,7 +1039,7 @@ android_ndk_cmake() {
 }
 
 set_toolchain_paths() {
-  export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
+  export PATH="$PATH":"${ANDROID_TOOLCHAIN}"/bin
 
   HOST=$(get_host)
 
@@ -1053,7 +1053,7 @@ set_toolchain_paths() {
   esac
   if [[ $(compare_versions "$DETECTED_NDK_VERSION" "23") -ge 0 ]]; then
     export AR=llvm-ar
-    export LD=lld
+    export LD=ld.lld
     export RANLIB=llvm-ranlib
     export STRIP=llvm-strip
     export NM=llvm-nm
@@ -1064,7 +1064,7 @@ set_toolchain_paths() {
     export RANLIB=${HOST}-ranlib
     export STRIP=${HOST}-strip
     export NM=${HOST}-nm
-    if [ "$1" == "x264" ]; then
+    if [[ "$1" == "x264" ]]; then
       export AS=${CC}
     else
       export AS=${HOST}-as

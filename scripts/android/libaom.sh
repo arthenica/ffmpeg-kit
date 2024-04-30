@@ -37,11 +37,11 @@ cmake -Wno-dev \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_SYSTEM_NAME=Generic \
   -DCMAKE_INSTALL_PREFIX="${LIB_INSTALL_PREFIX}" \
-  -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CXX" \
-  -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CC" \
-  -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$LD" \
-  -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AR" \
-  -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AS" \
+  -DCMAKE_CXX_COMPILER="${ANDROID_TOOLCHAIN}/bin/$CXX" \
+  -DCMAKE_C_COMPILER="${ANDROID_TOOLCHAIN}/bin/$CC" \
+  -DCMAKE_LINKER="${ANDROID_TOOLCHAIN}/bin/$LD" \
+  -DCMAKE_AR="${ANDROID_TOOLCHAIN}/bin/$AR" \
+  -DCMAKE_AS="${ANDROID_TOOLCHAIN}/bin/$AS" \
   -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
   ${ASM_OPTIONS} \
   -DENABLE_TESTS=0 \

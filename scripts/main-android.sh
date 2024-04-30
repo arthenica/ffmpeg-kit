@@ -15,13 +15,8 @@ if [[ -z ${BASEDIR} ]]; then
   exit 1
 fi
 
-if [[ -z ${TOOLCHAIN} ]]; then
-  echo -e "\n(*) TOOLCHAIN not defined\n"
-  exit 1
-fi
-
-if [[ -z ${TOOLCHAIN_ARCH} ]]; then
-  echo -e "\n(*) TOOLCHAIN_ARCH not defined\n"
+if [[ -z ${ANDROID_TOOLCHAIN} ]]; then
+  echo -e "\n(*) ANDROID_TOOLCHAIN is not set\n"
   exit 1
 fi
 

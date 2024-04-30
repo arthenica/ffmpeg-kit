@@ -138,6 +138,10 @@ while [ ! $# -eq 0 ]; do
   --no-ffmpeg-kit-protocols)
     export NO_FFMPEG_KIT_PROTOCOLS="1"
     ;;
+  --toolchain=*)
+    ANDROID_TOOLCHAIN=$(echo $1 | sed -e 's/^--[a-z]*=//g')
+    export ANDROID_TOOLCHAIN="${ANDROID_TOOLCHAIN}"
+    ;;
   *)
     print_unknown_option "$1"
     ;;
@@ -149,6 +153,12 @@ if [[ -z ${BUILD_VERSION} ]]; then
   echo -e "\n(*) error: Can not run git commands in this folder. See build.log.\n"
   exit 1
 fi
+
+if [[ -z ${ANDROID_TOOLCHAIN} ]]; then
+  export ANDROID_TOOLCHAIN="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"$(get_toolchain)"
+fi
+
+echo -e "INFO: Using Android toolchain at ${ANDROID_TOOLCHAIN}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # PROCESS FULL OPTION AS LAST OPTION
 if [[ -n ${BUILD_FULL} ]]; then
@@ -227,8 +237,6 @@ for run_arch in {0..12}; do
     fi
 
     export ARCH=$(get_arch_name $run_arch)
-    export TOOLCHAIN=$(get_toolchain)
-    export TOOLCHAIN_ARCH=$(get_toolchain_arch)
 
     # EXECUTE MAIN BUILD SCRIPT
     . "${BASEDIR}"/scripts/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
