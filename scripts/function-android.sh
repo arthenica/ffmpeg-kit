@@ -369,7 +369,7 @@ get_cflags() {
 
   local COMMON_INCLUDES=$(get_common_includes)
 
-  echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
+  echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${EXTRA_CFLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
@@ -387,26 +387,26 @@ get_cxxflags() {
 
   case $1 in
   gnutls)
-    echo "-std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS}"
+    echo "-std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   ffmpeg)
     if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
-      echo "-std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
+      echo "-std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections ${EXTRA_CXXFLAGS}"
     else
-      echo "-std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG}"
+      echo "-std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG} ${EXTRA_CXXFLAGS}"
     fi
     ;;
   opencore-amr)
-    echo "${OPTIMIZATION_FLAGS}"
+    echo "${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   x265)
-    echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
+    echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   rubberband | srt | tesseract | zimg)
-    echo "-std=c++11 ${OPTIMIZATION_FLAGS}"
+    echo "-std=c++11 ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   *)
-    echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS}"
+    echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   esac
 }
@@ -501,7 +501,7 @@ get_ldflags() {
   fi
   local COMMON_LINKED_LIBS=$(get_common_linked_libraries "$1")
 
-  echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
+  echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} ${EXTRA_LDFLAGS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
 }
 
 create_mason_cross_file() {

@@ -152,6 +152,18 @@ while [ ! $# -eq 0 ]; do
 
     export MAC_CATALYST_MIN_VERSION=${TARGET}
     ;;
+  --extra-cflags=*)
+    EXTRA_CFLAGS=$(echo $1 | sed -e 's/^--extra-cflags=//g')
+    export EXTRA_CFLAGS="${EXTRA_CFLAGS}"
+    ;;
+  --extra-cxxflags=*)
+    EXTRA_CXXFLAGS=$(echo $1 | sed -e 's/^--extra-cxxflags=//g')
+    export EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS}"
+    ;;
+  --extra-ldflags=*)
+    EXTRA_LDFLAGS=$(echo $1 | sed -e 's/^--extra-ldflags=//g')
+    export EXTRA_LDFLAGS="${EXTRA_LDFLAGS}"
+    ;;
   *)
     print_unknown_option "$1"
     ;;
