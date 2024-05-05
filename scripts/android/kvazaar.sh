@@ -8,18 +8,10 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_kvazaar} -
   autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
-# UPDATE BUILD FLAGS
-# LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ ${API} -lt 18 ]]; then
-  LTS_SUPPORT_LIBS=" -Wl,--no-whole-archive ${BASEDIR}/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
-else
-  LTS_SUPPORT_LIBS=""
-fi
-
 # WORKAROUND TO DISABLE LINKING TO -lrt
 ${SED_INLINE} 's/\-lrt//g' "${BASEDIR}"/src/"${LIB_NAME}"/configure || return 1
 
-LIBS="${LTS_SUPPORT_LIBS}" ./configure \
+./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
   --with-pic \
   --with-sysroot="${ANDROID_SYSROOT}" \

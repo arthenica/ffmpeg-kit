@@ -416,14 +416,18 @@ get_common_linked_libraries() {
 
   case $1 in
   ffmpeg)
+    local LIB_ANDROID_SUPPORT_PATHS="-L${LIB_INSTALL_BASE}/android-support/lib -Wl,--whole-archive -landroidsupport -Wl,--no-whole-archive"
 
     # SUPPORTED ON API LEVEL 24 AND LATER
     if [[ ${API} -ge 24 ]]; then
-      echo "-lc -lm -ldl -llog -landroid -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS}"
+      echo "-lc -lm -ldl -llog -landroid -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS} ${LIB_ANDROID_SUPPORT_PATHS}"
     else
-      echo "-lc -lm -ldl -llog -landroid ${COMMON_LIBRARY_PATHS}"
+      echo "-lc -lm -ldl -llog -landroid ${COMMON_LIBRARY_PATHS} ${LIB_ANDROID_SUPPORT_PATHS}"
       echo -e "INFO: Building ffmpeg without native camera API which is not supported on Android API Level ${API}\n" 1>>"${BASEDIR}"/build.log 2>&1
     fi
+    ;;
+  kvazaar)
+    echo "-L${LIB_INSTALL_BASE}/android-support/lib -Wl,--no-whole-archive -landroidsupport -Wl,--no-whole-archive"
     ;;
   libvpx)
     echo "-lc -lm ${COMMON_LIBRARY_PATHS}"
@@ -1082,16 +1086,19 @@ set_toolchain_paths() {
   fi
 }
 
-build_android_lts_support() {
+build_android_support() {
+  local LIBRARY_PATH="${LIB_INSTALL_BASE}/android-support"
 
-  # CLEAN OLD BUILD
-  rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
-  rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.a 1>>"${BASEDIR}"/build.log 2>&1
+  # DELETE THE PREVIOUS BUILD OF THE LIBRARY
+  if [ -d "${LIBRARY_PATH}" ]; then
+    rm -rf "${LIBRARY_PATH}" || return 1
+  fi
+  rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_support.o 1>>"${BASEDIR}"/build.log 2>&1
 
-  echo -e "INFO: Building android-lts-support objects for ${ARCH}\n" 1>>"${BASEDIR}"/build.log 2>&1
+  echo -e "INFO: Building android-support objects for ${ARCH}\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   # PREPARE PATHS
-  LIB_NAME="android-lts-support"
+  LIB_NAME="android-support"
   set_toolchain_paths ${LIB_NAME}
 
   # PREPARE FLAGS
@@ -1100,6 +1107,7 @@ build_android_lts_support() {
   LDFLAGS=$(get_ldflags ${LIB_NAME})
 
   # BUILD
-  "${CC}" ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.c -o "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
-  "${AR}" rcs "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.o 1>>"${BASEDIR}"/build.log 2>&1
+  mkdir -p "${LIBRARY_PATH}"/lib 1>>"${BASEDIR}"/build.log 2>&1
+  "${CC}" ${CFLAGS} -Wno-unused-command-line-argument -c "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_support.c -o "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_support.o ${LDFLAGS} 1>>"${BASEDIR}"/build.log 2>&1
+  "${AR}" rcs "${LIBRARY_PATH}"/lib/libandroidsupport.a "${BASEDIR}"/android/ffmpeg-kit-android-lib/src/main/cpp/android_support.o 1>>"${BASEDIR}"/build.log 2>&1
 }

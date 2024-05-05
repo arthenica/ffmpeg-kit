@@ -44,10 +44,8 @@ for library in {1..50}; do
   fi
 done
 
-# BUILD LTS SUPPORT LIBRARY FOR API < 18
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ ${API} -lt 18 ]]; then
-  build_android_lts_support
-fi
+# BUILD SUPPORT LIBRARY
+build_android_support
 
 # BUILD ENABLED LIBRARIES AND THEIR DEPENDENCIES
 let completed=0

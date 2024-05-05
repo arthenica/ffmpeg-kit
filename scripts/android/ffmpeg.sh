@@ -340,11 +340,6 @@ fi
 
 export LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
-# LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
-if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]] && [[ ${API} -lt 18 ]]; then
-  export LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/ffmpeg-kit-android-lib/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
-fi
-
 # ALWAYS BUILD SHARED LIBRARIES
 BUILD_LIBRARY_OPTIONS="--disable-static --enable-shared"
 

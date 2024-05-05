@@ -35,6 +35,8 @@
 extern "C" {
 #endif
 
+// posix_memalign() and memalign() are not available in the NDK __INTRODUCED_IN(17)
+
 #if __ANDROID_API__ < 17
 
 int posix_memalign(void** memptr, size_t alignment, size_t size) {
@@ -56,6 +58,10 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
 
 #endif /* __ANDROID_API__ < 17 */
 
+// log2() and log2f() are C99 functions, but they're not available in the NDK __INTRODUCED_IN(18)
+
+#if __ANDROID_API__ < 18
+
 double log2(double x) {
     return (log(x) / M_LN2);
 }
@@ -63,6 +69,8 @@ double log2(double x) {
 float log2f(float x) {
  return (float) log2((double) x);
 }
+
+#endif /* __ANDROID_API__ < 18 */
 
 #ifdef __cplusplus
 };  /* end of extern "C" */
