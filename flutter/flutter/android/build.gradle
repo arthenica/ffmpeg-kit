@@ -11,6 +11,8 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
+        // To use a local build of ffmpeg-kit.arr, set this to your absolute path.
+        //flatDir { dirs "/YOUR/PATH/TO/ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit" } 
         google()
         mavenCentral()
     }
@@ -41,7 +43,7 @@ android {
     lintOptions {
         disable 'GradleCompatible'
     }
-    compileOptions {
+    compileOptions {    
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -49,5 +51,10 @@ android {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
+
+    // To use the public build of ffmpeg-kit
     implementation 'com.arthenica:ffmpeg-kit-https:6.0-2'
+
+    // To use a local build of ffmpeg-kit.arr (see 'repositioris { flatDir }' above!)
+    //implementation(group: 'com.arthenica', name: 'ffmpeg-kit', ext: 'aar')
 }
