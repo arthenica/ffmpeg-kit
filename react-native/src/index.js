@@ -1904,21 +1904,25 @@ class FFmpegKitInitializer {
       this.#initialized = true;
     }
 
-    console.log("Loading ffmpeg-kit-react-native.");
-
     this.#eventEmitter.addListener(eventLogCallbackEvent, FFmpegKitInitializer.processLogCallbackEvent);
     this.#eventEmitter.addListener(eventStatisticsCallbackEvent, FFmpegKitInitializer.processStatisticsCallbackEvent);
     this.#eventEmitter.addListener(eventCompleteCallbackEvent, FFmpegKitInitializer.processCompleteCallbackEvent);
 
-    FFmpegKitFactory.setLogLevel(await FFmpegKitReactNativeModule.getLogLevel());
-    const version = FFmpegKitFactory.getVersion();
-    const platform = await FFmpegKitConfig.getPlatform();
-    const arch = await ArchDetect.getArch();
-    const packageName = await Packages.getPackageName();
-    await FFmpegKitConfig.enableRedirection();
-    const isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
+    const logLevel = await FFmpegKitReactNativeModule.getLogLevel()
 
-    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
+    FFmpegKitFactory.setLogLevel(logLevel);
+
+
+    if(logLevel === "debug") {
+      const version = FFmpegKitFactory.getVersion();
+      const platform = await FFmpegKitConfig.getPlatform();
+      const arch = await ArchDetect.getArch();
+      const packageName = await Packages.getPackageName();
+      await FFmpegKitConfig.enableRedirection();
+      const isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
+
+      console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
+    }
   }
 
 }
