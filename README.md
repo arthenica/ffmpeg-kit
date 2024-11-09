@@ -2,7 +2,7 @@
 
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
-`FFmpegKit` is a collection of tools to use `FFmpeg` in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
+`FFmpegKit` is a collection of tools to use `FFmpeg`<sup>1</sup> in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
 
 It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
  applications and 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases),
@@ -219,11 +219,15 @@ that you seek legal advice first. See [FFmpeg Patent Mini-FAQ](https://ffmpeg.or
 distribute that library, then you are subject to pay MPEG LA licensing fees. Refer to
 [OpenH264 FAQ](https://www.openh264.org/faq.html) page for the details.
 
-### 16. Contributing
+### 16. Trademarks
+
+<sup>1</sup> `FFmpeg` is a trademark of [Fabrice Bellard](http://www.bellard.org/). `FFmpegKit` is an independent project and not affiliated with the `FFmpeg` trademark holder.
+
+### 17. Contributing
 
 See our [CONTRIBUTING](CONTRIBUTING.md) guide.
 
-### 17. See Also
+### 18. See Also
 
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
 - [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
