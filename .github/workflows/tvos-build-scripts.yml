@@ -32,7 +32,7 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        xcode: [ '14.3.1', '15.3' ]
+        xcode: [ '15.4', '16.0' ]
     defaults:
       run:
         shell: bash
