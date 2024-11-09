@@ -118,7 +118,7 @@ jobs:
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
   build-lts-on-macos:
     name: android lts on macos
-    runs-on: macos-11
+    runs-on: macos-12
     strategy:
       matrix:
         ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin' ]
