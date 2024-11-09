@@ -369,10 +369,12 @@ get_cflags() {
 
   local COMMON_INCLUDES=$(get_common_includes)
 
-  echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${EXTRA_CFLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
+  echo "${COMMON_INCLUDES} ${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${EXTRA_CFLAGS} ${OPTIMIZATION_FLAGS}"
 }
 
 get_cxxflags() {
+  local COMMON_INCLUDES=$(get_common_includes)
+
   if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
     local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
   else
@@ -387,26 +389,26 @@ get_cxxflags() {
 
   case $1 in
   gnutls)
-    echo "-std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_INCLUDES} -std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   ffmpeg)
     if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
-      echo "-std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections ${EXTRA_CXXFLAGS}"
+      echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections ${EXTRA_CXXFLAGS}"
     else
-      echo "-std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG} ${EXTRA_CXXFLAGS}"
+      echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG} ${EXTRA_CXXFLAGS}"
     fi
     ;;
   opencore-amr)
-    echo "${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_INCLUDES} ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   x265)
-    echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   rubberband | srt | tesseract | zimg)
-    echo "-std=c++11 ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_INCLUDES} -std=c++11 ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   *)
-    echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   esac
 }

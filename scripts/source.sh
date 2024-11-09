@@ -18,12 +18,12 @@ get_library_source() {
     ;;
   cpu-features)
     SOURCE_REPO_URL="https://github.com/arthenica/cpu_features"
-    SOURCE_ID="v0.8.0"
+    SOURCE_ID="v0.9.0"
     SOURCE_TYPE="TAG"
     ;;
   dav1d)
     SOURCE_REPO_URL="https://github.com/arthenica/dav1d"
-    SOURCE_ID="1.2.1"
+    SOURCE_ID="1.4.2"
     SOURCE_TYPE="TAG"
     ;;
   expat)
@@ -33,7 +33,7 @@ get_library_source() {
     ;;
   ffmpeg)
     SOURCE_REPO_URL="https://github.com/arthenica/FFmpeg"
-    SOURCE_ID="n6.0"
+    SOURCE_ID="n6.1.2"
     SOURCE_TYPE="TAG"
     ;;
   fontconfig)
@@ -153,7 +153,7 @@ get_library_source() {
     ;;
   libvpx)
     SOURCE_REPO_URL="https://github.com/arthenica/libvpx"
-    SOURCE_ID="v1.13.0"
+    SOURCE_ID="v1.14.1"
     SOURCE_TYPE="TAG"
     ;;
   libwebp)
