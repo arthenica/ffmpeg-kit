@@ -78,7 +78,7 @@ build_application_mk() {
 
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
   if [[ -z ${NO_FFMPEG_KIT_PROTOCOLS} ]]; then
-    local USES_FFMPEG_KIT_PROTOCOLS="-D_USES_FFMPEG_KIT_PROTOCOLS"
+    local USES_FFMPEG_KIT_PROTOCOLS="-DUSES_FFMPEG_KIT_PROTOCOLS"
   fi
 
   rm -f "${BASEDIR}/android/jni/Application.mk"

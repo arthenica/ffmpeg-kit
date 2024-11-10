@@ -66,7 +66,7 @@ static NSMutableArray *supportedExternalLibraries;
     return [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];
 }
 
-+ (NSString*)getPackageName {
++ (NSString*)extractPackageNameFromExternalLibraries {
     NSArray *enabledLibraryArray = [Packages getExternalLibraries];
     Boolean speex = [enabledLibraryArray containsObject:@"speex"];
     Boolean fribidi = [enabledLibraryArray containsObject:@"fribidi"];
@@ -235,6 +235,14 @@ static NSMutableArray *supportedExternalLibraries;
     }
 
     return @"min";
+}
+
++ (NSString*)getPackageName {
+    #ifdef FFMPEG_KIT_PACKAGE
+    return [NSString stringWithUTF8String:FFMPEG_KIT_PACKAGE];
+    #else
+    return [self extractPackageNameFromExternalLibraries];
+    #endif
 }
 
 + (NSArray*)getExternalLibraries {

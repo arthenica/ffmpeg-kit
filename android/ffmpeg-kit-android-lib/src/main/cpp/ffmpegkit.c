@@ -120,6 +120,7 @@ JNINativeMethod configMethods[] = {
     {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel},
     {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion},
     {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion},
+    {"getNativePackageName", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName},
     {"nativeFFmpegExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute},
     {"nativeFFmpegCancel", "(J)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel},
     {"nativeFFprobeExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute},
@@ -663,7 +664,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 14) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 15) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -724,7 +725,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     redirectionEnabled = 0;
 
-#ifdef _USES_FFMPEG_KIT_PROTOCOLS
+#ifdef USES_FFMPEG_KIT_PROTOCOLS
     av_set_saf_open(saf_open);
     av_set_saf_close(saf_close);
 #endif
@@ -809,6 +810,21 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_KIT_VERSION);
+}
+
+/**
+ * Returns the native FFmpegKit package name.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return native FFmpegKit package name
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(JNIEnv *env, jclass object) {
+#ifdef FFMPEG_KIT_PACKAGE
+    return (*env)->NewStringUTF(env, FFMPEG_KIT_PACKAGE);
+#else
+    return (*env)->NewStringUTF(env, "");
+#endif
 }
 
 /**

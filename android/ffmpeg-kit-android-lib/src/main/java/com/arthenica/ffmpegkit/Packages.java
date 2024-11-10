@@ -74,6 +74,10 @@ public class Packages {
      * @return predicted FFmpegKit binary package name
      */
     public static String getPackageName() {
+        String nativePackageName = FFmpegKitConfig.getNativePackageName();
+        if (nativePackageName != null && !nativePackageName.isEmpty()) {
+            return nativePackageName;
+        }
         final List<String> externalLibraryList = getExternalLibraries();
         final boolean speex = externalLibraryList.contains("speex");
         final boolean fribidi = externalLibraryList.contains("fribidi");

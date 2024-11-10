@@ -1486,6 +1486,13 @@ public class FFmpegKitConfig {
     private native static String getNativeVersion();
 
     /**
+     * <p>Returns the native FFmpegKit package name.
+     *
+     * @return native FFmpegKit package name
+     */
+    native static String getNativePackageName();
+
+    /**
      * <p>Synchronously executes FFmpeg natively.
      *
      * @param sessionId id of the session

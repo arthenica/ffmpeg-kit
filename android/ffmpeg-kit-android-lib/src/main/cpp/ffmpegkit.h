@@ -91,6 +91,13 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
+ * Method:    getNativePackageName
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    nativeFFmpegExecute
  * Signature: (J[Ljava/lang/String;)I
  */

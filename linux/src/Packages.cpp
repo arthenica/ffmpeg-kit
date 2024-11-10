@@ -22,7 +22,7 @@
 #include <memory>
 #include <algorithm>
 
-std::string ffmpegkit::Packages::getPackageName() {
+std::string extractPackageNameFromExternalLibraries() {
     std::shared_ptr<std::set<std::string>> enabledLibrarySet = getExternalLibraries();
     #define contains_ext_lib(element) enabledLibrarySet->find(element) != enabledLibrarySet->end()
     bool speex = contains_ext_lib("speex");
@@ -195,6 +195,14 @@ std::string ffmpegkit::Packages::getPackageName() {
     }
 
     return "min";
+}
+
+std::string ffmpegkit::Packages::getPackageName() {
+#ifdef FFMPEG_KIT_PACKAGE
+    return std::string(FFMPEG_KIT_PACKAGE);
+#else
+    return extractPackageNameFromExternalLibraries();
+#endif
 }
 
 std::shared_ptr<std::set<std::string>> ffmpegkit::Packages::getExternalLibraries() {
