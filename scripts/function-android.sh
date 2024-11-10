@@ -1000,7 +1000,7 @@ get_build_directory() {
     LTS_POSTFIX="-lts"
   fi
 
-  echo "android-$(get_target_cpu)${LTS_POSTFIX}"
+  echo "android-$(get_target_cpu)-${API}${LTS_POSTFIX}"
 }
 
 get_aar_directory() {
@@ -1009,7 +1009,7 @@ get_aar_directory() {
     LTS_POSTFIX="-lts"
   fi
 
-  echo "bundle-android-aar${LTS_POSTFIX}"
+  echo "bundle-android-aar-${API}${LTS_POSTFIX}"
 }
 
 android_ndk_cmake() {

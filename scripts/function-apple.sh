@@ -610,13 +610,13 @@ get_build_directory() {
 
   case ${ARCH} in
   x86-64)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   x86-64-mac-catalyst)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-mac-catalyst${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   *)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-${ARCH}${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-${ARCH}-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   esac
 }
@@ -633,28 +633,28 @@ get_framework_directory() {
 
   case $FRAMEWORK_TYPE in
   "${ARCH_VAR_IOS}")
-    echo "bundle-apple-framework-ios${LTS_POSTFIX}"
+    echo "bundle-apple-framework-ios-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_IPHONEOS}")
-    echo "bundle-apple-framework-iphoneos${LTS_POSTFIX}"
+    echo "bundle-apple-framework-iphoneos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_IPHONESIMULATOR}")
-    echo "bundle-apple-framework-iphonesimulator${LTS_POSTFIX}"
+    echo "bundle-apple-framework-iphonesimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_MAC_CATALYST}")
-    echo "bundle-apple-framework-mac-catalyst${LTS_POSTFIX}"
+    echo "bundle-apple-framework-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_TVOS}")
-    echo "bundle-apple-framework-tvos${LTS_POSTFIX}"
+    echo "bundle-apple-framework-tvos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVOS}")
-    echo "bundle-apple-framework-appletvos${LTS_POSTFIX}"
+    echo "bundle-apple-framework-appletvos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    echo "bundle-apple-framework-appletvsimulator${LTS_POSTFIX}"
+    echo "bundle-apple-framework-appletvsimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_MACOS}")
-    echo "bundle-apple-framework-macos${LTS_POSTFIX}"
+    echo "bundle-apple-framework-macos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   esac
 }
@@ -665,7 +665,7 @@ get_xcframework_directory() {
     LTS_POSTFIX="-lts"
   fi
 
-  echo "bundle-apple-xcframework-${FFMPEG_KIT_BUILD_TYPE}${LTS_POSTFIX}"
+  echo "bundle-apple-xcframework-${FFMPEG_KIT_BUILD_TYPE}-$(get_min_sdk_version)${LTS_POSTFIX}"
 }
 
 get_umbrella_xcframework_directory() {
@@ -674,7 +674,7 @@ get_umbrella_xcframework_directory() {
     LTS_POSTFIX="-lts"
   fi
 
-  echo "bundle-apple-xcframework${LTS_POSTFIX}"
+  echo "bundle-apple-xcframework-$(get_min_sdk_version)${LTS_POSTFIX}"
 }
 
 #
@@ -689,28 +689,28 @@ get_universal_library_directory() {
 
   case ${ARCHITECTURE_VARIANT} in
   "${ARCH_VAR_IOS}")
-    echo "bundle-apple-universal-ios${LTS_POSTFIX}"
+    echo "bundle-apple-universal-ios-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_IPHONEOS}")
-    echo "bundle-apple-universal-iphoneos${LTS_POSTFIX}"
+    echo "bundle-apple-universal-iphoneos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_IPHONESIMULATOR}")
-    echo "bundle-apple-universal-iphonesimulator${LTS_POSTFIX}"
+    echo "bundle-apple-universal-iphonesimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_MAC_CATALYST}")
-    echo "bundle-apple-universal-mac-catalyst${LTS_POSTFIX}"
+    echo "bundle-apple-universal-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_TVOS}")
-    echo "bundle-apple-universal-tvos${LTS_POSTFIX}"
+    echo "bundle-apple-universal-tvos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVOS}")
-    echo "bundle-apple-universal-appletvos${LTS_POSTFIX}"
+    echo "bundle-apple-universal-appletvos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    echo "bundle-apple-universal-appletvsimulator${LTS_POSTFIX}"
+    echo "bundle-apple-universal-appletvsimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_MACOS}")
-    echo "bundle-apple-universal-macos${LTS_POSTFIX}"
+    echo "bundle-apple-universal-macos-$(get_min_sdk_version)${LTS_POSTFIX}"
     ;;
   esac
 }
