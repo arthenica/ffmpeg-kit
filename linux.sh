@@ -59,6 +59,10 @@ while [ ! $# -eq 0 ]; do
   -f | --force)
     export BUILD_FORCE="1"
     ;;
+  --jobs=*)
+    JOB_COUNT=$(echo $1 | sed -e 's/^--[A-Za-z]*=//g')
+    export BUILD_JOBS="${JOB_COUNT}"
+    ;;
   --reconf-*)
     CONF_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
 

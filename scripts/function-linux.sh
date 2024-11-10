@@ -25,7 +25,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support older devices"
+  display_help_options "  -l, --lts\t\t\tbuild lts packages to support older devices\n      --jobs=N\t\t\tnumber of jobs to run [auto]"
   display_help_licensing
 
   echo -e "Architectures:"

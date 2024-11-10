@@ -19,7 +19,7 @@ When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10.12+ devices" "      --target=macos sdk version\toverride minimum deployment target [10.15]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10.12+ devices\n      --jobs=N\t\t\t\tnumber of jobs to run [auto]" "      --target=macos sdk version\toverride minimum deployment target [10.15]"
   display_help_licensing
 
   echo -e "Architectures:"

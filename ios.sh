@@ -28,8 +28,9 @@ if [[ -f ${XCODE_FOR_FFMPEG_KIT} ]]; then
 fi
 
 # DETECT IOS SDK VERSION
-export DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>${BASEDIR}/build.log)"
-echo -e "\nINFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
+export DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
+XCODE_PATH=$(xcode-select -p 2>>"${BASEDIR}"/build.log)
+echo -e "\nINFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at ${XCODE_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS
@@ -97,6 +98,10 @@ while [ ! $# -eq 0 ]; do
     ;;
   -f | --force)
     export BUILD_FORCE="1"
+    ;;
+  --jobs=*)
+    JOB_COUNT=$(echo $1 | sed -e 's/^--[A-Za-z]*=//g')
+    export BUILD_JOBS="${JOB_COUNT}"
     ;;
   --reconf-*)
     CONF_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
@@ -185,7 +190,7 @@ if [[ -n ${BUILD_FULL} ]]; then
 fi
 
 # DISABLE SPECIFIED LIBRARIES
-for disabled_library in ${disabled_libraries[@]}; do
+for disabled_library in "${disabled_libraries[@]}"; do
   set_library "${disabled_library}" 0
 done
 

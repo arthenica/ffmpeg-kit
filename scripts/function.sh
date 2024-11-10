@@ -2235,7 +2235,9 @@ is_gnu_config_files_up_to_date() {
 }
 
 get_cpu_count() {
-  if [ "$(uname)" == "Darwin" ]; then
+  if [ -n "${BUILD_JOBS}" ]; then
+    echo "${BUILD_JOBS}"
+  elif [ "$(uname)" == "Darwin" ]; then
     echo $(sysctl -n hw.logicalcpu)
   else
     echo $(nproc)
