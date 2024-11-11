@@ -3,3 +3,4 @@
 /prebuilt/
 .DS_Store
 .idea
+/android/jni/build.mk

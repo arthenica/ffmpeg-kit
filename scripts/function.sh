@@ -2350,10 +2350,18 @@ overwrite_file() {
 
 #
 # 1. destination file
+# 2. initial content
 #
 create_file() {
-  rm -f "$1"
-  echo "" > "$1" 1>>"${BASEDIR}"/build.log 2>&1
+  echo "$2" > "$1" 2>>"${BASEDIR}"/build.log 2>&1
+}
+
+#
+# 1. destination file
+# 2. content to append
+#
+append_file() {
+  echo "$2" >> "$1" 2>>"${BASEDIR}"/build.log 2>&1
 }
 
 compare_versions() {

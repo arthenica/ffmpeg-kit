@@ -270,20 +270,22 @@ done
 export API=${ORIGINAL_API}
 
 # SET ARCHITECTURES TO BUILD
-rm -f "${BASEDIR}"/android/build/.armv7 1>>"${BASEDIR}"/build.log 2>&1
-rm -f "${BASEDIR}"/android/build/.armv7neon 1>>"${BASEDIR}"/build.log 2>&1
-rm -f "${BASEDIR}"/android/build/.lts 1>>"${BASEDIR}"/build.log 2>&1
+create_file "${BASEDIR}"/android/jni/build.mk "API := ${API}"
 ANDROID_ARCHITECTURES=""
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]] || [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  create_file "${BASEDIR}"/android/build/.armv7
+  append_file "${BASEDIR}"/android/jni/build.mk "ARMV7 := true"
+else
+  append_file "${BASEDIR}"/android/jni/build.mk "ARMV7 := false"
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]} -eq 1 ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  create_file "${BASEDIR}"/android/build/.armv7neon
+  append_file "${BASEDIR}"/android/jni/build.mk "ARMV7_NEON := true"
+else
+  append_file "${BASEDIR}"/android/jni/build.mk "ARMV7_NEON := false"
 fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 2) "
@@ -296,7 +298,9 @@ if [[ ${ENABLED_ARCHITECTURES[ARCH_X86_64]} -eq 1 ]]; then
 fi
 if [[ ! -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
   mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  create_file "${BASEDIR}"/android/build/.lts
+  append_file "${BASEDIR}"/android/jni/build.mk "LTS_POSTFIX := -lts"
+else
+  append_file "${BASEDIR}"/android/jni/build.mk "LTS_POSTFIX := "
 fi
 
 # BUILD FFMPEG-KIT

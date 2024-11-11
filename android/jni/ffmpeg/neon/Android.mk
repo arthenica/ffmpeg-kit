@@ -1,8 +1,4 @@
-ifeq ($(MY_LTS_POSTFIX),-lts)
-    LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon-lts/ffmpeg/lib
-else
-    LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon/ffmpeg/lib
-endif
+LOCAL_PATH := $(call my-dir)/../../../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/lib
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := true
