@@ -20,8 +20,8 @@
 #ifndef FFMPEG_KIT_MEDIA_INFORMATION_PARSER_H
 #define FFMPEG_KIT_MEDIA_INFORMATION_PARSER_H
 
-#import <Foundation/Foundation.h>
 #import "MediaInformation.h"
+#import <Foundation/Foundation.h>
 
 /**
  * A parser that constructs MediaInformation from FFprobe's json output.
@@ -34,16 +34,16 @@
  * @param ffprobeJsonOutput FFprobe json output
  * @return created MediaInformation instance of nil if a parsing error occurs
  */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput;
++ (MediaInformation *)from:(NSString *)ffprobeJsonOutput;
 
 /**
- * Extracts <code>MediaInformation</code> from the given FFprobe json output. If a parsing error occurs an NSException
- * is thrown.
+ * Extracts <code>MediaInformation</code> from the given FFprobe json output. If
+ * a parsing error occurs an NSException is thrown.
  *
  * @param ffprobeJsonOutput FFprobe json output
  * @return created MediaInformation instance
  */
-+ (MediaInformation*)fromWithError:(NSString*)ffprobeJsonOutput;
++ (MediaInformation *)fromWithError:(NSString *)ffprobeJsonOutput;
 
 @end
 

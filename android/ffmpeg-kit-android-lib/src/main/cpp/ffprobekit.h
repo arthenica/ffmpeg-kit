@@ -27,6 +27,9 @@
  * Method:    nativeFFprobeExecute
  * Signature: (J[Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *, jclass, jlong, jobjectArray);
+JNIEXPORT jint JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute(JNIEnv *,
+                                                                  jclass, jlong,
+                                                                  jobjectArray);
 
 #endif /* FFPROBE_KIT_H */

@@ -22,13 +22,13 @@
 
 namespace ffmpegkit {
 
-    enum LogRedirectionStrategy {
-        LogRedirectionStrategyAlwaysPrintLogs = 0,
-        LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined = 1,
-        LogRedirectionStrategyPrintLogsWhenGlobalCallbackNotDefined = 2,
-        LogRedirectionStrategyPrintLogsWhenSessionCallbackNotDefined = 3,
-        LogRedirectionStrategyNeverPrintLogs = 4
-    };
+enum LogRedirectionStrategy {
+    LogRedirectionStrategyAlwaysPrintLogs = 0,
+    LogRedirectionStrategyPrintLogsWhenNoCallbacksDefined = 1,
+    LogRedirectionStrategyPrintLogsWhenGlobalCallbackNotDefined = 2,
+    LogRedirectionStrategyPrintLogsWhenSessionCallbackNotDefined = 3,
+    LogRedirectionStrategyNeverPrintLogs = 4
+};
 
 }
 

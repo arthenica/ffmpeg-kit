@@ -20,14 +20,15 @@
 #ifndef FFMPEG_KIT_STATISTICS_CALLBACK_H
 #define FFMPEG_KIT_STATISTICS_CALLBACK_H
 
-#import <Foundation/Foundation.h>
 #import "Statistics.h"
+#import <Foundation/Foundation.h>
 
 /**
- * <p>Callback that receives statistics generated for <code>FFmpegKit</code> sessions.
+ * <p>Callback that receives statistics generated for <code>FFmpegKit</code>
+ * sessions.
  *
  * @param statistics statistics entry
  */
-typedef void (^StatisticsCallback)(Statistics* statistics);
+typedef void (^StatisticsCallback)(Statistics *statistics);
 
 #endif // FFMPEG_KIT_STATISTICS_CALLBACK_H

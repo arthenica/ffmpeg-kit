@@ -21,19 +21,22 @@
 #define FFMPEG_KIT_STATISTICS_CALLBACK_H
 
 #include "Statistics.h"
+#include <functional>
 #include <iostream>
 #include <memory>
-#include <functional>
 
 namespace ffmpegkit {
 
-    /**
-     * <p>Callback that receives statistics generated for <code>FFmpegKit</code> sessions.
-     *
-     * @param statistics statistics entry
-     */
-    typedef std::function<void(const std::shared_ptr<ffmpegkit::Statistics> statistics)> StatisticsCallback;
+/**
+ * <p>Callback that receives statistics generated for <code>FFmpegKit</code>
+ * sessions.
+ *
+ * @param statistics statistics entry
+ */
+typedef std::function<void(
+    const std::shared_ptr<ffmpegkit::Statistics> statistics)>
+    StatisticsCallback;
 
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_STATISTICS_CALLBACK_H

@@ -25,10 +25,11 @@
  * <p>Enumeration type for log levels.
  */
 typedef NS_ENUM(NSInteger, Level) {
-    
+
     /**
-     * This log level is defined by FFmpegKit. It is used to specify logs printed to stderr by
-     * FFmpeg. Logs that has this level are not filtered and always redirected.
+     * This log level is defined by FFmpegKit. It is used to specify logs
+     * printed to stderr by FFmpeg. Logs that has this level are not filtered
+     * and always redirected.
      */
     LevelAVLogStdErr = -16,
 
@@ -75,7 +76,7 @@ typedef NS_ENUM(NSInteger, Level) {
      * Stuff which is only useful for libav* developers.
      */
     LevelAVLogDebug = 48,
-    
+
     /**
      * Extremely verbose debugging, useful for libav* development.
      */

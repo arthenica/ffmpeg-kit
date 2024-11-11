@@ -20,20 +20,22 @@
 #ifndef FFMPEG_KIT_H
 #define FFMPEG_KIT_H
 
-#include <jni.h>
 #include <android/log.h>
+#include <jni.h>
+#include <string.h>
 
-#include "libavutil/log.h"
 #include "libavutil/ffversion.h"
+#include "libavutil/log.h"
 
 /** Library version string */
-#define FFMPEG_KIT_VERSION "6.0"
+#define FFMPEG_KIT_VERSION "6.1.2"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "ffmpeg-kit"
 
 /** Verbose Android logging macro. */
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LIB_NAME, __VA_ARGS__)
+#define LOGV(...)                                                              \
+    __android_log_print(ANDROID_LOG_VERBOSE, LIB_NAME, __VA_ARGS__)
 
 /** Debug Android logging macro. */
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LIB_NAME, __VA_ARGS__)
@@ -52,97 +54,127 @@
  * Method:    enableNativeRedirection
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(JNIEnv *,
+                                                                     jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    disableNativeRedirection
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection(JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection(JNIEnv *,
+                                                                      jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    setNativeLogLevel
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel(JNIEnv *, jclass, jint);
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel(JNIEnv *, jclass,
+                                                               jint);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    getNativeLogLevel
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel(JNIEnv *, jclass);
+JNIEXPORT jint JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel(JNIEnv *,
+                                                               jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    getNativeFFmpegVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion(JNIEnv *,
+                                                                    jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    getNativeVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *, jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    getNativePackageName
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(JNIEnv *,
+                                                                  jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    nativeFFmpegExecute
  * Signature: (J[Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(JNIEnv *, jclass, jlong, jobjectArray);
+JNIEXPORT jint JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(JNIEnv *,
+                                                                 jclass, jlong,
+                                                                 jobjectArray);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    nativeFFmpegCancel
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel(JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel(JNIEnv *,
+                                                                jclass, jlong);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    registerNewNativeFFmpegPipe
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath);
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe(
+    JNIEnv *env, jclass object, jstring ffmpegPipePath);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    getNativeBuildDate
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate(JNIEnv *env, jclass object);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate(JNIEnv *env,
+                                                                jclass object);
 
 /**
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    setNativeEnvironmentVariable
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue);
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable(
+    JNIEnv *env, jclass object, jstring variableName, jstring variableValue);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    ignoreNativeSignal
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal(JNIEnv *env, jclass object, jint signum);
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal(JNIEnv *env,
+                                                                jclass object,
+                                                                jint signum);
 
 /*
  * Class:     com_arthenica_ffmpegkit_FFmpegKitConfig
  * Method:    messagesInTransmit
  * Signature: (J)I
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env, jclass object, jlong id);
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env,
+                                                                jclass object,
+                                                                jlong id);
 
 #endif /* FFMPEG_KIT_H */

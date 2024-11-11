@@ -25,31 +25,33 @@
 
 namespace ffmpegkit {
 
+/**
+ * A parser that constructs MediaInformation from FFprobe's json output.
+ */
+class MediaInformationJsonParser {
+  public:
     /**
-     * A parser that constructs MediaInformation from FFprobe's json output.
+     * Extracts <code>MediaInformation</code> from the given FFprobe json
+     * output.
+     *
+     * @param ffprobeJsonOutput FFprobe json output
+     * @return created MediaInformation instance of nullptr if a parsing error
+     * occurs
      */
-    class MediaInformationJsonParser {
-        public:
+    static std::shared_ptr<ffmpegkit::MediaInformation>
+    from(const std::string &ffprobeJsonOutput);
 
-            /**
-             * Extracts <code>MediaInformation</code> from the given FFprobe json output.
-             *
-             * @param ffprobeJsonOutput FFprobe json output
-             * @return created MediaInformation instance of nullptr if a parsing error occurs
-             */
-            static std::shared_ptr<ffmpegkit::MediaInformation> from(const std::string& ffprobeJsonOutput);
+    /**
+     * Extracts <code>MediaInformation</code> from the given FFprobe json
+     * output. If a parsing error occurs an std::exception is thrown.
+     *
+     * @param ffprobeJsonOutput FFprobe json output
+     * @return created MediaInformation instance
+     */
+    static std::shared_ptr<ffmpegkit::MediaInformation>
+    fromWithError(const std::string &ffprobeJsonOutput);
+};
 
-            /**
-             * Extracts <code>MediaInformation</code> from the given FFprobe json output. If a parsing error occurs an
-             * std::exception is thrown.
-             *
-             * @param ffprobeJsonOutput FFprobe json output
-             * @return created MediaInformation instance
-             */
-            static std::shared_ptr<ffmpegkit::MediaInformation> fromWithError(const std::string& ffprobeJsonOutput);
-
-    };
-
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_MEDIA_INFORMATION_PARSER_H

@@ -1,6 +1,6 @@
 /*
  * Muxer internal APIs - should not be included outside of ffmpeg_mux*
- * Copyright (c) 2023 ARTHENICA LTD
+ * Copyright (c) 2023-2024 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -20,11 +20,16 @@
  */
 
 /*
- * This file is the modified version of ffmpeg_mux.h file living in ffmpeg source code under the fftools folder. We
- * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
+ * This file is the modified version of ffmpeg_mux.h file living in ffmpeg
+ * source code under the fftools folder. We manually update it each time we
+ * depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop ffmpeg-kit library.
  *
  * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 11.2024
+ * --------------------------------------------------------
+ * - FFmpeg 6.1 changes migrated
  *
  * 07.2023
  * --------------------------------------------------------
@@ -32,8 +37,8 @@
  * - fftools header names updated
  * - want_sdp made thread-local
  * - EncStatsFile declaration migrated from ffmpeg_mux_init.c
- * - WARN_MULTIPLE_OPT_USAGE, MATCH_PER_STREAM_OPT, MATCH_PER_TYPE_OPT, SPECIFIER_OPT_FMT declarations migrated from
- *   ffmpeg.h
+ * - WARN_MULTIPLE_OPT_USAGE, MATCH_PER_STREAM_OPT, MATCH_PER_TYPE_OPT,
+ * SPECIFIER_OPT_FMT declarations migrated from ffmpeg.h
  * - ms_from_ost migrated to ffmpeg_mux.c
  */
 
@@ -53,49 +58,58 @@
 #include "libavutil/fifo.h"
 #include "libavutil/thread.h"
 
-#define SPECIFIER_OPT_FMT_str  "%s"
-#define SPECIFIER_OPT_FMT_i    "%i"
-#define SPECIFIER_OPT_FMT_i64  "%"PRId64
-#define SPECIFIER_OPT_FMT_ui64 "%"PRIu64
-#define SPECIFIER_OPT_FMT_f    "%f"
-#define SPECIFIER_OPT_FMT_dbl  "%lf"
+#define SPECIFIER_OPT_FMT_str "%s"
+#define SPECIFIER_OPT_FMT_i "%i"
+#define SPECIFIER_OPT_FMT_i64 "%" PRId64
+#define SPECIFIER_OPT_FMT_ui64 "%" PRIu64
+#define SPECIFIER_OPT_FMT_f "%f"
+#define SPECIFIER_OPT_FMT_dbl "%lf"
 
-#define WARN_MULTIPLE_OPT_USAGE(name, type, so, st)\
-{\
-    char namestr[128] = "";\
-    const char *spec = so->specifier && so->specifier[0] ? so->specifier : "";\
-    for (int _i = 0; opt_name_##name[_i]; _i++)\
-        av_strlcatf(namestr, sizeof(namestr), "-%s%s", opt_name_##name[_i], opt_name_##name[_i+1] ? (opt_name_##name[_i+2] ? ", " : " or ") : "");\
-    av_log(NULL, AV_LOG_WARNING, "Multiple %s options specified for stream %d, only the last option '-%s%s%s "SPECIFIER_OPT_FMT_##type"' will be used.\n",\
-           namestr, st->index, opt_name_##name[0], spec[0] ? ":" : "", spec, so->u.type);\
-}
+#define WARN_MULTIPLE_OPT_USAGE(name, type, so, st)                            \
+    {                                                                          \
+        char namestr[128] = "";                                                \
+        const char *spec =                                                     \
+            so->specifier && so->specifier[0] ? so->specifier : "";            \
+        for (int _i = 0; opt_name_##name[_i]; _i++)                            \
+            av_strlcatf(namestr, sizeof(namestr), "-%s%s",                     \
+                        opt_name_##name[_i],                                   \
+                        opt_name_##name[_i + 1]                                \
+                            ? (opt_name_##name[_i + 2] ? ", " : " or ")        \
+                            : "");                                             \
+        av_log(NULL, AV_LOG_WARNING,                                           \
+               "Multiple %s options specified for stream %d, only the last "   \
+               "option '-%s%s%s " SPECIFIER_OPT_FMT_##type                     \
+               "' will be used.\n",                                            \
+               namestr, st->index, opt_name_##name[0], spec[0] ? ":" : "",     \
+               spec, so->u.type);                                              \
+    }
 
-#define MATCH_PER_STREAM_OPT(name, type, outvar, fmtctx, st)\
-{\
-    int _ret, _matches = 0;\
-    SpecifierOpt *so;\
-    for (int _i = 0; _i < o->nb_ ## name; _i++) {\
-        char *spec = o->name[_i].specifier;\
-        if ((_ret = check_stream_specifier(fmtctx, st, spec)) > 0) {\
-            outvar = o->name[_i].u.type;\
-            so = &o->name[_i];\
-            _matches++;\
-        } else if (_ret < 0)\
-            exit_program(1);\
-    }\
-    if (_matches > 1)\
-       WARN_MULTIPLE_OPT_USAGE(name, type, so, st);\
-}
+#define MATCH_PER_STREAM_OPT(name, type, outvar, fmtctx, st)                   \
+    {                                                                          \
+        int _ret, _matches = 0;                                                \
+        SpecifierOpt *so;                                                      \
+        for (int _i = 0; _i < o->nb_##name; _i++) {                            \
+            char *spec = o->name[_i].specifier;                                \
+            if ((_ret = check_stream_specifier(fmtctx, st, spec)) > 0) {       \
+                outvar = o->name[_i].u.type;                                   \
+                so = &o->name[_i];                                             \
+                _matches++;                                                    \
+            } else if (_ret < 0)                                               \
+                return _ret;                                                   \
+        }                                                                      \
+        if (_matches > 1)                                                      \
+            WARN_MULTIPLE_OPT_USAGE(name, type, so, st);                       \
+    }
 
-#define MATCH_PER_TYPE_OPT(name, type, outvar, fmtctx, mediatype)\
-{\
-    int i;\
-    for (i = 0; i < o->nb_ ## name; i++) {\
-        char *spec = o->name[i].specifier;\
-        if (!strcmp(spec, mediatype))\
-            outvar = o->name[i].u.type;\
-    }\
-}
+#define MATCH_PER_TYPE_OPT(name, type, outvar, fmtctx, mediatype)              \
+    {                                                                          \
+        int i;                                                                 \
+        for (i = 0; i < o->nb_##name; i++) {                                   \
+            char *spec = o->name[i].specifier;                                 \
+            if (!strcmp(spec, mediatype))                                      \
+                outvar = o->name[i].u.type;                                    \
+        }                                                                      \
+    }
 
 typedef struct MuxStream {
     OutputStream ost;
@@ -103,10 +117,14 @@ typedef struct MuxStream {
     // name used for logging
     char log_name[32];
 
-    /* the packets are buffered here until the muxer is ready to be initialized */
+    /* the packets are buffered here until the muxer is ready to be initialized
+     */
     AVFifo *muxing_queue;
 
     AVBSFContext *bsf_ctx;
+    AVPacket *bsf_pkt;
+
+    AVPacket *pkt;
 
     EncStats stats;
 
@@ -123,9 +141,27 @@ typedef struct MuxStream {
     /* Threshold after which max_muxing_queue_size will be in effect */
     size_t muxing_queue_data_threshold;
 
+    // timestamp from which the streamcopied streams should start,
+    // in AV_TIME_BASE_Q;
+    // everything before it should be discarded
+    int64_t ts_copy_start;
+
     /* dts of the last packet sent to the muxer, in the stream timebase
      * used for making up missing dts values */
     int64_t last_mux_dts;
+
+    int64_t stream_duration;
+    AVRational stream_duration_tb;
+
+    // state for av_rescale_delta() call for audio in write_packet()
+    int64_t ts_rescale_delta_last;
+
+    // combined size of all the packets sent to the muxer
+    uint64_t data_size_mux;
+
+    int copy_initial_nonkeyframes;
+    int copy_prior_start;
+    int streamcopy_started;
 } MuxStream;
 
 typedef struct Muxer {
@@ -136,7 +172,7 @@ typedef struct Muxer {
 
     AVFormatContext *fc;
 
-    pthread_t    thread;
+    pthread_t thread;
     ThreadQueue *tq;
 
     AVDictionary *opts;
@@ -151,11 +187,6 @@ typedef struct Muxer {
     SyncQueue *sq_mux;
     AVPacket *sq_pkt;
 } Muxer;
-
-typedef struct EncStatsFile {
-    char        *path;
-    AVIOContext *io;
-} EncStatsFile;
 
 /* whether we want to print an SDP, set in of_open() */
 extern __thread int want_sdp;

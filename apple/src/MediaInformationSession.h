@@ -20,14 +20,14 @@
 #ifndef FFMPEG_KIT_MEDIA_INFORMATION_SESSION_H
 #define FFMPEG_KIT_MEDIA_INFORMATION_SESSION_H
 
-#import <Foundation/Foundation.h>
 #import "AbstractSession.h"
 #import "MediaInformation.h"
 #import "MediaInformationSessionCompleteCallback.h"
+#import <Foundation/Foundation.h>
 
 /**
- * <p>A custom FFprobe session, which produces a <code>MediaInformation</code> object using the
- * FFprobe output.
+ * <p>A custom FFprobe session, which produces a <code>MediaInformation</code>
+ * object using the FFprobe output.
  */
 @interface MediaInformationSession : AbstractSession
 
@@ -37,7 +37,7 @@
  * @param arguments command arguments
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments;
++ (instancetype)create:(NSArray *)arguments;
 
 /**
  * Creates a new media information session.
@@ -46,7 +46,9 @@
  * @param completeCallback session specific complete callback
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback;
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:
+        (MediaInformationSessionCompleteCallback)completeCallback;
 
 /**
  * Creates a new media information session.
@@ -56,22 +58,25 @@
  * @param logCallback      session specific log callback
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:
+        (MediaInformationSessionCompleteCallback)completeCallback
+         withLogCallback:(LogCallback)logCallback;
 
 /**
  * Returns the media information extracted in this session.
  *
- * @return media information extracted or nil if the command failed or the output can not be
- * parsed
+ * @return media information extracted or nil if the command failed or the
+ * output can not be parsed
  */
-- (MediaInformation*)getMediaInformation;
+- (MediaInformation *)getMediaInformation;
 
 /**
  * Sets the media information extracted in this session.
  *
  * @param mediaInformation media information extracted
  */
-- (void)setMediaInformation:(MediaInformation*)mediaInformation;
+- (void)setMediaInformation:(MediaInformation *)mediaInformation;
 
 /**
  * Returns the session specific complete callback.

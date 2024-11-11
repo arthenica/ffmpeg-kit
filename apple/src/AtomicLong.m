@@ -17,8 +17,8 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import <stdatomic.h>
 #import "AtomicLong.h"
+#import <stdatomic.h>
 
 @implementation AtomicLong {
     atomic_int _value;

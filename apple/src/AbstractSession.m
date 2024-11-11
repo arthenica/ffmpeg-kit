@@ -33,15 +33,15 @@ extern void addSessionToSessionHistory(id<Session> session);
 @implementation AbstractSession {
     long _sessionId;
     LogCallback _logCallback;
-    NSDate* _createTime;
-    NSDate* _startTime;
-    NSDate* _endTime;
-    NSArray* _arguments;
-    NSMutableArray* _logs;
-    NSRecursiveLock* _logsLock;
+    NSDate *_createTime;
+    NSDate *_startTime;
+    NSDate *_endTime;
+    NSArray *_arguments;
+    NSMutableArray *_logs;
+    NSRecursiveLock *_logsLock;
     SessionState _state;
-    ReturnCode* _returnCode;
-    NSString* _failStackTrace;
+    ReturnCode *_returnCode;
+    NSString *_failStackTrace;
     LogRedirectionStrategy _logRedirectionStrategy;
 }
 
@@ -49,7 +49,9 @@ extern void addSessionToSessionHistory(id<Session> session);
     sessionIdGenerator = [[AtomicLong alloc] initWithValue:1];
 }
 
-- (instancetype)init:(NSArray*)arguments withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray *)arguments
+               withLogCallback:(LogCallback)logCallback
+    withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
     self = [super init];
     if (self) {
         _sessionId = [sessionIdGenerator getAndIncrement];
@@ -79,86 +81,101 @@ extern void addSessionToSessionHistory(id<Session> session);
     return _sessionId;
 }
 
-- (NSDate*)getCreateTime {
+- (NSDate *)getCreateTime {
     return _createTime;
 }
 
-- (NSDate*)getStartTime {
+- (NSDate *)getStartTime {
     return _startTime;
 }
 
-- (NSDate*)getEndTime {
+- (NSDate *)getEndTime {
     return _endTime;
 }
 
 - (long)getDuration {
-    NSDate* startTime = _startTime;
-    NSDate* endTime = _endTime;
+    NSDate *startTime = _startTime;
+    NSDate *endTime = _endTime;
     if (startTime != nil && endTime != nil) {
-        return [[NSNumber numberWithDouble:([endTime timeIntervalSinceDate:startTime]*1000)] longValue];
+        return [[NSNumber
+            numberWithDouble:([endTime timeIntervalSinceDate:startTime] * 1000)]
+            longValue];
     }
-    
+
     return 0;
 }
 
-- (NSArray*)getArguments {
+- (NSArray *)getArguments {
     return _arguments;
 }
 
-- (NSString*)getCommand {
+- (NSString *)getCommand {
     return [FFmpegKitConfig argumentsToString:_arguments];
 }
 
 - (void)waitForAsynchronousMessagesInTransmit:(int)timeout {
-    NSDate* expireDate = [[NSDate date] dateByAddingTimeInterval:((double)timeout)/1000];
+    NSDate *expireDate =
+        [[NSDate date] dateByAddingTimeInterval:((double)timeout) / 1000];
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
-    while ([self thereAreAsynchronousMessagesInTransmit] && ([[NSDate date] timeIntervalSinceDate:expireDate] < 0)) {
-        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC));
+    while ([self thereAreAsynchronousMessagesInTransmit] &&
+           ([[NSDate date] timeIntervalSinceDate:expireDate] < 0)) {
+        dispatch_semaphore_wait(
+            semaphore, dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC));
     }
 }
 
-- (NSArray*)getAllLogsWithTimeout:(int)waitTimeout {
+- (NSArray *)getAllLogsWithTimeout:(int)waitTimeout {
     [self waitForAsynchronousMessagesInTransmit:waitTimeout];
 
     if ([self thereAreAsynchronousMessagesInTransmit]) {
-        NSLog(@"getAllLogsWithTimeout was called to return all logs but there are still logs being transmitted for session id %ld.", _sessionId);
+        NSLog(@"getAllLogsWithTimeout was called to return all logs but there "
+              @"are "
+              @"still logs being transmitted for session id %ld.",
+              _sessionId);
     }
 
     return [self getLogs];
 }
 
-- (NSArray*)getAllLogs {
-    return [self getAllLogsWithTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+- (NSArray *)getAllLogs {
+    return [self
+        getAllLogsWithTimeout:
+            AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
 }
 
-- (NSArray*)getLogs {
+- (NSArray *)getLogs {
     [_logsLock lock];
-    NSArray* logsCopy = [_logs copy];
+    NSArray *logsCopy = [_logs copy];
     [_logsLock unlock];
-    
+
     return logsCopy;
 }
 
-- (NSString*)getAllLogsAsStringWithTimeout:(int)waitTimeout {
+- (NSString *)getAllLogsAsStringWithTimeout:(int)waitTimeout {
     [self waitForAsynchronousMessagesInTransmit:waitTimeout];
 
     if ([self thereAreAsynchronousMessagesInTransmit]) {
-        NSLog(@"getAllLogsAsStringWithTimeout was called to return all logs but there are still logs being transmitted for session id %ld.", _sessionId);
+        NSLog(
+            @"getAllLogsAsStringWithTimeout was called to return all logs but "
+            @"there are still logs being transmitted for session id %ld.",
+            _sessionId);
     }
 
     return [self getLogsAsString];
 }
 
-- (NSString*)getAllLogsAsString {
-    return [self getAllLogsAsStringWithTimeout:AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
+- (NSString *)getAllLogsAsString {
+    return [self
+        getAllLogsAsStringWithTimeout:
+            AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit];
 }
 
-- (NSString*)getLogsAsString {
-    NSMutableString* concatenatedString = [[NSMutableString alloc] init];
+- (NSString *)getLogsAsString {
+    NSMutableString *concatenatedString = [[NSMutableString alloc] init];
 
     [_logsLock lock];
-    for (int i=0; i < [_logs count]; i++) {
+    for (int i = 0; i < [_logs count]; i++) {
         [concatenatedString appendString:[[_logs objectAtIndex:i] getMessage]];
     }
     [_logsLock unlock];
@@ -166,7 +183,7 @@ extern void addSessionToSessionHistory(id<Session> session);
     return concatenatedString;
 }
 
-- (NSString*)getOutput {
+- (NSString *)getOutput {
     return [self getAllLogsAsString];
 }
 
@@ -174,11 +191,11 @@ extern void addSessionToSessionHistory(id<Session> session);
     return _state;
 }
 
-- (ReturnCode*)getReturnCode {
+- (ReturnCode *)getReturnCode {
     return _returnCode;
 }
 
-- (NSString*)getFailStackTrace {
+- (NSString *)getFailStackTrace {
     return _failStackTrace;
 }
 
@@ -190,7 +207,7 @@ extern void addSessionToSessionHistory(id<Session> session);
     return ([FFmpegKitConfig messagesInTransmit:_sessionId] != 0);
 }
 
-- (void)addLog:(Log*)log {
+- (void)addLog:(Log *)log {
     [_logsLock lock];
     [_logs addObject:log];
     [_logsLock unlock];
@@ -201,14 +218,16 @@ extern void addSessionToSessionHistory(id<Session> session);
     _startTime = [NSDate date];
 }
 
-- (void)complete:(ReturnCode*)returnCode {
+- (void)complete:(ReturnCode *)returnCode {
     _returnCode = returnCode;
     _state = SessionStateCompleted;
     _endTime = [NSDate date];
 }
 
-- (void)fail:(NSException*)exception {
-    _failStackTrace = [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]];
+- (void)fail:(NSException *)exception {
+    _failStackTrace =
+        [NSString stringWithFormat:@"%@\n%@", [exception userInfo],
+                                   [exception callStackSymbols]];
     _state = SessionStateFailed;
     _endTime = [NSDate date];
 }

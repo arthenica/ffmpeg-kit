@@ -20,152 +20,155 @@
 #ifndef FFMPEG_KIT_MEDIA_INFORMATION_H
 #define FFMPEG_KIT_MEDIA_INFORMATION_H
 
-#import <Foundation/Foundation.h>
 #import "Chapter.h"
 #import "StreamInformation.h"
+#import <Foundation/Foundation.h>
 
-extern NSString* const MediaKeyMediaProperties;
-extern NSString* const MediaKeyFilename;
-extern NSString* const MediaKeyFormat;
-extern NSString* const MediaKeyFormatLong;
-extern NSString* const MediaKeyStartTime;
-extern NSString* const MediaKeyDuration;
-extern NSString* const MediaKeySize;
-extern NSString* const MediaKeyBitRate;
-extern NSString* const MediaKeyTags;
+extern NSString *const MediaKeyMediaProperties;
+extern NSString *const MediaKeyFilename;
+extern NSString *const MediaKeyFormat;
+extern NSString *const MediaKeyFormatLong;
+extern NSString *const MediaKeyStartTime;
+extern NSString *const MediaKeyDuration;
+extern NSString *const MediaKeySize;
+extern NSString *const MediaKeyBitRate;
+extern NSString *const MediaKeyTags;
 
 /**
  * Media information class.
  */
 @interface MediaInformation : NSObject
 
-- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams withChapters:(NSArray*)chapters;
+- (instancetype)init:(NSDictionary *)mediaDictionary
+         withStreams:(NSArray *)streams
+        withChapters:(NSArray *)chapters;
 
 /**
  * Returns file name.
  *
  * @return media file name
  */
-- (NSString*)getFilename;
+- (NSString *)getFilename;
 
 /**
  * Returns format.
  *
  * @return media format
  */
-- (NSString*)getFormat;
+- (NSString *)getFormat;
 
 /**
  * Returns long format.
  *
  * @return media long format
  */
-- (NSString*)getLongFormat;
+- (NSString *)getLongFormat;
 
 /**
  * Returns duration.
  *
  * @return media duration in "seconds.microseconds" format
  */
-- (NSString*)getDuration;
+- (NSString *)getDuration;
 
 /**
  * Returns start time.
  *
  * @return media start time in milliseconds
  */
-- (NSString*)getStartTime;
+- (NSString *)getStartTime;
 
 /**
  * Returns size.
  *
  * @return media size in bytes
  */
-- (NSString*)getSize;
+- (NSString *)getSize;
 
 /**
  * Returns bitrate.
  *
  * @return media bitrate in kb/s
  */
-- (NSString*)getBitrate;
+- (NSString *)getBitrate;
 
 /**
  * Returns all tags.
  *
  * @return tags dictionary
  */
-- (NSDictionary*)getTags;
+- (NSDictionary *)getTags;
 
 /**
  * Returns all streams.
  *
  * @return streams array
  */
-- (NSArray*)getStreams;
+- (NSArray *)getStreams;
 
 /**
  * Returns all chapters.
  *
  * @return chapters array
  */
-- (NSArray*)getChapters;
+- (NSArray *)getChapters;
 
 /**
  * Returns the property associated with the key.
  *
  * @return property as string or nil if the key is not found
  */
-- (NSString*)getStringProperty:(NSString*)key;
+- (NSString *)getStringProperty:(NSString *)key;
 
 /**
  * Returns the property associated with the key.
  *
  * @return property as number or nil if the key is not found
  */
-- (NSNumber*)getNumberProperty:(NSString*)key;
+- (NSNumber *)getNumberProperty:(NSString *)key;
 
 /**
  * Returns the property associated with the key.
  *
  * @return property as id or nil if the key is not found
-*/
-- (id)getProperty:(NSString*)key;
+ */
+- (id)getProperty:(NSString *)key;
 
 /**
  * Returns the format property associated with the key.
  *
  * @return format property as string or nil if the key is not found
  */
-- (NSString*)getStringFormatProperty:(NSString*)key;
+- (NSString *)getStringFormatProperty:(NSString *)key;
 
 /**
  * Returns the format property associated with the key.
  *
  * @return format property as number or nil if the key is not found
  */
-- (NSNumber*)getNumberFormatProperty:(NSString*)key;
+- (NSNumber *)getNumberFormatProperty:(NSString *)key;
 
 /**
  * Returns the format property associated with the key.
  *
  * @return format property as id or nil if the key is not found
-*/
-- (id)getFormatProperty:(NSString*)key;
+ */
+- (id)getFormatProperty:(NSString *)key;
 
 /**
  * Returns all format properties defined.
  *
- * @return all format properties in a dictionary or nil if no format properties are defined
-*/
-- (NSDictionary*)getFormatProperties;
+ * @return all format properties in a dictionary or nil if no format properties
+ * are defined
+ */
+- (NSDictionary *)getFormatProperties;
 
 /**
  * Returns all properties defined.
  *
  * @return all properties in a dictionary or nil if no properties are defined
-*/
-- (NSDictionary*)getAllProperties;
+ */
+- (NSDictionary *)getAllProperties;
 
 @end
 

@@ -22,68 +22,69 @@
 
 namespace ffmpegkit {
 
+/**
+ * <p>Enumeration type for log levels.
+ */
+enum Level {
+
     /**
-     * <p>Enumeration type for log levels.
+     * This log level is defined by FFmpegKit. It is used to specify logs
+     * printed to stderr by FFmpeg. Logs that has this level are not filtered
+     * and always redirected.
      */
-    enum Level {
+    LevelAVLogStdErr = -16,
 
-        /**
-         * This log level is defined by FFmpegKit. It is used to specify logs printed to stderr by
-         * FFmpeg. Logs that has this level are not filtered and always redirected.
-         */
-        LevelAVLogStdErr = -16,
+    /**
+     * Print no output.
+     */
+    LevelAVLogQuiet = -8,
 
-        /**
-         * Print no output.
-         */
-        LevelAVLogQuiet = -8,
+    /**
+     * Something went really wrong and we will crash now.
+     */
+    LevelAVLogPanic = 0,
 
-        /**
-         * Something went really wrong and we will crash now.
-         */
-        LevelAVLogPanic = 0,
+    /**
+     * Something went wrong and recovery is not possible.
+     * For example, no header was found for a format which depends
+     * on headers or an illegal combination of parameters is used.
+     */
+    LevelAVLogFatal = 8,
 
-        /**
-         * Something went wrong and recovery is not possible.
-         * For example, no header was found for a format which depends
-         * on headers or an illegal combination of parameters is used.
-         */
-        LevelAVLogFatal = 8,
+    /**
+     * Something went wrong and cannot losslessly be recovered.
+     * However, not all future data is affected.
+     */
+    LevelAVLogError = 16,
 
-        /**
-         * Something went wrong and cannot losslessly be recovered.
-         * However, not all future data is affected.
-         */
-        LevelAVLogError = 16,
+    /**
+     * Something somehow does not look correct. This may or may not
+     * lead to problems. An example would be the use of '-vstrict -2'.
+     */
+    LevelAVLogWarning = 24,
 
-        /**
-         * Something somehow does not look correct. This may or may not
-         * lead to problems. An example would be the use of '-vstrict -2'.
-         */
-        LevelAVLogWarning = 24,
+    /**
+     * Standard information.
+     */
+    LevelAVLogInfo = 32,
 
-        /**
-         * Standard information.
-         */
-        LevelAVLogInfo = 32,
+    /**
+     * Detailed information.
+     */
+    LevelAVLogVerbose = 40,
 
-        /**
-         * Detailed information.
-         */
-        LevelAVLogVerbose = 40,
+    /**
+     * Stuff which is only useful for libav* developers.
+     */
+    LevelAVLogDebug = 48,
 
-        /**
-         * Stuff which is only useful for libav* developers.
-         */
-        LevelAVLogDebug = 48,
+    /**
+     * Extremely verbose debugging, useful for libav* development.
+     */
+    LevelAVLogTrace = 56
 
-        /**
-         * Extremely verbose debugging, useful for libav* development.
-         */
-        LevelAVLogTrace = 56
+};
 
-    };
-
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_LEVEL_H

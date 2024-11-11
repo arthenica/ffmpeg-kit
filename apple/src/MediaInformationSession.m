@@ -22,7 +22,7 @@
 #import "MediaInformation.h"
 
 @implementation MediaInformationSession {
-    MediaInformation* _mediaInformation;
+    MediaInformation *_mediaInformation;
     MediaInformationSessionCompleteCallback _completeCallback;
 }
 
@@ -30,21 +30,37 @@
     // EMPTY INITIALIZE
 }
 
-+ (instancetype)create:(NSArray*)arguments {
-    return [[self alloc] init:arguments withCompleteCallback:nil withLogCallback:nil];
++ (instancetype)create:(NSArray *)arguments {
+    return [[self alloc] init:arguments
+         withCompleteCallback:nil
+              withLogCallback:nil];
 }
 
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback {
-    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:nil];
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:
+        (MediaInformationSessionCompleteCallback)completeCallback {
+    return [[self alloc] init:arguments
+         withCompleteCallback:completeCallback
+              withLogCallback:nil];
 }
 
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
-    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback];
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:
+        (MediaInformationSessionCompleteCallback)completeCallback
+         withLogCallback:(LogCallback)logCallback {
+    return [[self alloc] init:arguments
+         withCompleteCallback:completeCallback
+              withLogCallback:logCallback];
 }
 
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(MediaInformationSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
+- (instancetype)init:(NSArray *)arguments
+    withCompleteCallback:
+        (MediaInformationSessionCompleteCallback)completeCallback
+         withLogCallback:(LogCallback)logCallback {
 
-    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
+    self = [super init:arguments
+                   withLogCallback:logCallback
+        withLogRedirectionStrategy:LogRedirectionStrategyNeverPrintLogs];
 
     if (self) {
         _completeCallback = completeCallback;
@@ -53,11 +69,11 @@
     return self;
 }
 
-- (MediaInformation*)getMediaInformation {
+- (MediaInformation *)getMediaInformation {
     return _mediaInformation;
 }
 
-- (void)setMediaInformation:(MediaInformation*)mediaInformation {
+- (void)setMediaInformation:(MediaInformation *)mediaInformation {
     _mediaInformation = mediaInformation;
 }
 
@@ -78,4 +94,3 @@
 }
 
 @end
-

@@ -17,10 +17,10 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#import "Packages.h"
+#import "FFmpegKitConfig.h"
 #import "config.h"
 #import "libavutil/ffversion.h"
-#import "FFmpegKitConfig.h"
-#import "Packages.h"
 
 static NSMutableArray *supportedExternalLibraries;
 
@@ -62,11 +62,11 @@ static NSMutableArray *supportedExternalLibraries;
     [supportedExternalLibraries addObject:@"xvid"];
 }
 
-+ (NSString*)getBuildConf {
++ (NSString *)getBuildConf {
     return [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];
 }
 
-+ (NSString*)extractPackageNameFromExternalLibraries {
++ (NSString *)extractPackageNameFromExternalLibraries {
     NSArray *enabledLibraryArray = [Packages getExternalLibraries];
     Boolean speex = [enabledLibraryArray containsObject:@"speex"];
     Boolean fribidi = [enabledLibraryArray containsObject:@"fribidi"];
@@ -237,25 +237,31 @@ static NSMutableArray *supportedExternalLibraries;
     return @"min";
 }
 
-+ (NSString*)getPackageName {
-    #ifdef FFMPEG_KIT_PACKAGE
++ (NSString *)getPackageName {
+#ifdef FFMPEG_KIT_PACKAGE
     return [NSString stringWithUTF8String:FFMPEG_KIT_PACKAGE];
-    #else
+#else
     return [self extractPackageNameFromExternalLibraries];
-    #endif
+#endif
 }
 
-+ (NSArray*)getExternalLibraries {
++ (NSArray *)getExternalLibraries {
     NSString *buildConfiguration = [Packages getBuildConf];
     NSMutableArray *enabledLibraryArray = [[NSMutableArray alloc] init];
 
-    for (int i=0; i < [supportedExternalLibraries count]; i++) {
-        NSString *supportedExternalLibrary = [supportedExternalLibraries objectAtIndex:i];
+    for (int i = 0; i < [supportedExternalLibraries count]; i++) {
+        NSString *supportedExternalLibrary =
+            [supportedExternalLibraries objectAtIndex:i];
 
-        NSString *libraryName1 = [NSString stringWithFormat:@"enable-%@", supportedExternalLibrary];
-        NSString *libraryName2 = [NSString stringWithFormat:@"enable-lib%@", supportedExternalLibrary];
+        NSString *libraryName1 =
+            [NSString stringWithFormat:@"enable-%@", supportedExternalLibrary];
+        NSString *libraryName2 = [NSString
+            stringWithFormat:@"enable-lib%@", supportedExternalLibrary];
 
-        if ([buildConfiguration rangeOfString:libraryName1].location != NSNotFound || [buildConfiguration rangeOfString:libraryName2].location != NSNotFound) {
+        if ([buildConfiguration rangeOfString:libraryName1].location !=
+                NSNotFound ||
+            [buildConfiguration rangeOfString:libraryName2].location !=
+                NSNotFound) {
             [enabledLibraryArray addObject:supportedExternalLibrary];
         }
     }

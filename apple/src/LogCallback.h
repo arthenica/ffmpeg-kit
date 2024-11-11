@@ -20,14 +20,14 @@
 #ifndef FFMPEG_KIT_LOG_CALLBACK_H
 #define FFMPEG_KIT_LOG_CALLBACK_H
 
-#import <Foundation/Foundation.h>
 #import "Log.h"
+#import <Foundation/Foundation.h>
 
 /**
  * <p>Callback that receives logs generated for <code>FFmpegKit</code> sessions.
  *
  * @param log log entry
  */
-typedef void (^LogCallback)(Log* log);
+typedef void (^LogCallback)(Log *log);
 
 #endif // FFMPEG_KIT_LOG_CALLBACK_H

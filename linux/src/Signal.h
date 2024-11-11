@@ -22,13 +22,13 @@
 
 namespace ffmpegkit {
 
-    enum Signal {
-        SignalInt = 2,
-        SignalQuit = 3,
-        SignalPipe = 13,
-        SignalTerm = 15,
-        SignalXcpu = 24
-    };
+enum Signal {
+    SignalInt = 2,
+    SignalQuit = 3,
+    SignalPipe = 13,
+    SignalTerm = 15,
+    SignalXcpu = 24
+};
 
 }
 

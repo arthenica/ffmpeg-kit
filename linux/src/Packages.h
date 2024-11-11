@@ -20,34 +20,33 @@
 #ifndef FFMPEG_KIT_PACKAGES_H
 #define FFMPEG_KIT_PACKAGES_H
 
-#include <set>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 
 namespace ffmpegkit {
 
+/**
+ * <p>Helper class to extract binary package information.
+ */
+class Packages {
+  public:
     /**
-     * <p>Helper class to extract binary package information.
+     * Returns the FFmpegKit binary package name.
+     *
+     * @return predicted FFmpegKit binary package name
      */
-    class Packages {
-        public:
+    static std::string getPackageName();
 
-            /**
-             * Returns the FFmpegKit binary package name.
-             *
-             * @return predicted FFmpegKit binary package name
-             */
-            static std::string getPackageName();
+    /**
+     * Returns enabled external libraries by FFmpeg.
+     *
+     * @return enabled external libraries
+     */
+    static std::shared_ptr<std::set<std::string>> getExternalLibraries();
+};
 
-            /**
-             * Returns enabled external libraries by FFmpeg.
-             *
-             * @return enabled external libraries
-             */
-            static std::shared_ptr<std::set<std::string>> getExternalLibraries();
-    };
-
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_PACKAGES_H

@@ -20,9 +20,9 @@
 #ifndef FFMPEG_KIT_FFPROBE_SESSION_H
 #define FFMPEG_KIT_FFPROBE_SESSION_H
 
-#import <Foundation/Foundation.h>
 #import "AbstractSession.h"
 #import "FFprobeSessionCompleteCallback.h"
+#import <Foundation/Foundation.h>
 
 /**
  * <p>An FFprobe session.
@@ -35,7 +35,7 @@
  * @param arguments command arguments
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments;
++ (instancetype)create:(NSArray *)arguments;
 
 /**
  * Builds a new FFprobe session.
@@ -44,7 +44,8 @@
  * @param completeCallback session specific complete callback
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback;
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback;
 
 /**
  * Builds a new FFprobe session.
@@ -54,7 +55,9 @@
  * @param logCallback      session specific log callback
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback;
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback
+         withLogCallback:(LogCallback)logCallback;
 
 /**
  * Builds a new FFprobe session.
@@ -65,7 +68,10 @@
  * @param logRedirectionStrategy  session specific log redirection strategy
  * @return created session
  */
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
++ (instancetype)create:(NSArray *)arguments
+          withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback
+               withLogCallback:(LogCallback)logCallback
+    withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
  * Returns the session specific complete callback.

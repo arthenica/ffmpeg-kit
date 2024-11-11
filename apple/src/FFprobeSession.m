@@ -29,25 +29,48 @@
     // EMPTY INITIALIZE
 }
 
-+ (instancetype)create:(NSArray*)arguments {
-    return [[self alloc] init:arguments withCompleteCallback:nil withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
++ (instancetype)create:(NSArray *)arguments {
+    return [[self alloc] init:arguments
+              withCompleteCallback:nil
+                   withLogCallback:nil
+        withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 }
 
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback {
-    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:nil withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback {
+    return [[self alloc] init:arguments
+              withCompleteCallback:completeCallback
+                   withLogCallback:nil
+        withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 }
 
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback {
-    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
++ (instancetype)create:(NSArray *)arguments
+    withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback
+         withLogCallback:(LogCallback)logCallback {
+    return [[self alloc] init:arguments
+              withCompleteCallback:completeCallback
+                   withLogCallback:logCallback
+        withLogRedirectionStrategy:[FFmpegKitConfig getLogRedirectionStrategy]];
 }
 
-+ (instancetype)create:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
-    return [[self alloc] init:arguments withCompleteCallback:completeCallback withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
++ (instancetype)create:(NSArray *)arguments
+          withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback
+               withLogCallback:(LogCallback)logCallback
+    withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+    return [[self alloc] init:arguments
+              withCompleteCallback:completeCallback
+                   withLogCallback:logCallback
+        withLogRedirectionStrategy:logRedirectionStrategy];
 }
 
-- (instancetype)init:(NSArray*)arguments withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback withLogCallback:(LogCallback)logCallback withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
+- (instancetype)init:(NSArray *)arguments
+          withCompleteCallback:(FFprobeSessionCompleteCallback)completeCallback
+               withLogCallback:(LogCallback)logCallback
+    withLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy {
 
-    self = [super init:arguments withLogCallback:logCallback withLogRedirectionStrategy:logRedirectionStrategy];
+    self = [super init:arguments
+                   withLogCallback:logCallback
+        withLogRedirectionStrategy:logRedirectionStrategy];
 
     if (self) {
         _completeCallback = completeCallback;
@@ -73,4 +96,3 @@
 }
 
 @end
-

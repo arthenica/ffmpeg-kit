@@ -1,6 +1,6 @@
-# ffmpeg-kit 6.0 configure.ac
+# ffmpeg-kit 6.1.2 configure.ac
 
-AC_INIT([ffmpeg-kit], [6.0], [https://github.com/arthenica/ffmpeg-kit/issues/new])
+AC_INIT([ffmpeg-kit], [6.1.2], [https://github.com/arthenica/ffmpeg-kit/issues/new])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FFmpegKit.cpp])
 

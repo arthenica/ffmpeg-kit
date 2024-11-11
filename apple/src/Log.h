@@ -27,13 +27,13 @@
  */
 @interface Log : NSObject
 
-- (instancetype)init:(long)sessionId :(int)level :(NSString*)message;
+- (instancetype)init:(long)sessionId:(int)level:(NSString *)message;
 
 - (long)getSessionId;
 
 - (int)getLevel;
 
-- (NSString*)getMessage;
+- (NSString *)getMessage;
 
 @end
 

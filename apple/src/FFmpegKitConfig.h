@@ -20,18 +20,18 @@
 #ifndef FFMPEG_KIT_CONFIG_H
 #define FFMPEG_KIT_CONFIG_H
 
-#import <stdio.h>
-#import <pthread.h>
-#import <unistd.h>
-#import <Foundation/Foundation.h>
 #import "FFmpegSession.h"
 #import "FFprobeSession.h"
 #import "LogCallback.h"
 #import "MediaInformationSession.h"
 #import "StatisticsCallback.h"
+#import <Foundation/Foundation.h>
+#import <pthread.h>
+#import <stdio.h>
+#import <unistd.h>
 
 /** Global library version */
-extern NSString* const FFmpegKitVersion;
+extern NSString *const FFmpegKitVersion;
 
 typedef NS_ENUM(NSUInteger, Signal) {
     SignalInt = 2,
@@ -42,29 +42,31 @@ typedef NS_ENUM(NSUInteger, Signal) {
 };
 
 /**
- * <p>Configuration class of <code>FFmpegKit</code> library. Allows customizing the global library
- * options. Provides helper methods to support additional resources.
+ * <p>Configuration class of <code>FFmpegKit</code> library. Allows customizing
+ * the global library options. Provides helper methods to support additional
+ * resources.
  */
 @interface FFmpegKitConfig : NSObject
 
 /**
  * <p>Enables log and statistics redirection.
  *
- * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to NSLog and sessions
- * collect log and statistics entries for the executions. It is possible to define global or
- * session specific log/statistics callbacks as well.
+ * <p>When redirection is enabled FFmpeg/FFprobe logs are redirected to NSLog
+ * and sessions collect log and statistics entries for the executions. It is
+ * possible to define global or session specific log/statistics callbacks as
+ * well.
  *
- * <p>Note that redirection is enabled by default. If you do not want to use its functionality
- * please use disableRedirection method to disable it.
+ * <p>Note that redirection is enabled by default. If you do not want to use its
+ * functionality please use disableRedirection method to disable it.
  */
 + (void)enableRedirection;
 
 /**
  * <p>Disables log and statistics redirection.
  *
- * <p>When redirection is disabled logs are printed to stderr, all logs and statistics
- * callbacks are disabled and <code>FFprobe</code>'s <code>getMediaInformation</code> methods
- * do not work.
+ * <p>When redirection is disabled logs are printed to stderr, all logs and
+ * statistics callbacks are disabled and <code>FFprobe</code>'s
+ * <code>getMediaInformation</code> methods do not work.
  */
 + (void)disableRedirection;
 
@@ -74,35 +76,40 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @param path directory that contains fontconfig configuration (fonts.conf)
  * @return zero on success, non-zero on error
  */
-+ (int)setFontconfigConfigurationPath:(NSString*)path;
++ (int)setFontconfigConfigurationPath:(NSString *)path;
 
 /**
- * <p>Registers the fonts inside the given path, so they become available to use in FFmpeg
- * filters.
+ * <p>Registers the fonts inside the given path, so they become available to use
+ * in FFmpeg filters.
  *
- * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
- * enabled or use a prebuilt package with <code>fontconfig</code> inside to be able to use
- * fonts in <code>FFmpeg</code>.
+ * <p>Note that you need to build <code>FFmpegKit</code> with
+ * <code>fontconfig</code> enabled or use a prebuilt package with
+ * <code>fontconfig</code> inside to be able to use fonts in
+ * <code>FFmpeg</code>.
  *
  * @param fontDirectoryPath directory that contains fonts (.ttf and .otf files)
- * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
- *                          friendly names
+ * @param fontNameMapping   custom font name mappings, useful to access your
+ * fonts with more friendly names
  */
-+ (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
++ (void)setFontDirectory:(NSString *)fontDirectoryPath
+                    with:(NSDictionary *)fontNameMapping;
 
 /**
- * <p>Registers the fonts inside the given array of font directories, so they become available
- * to use in FFmpeg filters.
+ * <p>Registers the fonts inside the given array of font directories, so they
+ * become available to use in FFmpeg filters.
  *
- * <p>Note that you need to build <code>FFmpegKit</code> with <code>fontconfig</code>
- * enabled or use a prebuilt package with <code>fontconfig</code> inside to be able to use
- * fonts in <code>FFmpeg</code>.
+ * <p>Note that you need to build <code>FFmpegKit</code> with
+ * <code>fontconfig</code> enabled or use a prebuilt package with
+ * <code>fontconfig</code> inside to be able to use fonts in
+ * <code>FFmpeg</code>.
  *
- * @param fontDirectoryList array of directories that contain fonts (.ttf and .otf files)
- * @param fontNameMapping   custom font name mappings, useful to access your fonts with more
- *                          friendly names
+ * @param fontDirectoryList array of directories that contain fonts (.ttf and
+ * .otf files)
+ * @param fontNameMapping   custom font name mappings, useful to access your
+ * fonts with more friendly names
  */
-+ (void)setFontDirectoryList:(NSArray*)fontDirectoryList with:(NSDictionary*)fontNameMapping;
++ (void)setFontDirectoryList:(NSArray *)fontDirectoryList
+                        with:(NSDictionary *)fontNameMapping;
 
 /**
  * <p>Creates a new named pipe to use in <code>FFmpeg</code> operations.
@@ -111,28 +118,29 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @return the full path of the named pipe
  */
-+ (NSString*)registerNewFFmpegPipe;
++ (NSString *)registerNewFFmpegPipe;
 
 /**
  * <p>Closes a previously created <code>FFmpeg</code> pipe.
  *
  * @param ffmpegPipePath full path of the FFmpeg pipe
  */
-+ (void)closeFFmpegPipe:(NSString*)ffmpegPipePath;
++ (void)closeFFmpegPipe:(NSString *)ffmpegPipePath;
 
 /**
- * <p>Returns the version of FFmpeg bundled within <code>FFmpegKit</code> library.
+ * <p>Returns the version of FFmpeg bundled within <code>FFmpegKit</code>
+ * library.
  *
  * @return the version of FFmpeg
  */
-+ (NSString*)getFFmpegVersion;
++ (NSString *)getFFmpegVersion;
 
 /**
  * Returns FFmpegKit library version.
  *
  * @return FFmpegKit version
  */
-+ (NSString*)getVersion;
++ (NSString *)getVersion;
 
 /**
  * <p>Returns whether FFmpegKit release is a Long Term Release or not.
@@ -146,7 +154,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @return FFmpegKit library build date
  */
-+ (NSString*)getBuildDate;
++ (NSString *)getBuildDate;
 
 /**
  * <p>Sets an environment variable.
@@ -155,11 +163,12 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @param variableValue environment variable value
  * @return zero on success, non-zero on error
  */
-+ (int)setEnvironmentVariable:(NSString*)variableName value:(NSString*)variableValue;
++ (int)setEnvironmentVariable:(NSString *)variableName
+                        value:(NSString *)variableValue;
 
 /**
- * <p>Registers a new ignored signal. Ignored signals are not handled by <code>FFmpegKit</code>
- * library.
+ * <p>Registers a new ignored signal. Ignored signals are not handled by
+ * <code>FFmpegKit</code> library.
  *
  * @param signal signal to be ignored
  */
@@ -170,108 +179,143 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @param ffmpegSession FFmpeg session which includes command options/arguments
  */
-+ (void)ffmpegExecute:(FFmpegSession*)ffmpegSession;
++ (void)ffmpegExecute:(FFmpegSession *)ffmpegSession;
 
 /**
  * <p>Synchronously executes the FFprobe session provided.
  *
- * @param ffprobeSession FFprobe session which includes command options/arguments
+ * @param ffprobeSession FFprobe session which includes command
+ * options/arguments
  */
-+ (void)ffprobeExecute:(FFprobeSession*)ffprobeSession;
++ (void)ffprobeExecute:(FFprobeSession *)ffprobeSession;
 
 /**
  * <p>Synchronously executes the media information session provided.
  *
- * @param mediaInformationSession media information session which includes command options/arguments
- * @param waitTimeout             max time to wait until media information is transmitted
+ * @param mediaInformationSession media information session which includes
+ * command options/arguments
+ * @param waitTimeout             max time to wait until media information is
+ * transmitted
  */
-+ (void)getMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
++ (void)getMediaInformationExecute:
+            (MediaInformationSession *)mediaInformationSession
+                       withTimeout:(int)waitTimeout;
 
 /**
  * <p>Starts an asynchronous FFmpeg execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an FFmpegSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an FFmpegSessionCompleteCallback if you want to be
+ * notified about the result.
  *
  * @param ffmpegSession FFmpeg session which includes command options/arguments
  */
-+ (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession;
++ (void)asyncFFmpegExecute:(FFmpegSession *)ffmpegSession;
 
 /**
  * <p>Starts an asynchronous FFmpeg execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an FFmpegSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an FFmpegSessionCompleteCallback if you want to be
+ * notified about the result.
  *
- * @param ffmpegSession   FFmpeg session which includes command options/arguments
- * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @param ffmpegSession   FFmpeg session which includes command
+ * options/arguments
+ * @param queue           dispatch queue that will be used to run this
+ * asynchronous operation
  */
-+ (void)asyncFFmpegExecute:(FFmpegSession*)ffmpegSession onDispatchQueue:(dispatch_queue_t)queue;
++ (void)asyncFFmpegExecute:(FFmpegSession *)ffmpegSession
+           onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
  * <p>Starts an asynchronous FFprobe execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an FFprobeSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an FFprobeSessionCompleteCallback if you want to be
+ * notified about the result.
  *
- * @param ffprobeSession FFprobe session which includes command options/arguments
+ * @param ffprobeSession FFprobe session which includes command
+ * options/arguments
  */
-+ (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession;
++ (void)asyncFFprobeExecute:(FFprobeSession *)ffprobeSession;
 
 /**
  * <p>Starts an asynchronous FFprobe execution for the given session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an FFprobeSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an FFprobeSessionCompleteCallback if you want to be
+ * notified about the result.
  *
- * @param ffprobeSession  FFprobe session which includes command options/arguments
- * @param queue           dispatch queue that will be used to run this asynchronous operation
+ * @param ffprobeSession  FFprobe session which includes command
+ * options/arguments
+ * @param queue           dispatch queue that will be used to run this
+ * asynchronous operation
  */
-+ (void)asyncFFprobeExecute:(FFprobeSession*)ffprobeSession onDispatchQueue:(dispatch_queue_t)queue;
++ (void)asyncFFprobeExecute:(FFprobeSession *)ffprobeSession
+            onDispatchQueue:(dispatch_queue_t)queue;
 
 /**
- * <p>Starts an asynchronous FFprobe execution for the given media information session.
+ * <p>Starts an asynchronous FFprobe execution for the given media information
+ * session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an MediaInformationSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an MediaInformationSessionCompleteCallback if you
+ * want to be notified about the result.
  *
- * @param mediaInformationSession media information session which includes command options/arguments
- * @param waitTimeout             max time to wait until media information is transmitted
+ * @param mediaInformationSession media information session which includes
+ * command options/arguments
+ * @param waitTimeout             max time to wait until media information is
+ * transmitted
  */
-+ (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession withTimeout:(int)waitTimeout;
++ (void)asyncGetMediaInformationExecute:
+            (MediaInformationSession *)mediaInformationSession
+                            withTimeout:(int)waitTimeout;
 
 /**
- * <p>Starts an asynchronous FFprobe execution for the given media information session.
+ * <p>Starts an asynchronous FFprobe execution for the given media information
+ * session.
  *
- * <p>Note that this method returns immediately and does not wait the execution to complete.
- * You must use an MediaInformationSessionCompleteCallback if you want to be notified about the result.
+ * <p>Note that this method returns immediately and does not wait the execution
+ * to complete. You must use an MediaInformationSessionCompleteCallback if you
+ * want to be notified about the result.
  *
- * @param mediaInformationSession media information session which includes command options/arguments
- * @param queue           dispatch queue that will be used to run this asynchronous operation
- * @param waitTimeout             max time to wait until media information is transmitted
+ * @param mediaInformationSession media information session which includes
+ * command options/arguments
+ * @param queue           dispatch queue that will be used to run this
+ * asynchronous operation
+ * @param waitTimeout             max time to wait until media information is
+ * transmitted
  */
-+ (void)asyncGetMediaInformationExecute:(MediaInformationSession*)mediaInformationSession onDispatchQueue:(dispatch_queue_t)queue withTimeout:(int)waitTimeout;
++ (void)asyncGetMediaInformationExecute:
+            (MediaInformationSession *)mediaInformationSession
+                        onDispatchQueue:(dispatch_queue_t)queue
+                            withTimeout:(int)waitTimeout;
 
 /**
  * <p>Sets a global log callback to redirect FFmpeg/FFprobe logs.
  *
- * @param logCallback log callback or nil to disable a previously defined log callback
+ * @param logCallback log callback or nil to disable a previously defined log
+ * callback
  */
 + (void)enableLogCallback:(LogCallback)logCallback;
 
 /**
  * <p>Sets a global statistics callback to redirect FFmpeg statistics.
  *
- * @param statisticsCallback statistics callback or nil to disable a previously defined statistics callback
+ * @param statisticsCallback statistics callback or nil to disable a previously
+ * defined statistics callback
  */
 + (void)enableStatisticsCallback:(StatisticsCallback)statisticsCallback;
 
 /**
- * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results for FFmpeg sessions.
+ * <p>Sets a global FFmpegSessionCompleteCallback to receive execution results
+ * for FFmpeg sessions.
  *
- * @param ffmpegSessionCompleteCallback complete callback or nil to disable a previously defined callback
+ * @param ffmpegSessionCompleteCallback complete callback or nil to disable a
+ * previously defined callback
  */
-+ (void)enableFFmpegSessionCompleteCallback:(FFmpegSessionCompleteCallback)ffmpegSessionCompleteCallback;
++ (void)enableFFmpegSessionCompleteCallback:
+    (FFmpegSessionCompleteCallback)ffmpegSessionCompleteCallback;
 
 /**
  * <p>Returns the global FFmpegSessionCompleteCallback set.
@@ -281,11 +325,14 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (FFmpegSessionCompleteCallback)getFFmpegSessionCompleteCallback;
 
 /**
- * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results for FFprobe sessions.
+ * <p>Sets a global FFprobeSessionCompleteCallback to receive execution results
+ * for FFprobe sessions.
  *
- * @param ffprobeSessionCompleteCallback complete callback or nil to disable a previously defined callback
+ * @param ffprobeSessionCompleteCallback complete callback or nil to disable a
+ * previously defined callback
  */
-+ (void)enableFFprobeSessionCompleteCallback:(FFprobeSessionCompleteCallback)ffprobeSessionCompleteCallback;
++ (void)enableFFprobeSessionCompleteCallback:
+    (FFprobeSessionCompleteCallback)ffprobeSessionCompleteCallback;
 
 /**
  * <p>Returns the global FFprobeSessionCompleteCallback set.
@@ -295,19 +342,24 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (FFprobeSessionCompleteCallback)getFFprobeSessionCompleteCallback;
 
 /**
- * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution results for MediaInformation sessions.
+ * <p>Sets a global MediaInformationSessionCompleteCallback to receive execution
+ * results for MediaInformation sessions.
  *
- * @param mediaInformationSessionCompleteCallback complete callback or nil to disable a previously defined
- * callback
+ * @param mediaInformationSessionCompleteCallback complete callback or nil to
+ * disable a previously defined callback
  */
-+ (void)enableMediaInformationSessionCompleteCallback:(MediaInformationSessionCompleteCallback)mediaInformationSessionCompleteCallback;
++ (void)enableMediaInformationSessionCompleteCallback:
+    (MediaInformationSessionCompleteCallback)
+        mediaInformationSessionCompleteCallback;
 
 /**
  * <p>Returns the global MediaInformationSessionCompleteCallback set.
  *
- * @return global MediaInformationSessionCompleteCallback or nil if it is not set
+ * @return global MediaInformationSessionCompleteCallback or nil if it is not
+ * set
  */
-+ (MediaInformationSessionCompleteCallback)getMediaInformationSessionCompleteCallback;
++ (MediaInformationSessionCompleteCallback)
+    getMediaInformationSessionCompleteCallback;
 
 /**
  * Returns the current log level.
@@ -329,7 +381,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @param level value
  * @return string value
  */
-+ (NSString*)logLevelToString:(int)level;
++ (NSString *)logLevelToString:(int)level;
 
 /**
  * Returns the session history size.
@@ -346,10 +398,12 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (void)setSessionHistorySize:(int)sessionHistorySize;
 
 /**
- * Returns the session specified with <code>sessionId</code> from the session history.
+ * Returns the session specified with <code>sessionId</code> from the session
+ * history.
  *
  * @param sessionId session identifier
- * @return session specified with sessionId or nil if it is not found in the history
+ * @return session specified with sessionId or nil if it is not found in the
+ * history
  */
 + (id<Session>)getSession:(long)sessionId;
 
@@ -363,8 +417,8 @@ typedef NS_ENUM(NSUInteger, Signal) {
 /**
  * Returns the last session completed from the session history.
  *
- * @return the last session completed. If there are no completed sessions in the history this
- * method will return nil
+ * @return the last session completed. If there are no completed sessions in the
+ * history this method will return nil
  */
 + (id<Session>)getLastCompletedSession;
 
@@ -373,7 +427,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @return all sessions in the session history
  */
-+ (NSArray*)getSessions;
++ (NSArray *)getSessions;
 
 /**
  * <p>Clears all, including ongoing, sessions in the session history.
@@ -386,28 +440,28 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @return all FFmpeg sessions in the session history
  */
-+ (NSArray*)getFFmpegSessions;
++ (NSArray *)getFFmpegSessions;
 
 /**
  * <p>Returns all FFprobe sessions in the session history.
  *
  * @return all FFprobe sessions in the session history
  */
-+ (NSArray*)getFFprobeSessions;
++ (NSArray *)getFFprobeSessions;
 
 /**
  * <p>Returns all MediaInformation sessions in the session history.
  *
  * @return all MediaInformation sessions in the session history
  */
-+ (NSArray*)getMediaInformationSessions;
++ (NSArray *)getMediaInformationSessions;
 
 /**
  * <p>Returns sessions that have the given state.
  *
  * @return sessions that have the given state from the session history
  */
-+ (NSArray*)getSessionsByState:(SessionState)state;
++ (NSArray *)getSessionsByState:(SessionState)state;
 
 /**
  * Returns the active log redirection strategy.
@@ -421,14 +475,16 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @param logRedirectionStrategy log redirection strategy
  */
-+ (void)setLogRedirectionStrategy:(LogRedirectionStrategy)logRedirectionStrategy;
++ (void)setLogRedirectionStrategy:
+    (LogRedirectionStrategy)logRedirectionStrategy;
 
 /**
- * <p>Returns the number of async messages that are not transmitted to the callbacks for
- * this session.
+ * <p>Returns the number of async messages that are not transmitted to the
+ * callbacks for this session.
  *
  * @param sessionId id of the session
- * @return number of async messages that are not transmitted to the callbacks for this session
+ * @return number of async messages that are not transmitted to the callbacks
+ * for this session
  */
 + (int)messagesInTransmit:(long)sessionId;
 
@@ -438,24 +494,25 @@ typedef NS_ENUM(NSUInteger, Signal) {
  * @param state session state
  * @return string value
  */
-+ (NSString*)sessionStateToString:(SessionState)state;
++ (NSString *)sessionStateToString:(SessionState)state;
 
 /**
- * <p>Parses the given command into arguments. Uses space character to split the arguments.
- * Supports single and double quote characters.
+ * <p>Parses the given command into arguments. Uses space character to split the
+ * arguments. Supports single and double quote characters.
  *
  * @param command string command
  * @return array of arguments
  */
-+ (NSArray*)parseArguments:(NSString*)command;
++ (NSArray *)parseArguments:(NSString *)command;
 
 /**
- * <p>Concatenates arguments into a string adding a space character between two arguments.
+ * <p>Concatenates arguments into a string adding a space character between two
+ * arguments.
  *
  * @param arguments arguments
  * @return concatenated string containing all arguments
  */
-+ (NSString*)argumentsToString:(NSArray*)arguments;
++ (NSString *)argumentsToString:(NSArray *)arguments;
 
 @end
 

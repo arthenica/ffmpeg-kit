@@ -17,8 +17,9 @@
  */
 
 /*
- * This file is the modified version of fopen_utf8.h file living in ffmpeg source code under the fftools folder. We
- * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
+ * This file is the modified version of fopen_utf8.h file living in ffmpeg
+ * source code under the fftools folder. We manually update it each time we
+ * depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop the ffmpeg-kit library.
  *
  * ffmpeg-kit changes by Taner Sener
@@ -37,13 +38,13 @@
 #ifdef _WIN32
 #include "libavutil/wchar_filename.h"
 
-static inline FILE *fopen_utf8(const char *path_utf8, const char *mode)
-{
+static inline FILE *fopen_utf8(const char *path_utf8, const char *mode) {
     wchar_t *path_w, *mode_w;
     FILE *f;
 
     /* convert UTF-8 to wide chars */
-    if (get_extended_win32_path(path_utf8, &path_w)) /* This sets errno on error. */
+    if (get_extended_win32_path(path_utf8,
+                                &path_w)) /* This sets errno on error. */
         return NULL;
     if (!path_w)
         goto fallback;
@@ -70,8 +71,7 @@ fallback:
 
 #else
 
-static inline FILE *fopen_utf8(const char *path, const char *mode)
-{
+static inline FILE *fopen_utf8(const char *path, const char *mode) {
     return fopen(path, mode);
 }
 #endif

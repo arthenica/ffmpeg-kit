@@ -1,5 +1,6 @@
 /autom4te.cache/
 /Makefile
+/Makefile.in
 /config.status
 /configure.tmp
 /configure~
@@ -14,4 +15,11 @@
 /configure
 /libtool
 /ltmain.sh
-/Makefile.in
+/aclocal.m4
+/ar-lib
+/compile
+/config.guess
+/config.sub
+/depcomp
+/install-sh
+/missing

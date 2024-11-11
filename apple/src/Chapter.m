@@ -19,13 +19,13 @@
 
 #import "Chapter.h"
 
-NSString* const ChapterKeyId = @"id";
-NSString* const ChapterKeyTimeBase = @"time_base";
-NSString* const ChapterKeyStart = @"start";
-NSString* const ChapterKeyStartTime = @"start_time";
-NSString* const ChapterKeyEnd = @"end";
-NSString* const ChapterKeyEndTime = @"end_time";
-NSString* const ChapterKeyTags = @"tags";
+NSString *const ChapterKeyId = @"id";
+NSString *const ChapterKeyTimeBase = @"time_base";
+NSString *const ChapterKeyStart = @"start";
+NSString *const ChapterKeyStartTime = @"start_time";
+NSString *const ChapterKeyEnd = @"end";
+NSString *const ChapterKeyEndTime = @"end_time";
+NSString *const ChapterKeyTags = @"tags";
 
 @implementation Chapter {
 
@@ -33,10 +33,9 @@ NSString* const ChapterKeyTags = @"tags";
      * Stores all properties.
      */
     NSDictionary *dictionary;
-
 }
 
-- (instancetype)init:(NSDictionary*)chapterDictionary {
+- (instancetype)init:(NSDictionary *)chapterDictionary {
     self = [super init];
     if (self) {
         dictionary = chapterDictionary;
@@ -45,36 +44,36 @@ NSString* const ChapterKeyTags = @"tags";
     return self;
 }
 
-- (NSNumber*)getId {
+- (NSNumber *)getId {
     return [self getNumberProperty:ChapterKeyId];
 }
 
-- (NSString*)getTimeBase {
+- (NSString *)getTimeBase {
     return [self getStringProperty:ChapterKeyTimeBase];
 }
 
-- (NSNumber*)getStart {
+- (NSNumber *)getStart {
     return [self getNumberProperty:ChapterKeyStart];
 }
 
-- (NSString*)getStartTime {
+- (NSString *)getStartTime {
     return [self getStringProperty:ChapterKeyStartTime];
 }
 
-- (NSNumber*)getEnd {
+- (NSNumber *)getEnd {
     return [self getNumberProperty:ChapterKeyEnd];
 }
 
-- (NSString*)getEndTime {
+- (NSString *)getEndTime {
     return [self getStringProperty:ChapterKeyEndTime];
 }
 
-- (NSDictionary*)getTags {
+- (NSDictionary *)getTags {
     return [self getProperty:ChapterKeyTags];
 }
 
-- (NSString*)getStringProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (NSString *)getStringProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -82,8 +81,8 @@ NSString* const ChapterKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (NSNumber*)getNumberProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (NSNumber *)getNumberProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -91,8 +90,8 @@ NSString* const ChapterKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (id)getProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (id)getProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -100,7 +99,7 @@ NSString* const ChapterKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (NSDictionary*)getAllProperties {
+- (NSDictionary *)getAllProperties {
     return dictionary;
 }
 

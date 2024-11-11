@@ -22,12 +22,12 @@
 
 namespace ffmpegkit {
 
-    enum SessionState {
-        SessionStateCreated = 0,
-        SessionStateRunning = 1,
-        SessionStateFailed = 2,
-        SessionStateCompleted = 3
-    };
+enum SessionState {
+    SessionStateCreated = 0,
+    SessionStateRunning = 1,
+    SessionStateFailed = 2,
+    SessionStateCompleted = 3
+};
 
 }
 

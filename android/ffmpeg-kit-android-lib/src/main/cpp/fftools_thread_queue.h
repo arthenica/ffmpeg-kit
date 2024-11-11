@@ -18,8 +18,9 @@
  */
 
 /*
- * This file is the modified version of thread_queue.h file living in ffmpeg source code under the fftools folder. We
- * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
+ * This file is the modified version of thread_queue.h file living in ffmpeg
+ * source code under the fftools folder. We manually update it each time we
+ * depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop ffmpeg-kit library.
  *
  * ffmpeg-kit changes by ARTHENICA LTD
@@ -50,8 +51,9 @@ typedef struct ThreadQueue ThreadQueue;
  * @param callback that moves the contents between two data pointers
  */
 ThreadQueue *tq_alloc(unsigned int nb_streams, size_t queue_size,
-                      ObjPool *obj_pool, void (*obj_move)(void *dst, void *src));
-void         tq_free(ThreadQueue **tq);
+                      ObjPool *obj_pool,
+                      void (*obj_move)(void *dst, void *src));
+void tq_free(ThreadQueue **tq);
 
 /**
  * Send an item for the given stream to the queue.

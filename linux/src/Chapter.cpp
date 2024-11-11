@@ -19,8 +19,8 @@
 
 #include "Chapter.h"
 
-ffmpegkit::Chapter::Chapter(std::shared_ptr<rapidjson::Value> chapterValue) : _chapterValue{chapterValue} {
-}
+ffmpegkit::Chapter::Chapter(std::shared_ptr<rapidjson::Value> chapterValue)
+    : _chapterValue{chapterValue} {}
 
 std::shared_ptr<int64_t> ffmpegkit::Chapter::getId() {
     return getNumberProperty(KeyId);
@@ -50,7 +50,8 @@ std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getTags() {
     return getProperty(KeyTags);
 }
 
-std::shared_ptr<std::string> ffmpegkit::Chapter::getStringProperty(const char* key) {
+std::shared_ptr<std::string>
+ffmpegkit::Chapter::getStringProperty(const char *key) {
     if (_chapterValue->HasMember(key)) {
         return std::make_shared<std::string>((*_chapterValue)[key].GetString());
     } else {
@@ -58,7 +59,8 @@ std::shared_ptr<std::string> ffmpegkit::Chapter::getStringProperty(const char* k
     }
 }
 
-std::shared_ptr<int64_t> ffmpegkit::Chapter::getNumberProperty(const char* key) {
+std::shared_ptr<int64_t>
+ffmpegkit::Chapter::getNumberProperty(const char *key) {
     if (_chapterValue->HasMember(key)) {
         return std::make_shared<int64_t>((*_chapterValue)[key].GetInt64());
     } else {
@@ -66,7 +68,8 @@ std::shared_ptr<int64_t> ffmpegkit::Chapter::getNumberProperty(const char* key) 
     }
 }
 
-std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getProperty(const char* key) {
+std::shared_ptr<rapidjson::Value>
+ffmpegkit::Chapter::getProperty(const char *key) {
     if (_chapterValue->HasMember(key)) {
         auto value = std::make_shared<rapidjson::Value>();
         *value = (*_chapterValue)[key];
@@ -79,7 +82,7 @@ std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getProperty(const char* ke
 std::shared_ptr<rapidjson::Value> ffmpegkit::Chapter::getAllProperties() {
     if (_chapterValue != nullptr) {
         auto all = std::make_shared<rapidjson::Value>();
-        *all =  (*_chapterValue);
+        *all = (*_chapterValue);
         return all;
     } else {
         return nullptr;

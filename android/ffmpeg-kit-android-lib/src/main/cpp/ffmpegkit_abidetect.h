@@ -20,8 +20,8 @@
 #ifndef FFMPEG_KIT_ABIDETECT_H
 #define FFMPEG_KIT_ABIDETECT_H
 
-#include <jni.h>
 #include "ffmpegkit.h"
+#include <jni.h>
 
 /** Represents armeabi-v7a ABI with NEON support. */
 #define ABI_ARMV7A_NEON "armeabi-v7a-neon"
@@ -49,27 +49,31 @@
  * Method:    getNativeAbi
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_AbiDetect_getNativeAbi(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_AbiDetect_getNativeAbi(JNIEnv *, jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_AbiDetect
  * Method:    getNativeCpuAbi
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_AbiDetect_getNativeCpuAbi(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_AbiDetect_getNativeCpuAbi(JNIEnv *, jclass);
 
 /**
  * Class:     com_arthenica_ffmpegkit_AbiDetect
  * Method:    isNativeLTSBuild
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_com_arthenica_ffmpegkit_AbiDetect_isNativeLTSBuild(JNIEnv *, jclass);
+JNIEXPORT jboolean JNICALL
+Java_com_arthenica_ffmpegkit_AbiDetect_isNativeLTSBuild(JNIEnv *, jclass);
 
 /*
  * Class:     com_arthenica_ffmpegkit_AbiDetect
  * Method:    getNativeBuildConf
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_AbiDetect_getNativeBuildConf(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_AbiDetect_getNativeBuildConf(JNIEnv *, jclass);
 
 #endif /* FFMPEG_KIT_ABIDETECT_H */

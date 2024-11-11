@@ -32,14 +32,14 @@
  *
  * @return predicted FFmpegKit binary package name
  */
-+ (NSString*)getPackageName;
++ (NSString *)getPackageName;
 
 /**
  * Returns enabled external libraries by FFmpeg.
  *
  * @return enabled external libraries
  */
-+ (NSArray*)getExternalLibraries;
++ (NSArray *)getExternalLibraries;
 
 @end
 

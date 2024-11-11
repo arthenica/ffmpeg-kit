@@ -19,46 +19,61 @@
 
 #import "MediaInformationJsonParser.h"
 
-NSString* const MediaInformationJsonParserKeyStreams =  @"streams";
-NSString* const MediaInformationJsonParserKeyChapters = @"chapters";
+NSString *const MediaInformationJsonParserKeyStreams = @"streams";
+NSString *const MediaInformationJsonParserKeyChapters = @"chapters";
 
 @implementation MediaInformationJsonParser
 
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput {
++ (MediaInformation *)from:(NSString *)ffprobeJsonOutput {
     @try {
         return [self fromWithError:ffprobeJsonOutput];
     } @catch (NSException *exception) {
-        NSLog(@"MediaInformation parsing failed: %@.\n", [NSString stringWithFormat:@"%@\n%@", [exception userInfo], [exception callStackSymbols]]);
+        NSLog(@"MediaInformation parsing failed: %@.\n",
+              [NSString stringWithFormat:@"%@\n%@", [exception userInfo],
+                                         [exception callStackSymbols]]);
         return nil;
     }
 }
 
-+ (MediaInformation*)fromWithError:(NSString*)ffprobeJsonOutput {
-    NSError* error = nil;
-    NSData *jsonData = [ffprobeJsonOutput dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
++ (MediaInformation *)fromWithError:(NSString *)ffprobeJsonOutput {
+    NSError *error = nil;
+    NSData *jsonData =
+        [ffprobeJsonOutput dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *jsonDictionary =
+        [NSJSONSerialization JSONObjectWithData:jsonData
+                                        options:kNilOptions
+                                          error:&error];
     if (error != nil) {
-        @throw [NSException exceptionWithName:@"ParsingException" reason:[NSString stringWithFormat:@"%ld",(long)[error code]] userInfo:[error userInfo]];
+        @throw [NSException
+            exceptionWithName:@"ParsingException"
+                       reason:[NSString
+                                  stringWithFormat:@"%ld", (long)[error code]]
+                     userInfo:[error userInfo]];
     }
     if (jsonDictionary == nil) {
         return nil;
     }
 
-    NSArray* jsonStreamArray = [jsonDictionary objectForKey:MediaInformationJsonParserKeyStreams];
+    NSArray *jsonStreamArray =
+        [jsonDictionary objectForKey:MediaInformationJsonParserKeyStreams];
     NSMutableArray *streamArray = [[NSMutableArray alloc] init];
-    for(int i = 0; i<jsonStreamArray.count; i++) {
+    for (int i = 0; i < jsonStreamArray.count; i++) {
         NSDictionary *streamDictionary = [jsonStreamArray objectAtIndex:i];
-        [streamArray addObject:[[StreamInformation alloc] init:streamDictionary]];
+        [streamArray
+            addObject:[[StreamInformation alloc] init:streamDictionary]];
     }
 
-    NSArray* jsonChapterArray = [jsonDictionary objectForKey:MediaInformationJsonParserKeyChapters];
+    NSArray *jsonChapterArray =
+        [jsonDictionary objectForKey:MediaInformationJsonParserKeyChapters];
     NSMutableArray *chapterArray = [[NSMutableArray alloc] init];
-    for(int i = 0; i<jsonChapterArray.count; i++) {
+    for (int i = 0; i < jsonChapterArray.count; i++) {
         NSDictionary *chapterDictionary = [jsonChapterArray objectAtIndex:i];
         [chapterArray addObject:[[Chapter alloc] init:chapterDictionary]];
     }
 
-    return [[MediaInformation alloc] init:jsonDictionary withStreams:streamArray withChapters:chapterArray];
+    return [[MediaInformation alloc] init:jsonDictionary
+                              withStreams:streamArray
+                             withChapters:chapterArray];
 }
 
 @end

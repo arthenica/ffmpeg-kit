@@ -23,18 +23,14 @@
 @class MediaInformationSession;
 
 /**
- * <p>Callback function that is invoked when an asynchronous <code>MediaInformation</code> session
- * has ended.
- * <p>Session has either SessionStateCompleted or SessionStateFailed state when
- * the callback is invoked.
- * <p>If it has SessionStateCompleted state, <code>ReturnCode</code> should be checked to
- * see the execution result.
- * <p>If <code>getState</code> returns SessionStateFailed then
- * <code>getFailStackTrace</code> should be used to get the failure reason.
- * <pre>
- *  switch ([session getState]) {
- *      case SessionStateCompleted:
- *          ReturnCode *returnCode = [session getReturnCode];
+ * <p>Callback function that is invoked when an asynchronous
+ * <code>MediaInformation</code> session has ended. <p>Session has either
+ * SessionStateCompleted or SessionStateFailed state when the callback is
+ * invoked. <p>If it has SessionStateCompleted state, <code>ReturnCode</code>
+ * should be checked to see the execution result. <p>If <code>getState</code>
+ * returns SessionStateFailed then <code>getFailStackTrace</code> should be used
+ * to get the failure reason. <pre> switch ([session getState]) { case
+ * SessionStateCompleted: ReturnCode *returnCode = [session getReturnCode];
  *          break;
  *      case SessionStateFailed:
  *          NSString *failStackTrace = [session getFailStackTrace];
@@ -44,7 +40,8 @@
  *
  * @param session session of the completed execution
  */
-typedef void (^MediaInformationSessionCompleteCallback)(MediaInformationSession* session);
+typedef void (^MediaInformationSessionCompleteCallback)(
+    MediaInformationSession *session);
 
 #import "MediaInformationSession.h"
 

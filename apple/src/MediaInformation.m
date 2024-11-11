@@ -19,15 +19,15 @@
 
 #import "MediaInformation.h"
 
-NSString* const MediaKeyFormatProperties =  @"format";
-NSString* const MediaKeyFilename = @"filename";
-NSString* const MediaKeyFormat = @"format_name";
-NSString* const MediaKeyFormatLong = @"format_long_name";
-NSString* const MediaKeyStartTime = @"start_time";
-NSString* const MediaKeyDuration = @"duration";
-NSString* const MediaKeySize = @"size";
-NSString* const MediaKeyBitRate = @"bit_rate";
-NSString* const MediaKeyTags = @"tags";
+NSString *const MediaKeyFormatProperties = @"format";
+NSString *const MediaKeyFilename = @"filename";
+NSString *const MediaKeyFormat = @"format_name";
+NSString *const MediaKeyFormatLong = @"format_long_name";
+NSString *const MediaKeyStartTime = @"start_time";
+NSString *const MediaKeyDuration = @"duration";
+NSString *const MediaKeySize = @"size";
+NSString *const MediaKeyBitRate = @"bit_rate";
+NSString *const MediaKeyTags = @"tags";
 
 @implementation MediaInformation {
 
@@ -45,10 +45,11 @@ NSString* const MediaKeyTags = @"tags";
      * Stores chapters.
      */
     NSArray *chapterArray;
-
 }
 
-- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams withChapters:(NSArray*)chapters{
+- (instancetype)init:(NSDictionary *)mediaDictionary
+         withStreams:(NSArray *)streams
+        withChapters:(NSArray *)chapters {
     self = [super init];
     if (self) {
         dictionary = mediaDictionary;
@@ -59,48 +60,48 @@ NSString* const MediaKeyTags = @"tags";
     return self;
 }
 
-- (NSString*)getFilename {
+- (NSString *)getFilename {
     return [self getStringFormatProperty:MediaKeyFilename];
 }
 
-- (NSString*)getFormat {
+- (NSString *)getFormat {
     return [self getStringFormatProperty:MediaKeyFormat];
 }
 
-- (NSString*)getLongFormat {
+- (NSString *)getLongFormat {
     return [self getStringFormatProperty:MediaKeyFormatLong];
 }
 
-- (NSString*)getStartTime {
+- (NSString *)getStartTime {
     return [self getStringFormatProperty:MediaKeyStartTime];
 }
 
-- (NSString*)getDuration {
+- (NSString *)getDuration {
     return [self getStringFormatProperty:MediaKeyDuration];
 }
 
-- (NSString*)getSize {
+- (NSString *)getSize {
     return [self getStringFormatProperty:MediaKeySize];
 }
 
-- (NSString*)getBitrate {
+- (NSString *)getBitrate {
     return [self getStringFormatProperty:MediaKeyBitRate];
 }
 
-- (NSDictionary*)getTags {
+- (NSDictionary *)getTags {
     return [self getFormatProperty:MediaKeyTags];
 }
 
-- (NSArray*)getStreams {
+- (NSArray *)getStreams {
     return streamArray;
 }
 
-- (NSArray*)getChapters {
+- (NSArray *)getChapters {
     return chapterArray;
 }
 
-- (NSString*)getStringProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (NSString *)getStringProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -108,8 +109,8 @@ NSString* const MediaKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (NSNumber*)getNumberProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (NSNumber *)getNumberProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -117,8 +118,8 @@ NSString* const MediaKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (id)getProperty:(NSString*)key {
-    NSDictionary* allProperties = [self getAllProperties];
+- (id)getProperty:(NSString *)key {
+    NSDictionary *allProperties = [self getAllProperties];
     if (allProperties == nil) {
         return nil;
     }
@@ -126,8 +127,8 @@ NSString* const MediaKeyTags = @"tags";
     return allProperties[key];
 }
 
-- (NSString*)getStringFormatProperty:(NSString*)key {
-    NSDictionary* formatProperties = [self getFormatProperties];
+- (NSString *)getStringFormatProperty:(NSString *)key {
+    NSDictionary *formatProperties = [self getFormatProperties];
     if (formatProperties == nil) {
         return nil;
     }
@@ -135,8 +136,8 @@ NSString* const MediaKeyTags = @"tags";
     return formatProperties[key];
 }
 
-- (NSNumber*)getNumberFormatProperty:(NSString*)key {
-    NSDictionary* formatProperties = [self getFormatProperties];
+- (NSNumber *)getNumberFormatProperty:(NSString *)key {
+    NSDictionary *formatProperties = [self getFormatProperties];
     if (formatProperties == nil) {
         return nil;
     }
@@ -144,8 +145,8 @@ NSString* const MediaKeyTags = @"tags";
     return formatProperties[key];
 }
 
-- (id)getFormatProperty:(NSString*)key {
-    NSDictionary* formatProperties = [self getFormatProperties];
+- (id)getFormatProperty:(NSString *)key {
+    NSDictionary *formatProperties = [self getFormatProperties];
     if (formatProperties == nil) {
         return nil;
     }
@@ -153,11 +154,11 @@ NSString* const MediaKeyTags = @"tags";
     return formatProperties[key];
 }
 
-- (NSDictionary*)getFormatProperties {
+- (NSDictionary *)getFormatProperties {
     return dictionary[MediaKeyFormatProperties];
 }
 
-- (NSDictionary*)getAllProperties {
+- (NSDictionary *)getAllProperties {
     return dictionary;
 }
 

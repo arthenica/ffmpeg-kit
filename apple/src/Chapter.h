@@ -22,62 +22,63 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString* const ChapterKeyId;
-extern NSString* const ChapterKeyTimeBase;
-extern NSString* const ChapterKeyStart;
-extern NSString* const ChapterKeyStartTime;
-extern NSString* const ChapterKeyEnd;
-extern NSString* const ChapterKeyEndTime;
-extern NSString* const ChapterKeyTags;
+extern NSString *const ChapterKeyId;
+extern NSString *const ChapterKeyTimeBase;
+extern NSString *const ChapterKeyStart;
+extern NSString *const ChapterKeyStartTime;
+extern NSString *const ChapterKeyEnd;
+extern NSString *const ChapterKeyEndTime;
+extern NSString *const ChapterKeyTags;
 
 /**
  * Chapter class.
  */
 @interface Chapter : NSObject
 
-- (instancetype)init:(NSDictionary*)chapterDictionary;
+- (instancetype)init:(NSDictionary *)chapterDictionary;
 
-- (NSNumber*)getId;
+- (NSNumber *)getId;
 
-- (NSString*)getTimeBase;
+- (NSString *)getTimeBase;
 
-- (NSNumber*)getStart;
+- (NSNumber *)getStart;
 
-- (NSString*)getStartTime;
+- (NSString *)getStartTime;
 
-- (NSNumber*)getEnd;
+- (NSNumber *)getEnd;
 
-- (NSString*)getEndTime;
+- (NSString *)getEndTime;
 
-- (NSDictionary*)getTags;
+- (NSDictionary *)getTags;
 
 /**
  * Returns the chapter property associated with the key.
  *
  * @return chapter property as string or nil if the key is not found
  */
-- (NSString*)getStringProperty:(NSString*)key;
+- (NSString *)getStringProperty:(NSString *)key;
 
 /**
  * Returns the chapter property associated with the key.
  *
  * @return chapter property as number or nil if the key is not found
  */
-- (NSNumber*)getNumberProperty:(NSString*)key;
+- (NSNumber *)getNumberProperty:(NSString *)key;
 
 /**
  * Returns the chapter property associated with the key.
  *
  * @return chapter property as id or nil if the key is not found
-*/
-- (id)getProperty:(NSString*)key;
+ */
+- (id)getProperty:(NSString *)key;
 
 /**
  * Returns all chapter properties defined.
  *
- * @return all chapter properties in a dictionary or nil if no properties are defined
-*/
-- (NSDictionary*)getAllProperties;
+ * @return all chapter properties in a dictionary or nil if no properties are
+ * defined
+ */
+- (NSDictionary *)getAllProperties;
 
 @end
 

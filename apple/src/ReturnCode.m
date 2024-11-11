@@ -32,11 +32,11 @@
     return self;
 }
 
-+ (BOOL)isSuccess:(ReturnCode*)value {
++ (BOOL)isSuccess:(ReturnCode *)value {
     return (value != nil) && ([value getValue] == ReturnCodeSuccess);
 }
 
-+ (BOOL)isCancel:(ReturnCode*)value {
++ (BOOL)isCancel:(ReturnCode *)value {
     return (value != nil) && ([value getValue] == ReturnCodeCancel);
 }
 
@@ -56,8 +56,8 @@
     return (_value == ReturnCodeCancel);
 }
 
-- (NSString*)description {
-   return [NSString stringWithFormat:@"%d", _value];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%d", _value];
 }
 
 @end

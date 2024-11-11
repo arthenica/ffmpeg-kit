@@ -20,37 +20,37 @@
 
 #include <pthread.h>
 #include <stdatomic.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include "config.h"
+#include "ffmpegkit.h"
+#include "ffprobekit.h"
+#include "fftools_ffmpeg.h"
 #include "libavcodec/jni.h"
 #include "libavutil/bprint.h"
 #include "libavutil/file.h"
-#include "fftools_ffmpeg.h"
-#include "ffmpegkit.h"
-#include "ffprobekit.h"
 
-# define LogType 1
-# define StatisticsType 2
+#define LogType 1
+#define StatisticsType 2
 
 /** Callback data structure */
 struct CallbackData {
-  int type;                 // 1 (log callback) or 2 (statistics callback)
-  long sessionId;           // session identifier
+    int type;       // 1 (log callback) or 2 (statistics callback)
+    long sessionId; // session identifier
 
-  int logLevel;             // log level
-  AVBPrint logData;         // log data
+    int logLevel;     // log level
+    AVBPrint logData; // log data
 
-  int statisticsFrameNumber;        // statistics frame number
-  float statisticsFps;              // statistics fps
-  float statisticsQuality;          // statistics quality
-  int64_t statisticsSize;           // statistics size
-  double statisticsTime;            // statistics time
-  double statisticsBitrate;         // statistics bitrate
-  double statisticsSpeed;           // statistics speed
+    int statisticsFrameNumber; // statistics frame number
+    float statisticsFps;       // statistics fps
+    float statisticsQuality;   // statistics quality
+    int64_t statisticsSize;    // statistics size
+    double statisticsTime;     // statistics time
+    double statisticsBitrate;  // statistics bitrate
+    double statisticsSpeed;    // statistics speed
 
-  struct CallbackData *next;
+    struct CallbackData *next;
 };
 
 /** Session control variables */
@@ -114,22 +114,41 @@ int configuredLogLevel = AV_LOG_INFO;
 
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
-    {"enableNativeRedirection", "()V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection},
-    {"disableNativeRedirection", "()V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection},
-    {"setNativeLogLevel", "(I)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel},
-    {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel},
-    {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion},
-    {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion},
-    {"getNativePackageName", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName},
-    {"nativeFFmpegExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute},
-    {"nativeFFmpegCancel", "(J)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel},
-    {"nativeFFprobeExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute},
-    {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe},
-    {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate},
-    {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable},
-    {"ignoreNativeSignal", "(I)V", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal},
-    {"messagesInTransmit", "(J)I", (void*) Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit}
-};
+    {"enableNativeRedirection", "()V",
+     (void *)
+         Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection},
+    {"disableNativeRedirection", "()V",
+     (void *)
+         Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection},
+    {"setNativeLogLevel", "(I)V",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel},
+    {"getNativeLogLevel", "()I",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel},
+    {"getNativeFFmpegVersion", "()Ljava/lang/String;",
+     (void *)
+         Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion},
+    {"getNativeVersion", "()Ljava/lang/String;",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion},
+    {"getNativePackageName", "()Ljava/lang/String;",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName},
+    {"nativeFFmpegExecute", "(J[Ljava/lang/String;)I",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute},
+    {"nativeFFmpegCancel", "(J)V",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel},
+    {"nativeFFprobeExecute", "(J[Ljava/lang/String;)I",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFprobeExecute},
+    {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I",
+     (void *)
+         Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe},
+    {"getNativeBuildDate", "()Ljava/lang/String;",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate},
+    {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I",
+     (void *)
+         Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable},
+    {"ignoreNativeSignal", "(I)V",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal},
+    {"messagesInTransmit", "(J)I",
+     (void *)Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit}};
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
 int ffmpeg_execute(int argc, char **argv);
@@ -159,42 +178,45 @@ static const char *avutil_log_get_level_str(int level) {
     }
 }
 
-static void avutil_log_format_line(void *avcl, int level, const char *fmt, va_list vl, AVBPrint part[4], int *print_prefix) {
+static void avutil_log_format_line(void *avcl, int level, const char *fmt,
+                                   va_list vl, AVBPrint part[4],
+                                   int *print_prefix) {
     int flags = av_log_get_flags();
-    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
-    av_bprint_init(part+0, 0, 1);
-    av_bprint_init(part+1, 0, 1);
-    av_bprint_init(part+2, 0, 1);
-    av_bprint_init(part+3, 0, 65536);
+    AVClass *avc = avcl ? *(AVClass **)avcl : NULL;
+    av_bprint_init(part + 0, 0, 1);
+    av_bprint_init(part + 1, 0, 1);
+    av_bprint_init(part + 2, 0, 1);
+    av_bprint_init(part + 3, 0, 65536);
 
     if (*print_prefix && avc) {
         if (avc->parent_log_context_offset) {
-            AVClass** parent = *(AVClass ***) (((uint8_t *) avcl) +
-                                   avc->parent_log_context_offset);
+            AVClass **parent = *(AVClass ***)(((uint8_t *)avcl) +
+                                              avc->parent_log_context_offset);
             if (parent && *parent) {
-                av_bprintf(part+0, "[%s @ %p] ",
-                         (*parent)->item_name(parent), parent);
+                av_bprintf(part + 0, "[%s @ %p] ", (*parent)->item_name(parent),
+                           parent);
             }
         }
-        av_bprintf(part+1, "[%s @ %p] ",
-                 avc->item_name(avcl), avcl);
+        av_bprintf(part + 1, "[%s @ %p] ", avc->item_name(avcl), avcl);
     }
 
     if (*print_prefix && (level > AV_LOG_QUIET) && (flags & AV_LOG_PRINT_LEVEL))
-        av_bprintf(part+2, "[%s] ", avutil_log_get_level_str(level));
+        av_bprintf(part + 2, "[%s] ", avutil_log_get_level_str(level));
 
-    av_vbprintf(part+3, fmt, vl);
+    av_vbprintf(part + 3, fmt, vl);
 
-    if(*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
-        char lastc = part[3].len && part[3].len <= part[3].size ? part[3].str[part[3].len - 1] : 0;
+    if (*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
+        char lastc = part[3].len && part[3].len <= part[3].size
+                         ? part[3].str[part[3].len - 1]
+                         : 0;
         *print_prefix = lastc == '\n' || lastc == '\r';
     }
 }
 
 static void avutil_log_sanitize(uint8_t *line) {
-    while(*line){
-        if(*line < 0x08 || (*line > 0x0D && *line < 0x20))
-            *line='?';
+    while (*line) {
+        if (*line < 0x08 || (*line > 0x0D && *line < 0x20))
+            *line = '?';
         line++;
     }
 }
@@ -224,22 +246,16 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
-void mutexUnInit() {
-    pthread_mutex_destroy(&lockMutex);
-}
+void mutexUnInit() { pthread_mutex_destroy(&lockMutex); }
 
 void monitorUnInit() {
     pthread_mutex_destroy(&monitorMutex);
     pthread_cond_destroy(&monitorCondition);
 }
 
-void mutexLock() {
-    pthread_mutex_lock(&lockMutex);
-}
+void mutexLock() { pthread_mutex_lock(&lockMutex); }
 
-void mutexUnlock() {
-    pthread_mutex_unlock(&lockMutex);
-}
+void mutexUnlock() { pthread_mutex_unlock(&lockMutex); }
 
 void monitorWait(int milliSeconds) {
     struct timeval tp;
@@ -251,10 +267,10 @@ void monitorWait(int milliSeconds) {
         return;
     }
 
-    ts.tv_sec  = tp.tv_sec;
+    ts.tv_sec = tp.tv_sec;
     ts.tv_nsec = tp.tv_usec * 1000;
     ts.tv_sec += milliSeconds / 1000;
-    ts.tv_nsec += (milliSeconds % 1000)*1000000;
+    ts.tv_nsec += (milliSeconds % 1000) * 1000000;
     ts.tv_sec += ts.tv_nsec / 1000000000L;
     ts.tv_nsec = ts.tv_nsec % 1000000000L;
 
@@ -278,7 +294,8 @@ void monitorNotify() {
 void logCallbackDataAdd(int level, AVBPrint *data) {
 
     // CREATE DATA STRUCT FIRST
-    struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
+    struct CallbackData *newData =
+        (struct CallbackData *)av_malloc(sizeof(struct CallbackData));
     newData->type = LogType;
     newData->sessionId = globalSessionId;
     newData->logLevel = level;
@@ -293,7 +310,8 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
         callbackDataTail = newData;
 
         if (callbackDataHead != NULL) {
-            LOGE("Dangling callback data head detected. This can cause memory leak.");
+            LOGE("Dangling callback data head detected. This can cause memory "
+                 "leak.");
         } else {
             callbackDataHead = newData;
         }
@@ -308,16 +326,21 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
 
     monitorNotify();
 
-    atomic_fetch_add(&sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE], 1);
+    atomic_fetch_add(
+        &sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE],
+        1);
 }
 
 /**
  * Adds statistics data to the end of callback data list.
  */
-void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality,
+                               int64_t size, double time, double bitrate,
+                               double speed) {
 
     // CREATE DATA STRUCT FIRST
-    struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
+    struct CallbackData *newData =
+        (struct CallbackData *)av_malloc(sizeof(struct CallbackData));
     newData->type = StatisticsType;
     newData->sessionId = globalSessionId;
     newData->statisticsFrameNumber = frameNumber;
@@ -337,7 +360,8 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
         callbackDataTail = newData;
 
         if (callbackDataHead != NULL) {
-            LOGE("Dangling callback data head detected. This can cause memory leak.");
+            LOGE("Dangling callback data head detected. This can cause memory "
+                 "leak.");
         } else {
             callbackDataHead = newData;
         }
@@ -352,7 +376,9 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 
     monitorNotify();
 
-    atomic_fetch_add(&sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE], 1);
+    atomic_fetch_add(
+        &sessionInTransitMessageCountMap[globalSessionId % SESSION_MAP_SIZE],
+        1);
 }
 
 /**
@@ -380,7 +406,9 @@ struct CallbackData *callbackDataRemove() {
         struct CallbackData *nextHead = currentData->next;
         if (nextHead == NULL) {
             if (callbackDataHead != callbackDataTail) {
-                LOGE("Head and tail callback data pointers do not match for single callback data element. This can cause memory leak.");
+                LOGE("Head and tail callback data pointers do not match for "
+                     "single callback data element. This can cause memory "
+                     "leak.");
             } else {
                 callbackDataTail = NULL;
             }
@@ -415,7 +443,8 @@ void cancelSession(long id) {
 }
 
 /**
- * Checks whether a cancel request for the given session id exists in the session map.
+ * Checks whether a cancel request for the given session id exists in the
+ * session map.
  *
  * @param id session id
  * @return 1 if exists, false otherwise
@@ -445,7 +474,8 @@ void resetMessagesInTransmit(long id) {
  * @param format format string
  * @param vargs arguments
  */
-void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
+void ffmpegkit_log_callback_function(void *ptr, int level, const char *format,
+                                     va_list vargs) {
     AVBPrint fullLine;
     AVBPrint part[4];
     int print_prefix = 1;
@@ -456,7 +486,8 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
     int activeLogLevel = av_log_get_level();
 
     // AV_LOG_STDERR logs are always redirected
-    if ((activeLogLevel == AV_LOG_QUIET && level != AV_LOG_STDERR) || (level > activeLogLevel)) {
+    if ((activeLogLevel == AV_LOG_QUIET && level != AV_LOG_STDERR) ||
+        (level > activeLogLevel)) {
         return;
     }
 
@@ -469,16 +500,17 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
     avutil_log_sanitize(part[3].str);
 
     // COMBINE ALL 4 LOG PARTS
-    av_bprintf(&fullLine, "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+    av_bprintf(&fullLine, "%s%s%s%s", part[0].str, part[1].str, part[2].str,
+               part[3].str);
 
     if (fullLine.len > 0) {
         logCallbackDataAdd(level, &fullLine);
     }
 
     av_bprint_finalize(part, NULL);
-    av_bprint_finalize(part+1, NULL);
-    av_bprint_finalize(part+2, NULL);
-    av_bprint_finalize(part+3, NULL);
+    av_bprint_finalize(part + 1, NULL);
+    av_bprint_finalize(part + 2, NULL);
+    av_bprint_finalize(part + 3, NULL);
     av_bprint_finalize(&fullLine, NULL);
 }
 
@@ -493,8 +525,12 @@ void ffmpegkit_log_callback_function(void *ptr, int level, const char* format, v
  * @param bitrate output bit rate in kbits/s
  * @param speed processing speed = processed duration / operation duration
  */
-void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, double time, double bitrate, double speed) {
-    statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
+void ffmpegkit_statistics_callback_function(int frameNumber, float fps,
+                                            float quality, int64_t size,
+                                            double time, double bitrate,
+                                            double speed) {
+    statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate,
+                              speed);
 }
 
 /**
@@ -502,22 +538,26 @@ void ffmpegkit_statistics_callback_function(int frameNumber, float fps, float qu
  */
 void *callbackThreadFunction() {
     JNIEnv *env;
-    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    jint getEnvRc =
+        (*globalVm)->GetEnv(globalVm, (void **)&env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
-            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            LOGE("Callback thread failed to GetEnv for class %s with rc %d.\n",
+                 configClassName, getEnvRc);
             return NULL;
         }
 
         if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
-            LOGE("Callback thread failed to AttachCurrentThread for class %s.\n", configClassName);
+            LOGE(
+                "Callback thread failed to AttachCurrentThread for class %s.\n",
+                configClassName);
             return NULL;
         }
     }
 
     LOGD("Async callback block started.\n");
 
-    while(redirectionEnabled) {
+    while (redirectionEnabled) {
 
         struct CallbackData *callbackData = callbackDataRemove();
         if (callbackData != NULL) {
@@ -527,9 +567,13 @@ void *callbackThreadFunction() {
 
                 int size = callbackData->logData.len;
 
-                jbyteArray byteArray = (jbyteArray) (*env)->NewByteArray(env, size);
-                (*env)->SetByteArrayRegion(env, byteArray, 0, size, callbackData->logData.str);
-                (*env)->CallStaticVoidMethod(env, configClass, logMethod, (jlong) callbackData->sessionId, callbackData->logLevel, byteArray);
+                jbyteArray byteArray =
+                    (jbyteArray)(*env)->NewByteArray(env, size);
+                (*env)->SetByteArrayRegion(env, byteArray, 0, size,
+                                           callbackData->logData.str);
+                (*env)->CallStaticVoidMethod(env, configClass, logMethod,
+                                             (jlong)callbackData->sessionId,
+                                             callbackData->logLevel, byteArray);
                 (*env)->DeleteLocalRef(env, byteArray);
 
                 // CLEAN LOG DATA
@@ -539,15 +583,21 @@ void *callbackThreadFunction() {
 
                 // STATISTICS CALLBACK
 
-                (*env)->CallStaticVoidMethod(env, configClass, statisticsMethod,
-                    (jlong) callbackData->sessionId, callbackData->statisticsFrameNumber,
-                    callbackData->statisticsFps, callbackData->statisticsQuality,
+                (*env)->CallStaticVoidMethod(
+                    env, configClass, statisticsMethod,
+                    (jlong)callbackData->sessionId,
+                    callbackData->statisticsFrameNumber,
+                    callbackData->statisticsFps,
+                    callbackData->statisticsQuality,
                     callbackData->statisticsSize, callbackData->statisticsTime,
-                    callbackData->statisticsBitrate, callbackData->statisticsSpeed);
-
+                    callbackData->statisticsBitrate,
+                    callbackData->statisticsSpeed);
             }
 
-            atomic_fetch_sub(&sessionInTransitMessageCountMap[callbackData->sessionId % SESSION_MAP_SIZE], 1);
+            atomic_fetch_sub(
+                &sessionInTransitMessageCountMap[callbackData->sessionId %
+                                                 SESSION_MAP_SIZE],
+                1);
 
             // CLEAN STRUCT
             callbackData->next = NULL;
@@ -566,57 +616,67 @@ void *callbackThreadFunction() {
 }
 
 /**
- * Used by saf protocol; If it is called from a Java thread, we don't need attach/detach.
- * However it can be called from other threads as well (as it happens for concat demuxer),
- * in that case we perform attach & detach.
- * Returns file descriptor created for this SAF id or 0 if an error occurs.
+ * Used by saf protocol; If it is called from a Java thread, we don't need
+ * attach/detach. However it can be called from other threads as well (as it
+ * happens for concat demuxer), in that case we perform attach & detach. Returns
+ * file descriptor created for this SAF id or 0 if an error occurs.
  */
 int saf_open(int safId) {
     JNIEnv *env = NULL;
     bool attached = false;
-    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    jint getEnvRc =
+        (*globalVm)->GetEnv(globalVm, (void **)&env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
-            LOGE("saf_open failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            LOGE("saf_open failed to GetEnv for class %s with rc %d.\n",
+                 configClassName, getEnvRc);
             return 0;
         }
         if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
-            LOGE("saf_open failed to AttachCurrentThread for class %s.\n", configClassName);
+            LOGE("saf_open failed to AttachCurrentThread for class %s.\n",
+                 configClassName);
             return 0;
         } else {
-          attached = true;
+            attached = true;
         }
     }
-    int result = (*env)->CallStaticIntMethod(env, configClass, safOpenMethod, safId);
-    if (attached) (*globalVm)->DetachCurrentThread(globalVm);
+    int result =
+        (*env)->CallStaticIntMethod(env, configClass, safOpenMethod, safId);
+    if (attached)
+        (*globalVm)->DetachCurrentThread(globalVm);
     return result;
 }
 
 /**
- * Used by saf protocol; If it is called from a Java thread, we don't need attach/detach.
- * However it can be called from other threads as well (as it happens for concat demuxer),
- * in that case we perform attach & detach.
- * Returns 1 if the given file descriptor is closed successfully, 0 if an error occurs.
+ * Used by saf protocol; If it is called from a Java thread, we don't need
+ * attach/detach. However it can be called from other threads as well (as it
+ * happens for concat demuxer), in that case we perform attach & detach. Returns
+ * 1 if the given file descriptor is closed successfully, 0 if an error occurs.
  */
 int saf_close(int fd) {
     JNIEnv *env = NULL;
     bool attached = false;
-    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    jint getEnvRc =
+        (*globalVm)->GetEnv(globalVm, (void **)&env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
-            LOGE("saf_close failed to GetEnv for class %s with rc %d.\n", configClassName, getEnvRc);
+            LOGE("saf_close failed to GetEnv for class %s with rc %d.\n",
+                 configClassName, getEnvRc);
             return 0;
         }
 
         if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
-            LOGE("saf_close failed to AttachCurrentThread for class %s.\n", configClassName);
+            LOGE("saf_close failed to AttachCurrentThread for class %s.\n",
+                 configClassName);
             return 0;
         } else {
-          attached = true;
+            attached = true;
         }
     }
-    int result = (*env)->CallStaticIntMethod(env, configClass, safCloseMethod, fd);
-    if (attached) (*globalVm)->DetachCurrentThread(globalVm);
+    int result =
+        (*env)->CallStaticIntMethod(env, configClass, safCloseMethod, fd);
+    if (attached)
+        (*globalVm)->DetachCurrentThread(globalVm);
     return result;
 }
 
@@ -653,7 +713,7 @@ static void enableNativeRedirection() {
  */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
-    if ((*vm)->GetEnv(vm, (void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
+    if ((*vm)->GetEnv(vm, (void **)(&env), JNI_VERSION_1_6) != JNI_OK) {
         LOGE("OnLoad failed to GetEnv for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -665,7 +725,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 15) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
+        LOGE("OnLoad failed to RegisterNatives for class %s.\n",
+             configClassName);
         return JNI_FALSE;
     }
 
@@ -677,31 +738,37 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     (*env)->GetJavaVM(env, &globalVm);
 
-    logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(JI[B)V");
+    logMethod =
+        (*env)->GetStaticMethodID(env, localConfigClass, "log", "(JI[B)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "log");
         return JNI_FALSE;
     }
 
-    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJDDD)V");
+    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass,
+                                                 "statistics", "(JIFFJDDD)V");
     if (statisticsMethod == NULL) {
-        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n",
+             "statistics");
         return JNI_FALSE;
     }
 
-    safOpenMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safOpen", "(I)I");
+    safOpenMethod =
+        (*env)->GetStaticMethodID(env, localConfigClass, "safOpen", "(I)I");
     if (safOpenMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safOpen");
         return JNI_FALSE;
     }
 
-    safCloseMethod = (*env)->GetStaticMethodID(env, localConfigClass, "safClose", "(I)I");
+    safCloseMethod =
+        (*env)->GetStaticMethodID(env, localConfigClass, "safClose", "(I)I");
     if (safCloseMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "safClose");
         return JNI_FALSE;
     }
 
-    stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
+    stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>",
+                                            "([BLjava/lang/String;)V");
     if (stringConstructor == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
         return JNI_FALSE;
@@ -709,13 +776,13 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     av_jni_set_java_vm(vm, NULL);
 
-    configClass = (jclass) ((*env)->NewGlobalRef(env, localConfigClass));
-    stringClass = (jclass) ((*env)->NewGlobalRef(env, localStringClass));
+    configClass = (jclass)((*env)->NewGlobalRef(env, localConfigClass));
+    stringClass = (jclass)((*env)->NewGlobalRef(env, localStringClass));
 
     callbackDataHead = NULL;
     callbackDataTail = NULL;
-    
-    for(int i = 0; i<SESSION_MAP_SIZE; i++) {
+
+    for (int i = 0; i < SESSION_MAP_SIZE; i++) {
         atomic_init(&sessionMap[i], 0);
         atomic_init(&sessionInTransitMessageCountMap[i], 0);
     }
@@ -742,7 +809,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
  * @param object reference to the class on which this method is invoked
  * @param level log level
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel(JNIEnv *env, jclass object, jint level) {
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLogLevel(JNIEnv *env,
+                                                               jclass object,
+                                                               jint level) {
     configuredLogLevel = level;
 }
 
@@ -752,7 +822,9 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeLog
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel(JNIEnv *env, jclass object) {
+JNIEXPORT jint JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLogLevel(JNIEnv *env,
+                                                               jclass object) {
     return configuredLogLevel;
 }
 
@@ -762,7 +834,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeLog
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(JNIEnv *env, jclass object) {
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNativeRedirection(
+    JNIEnv *env, jclass object) {
     enableNativeRedirection();
 }
 
@@ -772,7 +846,9 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_enableNative
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection(JNIEnv *env, jclass object) {
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativeRedirection(
+    JNIEnv *env, jclass object) {
 
     mutexLock();
 
@@ -797,7 +873,9 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_disableNativ
  * @param object reference to the class on which this method is invoked
  * @return FFmpeg version string
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion(JNIEnv *env, jclass object) {
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeFFmpegVersion(
+    JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_VERSION);
 }
 
@@ -808,7 +886,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * @param object reference to the class on which this method is invoked
  * @return FFmpegKit version string
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *env, jclass object) {
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *env,
+                                                              jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_KIT_VERSION);
 }
 
@@ -819,7 +899,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * @param object reference to the class on which this method is invoked
  * @return native FFmpegKit package name
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(JNIEnv *env, jclass object) {
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(
+    JNIEnv *env, jclass object) {
 #ifdef FFMPEG_KIT_PACKAGE
     return (*env)->NewStringUTF(env, FFMPEG_KIT_PACKAGE);
 #else
@@ -836,7 +918,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * @param stringArray reference to the object holding FFmpeg command arguments
  * @return zero on successful execution, non-zero on error
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(JNIEnv *env, jclass object, jlong id, jobjectArray stringArray) {
+JNIEXPORT jint JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegExecute(
+    JNIEnv *env, jclass object, jlong id, jobjectArray stringArray) {
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
@@ -848,30 +932,33 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
         argumentCount = programArgumentCount + 1;
 
-        tempArray = (jstring *) av_malloc(sizeof(jstring) * programArgumentCount);
+        tempArray =
+            (jstring *)av_malloc(sizeof(jstring) * programArgumentCount);
     }
 
     /* PRESERVE USAGE FORMAT
      *
      * ffmpeg <arguments>
      */
-    argv = (char **)av_malloc(sizeof(char*) * (argumentCount));
+    argv = (char **)av_malloc(sizeof(char *) * (argumentCount));
     argv[0] = (char *)av_malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
     strcpy(argv[0], LIB_NAME);
 
     // PREPARE ARRAY ELEMENTS
     if (stringArray) {
         for (int i = 0; i < (argumentCount - 1); i++) {
-            tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
+            tempArray[i] =
+                (jstring)(*env)->GetObjectArrayElement(env, stringArray, i);
             if (tempArray[i] != NULL) {
-                argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+                argv[i + 1] =
+                    (char *)(*env)->GetStringUTFChars(env, tempArray[i], 0);
             }
         }
     }
 
     // REGISTER THE ID BEFORE STARTING THE SESSION
-    globalSessionId = (long) id;
-    addSession((long) id);
+    globalSessionId = (long)id;
+    addSession((long)id);
 
     resetMessagesInTransmit(globalSessionId);
 
@@ -879,7 +966,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
     int returnCode = ffmpeg_execute(argumentCount, argv);
 
     // ALWAYS REMOVE THE ID FROM THE MAP
-    removeSession((long) id);
+    removeSession((long)id);
 
     // CLEANUP
     if (tempArray) {
@@ -902,7 +989,10 @@ JNIEXPORT jint JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
  * @param object reference to the class on which this method is invoked
  * @param id session id
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel(JNIEnv *env, jclass object, jlong id) {
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpegCancel(JNIEnv *env,
+                                                                jclass object,
+                                                                jlong id) {
     cancel_operation(id);
 }
 
@@ -914,8 +1004,11 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_nativeFFmpeg
  * @param ffmpegPipePath full path of ffmpeg pipe
  * @return zero on successful creation, non-zero on error
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath) {
-    const char *ffmpegPipePathString = (*env)->GetStringUTFChars(env, ffmpegPipePath, 0);
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNativeFFmpegPipe(
+    JNIEnv *env, jclass object, jstring ffmpegPipePath) {
+    const char *ffmpegPipePathString =
+        (*env)->GetStringUTFChars(env, ffmpegPipePath, 0);
 
     return mkfifo(ffmpegPipePathString, S_IRWXU | S_IRWXG | S_IROTH);
 }
@@ -927,7 +1020,9 @@ JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_registerNewNa
  * @param object reference to the class on which this method is invoked
  * @return FFmpegKit library build date
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate(JNIEnv *env, jclass object) {
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeBuildDate(JNIEnv *env,
+                                                                jclass object) {
     char buildDate[10];
     sprintf(buildDate, "%d", FFMPEG_KIT_BUILD_DATE);
     return (*env)->NewStringUTF(env, buildDate);
@@ -942,9 +1037,13 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNative
  * @param variableValue environment variable value
  * @return zero on success, non-zero on error
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue) {
-    const char *variableNameString = (*env)->GetStringUTFChars(env, variableName, 0);
-    const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvironmentVariable(
+    JNIEnv *env, jclass object, jstring variableName, jstring variableValue) {
+    const char *variableNameString =
+        (*env)->GetStringUTFChars(env, variableName, 0);
+    const char *variableValueString =
+        (*env)->GetStringUTFChars(env, variableValue, 0);
 
     int rc = setenv(variableNameString, variableValueString, 1);
 
@@ -954,13 +1053,17 @@ JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_setNativeEnvi
 }
 
 /**
- * Registers a new ignored signal. Ignored signals are not handled by the library.
+ * Registers a new ignored signal. Ignored signals are not handled by the
+ * library.
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  * @param signum signal number
  */
-JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal(JNIEnv *env, jclass object, jint signum) {
+JNIEXPORT void JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNativeSignal(JNIEnv *env,
+                                                                jclass object,
+                                                                jint signum) {
     if (signum == SIGQUIT) {
         handleSIGQUIT = 0;
     } else if (signum == SIGINT) {
@@ -975,13 +1078,16 @@ JNIEXPORT void JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_ignoreNative
 }
 
 /**
- * Returns the number of native messages which are not transmitted to the Java callbacks for the
- * given session.
+ * Returns the number of native messages which are not transmitted to the Java
+ * callbacks for the given session.
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  * @param id session id
  */
-JNIEXPORT int JNICALL Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env, jclass object, jlong id) {
+JNIEXPORT int JNICALL
+Java_com_arthenica_ffmpegkit_FFmpegKitConfig_messagesInTransmit(JNIEnv *env,
+                                                                jclass object,
+                                                                jlong id) {
     return atomic_load(&sessionInTransitMessageCountMap[id % SESSION_MAP_SIZE]);
 }

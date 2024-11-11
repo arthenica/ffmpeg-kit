@@ -25,7 +25,7 @@
     NSString *_message;
 }
 
-- (instancetype)init:(long)sessionId :(int)level :(NSString*)message {
+- (instancetype)init:(long)sessionId:(int)level:(NSString *)message {
     self = [super init];
     if (self) {
         _sessionId = sessionId;
@@ -44,7 +44,7 @@
     return _level;
 }
 
-- (NSString*)getMessage {
+- (NSString *)getMessage {
     return _message;
 }
 

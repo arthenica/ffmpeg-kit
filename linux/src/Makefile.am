@@ -22,7 +22,9 @@ libffmpegkit_la_SOURCES = \
     ffmpegkit_exception.cpp \
     fftools_cmdutils.c \
     fftools_ffmpeg.c \
+    fftools_ffmpeg_dec.c \
     fftools_ffmpeg_demux.c \
+    fftools_ffmpeg_enc.c \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_mux.c \

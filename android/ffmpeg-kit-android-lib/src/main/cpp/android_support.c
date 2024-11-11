@@ -26,52 +26,50 @@
  * SUCH DAMAGE.
  */
 
-#include <math.h>
 #include <errno.h>
 #include <malloc.h>
+#include <math.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// posix_memalign() and memalign() are not available in the NDK __INTRODUCED_IN(17)
+// posix_memalign() and memalign() are not available in the NDK
+// __INTRODUCED_IN(17)
 
 #if __ANDROID_API__ < 17
 
-int posix_memalign(void** memptr, size_t alignment, size_t size) {
-  if ((alignment & (alignment - 1)) != 0 || alignment == 0) {
-    return EINVAL;
-  }
+int posix_memalign(void **memptr, size_t alignment, size_t size) {
+    if ((alignment & (alignment - 1)) != 0 || alignment == 0) {
+        return EINVAL;
+    }
 
-  if (alignment % sizeof(void*) != 0) {
-    return EINVAL;
-  }
+    if (alignment % sizeof(void *) != 0) {
+        return EINVAL;
+    }
 
-  *memptr = memalign(alignment, size);
-  if (*memptr == NULL) {
-    return errno;
-  }
+    *memptr = memalign(alignment, size);
+    if (*memptr == NULL) {
+        return errno;
+    }
 
-  return 0;
+    return 0;
 }
 
 #endif /* __ANDROID_API__ < 17 */
 
-// log2() and log2f() are C99 functions, but they're not available in the NDK __INTRODUCED_IN(18)
+// log2() and log2f() are C99 functions, but they're not available in the NDK
+// __INTRODUCED_IN(18)
 
 #if __ANDROID_API__ < 18
 
-double log2(double x) {
-    return (log(x) / M_LN2);
-}
+double log2(double x) { return (log(x) / M_LN2); }
 
-float log2f(float x) {
- return (float) log2((double) x);
-}
+float log2f(float x) { return (float)log2((double)x); }
 
 #endif /* __ANDROID_API__ < 18 */
 
 #ifdef __cplusplus
-};  /* end of extern "C" */
+}; /* end of extern "C" */
 #endif

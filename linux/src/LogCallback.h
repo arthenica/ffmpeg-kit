@@ -21,19 +21,20 @@
 #define FFMPEG_KIT_LOG_CALLBACK_H
 
 #include "Log.h"
+#include <functional>
 #include <iostream>
 #include <memory>
-#include <functional>
 
 namespace ffmpegkit {
 
-    /**
-     * <p>Callback that receives logs generated for <code>FFmpegKit</code> sessions.
-     *
-     * @param log log entry
-     */
-    typedef std::function<void(const std::shared_ptr<ffmpegkit::Log> log)> LogCallback;
+/**
+ * <p>Callback that receives logs generated for <code>FFmpegKit</code> sessions.
+ *
+ * @param log log entry
+ */
+typedef std::function<void(const std::shared_ptr<ffmpegkit::Log> log)>
+    LogCallback;
 
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_LOG_CALLBACK_H

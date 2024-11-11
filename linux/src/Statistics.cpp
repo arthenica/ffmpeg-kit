@@ -19,38 +19,28 @@
 
 #include "Statistics.h"
 
-ffmpegkit::Statistics::Statistics(const long sessionId, const int videoFrameNumber, const float videoFps, const float videoQuality, const int64_t size, const double time, const double bitrate, const double speed) :
-    _sessionId{sessionId}, _videoFrameNumber{videoFrameNumber}, _videoFps{videoFps}, _videoQuality{videoQuality}, _size{size}, _time{time}, _bitrate{bitrate}, _speed{speed} {
-}
+ffmpegkit::Statistics::Statistics(const long sessionId,
+                                  const int videoFrameNumber,
+                                  const float videoFps,
+                                  const float videoQuality, const int64_t size,
+                                  const double time, const double bitrate,
+                                  const double speed)
+    : _sessionId{sessionId}, _videoFrameNumber{videoFrameNumber},
+      _videoFps{videoFps}, _videoQuality{videoQuality}, _size{size},
+      _time{time}, _bitrate{bitrate}, _speed{speed} {}
 
-long ffmpegkit::Statistics::getSessionId() {
-    return _sessionId;
-}
+long ffmpegkit::Statistics::getSessionId() { return _sessionId; }
 
-int ffmpegkit::Statistics::getVideoFrameNumber() {
-    return _videoFrameNumber;
-}
+int ffmpegkit::Statistics::getVideoFrameNumber() { return _videoFrameNumber; }
 
-float ffmpegkit::Statistics::getVideoFps() {
-    return _videoFps;
-}
+float ffmpegkit::Statistics::getVideoFps() { return _videoFps; }
 
-float ffmpegkit::Statistics::getVideoQuality() {
-    return _videoQuality;
-}
+float ffmpegkit::Statistics::getVideoQuality() { return _videoQuality; }
 
-int64_t ffmpegkit::Statistics::getSize() {
-    return _size;
-}
+int64_t ffmpegkit::Statistics::getSize() { return _size; }
 
-double ffmpegkit::Statistics::getTime() {
-    return _time;
-}
+double ffmpegkit::Statistics::getTime() { return _time; }
 
-double ffmpegkit::Statistics::getBitrate() {
-    return _bitrate;
-}
+double ffmpegkit::Statistics::getBitrate() { return _bitrate; }
 
-double ffmpegkit::Statistics::getSpeed() {
-    return _speed;
-}
+double ffmpegkit::Statistics::getSpeed() { return _speed; }

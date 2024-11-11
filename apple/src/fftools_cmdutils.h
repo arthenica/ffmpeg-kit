@@ -2,7 +2,7 @@
  * Various utilities for command line tools
  * copyright (c) 2003 Fabrice Bellard
  * copyright (c) 2018-2022 Taner Sener
- * copyright (c) 2023 ARTHENICA LTD
+ * copyright (c) 2023-2024 ARTHENICA LTD
  *
  * This file is part of FFmpeg.
  *
@@ -22,11 +22,16 @@
  */
 
 /*
- * This file is the modified version of cmdutils.h file living in ffmpeg source code under the fftools folder. We
- * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
- * by us to develop mobile-ffmpeg and later ffmpeg-kit libraries.
+ * This file is the modified version of cmdutils.h file living in ffmpeg source
+ * code under the fftools folder. We manually update it each time we depend on a
+ * new ffmpeg version. Below you can see the list of changes applied by us to
+ * develop mobile-ffmpeg and later ffmpeg-kit libraries.
  *
  * ffmpeg-kit changes by ARTHENICA LTD
+ *
+ * 11.2024
+ * --------------------------------------------------------
+ * - FFmpeg 6.1 changes migrated
  *
  * 07.2023
  * --------------------------------------------------------
@@ -40,12 +45,14 @@
  *
  * 01.2020
  * --------------------------------------------------------
- * - ffprobe support added (variables used by ffprobe marked with "__thread" specifier)
+ * - ffprobe support added (variables used by ffprobe marked with "__thread"
+ * specifier)
  * - AV_LOG_STDERR log level added
  *
  * 12.2019
  * --------------------------------------------------------
- * - concurrent execution support ("__thread" specifier added to variables used by multiple threads)
+ * - concurrent execution support ("__thread" specifier added to variables used
+ * by multiple threads)
  *
  * 03.2019
  * --------------------------------------------------------
@@ -77,9 +84,10 @@
 #endif
 
 /**
- * Defines logs printed to stderr by ffmpeg. They are not filtered and always redirected.
+ * Defines logs printed to stderr by ffmpeg. They are not filtered and always
+ * redirected.
  */
-#define AV_LOG_STDERR    -16
+#define AV_LOG_STDERR -16
 
 /**
  * program name, defined by the program for show_version().
@@ -98,22 +106,6 @@ extern __thread int hide_banner;
 extern __thread int find_stream_info;
 
 /**
- * Register a program-specific cleanup routine.
- */
-void register_exit(void (*cb)(int ret));
-
-/**
- * Reports an error corresponding to the provided
- * AVERROR code and calls exit_program() with the
- * corresponding POSIX error code.
- * @note ret must be an AVERROR-value of a POSIX error code
- *       (i.e. AVERROR(EFOO) and not AVERROR_FOO).
- *       library functions can return both, so call this only
- *       with AVERROR(EFOO) of your own.
- */
-void report_and_exit(int ret) av_noreturn;
-
-/**
  * Wraps exit with a program-specific cleanup routine.
  */
 void exit_program(int ret) av_noreturn;
@@ -130,12 +122,6 @@ void init_dynload(void);
 void uninit_opts(void);
 
 /**
- * Trivial log callback.
- * Only suitable for opt_help and similar since it lacks prefix handling.
- */
-void log_callback_help(void* ptr, int level, const char* fmt, va_list vl);
-
-/**
  * Fallback for options that are not explicitly handled, these will be
  * parsed through AVOptions.
  */
@@ -148,8 +134,6 @@ int opt_timelimit(void *optctx, const char *opt, const char *arg);
 
 /**
  * Parse a string and return its corresponding value as a double.
- * Exit from the application if the string cannot be correctly
- * parsed or the corresponding value is invalid.
  *
  * @param context the context of the value to be set (e.g. the
  * corresponding command line option name)
@@ -159,64 +143,50 @@ int opt_timelimit(void *optctx, const char *opt, const char *arg);
  * @param min the minimum valid accepted value
  * @param max the maximum valid accepted value
  */
-double parse_number_or_die(const char *context, const char *numstr, int type,
-                           double min, double max);
-
-/**
- * Parse a string specifying a time and return its corresponding
- * value as a number of microseconds. Exit from the application if
- * the string cannot be correctly parsed.
- *
- * @param context the context of the value to be set (e.g. the
- * corresponding command line option name)
- * @param timestr the string to be parsed
- * @param is_duration a flag which tells how to interpret timestr, if
- * not zero timestr is interpreted as a duration, otherwise as a
- * date
- *
- * @see av_parse_time()
- */
-int64_t parse_time_or_die(const char *context, const char *timestr,
-                          int is_duration);
+int parse_number(const char *context, const char *numstr, int type, double min,
+                 double max, double *dst);
 
 typedef struct SpecifierOpt {
-    char *specifier;    /**< stream/chapter/program/... specifier */
+    char *specifier; /**< stream/chapter/program/... specifier */
     union {
         uint8_t *str;
-        int        i;
-        int64_t  i64;
+        int i;
+        int64_t i64;
         uint64_t ui64;
-        float      f;
-        double   dbl;
+        float f;
+        double dbl;
     } u;
 } SpecifierOpt;
 
 typedef struct OptionDef {
     const char *name;
     int flags;
-#define HAS_ARG    0x0001
-#define OPT_BOOL   0x0002
+#define HAS_ARG 0x0001
+#define OPT_BOOL 0x0002
 #define OPT_EXPERT 0x0004
 #define OPT_STRING 0x0008
-#define OPT_VIDEO  0x0010
-#define OPT_AUDIO  0x0020
-#define OPT_INT    0x0080
-#define OPT_FLOAT  0x0100
+#define OPT_VIDEO 0x0010
+#define OPT_AUDIO 0x0020
+#define OPT_INT 0x0080
+#define OPT_FLOAT 0x0100
 #define OPT_SUBTITLE 0x0200
-#define OPT_INT64  0x0400
-#define OPT_EXIT   0x0800
-#define OPT_DATA   0x1000
-#define OPT_PERFILE  0x2000     /* the option is per-file (currently ffmpeg-only).
-                                   implied by OPT_OFFSET or OPT_SPEC */
-#define OPT_OFFSET 0x4000       /* option is specified as an offset in a passed optctx */
-#define OPT_SPEC   0x8000       /* option is to be stored in an array of SpecifierOpt.
-                                   Implies OPT_OFFSET. Next element after the offset is
-                                   an int containing element count in the array. */
-#define OPT_TIME  0x10000
+#define OPT_INT64 0x0400
+#define OPT_EXIT 0x0800
+#define OPT_DATA 0x1000
+#define OPT_PERFILE                                                            \
+    0x2000 /* the option is per-file (currently ffmpeg-only).                  \
+              implied by OPT_OFFSET or OPT_SPEC */
+#define OPT_OFFSET                                                             \
+    0x4000 /* option is specified as an offset in a passed optctx */
+#define OPT_SPEC                                                               \
+    0x8000 /* option is to be stored in an array of SpecifierOpt.              \
+              Implies OPT_OFFSET. Next element after the offset is             \
+              an int containing element count in the array. */
+#define OPT_TIME 0x10000
 #define OPT_DOUBLE 0x20000
-#define OPT_INPUT  0x40000
+#define OPT_INPUT 0x40000
 #define OPT_OUTPUT 0x80000
-     union {
+    union {
         void *dst_ptr;
         int (*func_arg)(void *, const char *, const char *);
         size_t off;
@@ -262,13 +232,14 @@ void show_help_default_ffprobe(const char *opt, const char *arg);
  * argument without a leading option name flag. NULL if such arguments do
  * not have to be processed.
  */
-void parse_options(void *optctx, int argc, char **argv, const OptionDef *options,
-                   void (* parse_arg_function)(void *optctx, const char*));
+int parse_options(void *optctx, int argc, char **argv, const OptionDef *options,
+                  int (*parse_arg_function)(void *optctx, const char *));
 
 /**
  * Parse one given option.
  *
- * @return on success 1 if arg was consumed, 0 otherwise; negative number on error
+ * @return on success 1 if arg was consumed, 0 otherwise; negative number on
+ * error
  */
 int parse_option(void *optctx, const char *opt, const char *arg,
                  const OptionDef *options);
@@ -279,9 +250,9 @@ int parse_option(void *optctx, const char *opt, const char *arg,
  * used multiple times.
  */
 typedef struct Option {
-    const OptionDef  *opt;
-    const char       *key;
-    const char       *val;
+    const OptionDef *opt;
+    const char *key;
+    const char *val;
 } Option;
 
 typedef struct OptionGroupDef {
@@ -304,7 +275,7 @@ typedef struct OptionGroup {
     const char *arg;
 
     Option *opts;
-    int  nb_opts;
+    int nb_opts;
 
     AVDictionary *codec_opts;
     AVDictionary *format_opts;
@@ -320,14 +291,14 @@ typedef struct OptionGroupList {
     const OptionGroupDef *group_def;
 
     OptionGroup *groups;
-    int       nb_groups;
+    int nb_groups;
 } OptionGroupList;
 
 typedef struct OptionParseContext {
     OptionGroup global_opts;
 
     OptionGroupList *groups;
-    int           nb_groups;
+    int nb_groups;
 
     /* parsing state */
     OptionGroup cur_group;
@@ -360,8 +331,8 @@ int parse_optgroup(void *optctx, OptionGroup *g);
  * same as the order of group definitions.
  */
 int split_commandline(OptionParseContext *octx, int argc, char *argv[],
-                      const OptionDef *options,
-                      const OptionGroupDef *groups, int nb_groups);
+                      const OptionDef *options, const OptionGroupDef *groups,
+                      int nb_groups);
 
 /**
  * Free all allocated memory in an OptionParseContext.
@@ -402,10 +373,12 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec);
  * @param st A stream from s for which the options should be filtered.
  * @param codec The particular codec for which the options should be filtered.
  *              If null, the default one is looked up according to the codec id.
- * @return a pointer to the created dictionary
+ * @param dst a pointer to the created dictionary
+ * @return a non-negative number on success, a negative error code on failure
  */
-AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
-                                AVFormatContext *s, AVStream *st, const AVCodec *codec);
+int filter_codec_opts(const AVDictionary *opts, enum AVCodecID codec_id,
+                      AVFormatContext *s, AVStream *st, const AVCodec *codec,
+                      AVDictionary **dst);
 
 /**
  * Setup AVCodecContext options for avformat_find_stream_info().
@@ -414,12 +387,9 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
  * contained in s.
  * Each dictionary will contain the options from codec_opts which can
  * be applied to the corresponding stream codec context.
- *
- * @return pointer to the created array of dictionaries.
- * Calls exit() on failure.
  */
-AVDictionary **setup_find_stream_info_opts(AVFormatContext *s,
-                                           AVDictionary *codec_opts);
+int setup_find_stream_info_opts(AVFormatContext *s, AVDictionary *codec_opts,
+                                AVDictionary ***dst);
 
 /**
  * Print an error message to stderr, indicating filename and a human
@@ -464,53 +434,49 @@ int read_yesno(void);
  * preset, may be NULL
  */
 FILE *get_preset_file(char *filename, size_t filename_size,
-                      const char *preset_name, int is_path, const char *codec_name);
+                      const char *preset_name, int is_path,
+                      const char *codec_name);
 
 /**
  * Realloc array to hold new_size elements of elem_size.
- * Calls exit() on failure.
  *
- * @param array array to reallocate
+ * @param array pointer to the array to reallocate, will be updated
+ *              with a new pointer on success
  * @param elem_size size in bytes of each element
  * @param size new element count will be written here
  * @param new_size number of elements to place in reallocated array
- * @return reallocated array
+ * @return a non-negative number on success, a negative error code on failure
  */
-void *grow_array(void *array, int elem_size, int *size, int new_size);
+int grow_array(void **array, int elem_size, int *size, int new_size);
 
 /**
  * Atomically add a new element to an array of pointers, i.e. allocate
  * a new entry, reallocate the array of pointers and make the new last
  * member of this array point to the newly allocated buffer.
- * Calls exit() on failure.
  *
  * @param array     array of pointers to reallocate
  * @param elem_size size of the new element to allocate
  * @param nb_elems  pointer to the number of elements of the array array;
  *                  *nb_elems will be incremented by one by this function.
- * @return pointer to the newly allocated entry
+ * @return pointer to the newly allocated entry or NULL on failure
  */
 void *allocate_array_elem(void *array, size_t elem_size, int *nb_elems);
 
-#define GROW_ARRAY(array, nb_elems)\
-    array = grow_array(array, sizeof(*array), &nb_elems, nb_elems + 1)
+#define GROW_ARRAY(array, nb_elems)                                            \
+    grow_array((void **)&array, sizeof(*array), &nb_elems, nb_elems + 1)
 
-#define ALLOC_ARRAY_ELEM(array, nb_elems)\
-    allocate_array_elem(&array, sizeof(*array[0]), &nb_elems)
-
-#define GET_PIX_FMT_NAME(pix_fmt)\
+#define GET_PIX_FMT_NAME(pix_fmt)                                              \
     const char *name = av_get_pix_fmt_name(pix_fmt);
 
-#define GET_CODEC_NAME(id)\
-    const char *name = avcodec_descriptor_get(id)->name;
+#define GET_CODEC_NAME(id) const char *name = avcodec_descriptor_get(id)->name;
 
-#define GET_SAMPLE_FMT_NAME(sample_fmt)\
+#define GET_SAMPLE_FMT_NAME(sample_fmt)                                        \
     const char *name = av_get_sample_fmt_name(sample_fmt)
 
-#define GET_SAMPLE_RATE_NAME(rate)\
-    char name[16];\
+#define GET_SAMPLE_RATE_NAME(rate)                                             \
+    char name[16];                                                             \
     snprintf(name, sizeof(name), "%d", rate);
 
-double get_rotation(int32_t *displaymatrix);
+double get_rotation(const int32_t *displaymatrix);
 
 #endif /* FFTOOLS_CMDUTILS_H */

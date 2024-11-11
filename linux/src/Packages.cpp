@@ -19,12 +19,14 @@
 
 #include "Packages.h"
 #include "config.h"
-#include <memory>
 #include <algorithm>
+#include <memory>
 
 std::string extractPackageNameFromExternalLibraries() {
-    std::shared_ptr<std::set<std::string>> enabledLibrarySet = getExternalLibraries();
-    #define contains_ext_lib(element) enabledLibrarySet->find(element) != enabledLibrarySet->end()
+    std::shared_ptr<std::set<std::string>> enabledLibrarySet =
+        getExternalLibraries();
+#define contains_ext_lib(element)                                              \
+    enabledLibrarySet->find(element) != enabledLibrarySet->end()
     bool speex = contains_ext_lib("speex");
     bool fribidi = contains_ext_lib("fribidi");
     bool gnutls = contains_ext_lib("gnutls");
@@ -64,32 +66,19 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (fullGpl) {
-        if (contains_ext_lib("dav1d") &&
-            contains_ext_lib("fontconfig") &&
-            contains_ext_lib("freetype") &&
-            contains_ext_lib("fribidi") &&
-            contains_ext_lib("gmp") &&
-            contains_ext_lib("gnutls") &&
-            contains_ext_lib("kvazaar") &&
-            contains_ext_lib("mp3lame") &&
-            contains_ext_lib("libass") &&
-            contains_ext_lib("iconv") &&
-            contains_ext_lib("libilbc") &&
-            contains_ext_lib("libtheora") &&
-            contains_ext_lib("libvidstab") &&
-            contains_ext_lib("libvorbis") &&
-            contains_ext_lib("libvpx") &&
-            contains_ext_lib("libwebp") &&
-            contains_ext_lib("libxml2") &&
-            contains_ext_lib("opencore-amr") &&
-            contains_ext_lib("opus") &&
-            contains_ext_lib("shine") &&
-            contains_ext_lib("snappy") &&
-            contains_ext_lib("soxr") &&
-            contains_ext_lib("speex") &&
-            contains_ext_lib("twolame") &&
-            contains_ext_lib("x264") &&
-            contains_ext_lib("x265") &&
+        if (contains_ext_lib("dav1d") && contains_ext_lib("fontconfig") &&
+            contains_ext_lib("freetype") && contains_ext_lib("fribidi") &&
+            contains_ext_lib("gmp") && contains_ext_lib("gnutls") &&
+            contains_ext_lib("kvazaar") && contains_ext_lib("mp3lame") &&
+            contains_ext_lib("libass") && contains_ext_lib("iconv") &&
+            contains_ext_lib("libilbc") && contains_ext_lib("libtheora") &&
+            contains_ext_lib("libvidstab") && contains_ext_lib("libvorbis") &&
+            contains_ext_lib("libvpx") && contains_ext_lib("libwebp") &&
+            contains_ext_lib("libxml2") && contains_ext_lib("opencore-amr") &&
+            contains_ext_lib("opus") && contains_ext_lib("shine") &&
+            contains_ext_lib("snappy") && contains_ext_lib("soxr") &&
+            contains_ext_lib("speex") && contains_ext_lib("twolame") &&
+            contains_ext_lib("x264") && contains_ext_lib("x265") &&
             contains_ext_lib("xvid")) {
             return "full-gpl";
         } else {
@@ -98,28 +87,17 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (full) {
-        if (contains_ext_lib("dav1d") &&
-            contains_ext_lib("fontconfig") &&
-            contains_ext_lib("freetype") &&
-            contains_ext_lib("fribidi") &&
-            contains_ext_lib("gmp") &&
-            contains_ext_lib("gnutls") &&
-            contains_ext_lib("kvazaar") &&
-            contains_ext_lib("mp3lame") &&
-            contains_ext_lib("libass") &&
-            contains_ext_lib("iconv") &&
-            contains_ext_lib("libilbc") &&
-            contains_ext_lib("libtheora") &&
-            contains_ext_lib("libvorbis") &&
-            contains_ext_lib("libvpx") &&
-            contains_ext_lib("libwebp") &&
-            contains_ext_lib("libxml2") &&
-            contains_ext_lib("opencore-amr") &&
-            contains_ext_lib("opus") &&
-            contains_ext_lib("shine") &&
-            contains_ext_lib("snappy") &&
-            contains_ext_lib("soxr") &&
-            contains_ext_lib("speex") &&
+        if (contains_ext_lib("dav1d") && contains_ext_lib("fontconfig") &&
+            contains_ext_lib("freetype") && contains_ext_lib("fribidi") &&
+            contains_ext_lib("gmp") && contains_ext_lib("gnutls") &&
+            contains_ext_lib("kvazaar") && contains_ext_lib("mp3lame") &&
+            contains_ext_lib("libass") && contains_ext_lib("iconv") &&
+            contains_ext_lib("libilbc") && contains_ext_lib("libtheora") &&
+            contains_ext_lib("libvorbis") && contains_ext_lib("libvpx") &&
+            contains_ext_lib("libwebp") && contains_ext_lib("libxml2") &&
+            contains_ext_lib("opencore-amr") && contains_ext_lib("opus") &&
+            contains_ext_lib("shine") && contains_ext_lib("snappy") &&
+            contains_ext_lib("soxr") && contains_ext_lib("speex") &&
             contains_ext_lib("twolame")) {
             return "full";
         } else {
@@ -128,16 +106,11 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (video) {
-        if (contains_ext_lib("dav1d") &&
-            contains_ext_lib("fontconfig") &&
-            contains_ext_lib("freetype") &&
-            contains_ext_lib("fribidi") &&
-            contains_ext_lib("kvazaar") &&
-            contains_ext_lib("libass") &&
-            contains_ext_lib("iconv") &&
-            contains_ext_lib("libtheora") &&
-            contains_ext_lib("libvpx") &&
-            contains_ext_lib("libwebp") &&
+        if (contains_ext_lib("dav1d") && contains_ext_lib("fontconfig") &&
+            contains_ext_lib("freetype") && contains_ext_lib("fribidi") &&
+            contains_ext_lib("kvazaar") && contains_ext_lib("libass") &&
+            contains_ext_lib("iconv") && contains_ext_lib("libtheora") &&
+            contains_ext_lib("libvpx") && contains_ext_lib("libwebp") &&
             contains_ext_lib("snappy")) {
             return "video";
         } else {
@@ -146,14 +119,10 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (audio) {
-        if (contains_ext_lib("mp3lame") &&
-            contains_ext_lib("libilbc") &&
-            contains_ext_lib("libvorbis") &&
-            contains_ext_lib("opencore-amr") &&
-            contains_ext_lib("opus") &&
-            contains_ext_lib("shine") &&
-            contains_ext_lib("soxr") &&
-            contains_ext_lib("speex") &&
+        if (contains_ext_lib("mp3lame") && contains_ext_lib("libilbc") &&
+            contains_ext_lib("libvorbis") && contains_ext_lib("opencore-amr") &&
+            contains_ext_lib("opus") && contains_ext_lib("shine") &&
+            contains_ext_lib("soxr") && contains_ext_lib("speex") &&
             contains_ext_lib("twolame")) {
             return "audio";
         } else {
@@ -162,12 +131,9 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (httpsGpl) {
-        if (contains_ext_lib("gmp") &&
-            contains_ext_lib("gnutls") &&
-            contains_ext_lib("libvidstab") &&
-            contains_ext_lib("x264") &&
-            contains_ext_lib("x265") &&
-            contains_ext_lib("xvid")) {
+        if (contains_ext_lib("gmp") && contains_ext_lib("gnutls") &&
+            contains_ext_lib("libvidstab") && contains_ext_lib("x264") &&
+            contains_ext_lib("x265") && contains_ext_lib("xvid")) {
             return "https-gpl";
         } else {
             return "custom";
@@ -175,8 +141,7 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (https) {
-        if (contains_ext_lib("gmp") &&
-            contains_ext_lib("gnutls")) {
+        if (contains_ext_lib("gmp") && contains_ext_lib("gnutls")) {
             return "https";
         } else {
             return "custom";
@@ -184,10 +149,8 @@ std::string extractPackageNameFromExternalLibraries() {
     }
 
     if (minGpl) {
-        if (contains_ext_lib("libvidstab") &&
-            contains_ext_lib("x264") &&
-            contains_ext_lib("x265") &&
-            contains_ext_lib("xvid")) {
+        if (contains_ext_lib("libvidstab") && contains_ext_lib("x264") &&
+            contains_ext_lib("x265") && contains_ext_lib("xvid")) {
             return "min-gpl";
         } else {
             return "custom";
@@ -205,53 +168,33 @@ std::string ffmpegkit::Packages::getPackageName() {
 #endif
 }
 
-std::shared_ptr<std::set<std::string>> ffmpegkit::Packages::getExternalLibraries() {
-    const std::set<const char*> supportedExternalLibraries{
-        "dav1d",
-        "fontconfig",
-        "freetype",
-        "fribidi",
-        "gmp",
-        "gnutls",
-        "kvazaar",
-        "mp3lame",
-        "libaom",
-        "libass",
-        "iconv",
-        "libilbc",
-        "libtheora",
-        "libvidstab",
-        "libvorbis",
-        "libvpx",
-        "libwebp",
-        "libxml2",
-        "opencore-amr",
-        "openh264",
-        "opus",
-        "rubberband",
-        "sdl2",
-        "shine",
-        "snappy",
-        "soxr",
-        "speex",
-        "tesseract",
-        "twolame",
-        "x264",
-        "x265",
-        "xvid"};
+std::shared_ptr<std::set<std::string>>
+ffmpegkit::Packages::getExternalLibraries() {
+    const std::set<const char *> supportedExternalLibraries{
+        "dav1d",  "fontconfig", "freetype",  "fribidi",      "gmp",
+        "gnutls", "kvazaar",    "mp3lame",   "libaom",       "libass",
+        "iconv",  "libilbc",    "libtheora", "libvidstab",   "libvorbis",
+        "libvpx", "libwebp",    "libxml2",   "opencore-amr", "openh264",
+        "opus",   "rubberband", "sdl2",      "shine",        "snappy",
+        "soxr",   "speex",      "tesseract", "twolame",      "x264",
+        "x265",   "xvid"};
     std::string buildConfiguration(FFMPEG_CONFIGURATION);
     char libraryName1[50];
     char libraryName2[50];
-    std::shared_ptr<std::set<std::string>> enabledLibrarySet = std::make_shared<std::set<std::string>>();
+    std::shared_ptr<std::set<std::string>> enabledLibrarySet =
+        std::make_shared<std::set<std::string>>();
 
-    std::for_each(supportedExternalLibraries.cbegin(), supportedExternalLibraries.cend(), [&](const char* supportedExternalLibrary) {
-        sprintf(libraryName1, "enable-%s", supportedExternalLibrary);
-        sprintf(libraryName2, "enable-lib%s", supportedExternalLibrary);
+    std::for_each(
+        supportedExternalLibraries.cbegin(), supportedExternalLibraries.cend(),
+        [&](const char *supportedExternalLibrary) {
+            sprintf(libraryName1, "enable-%s", supportedExternalLibrary);
+            sprintf(libraryName2, "enable-lib%s", supportedExternalLibrary);
 
-        if (buildConfiguration.find(libraryName1) != std::string::npos || buildConfiguration.find(libraryName2) != std::string::npos) {
-            enabledLibrarySet->insert(supportedExternalLibrary);
-        }
-    });
+            if (buildConfiguration.find(libraryName1) != std::string::npos ||
+                buildConfiguration.find(libraryName2) != std::string::npos) {
+                enabledLibrarySet->insert(supportedExternalLibrary);
+            }
+        });
 
     return enabledLibrarySet;
 }

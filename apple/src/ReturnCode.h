@@ -31,9 +31,9 @@ typedef NS_ENUM(NSUInteger, ReturnCodeEnum) {
 
 - (instancetype)init:(int)value;
 
-+ (BOOL)isSuccess:(ReturnCode*)value;
++ (BOOL)isSuccess:(ReturnCode *)value;
 
-+ (BOOL)isCancel:(ReturnCode*)value;
++ (BOOL)isCancel:(ReturnCode *)value;
 
 - (int)getValue;
 

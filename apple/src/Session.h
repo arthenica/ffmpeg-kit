@@ -20,12 +20,12 @@
 #ifndef FFMPEG_KIT_SESSION_H
 #define FFMPEG_KIT_SESSION_H
 
-#import <Foundation/Foundation.h>
 #import "Log.h"
 #import "LogCallback.h"
 #import "LogRedirectionStrategy.h"
 #import "ReturnCode.h"
 #import "SessionState.h"
+#import <Foundation/Foundation.h>
 
 /**
  * <p>Common interface for all <code>FFmpegKit</code> sessions.
@@ -53,27 +53,27 @@
  *
  * @return session create time
  */
-- (NSDate*)getCreateTime;
+- (NSDate *)getCreateTime;
 
 /**
  * Returns session start time.
  *
  * @return session start time
  */
-- (NSDate*)getStartTime;
+- (NSDate *)getStartTime;
 
 /**
  * Returns session end time.
  *
  * @return session end time
  */
-- (NSDate*)getEndTime;
+- (NSDate *)getEndTime;
 
 /**
  * Returns the time taken to execute this session.
  *
- * @return time taken to execute this session in milliseconds or zero (0) if the session is
- * not over yet
+ * @return time taken to execute this session in milliseconds or zero (0) if the
+ * session is not over yet
  */
 - (long)getDuration;
 
@@ -82,23 +82,24 @@
  *
  * @return command arguments as an array
  */
-- (NSArray*)getArguments;
+- (NSArray *)getArguments;
 
 /**
  * Returns command arguments as a concatenated string.
  *
  * @return command arguments as a concatenated string
  */
-- (NSString*)getCommand;
+- (NSString *)getCommand;
 
 /**
  * Returns all log entries generated for this session. If there are asynchronous
- * messages that are not delivered yet, this method waits for them until the given timeout.
+ * messages that are not delivered yet, this method waits for them until the
+ * given timeout.
  *
  * @param waitTimeout wait timeout for asynchronous messages in milliseconds
  * @return list of log entries generated for this session
  */
-- (NSArray*)getAllLogsWithTimeout:(int)waitTimeout;
+- (NSArray *)getAllLogsWithTimeout:(int)waitTimeout;
 
 /**
  * Returns all log entries generated for this session. If there are asynchronous
@@ -106,50 +107,51 @@
  *
  * @return list of log entries generated for this session
  */
-- (NSArray*)getAllLogs;
+- (NSArray *)getAllLogs;
 
 /**
- * Returns all log entries delivered for this session. Note that if there are asynchronous
- * messages that are not delivered yet, this method will not wait for them and will return
- * immediately.
- *
- * @return list of log entries received for this session
- */
-- (NSArray*)getLogs;
-
-/**
- * Returns all log entries generated for this session as a concatenated string. If there are
- * asynchronous messages that are not delivered yet, this method waits for them until
- * the given timeout.
- *
- * @param waitTimeout wait timeout for asynchronous messages in milliseconds
- * @return all log entries generated for this session as a concatenated string
- */
-- (NSString*)getAllLogsAsStringWithTimeout:(int)waitTimeout;
-
-/**
- * Returns all log entries generated for this session as a concatenated string. If there are
- * asynchronous messages that are not delivered yet, this method waits for them.
- *
- * @return all log entries generated for this session as a concatenated string
- */
-- (NSString*)getAllLogsAsString;
-
-/**
- * Returns all log entries delivered for this session as a concatenated string. Note that if
- * there are asynchronous messages that are not delivered yet, this method will not wait
+ * Returns all log entries delivered for this session. Note that if there are
+ * asynchronous messages that are not delivered yet, this method will not wait
  * for them and will return immediately.
  *
  * @return list of log entries received for this session
  */
-- (NSString*)getLogsAsString;
+- (NSArray *)getLogs;
+
+/**
+ * Returns all log entries generated for this session as a concatenated string.
+ * If there are asynchronous messages that are not delivered yet, this method
+ * waits for them until the given timeout.
+ *
+ * @param waitTimeout wait timeout for asynchronous messages in milliseconds
+ * @return all log entries generated for this session as a concatenated string
+ */
+- (NSString *)getAllLogsAsStringWithTimeout:(int)waitTimeout;
+
+/**
+ * Returns all log entries generated for this session as a concatenated string.
+ * If there are asynchronous messages that are not delivered yet, this method
+ * waits for them.
+ *
+ * @return all log entries generated for this session as a concatenated string
+ */
+- (NSString *)getAllLogsAsString;
+
+/**
+ * Returns all log entries delivered for this session as a concatenated string.
+ * Note that if there are asynchronous messages that are not delivered yet, this
+ * method will not wait for them and will return immediately.
+ *
+ * @return list of log entries received for this session
+ */
+- (NSString *)getLogsAsString;
 
 /**
  * Returns the log output generated while running the session.
  *
  * @return log output generated
  */
-- (NSString*)getOutput;
+- (NSString *)getOutput;
 
 /**
  * Returns the state of the session.
@@ -159,25 +161,25 @@
 - (SessionState)getState;
 
 /**
- * Returns the return code for this session. Note that return code is only set for sessions
- * that end with SessionStateCompleted state. If a session is not started, still running or failed then
- * this method returns nil.
+ * Returns the return code for this session. Note that return code is only set
+ * for sessions that end with SessionStateCompleted state. If a session is not
+ * started, still running or failed then this method returns nil.
  *
- * @return the return code for this session if the session has completed, nil if session is
- * not started, still running or failed
+ * @return the return code for this session if the session has completed, nil if
+ * session is not started, still running or failed
  */
-- (ReturnCode*)getReturnCode;
+- (ReturnCode *)getReturnCode;
 
 /**
- * Returns the stack trace of the exception received while executing this session.
- * <p>
- * The stack trace is only set for sessions that end with SessionStateFailed state. For sessions that has
- * SessionStateCompleted state this method returns nil.
+ * Returns the stack trace of the exception received while executing this
+ * session. <p> The stack trace is only set for sessions that end with
+ * SessionStateFailed state. For sessions that has SessionStateCompleted state
+ * this method returns nil.
  *
- * @return stack trace of the exception received while executing this session, nil if session
- * is not started, still running or completed
+ * @return stack trace of the exception received while executing this session,
+ * nil if session is not started, still running or completed
  */
-- (NSString*)getFailStackTrace;
+- (NSString *)getFailStackTrace;
 
 /**
  * Returns session specific log redirection strategy.
@@ -187,23 +189,23 @@
 - (LogRedirectionStrategy)getLogRedirectionStrategy;
 
 /**
- * Returns whether there are still asynchronous messages being transmitted for this
- * session or not.
+ * Returns whether there are still asynchronous messages being transmitted for
+ * this session or not.
  *
- * @return true if there are still asynchronous messages being transmitted, false
- * otherwise
+ * @return true if there are still asynchronous messages being transmitted,
+ * false otherwise
  */
 - (BOOL)thereAreAsynchronousMessagesInTransmit;
 
 /**
  * Adds a new log entry for this session.
  *
- * It is invoked internally by <code>FFmpegKit</code> library methods. Must not be used by user
- * applications.
+ * It is invoked internally by <code>FFmpegKit</code> library methods. Must not
+ * be used by user applications.
  *
  * @param log log entry
  */
-- (void)addLog:(Log*)log;
+- (void)addLog:(Log *)log;
 
 /**
  * Starts running the session.
@@ -215,14 +217,14 @@
  *
  * @param returnCode return code of the execution
  */
-- (void)complete:(ReturnCode*)returnCode;
+- (void)complete:(ReturnCode *)returnCode;
 
 /**
  * Ends running the session with a failure.
  *
  * @param exception execution received
  */
-- (void)fail:(NSException*)exception;
+- (void)fail:(NSException *)exception;
 
 /**
  * Returns whether it is an <code>FFmpeg</code> session or not.
@@ -241,7 +243,8 @@
 /**
  * Returns whether it is a <code>MediaInformation</code> session or not.
  *
- * @return true if it is a <code>MediaInformation</code> session, false otherwise
+ * @return true if it is a <code>MediaInformation</code> session, false
+ * otherwise
  */
 - (BOOL)isMediaInformation;
 

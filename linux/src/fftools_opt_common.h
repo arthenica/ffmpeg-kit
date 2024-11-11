@@ -20,15 +20,17 @@
  */
 
 /*
- * This file is the modified version of opt_common.h file living in ffmpeg source code under the fftools folder. We
- * manually update it each time we depend on a new ffmpeg version. Below you can see the list of changes applied
+ * This file is the modified version of opt_common.h file living in ffmpeg
+ * source code under the fftools folder. We manually update it each time we
+ * depend on a new ffmpeg version. Below you can see the list of changes applied
  * by us to develop the ffmpeg-kit library.
  *
  * ffmpeg-kit changes by Taner Sener
  *
  * 09.2022
  * --------------------------------------------------------
- * - CMDUTILS_COMMON_OPTIONS and CMDUTILS_COMMON_OPTIONS_AVDEVICE defines dropped
+ * - CMDUTILS_COMMON_OPTIONS and CMDUTILS_COMMON_OPTIONS_AVDEVICE defines
+ * dropped
  * - fftools_ prefix added to fftools headers
  */
 

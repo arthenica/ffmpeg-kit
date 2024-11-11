@@ -25,22 +25,23 @@
 
 namespace ffmpegkit {
 
-    /**
-     * <p>Log entry for an <code>FFmpegKit</code> session.
-     */
-    class Log {
-        public:
-            Log(const long sessionId, const ffmpegkit::Level level, const char* message);
-            long getSessionId() const;
-            ffmpegkit::Level getLevel() const;
-            std::string getMessage() const;
+/**
+ * <p>Log entry for an <code>FFmpegKit</code> session.
+ */
+class Log {
+  public:
+    Log(const long sessionId, const ffmpegkit::Level level,
+        const char *message);
+    long getSessionId() const;
+    ffmpegkit::Level getLevel() const;
+    std::string getMessage() const;
 
-        private:
-            long _sessionId;
-            ffmpegkit::Level _level;
-            std::string _message;
-    };
+  private:
+    long _sessionId;
+    ffmpegkit::Level _level;
+    std::string _message;
+};
 
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_LOG_H

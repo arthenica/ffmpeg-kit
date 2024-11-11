@@ -24,20 +24,19 @@
 
 namespace ffmpegkit {
 
+/**
+ * Detects the running architecture.
+ */
+class ArchDetect {
+  public:
     /**
-     * Detects the running architecture.
+     * Returns architecture name loaded.
+     *
+     * @return architecture name loaded
      */
-    class ArchDetect {
-        public:
+    static std::string getArch();
+};
 
-            /**
-             * Returns architecture name loaded.
-             *
-             * @return architecture name loaded
-             */
-            static std::string getArch();
-    };
-
-}
+} // namespace ffmpegkit
 
 #endif // FFMPEG_KIT_ARCH_DETECT_H
