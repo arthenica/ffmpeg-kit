@@ -8,6 +8,52 @@ fi
 
 LIB_NAME="ffmpeg"
 
+build_ffmpeg() {
+  if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
+    make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
+
+    if [[ $? -ne 0 ]]; then
+      exit 1
+    fi
+  else
+    echo -e "started\n"
+    make -j$(get_cpu_count)
+
+    echo -n -e "\n${LIB_NAME}: "
+    if [[ $? -ne 0 ]]; then
+      exit 1
+    fi
+  fi
+}
+
+install_ffmpeg() {
+
+  if [[ -n $1 ]]; then
+
+    # DELETE THE PREVIOUS BUILD
+    if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
+      rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+    fi
+  else
+
+    # LEAVE EVERYTHING EXCEPT frameworks
+    rm -rf "${FFMPEG_LIBRARY_PATH}/include" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+    rm -rf "${FFMPEG_LIBRARY_PATH}/share" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  fi
+  make install 1>>"${BASEDIR}"/build.log 2>&1
+
+  if [[ $? -ne 0 ]]; then
+    exit 1
+  fi
+}
+
+create_temporary_framework() {
+  local FRAMEWORK_NAME="$1"
+  mkdir -p "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+  cp "${FFMPEG_LIBRARY_PATH}/lib/${FRAMEWORK_NAME}.dylib" "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
+}
+
 echo -e "----------------------------------------------------------------" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "\nINFO: Building ${LIB_NAME} for ${HOST} with the following environment variables\n" 1>>"${BASEDIR}"/build.log 2>&1
 env 1>>"${BASEDIR}"/build.log 2>&1
@@ -356,6 +402,17 @@ for library in {0..61}; do
         ;;
       *-videotoolbox)
         CONFIGURE_POSTFIX+=" --enable-videotoolbox"
+
+        # DISABLE FILTERS THAT REQUIRE IOS 16.0 OR MACOS 10.8
+        if [[ $(compare_versions "$IOS_MIN_VERSION" "16.0") -lt 1 ]]; then
+          CONFIGURE_POSTFIX+=" --disable-filter=scale_vt"
+        elif [[ $(compare_versions "$MACOS_MIN_VERSION" "10.8") -lt 1 ]]; then
+          CONFIGURE_POSTFIX+=" --disable-filter=scale_vt"
+        elif [[ $(compare_versions "$MAC_CATALYST_MIN_VERSION" "16.0") -lt 1 ]]; then
+          CONFIGURE_POSTFIX+=" --disable-filter=scale_vt"
+        elif [[ $(compare_versions "$TVOS_MIN_VERSION" "16.0") -lt 1 ]]; then
+          CONFIGURE_POSTFIX+=" --disable-filter=scale_vt"
+        fi
         ;;
       *-zlib)
         CONFIGURE_POSTFIX+=" --enable-zlib"
@@ -555,46 +612,6 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-build_ffmpeg() {
-  if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
-    make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
-
-    if [[ $? -ne 0 ]]; then
-      exit 1
-    fi
-  else
-    echo -e "started\n"
-    make -j$(get_cpu_count)
-
-    echo -n -e "\n${LIB_NAME}: "
-    if [[ $? -ne 0 ]]; then
-      exit 1
-    fi
-  fi
-}
-
-install_ffmpeg() {
-
-  if [[ -n $1 ]]; then
-
-    # DELETE THE PREVIOUS BUILD
-    if [ -d "${FFMPEG_LIBRARY_PATH}" ]; then
-      rm -rf "${FFMPEG_LIBRARY_PATH}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-    fi
-  else
-
-    # LEAVE EVERYTHING EXCEPT frameworks
-    rm -rf "${FFMPEG_LIBRARY_PATH}/include" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-    rm -rf "${FFMPEG_LIBRARY_PATH}/lib" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-    rm -rf "${FFMPEG_LIBRARY_PATH}/share" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-  fi
-  make install 1>>"${BASEDIR}"/build.log 2>&1
-
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
-}
-
 ${SED_INLINE} 's|$(SLIBNAME_WITH_MAJOR),|$(SLIBPREF)$(FULLNAME).framework/$(SLIBPREF)$(FULLNAME),|g' ${BASEDIR}/src/ffmpeg/ffbuild/config.mak 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
 # BUILD DYNAMIC LIBRARIES WITH DEFAULT OPTIONS
@@ -605,12 +622,6 @@ install_ffmpeg "true"
 find . -name "*.dylib" -delete 1>>"${BASEDIR}"/build.log 2>&1
 
 echo -e "\nShared libraries built successfully. Building frameworks.\n" 1>>"${BASEDIR}"/build.log 2>&1
-
-create_temporary_framework() {
-  local FRAMEWORK_NAME="$1"
-  mkdir -p "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-  cp "${FFMPEG_LIBRARY_PATH}/lib/${FRAMEWORK_NAME}.dylib" "${FFMPEG_LIBRARY_PATH}/framework/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
-}
 
 create_temporary_framework "libavcodec"
 create_temporary_framework "libavdevice"
