@@ -483,13 +483,13 @@ get_arch_specific_ldflags() {
     echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
     ;;
   arm64-v8a)
-    echo "-march=armv8-a"
+    echo "-march=armv8-a -Wl,-z,max-page-size=16384"
     ;;
   x86)
     echo "-march=i686"
     ;;
   x86-64)
-    echo "-march=x86-64"
+    echo "-march=x86-64 -Wl,-z,max-page-size=16384"
     ;;
   esac
 }

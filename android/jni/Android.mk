@@ -44,12 +44,19 @@ ifeq ($(TARGET_ARCH_ABI), x86_64)
     MY_ARM_NEON := true
 endif
 
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+    MY_LDFLAGS := -Wl,-z,max-page-size=16384
+else ifeq ($(TARGET_ARCH_ABI),x86_64)
+    MY_LDFLAGS := -Wl,-z,max-page-size=16384
+endif
+
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := ffmpegkit_abidetect
 LOCAL_SRC_FILES := ffmpegkit_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -DFFMPEG_KIT_${MY_ARCH_FLAGS}
 LOCAL_C_INCLUDES := $(FFMPEG_INCLUDES)
+LOCAL_LDFLAGS := $(MY_LDFLAGS)
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_STATIC_LIBRARIES := cpu-features
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
@@ -71,6 +78,7 @@ ifeq ($(MY_ARMV7_NEON), true)
     LOCAL_MODULE := ffmpegkit_armv7a_neon
     LOCAL_SRC_FILES := $(MY_SRC_FILES)
     LOCAL_CFLAGS := $(MY_CFLAGS)
+    LOCAL_LDFLAGS := $(MY_LDFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
     LOCAL_SHARED_LIBRARIES := libavcodec_neon libavfilter_neon libswscale_neon libavformat_neon libavutil_neon libswresample_neon libavdevice_neon
     ifeq ($(APP_STL), c++_shared)
@@ -93,6 +101,7 @@ ifeq ($(MY_BUILD_GENERIC_FFMPEG_KIT), true)
     LOCAL_MODULE := ffmpegkit
     LOCAL_SRC_FILES := $(MY_SRC_FILES)
     LOCAL_CFLAGS := $(MY_CFLAGS)
+    LOCAL_LDFLAGS := $(MY_LDFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
     LOCAL_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice libswscale
     ifeq ($(APP_STL), c++_shared)
