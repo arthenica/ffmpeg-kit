@@ -229,6 +229,7 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_XVIDCORE,$LIBRARY_X265,$LIBRARY_LIBVI
   fi
 done
 
+trap fail_operation EXIT
 echo -n -e "\nDownloading sources: "
 echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -328,8 +329,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
       RC=$(copy_external_library_license_file ${library} "${LICENSE_FILE}")
 
       if [[ ${RC} -ne 0 ]]; then
-        echo -e "DEBUG: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
-        echo -e "failed\n\nSee build.log for details\n"
+        echo -e "ERROR: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
         exit 1
       fi
 
@@ -349,8 +349,7 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     RC=$?
 
     if [[ ${RC} -ne 0 ]]; then
-      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
+      echo -e "ERROR: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
       exit 1
     fi
 
@@ -381,7 +380,6 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     if [ $? -eq 0 ]; then
       echo "ok"
     else
-      echo "failed"
       exit 1
     fi
   else
@@ -399,7 +397,6 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar 1>>"${BASEDIR}"/build.log 2>&1
     ./gradlew ffmpeg-kit-android-lib:clean ffmpeg-kit-android-lib:assembleRelease ffmpeg-kit-android-lib:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
     if [ $? -ne 0 ]; then
-      echo -e "failed\n"
       exit 1
     fi
 
@@ -409,7 +406,6 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
     mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
     cp "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1
     if [ $? -ne 0 ]; then
-      echo -e "failed\n"
       exit 1
     fi
 

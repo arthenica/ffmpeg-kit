@@ -48,7 +48,6 @@ autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
   --host="${HOST}" 1>>"${BASEDIR}"/build.log 2>&1
 
 if [ $? -ne 0 ]; then
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
@@ -62,7 +61,6 @@ make -j$(get_cpu_count) install 1>>"${BASEDIR}"/build.log 2>&1
 if [ $? -eq 0 ]; then
   echo "ok"
 else
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 

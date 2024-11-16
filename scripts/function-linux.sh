@@ -98,14 +98,12 @@ install_pkg_config_file() {
   # DELETE OLD FILE
   rm -f "$DESTINATION" 2>>"${BASEDIR}"/build.log
   if [[ $? -ne 0 ]]; then
-    echo -e "failed\n\nSee build.log for details\n"
     exit 1
   fi
 
   # INSTALL THE NEW FILE
   cp "$SOURCE" "$DESTINATION" 2>>"${BASEDIR}"/build.log
   if [[ $? -ne 0 ]]; then
-    echo -e "failed\n\nSee build.log for details\n"
     exit 1
   fi
 
@@ -165,8 +163,7 @@ create_linux_bundle() {
       RC=$(copy_external_library_license_file ${library} "${LICENSE_FILE}")
 
       if [[ ${RC} -ne 0 ]]; then
-        echo -e "DEBUG: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
-        echo -e "failed\n\nSee build.log for details\n"
+        echo -e "ERROR: Failed to copy the license file of ${ENABLED_LIBRARY}\n" 1>>"${BASEDIR}"/build.log 2>&1
         exit 1
       fi
 
@@ -186,8 +183,7 @@ create_linux_bundle() {
     RC=$?
 
     if [[ ${RC} -ne 0 ]]; then
-      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
+      echo -e "ERROR: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
       exit 1
     fi
 

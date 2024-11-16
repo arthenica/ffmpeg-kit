@@ -73,7 +73,6 @@ ${SED_INLINE} "s|allow_undefined_flag -o|allow_undefined_flag -target $(get_targ
 ${SED_INLINE} 's|\$rpath/\\$soname|@rpath/ffmpegkit.framework/ffmpegkit|g' libtool 1>>"${BASEDIR}"/build.log 2>&1
 
 if [ $? -ne 0 ]; then
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
@@ -89,6 +88,5 @@ make install 1>>"${BASEDIR}"/build.log 2>&1
 if [ $? -eq 0 ]; then
   echo "ok"
 else
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi

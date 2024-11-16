@@ -185,6 +185,7 @@ for gpl_library in {$LIBRARY_X264,$LIBRARY_LINUX_XVIDCORE,$LIBRARY_LINUX_X265,$L
   fi
 done
 
+trap fail_operation EXIT
 echo -n -e "\nDownloading sources: "
 echo -e "INFO: Downloading the source code of ffmpeg and external libraries.\n" 1>>"${BASEDIR}"/build.log 2>&1
 

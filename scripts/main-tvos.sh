@@ -153,11 +153,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
           declare "$BUILD_COMPLETED_FLAG=1"
           check_if_dependency_rebuilt "${library}"
           echo "ok"
-        elif [ $RC -eq 200 ]; then
-          echo -e "not supported\n\nSee build.log for details\n"
-          exit 1
         else
-          echo -e "failed\n\nSee build.log for details\n"
           exit 1
         fi
       else
@@ -194,11 +190,7 @@ for custom_library_index in "${CUSTOM_LIBRARIES[@]}"; do
     # SET SOME FLAGS AFTER THE BUILD
     if [ $RC -eq 0 ]; then
       echo "ok"
-    elif [ $RC -eq 200 ]; then
-      echo -e "not supported\n\nSee build.log for details\n"
-      exit 1
     else
-      echo -e "failed\n\nSee build.log for details\n"
       exit 1
     fi
   else

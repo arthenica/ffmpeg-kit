@@ -262,8 +262,7 @@ create_ffmpeg_universal_library() {
     RC=$?
 
     if [[ ${RC} -ne 0 ]]; then
-      echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
-      echo -e "failed\n\nSee build.log for details\n"
+      echo -e "ERROR: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
       exit 1
     fi
 
@@ -427,8 +426,7 @@ create_ffmpeg_framework() {
         RC=$?
 
         if [[ ${RC} -ne 0 ]]; then
-          echo -e "DEBUG: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
-          echo -e "failed\n\nSee build.log for details\n"
+          echo -e "ERROR: Failed to copy the license file of custom library ${!library_name}\n" 1>>"${BASEDIR}"/build.log 2>&1
           exit 1
         fi
 
@@ -1112,8 +1110,7 @@ get_sdk_path() {
 # 1. XCFRAMEWORK NAME
 #
 exit_xcframework() {
-  echo -e "INFO: Building $1 xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-  echo -e "failed\n\nSee build.log for details\n"
+  echo -e "ERROR: Building $1 xcframework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
   exit 1
 }
 
@@ -1121,8 +1118,7 @@ exit_xcframework() {
 # 1. FRAMEWORK NAME
 #
 exit_framework() {
-  echo -e "INFO: Building $1 framework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
-  echo -e "failed\n\nSee build.log for details\n"
+  echo -e "ERROR: Building $1 framework failed\n" 1>>"${BASEDIR}"/build.log 2>&1
   exit 1
 }
 
@@ -1130,8 +1126,7 @@ exit_framework() {
 # 1. UNIVERSAL LIBRARY NAME
 #
 exit_universal_library() {
-  echo -e "\nINFO: Failed to build universal $1 library\n" 1>>"${BASEDIR}"/build.log 2>&1
-  echo -e "failed\n\nSee build.log for details\n"
+  echo -e "\nERROR: Failed to build universal $1 library\n" 1>>"${BASEDIR}"/build.log 2>&1
   exit 1
 }
 

@@ -85,7 +85,7 @@ for library in {0..61}; do
       pkg-config --libs --static cpu-features 2>>"${BASEDIR}"/build.log 1>/dev/null
       if [[ $? -eq 1 ]]; then
         echo -e "ERROR: cpu-features was not found in the pkg-config search path\n" 1>>"${BASEDIR}"/build.log 2>&1
-        echo -e "\nffmpeg: failed\n\nSee build.log for details\n"
+        echo -e "\nffmpeg: "
         exit 1
       fi
       ;;
@@ -469,7 +469,6 @@ fi
   ${CONFIGURE_POSTFIX} 1>>"${BASEDIR}"/build.log 2>&1
 
 if [[ $? -ne 0 ]]; then
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
@@ -477,18 +476,15 @@ if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
   make -j$(get_cpu_count) 1>>"${BASEDIR}"/build.log 2>&1
 
   if [[ $? -ne 0 ]]; then
-    echo -e "failed\n\nSee build.log for details\n"
     exit 1
   fi
 else
   echo -e "started\n"
   make -j$(get_cpu_count)
 
+  echo -n -e "\n${LIB_NAME}: "
   if [[ $? -ne 0 ]]; then
-    echo -n -e "\n${LIB_NAME}: failed\n\nSee build.log for details\n"
     exit 1
-  else
-    echo -n -e "\n${LIB_NAME}: "
   fi
 fi
 
@@ -499,7 +495,6 @@ fi
 make install 1>>"${BASEDIR}"/build.log 2>&1
 
 if [[ $? -ne 0 ]]; then
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
 
@@ -511,6 +506,5 @@ rsync -am --include='*.h' --include='*/' --exclude='*' "${BASEDIR}"/src/ffmpeg/ 
 if [ $? -eq 0 ]; then
   echo "ok"
 else
-  echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
