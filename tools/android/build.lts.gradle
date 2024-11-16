@@ -4,14 +4,14 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.arthenica.ffmpegkit'
     }
-    compileSdk 33
+    compileSdk 34
     ndkVersion "22.1.7171670"
 
     defaultConfig {
         minSdk 16
-        targetSdk 33
-        versionCode 160600
-        versionName "6.0.LTS"
+        targetSdk 34
+        versionCode 160612
+        versionName "6.1.2.LTS"
         project.archivesBaseName = "ffmpeg-kit"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -60,6 +60,6 @@ task javadoc(type: Javadoc) {
 
 dependencies {
     api 'com.arthenica:smart-exception-java:0.2.1'
-    testImplementation "androidx.test.ext:junit:1.1.5"
-    testImplementation 'org.json:json:20230618'
+    testImplementation "androidx.test.ext:junit:1.2.1"
+    testImplementation 'org.json:json:20240303'
 }
