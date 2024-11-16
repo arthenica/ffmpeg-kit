@@ -20,16 +20,15 @@
 #ifndef FFMPEG_CONTEXT_H
 #define FFMPEG_CONTEXT_H
 
-#if HAVE_TERMIOS_H
-#include <termios.h>
-#endif
-
 #include "fftools_ffmpeg.h"
 #include "libavformat/avio.h"
 #include "libavutil/dict.h"
 
 extern __thread BenchmarkTimeStamps current_time;
+#if HAVE_TERMIOS_H
+#include <termios.h>
 extern __thread struct termios oldtty;
+#endif
 extern __thread int restore_tty;
 extern __thread volatile int received_sigterm;
 extern __thread volatile int received_nb_signals;

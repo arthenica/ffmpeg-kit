@@ -158,6 +158,14 @@ while [ ! $# -eq 0 ]; do
     EXTRA_LDFLAGS=$(echo $1 | sed -e 's/^--extra-ldflags=//g')
     export EXTRA_LDFLAGS="${EXTRA_LDFLAGS}"
     ;;
+  --version-*)
+    CUSTOM_VERSION_KEY=$(echo $1 | sed -e 's/^--version-//g;s/=.*$//g')
+    CUSTOM_VERSION_VALUE=$(echo $1 | sed -e 's/^--version-.*=//g')
+
+    echo -e "INFO: Custom version detected: ${CUSTOM_VERSION_KEY} ${CUSTOM_VERSION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_version_environment_variables "${CUSTOM_VERSION_KEY}" "${CUSTOM_VERSION_VALUE}"
+    ;;
   *)
     print_unknown_option "$1"
     ;;
@@ -190,7 +198,7 @@ if [[ -n ${BUILD_FULL} ]]; then
 fi
 
 # DISABLE SPECIFIED LIBRARIES
-for disabled_library in ${disabled_libraries[@]}; do
+for disabled_library in "${disabled_libraries[@]}"; do
   set_library "${disabled_library}" 0
 done
 
@@ -371,7 +379,9 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
 
   # BUILD NATIVE LIBRARY
   if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
-    if [ "$(is_darwin_arm64)" == "1" ]; then
+
+    # NDK >= 24.0 DOES NOT REQUIRE arch -x86_64 ON DARWIN ARM64 HOSTS
+    if [[ "$(is_darwin_arm64)" == "1" ]] && [[ $(compare_versions "$DETECTED_NDK_VERSION" "24.0") -lt 1 ]]; then
        arch -x86_64 "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1
     else
       "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1

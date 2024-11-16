@@ -17,12 +17,12 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "FFmpegKit.h"
+#import "fftools_ffmpeg.h"
 #import "ArchDetect.h"
 #import "AtomicLong.h"
+#import "FFmpegKit.h"
 #import "FFmpegKitConfig.h"
 #import "Packages.h"
-#import "fftools_ffmpeg.h"
 
 @implementation FFmpegKit
 

@@ -19,6 +19,7 @@ libffmpegkit_la_SOURCES = \
     ReturnCode.cpp \
     Statistics.cpp \
     StreamInformation.cpp \
+    ffmpeg_context.c \
     ffmpegkit_exception.cpp \
     fftools_cmdutils.c \
     fftools_ffmpeg.c \
@@ -63,6 +64,7 @@ include_HEADERS = \
     Statistics.h \
     StatisticsCallback.h \
     StreamInformation.h \
+    ffmpeg_context.h \
     ffmpegkit_exception.h \
     fftools_cmdutils.h \
     fftools_ffmpeg.h \

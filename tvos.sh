@@ -164,6 +164,14 @@ while [ ! $# -eq 0 ]; do
     EXTRA_LDFLAGS=$(echo $1 | sed -e 's/^--extra-ldflags=//g')
     export EXTRA_LDFLAGS="${EXTRA_LDFLAGS}"
     ;;
+  --version-*)
+    CUSTOM_VERSION_KEY=$(echo $1 | sed -e 's/^--version-//g;s/=.*$//g')
+    CUSTOM_VERSION_VALUE=$(echo $1 | sed -e 's/^--version-.*=//g')
+
+    echo -e "INFO: Custom version detected: ${CUSTOM_VERSION_KEY} ${CUSTOM_VERSION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
+
+    generate_custom_version_environment_variables "${CUSTOM_VERSION_KEY}" "${CUSTOM_VERSION_VALUE}"
+    ;;
   *)
     print_unknown_option "$1"
     ;;

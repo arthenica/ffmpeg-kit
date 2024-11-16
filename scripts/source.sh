@@ -273,7 +273,12 @@ get_library_source() {
     echo "${SOURCE_REPO_URL}"
     ;;
   2)
-    echo "${SOURCE_ID}"
+    CUSTOM_VERSION_FLAG=$(echo "version_$1" | sed "s/\-/\_/g")
+    if [[ ! -z "${!CUSTOM_VERSION_FLAG}" ]]; then
+      echo "${!CUSTOM_VERSION_FLAG}"
+    else
+      echo "${SOURCE_ID}"
+    fi
     ;;
   3)
     echo "${SOURCE_TYPE}"

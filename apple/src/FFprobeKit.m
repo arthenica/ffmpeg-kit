@@ -17,10 +17,10 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import "FFprobeKit.h"
+#import "fftools_ffmpeg.h"
 #import "FFmpegKit.h"
 #import "FFmpegKitConfig.h"
-#import "fftools_ffmpeg.h"
+#import "FFprobeKit.h"
 
 @implementation FFprobeKit
 

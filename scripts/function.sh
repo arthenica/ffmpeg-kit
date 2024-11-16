@@ -924,6 +924,7 @@ display_help_advanced_options() {
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
   echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even if it is detected as already downloaded [no]"
   echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even if it is detected as already built [no]"
+  echo -e "  --version-LIBRARY=n\t\toverride default LIBRARY version []"
   if [ -n "$1" ]; then
     echo -e "$1"
   fi
@@ -2416,6 +2417,21 @@ initialize_folder() {
 }
 
 fail_operation() {
-  echo -e "failed\n"
-  echo -e "See build.log for the details\n"
+  if [[ "$?" -ne 0 ]]; then
+    echo -e "failed\n"
+    echo -e "See build.log for the details\n"
+  fi
+}
+
+#
+# 1. key
+# 2. value
+#
+generate_custom_version_environment_variables() {
+  VERSION_KEY=$(echo "VERSION_$1" | sed "s/\-/\_/g" | tr '[A-Z]' '[a-z]')
+  VERSION_VALUE="$2"
+
+  export "${VERSION_KEY}"="${VERSION_VALUE}"
+
+  echo -e "INFO: Custom version env variable generated: ${VERSION_KEY}=${VERSION_VALUE}\n" 1>>"${BASEDIR}"/build.log 2>&1
 }
