@@ -24,7 +24,7 @@
 
 std::string extractPackageNameFromExternalLibraries() {
     std::shared_ptr<std::set<std::string>> enabledLibrarySet =
-        getExternalLibraries();
+        ffmpegkit::Packages::getExternalLibraries();
 #define contains_ext_lib(element)                                              \
     enabledLibrarySet->find(element) != enabledLibrarySet->end()
     bool speex = contains_ext_lib("speex");
