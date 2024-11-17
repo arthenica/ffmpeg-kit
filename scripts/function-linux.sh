@@ -25,7 +25,7 @@ libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support older devices\n      --jobs=N\t\t\tnumber of jobs to run [auto]"
+  display_help_options "      --jobs=N\t\t\tnumber of jobs to run [auto]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -83,11 +83,7 @@ libraries are created under the prebuilt folder.\n"
 }
 
 enable_main_build() {
-  unset FFMPEG_KIT_LTS_BUILD
-}
-
-enable_lts_build() {
-  export FFMPEG_KIT_LTS_BUILD="1"
+  local _TMP
 }
 
 install_pkg_config_file() {
@@ -113,12 +109,7 @@ install_pkg_config_file() {
 }
 
 get_bundle_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "bundle-linux${LTS_POSTFIX}"
+  echo "bundle-linux"
 }
 
 create_linux_bundle() {
@@ -223,11 +214,7 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
-  fi
-
-  echo "-fstrict-aliasing -fPIC -DLINUX ${LTS_BUILD_FLAG} ${LLVM_CONFIG_CFLAGS}"
+  echo "-fstrict-aliasing -fPIC -DLINUX ${LLVM_CONFIG_CFLAGS}"
 }
 
 get_arch_specific_cflags() {
@@ -513,38 +500,20 @@ EOF
 }
 
 get_build_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "linux-$(get_target_cpu)${LTS_POSTFIX}"
+  echo "linux-$(get_target_cpu)"
 }
 
 detect_clang_version() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    for clang_version in 6 .. 10; do
-      if [[ $(command_exists "clang-$clang_version") -eq 0 ]]; then
-        echo "$clang_version"
-        return
-      elif [[ $(command_exists "clang-$clang_version.0") -eq 0 ]]; then
-        echo "$clang_version.0"
-        return
-      fi
-    done
-    echo "none"
-  else
-    for clang_version in 11 .. 20; do
-      if [[ $(command_exists "clang-$clang_version") -eq 0 ]]; then
-        echo "$clang_version"
-        return
-      elif [[ $(command_exists "clang-$clang_version.0") -eq 0 ]]; then
-        echo "$clang_version.0"
-        return
-      fi
-    done
-    echo "none"
-  fi
+  for clang_version in 6 .. 20; do
+    if [[ $(command_exists "clang-$clang_version") -eq 0 ]]; then
+      echo "$clang_version"
+      return
+    elif [[ $(command_exists "clang-$clang_version.0") -eq 0 ]]; then
+      echo "$clang_version.0"
+      return
+    fi
+  done
+  echo "none"
 }
 
 set_toolchain_paths() {

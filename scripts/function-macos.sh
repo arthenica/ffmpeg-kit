@@ -19,7 +19,7 @@ When compilation ends, libraries are created under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10.12+ devices\n      --jobs=N\t\t\t\tnumber of jobs to run [auto]" "      --target=macos sdk version\toverride minimum deployment target [10.15]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "      --jobs=N\t\t\t\tnumber of jobs to run [auto]" "      --target=macos sdk version\toverride minimum deployment target [10.15]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -57,35 +57,19 @@ enable_main_build() {
   fi
 }
 
-enable_lts_build() {
-  export FFMPEG_KIT_LTS_BUILD="1"
-
-  if [[ $(compare_versions "$DETECTED_MACOS_SDK_VERSION" "10.12") -le 0 ]]; then
-    export MACOS_MIN_VERSION=$DETECTED_MACOS_SDK_VERSION
-  else
-
-    # XCODE 8.0 HAS MACOS SDK 10.12
-    export MACOS_MIN_VERSION=10.12
-  fi
-}
-
 get_common_includes() {
   echo "-I${SDK_PATH}/usr/include"
 }
 
 get_common_cflags() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
-  fi
-
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
 
   case ${ARCH} in
   arm64)
-    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DMACOSX $(get_min_sdk_version_flag) ${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   *)
-    echo "-fstrict-aliasing -DMACOSX ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DMACOSX $(get_min_sdk_version_flag) ${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   esac
 }
@@ -214,7 +198,7 @@ get_asmflags() {
 }
 
 get_cxxflags() {
-  local COMMON_CFLAGS="$(get_common_cflags "$1") $(get_common_includes "$1") $(get_arch_specific_cflags) $(get_min_version_cflags "$1")"
+  local COMMON_CFLAGS="$(get_common_cflags "$1") $(get_common_includes "$1") $(get_arch_specific_cflags) $(get_min_version_cflags "$1") $(get_min_sdk_version_flag)"
   if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
     local OPTIMIZATION_FLAGS="-Oz"
   else

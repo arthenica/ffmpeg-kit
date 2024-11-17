@@ -7,7 +7,7 @@ source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 disabled_libraries=()
 
-# SET DEFAULTS SETTINGS
+# SET DEFAULT SETTINGS
 enable_default_linux_architectures
 
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
@@ -55,7 +55,6 @@ while [ ! $# -eq 0 ]; do
   -s | --speed)
     optimize_for_speed
     ;;
-  -l | --lts) ;;
   -f | --force)
     export BUILD_FORCE="1"
     ;;

@@ -25,8 +25,7 @@ After that this script should be used to create an umbrella xcframework.\n"
   echo -e "Options:"
   echo -e "  -h, --help\t\t\tdisplay this help and exit"
   echo -e "  -v, --version\t\t\tdisplay version information and exit"
-  echo -e "  -f, --force\t\t\tignore warnings"
-  echo -e "  -l, --lts\t\t\tinclude lts packages to support iOS 10+, tvOS 10+, macOS 10.12+ devices\n"
+  echo -e "  -f, --force\t\t\tignore warnings\n"
 
   echo -e "Architectures:"
   echo -e "  --disable-iphoneos\t\tdo not include iphoneos architecture variant [yes]"
@@ -124,7 +123,7 @@ source "${BASEDIR}"/scripts/variable.sh
 export FFMPEG_KIT_BUILD_TYPE="apple"
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 
-# SET DEFAULTS SETTINGS
+# SET DEFAULT SETTINGS
 enable_default_architecture_variants
 
 # SELECT XCODE VERSION USED FOR BUILDING
@@ -137,7 +136,8 @@ fi
 DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
 DETECTED_TVOS_SDK_VERSION="$(xcrun --sdk appletvos --show-sdk-version 2>>"${BASEDIR}"/build.log)"
 DETECTED_MACOS_SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version 2>>"${BASEDIR}"/build.log)"
-echo -e "INFO: Using iOS SDK: ${DETECTED_IOS_SDK_VERSION}, tvOS SDK: ${DETECTED_TVOS_SDK_VERSION}, macOS SDK: ${DETECTED_MACOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>"${BASEDIR}"/build.log 2>&1
+XCODE_PATH=$(xcode-select -p 2>>"${BASEDIR}"/build.log)
+echo -e "INFO: Using iOS SDK: ${DETECTED_IOS_SDK_VERSION}, tvOS SDK: ${DETECTED_TVOS_SDK_VERSION}, macOS SDK: ${DETECTED_MACOS_SDK_VERSION} by Xcode provided at ${XCODE_PATH}\n" 1>>"${BASEDIR}"/build.log 2>&1
 echo -e "INFO: Build options: $*\n" 1>>"${BASEDIR}"/build.log 2>&1
 
 # SET DEFAULT BUILD OPTIONS
@@ -152,14 +152,6 @@ if [[ -z ${BUILD_VERSION} ]]; then
   exit 1
 fi
 
-# PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
-for argument in "$@"; do
-  if [[ "$argument" == "-l" ]] || [[ "$argument" == "--lts" ]]; then
-    export FFMPEG_KIT_LTS_BUILD="1"
-    BUILD_TYPE_ID+="LTS "
-  fi
-done
-
 # PROCESS BUILD OPTIONS
 while [ ! $# -eq 0 ]; do
   case $1 in
@@ -170,7 +162,6 @@ while [ ! $# -eq 0 ]; do
     display_version
     exit 0
     ;;
-  -l | --lts) ;;
   -f | --force)
     export BUILD_FORCE="1"
     ;;

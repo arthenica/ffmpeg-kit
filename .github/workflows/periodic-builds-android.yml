@@ -43,8 +43,8 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-android-lts-on-linux:
-    name: android lts on linux
+  build-android-api-16-on-linux:
+    name: android api 16 on linux
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -74,7 +74,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -l --full --enable-gpl --disable-lib-srt
+        run: ./android.sh --api-level=16 --full --enable-gpl --disable-lib-srt
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log

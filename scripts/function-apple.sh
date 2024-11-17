@@ -7,11 +7,7 @@ export FFMPEG_LIBS=("libavcodec" "libavdevice" "libavfilter" "libavformat" "liba
 get_ffmpeg_kit_version() {
   local FFMPEG_KIT_VERSION=$(grep 'const FFmpegKitVersion' "${BASEDIR}"/apple/src/FFmpegKitConfig.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
-  if [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    echo "${FFMPEG_KIT_VERSION}"
-  else
-    echo "${FFMPEG_KIT_VERSION}.LTS"
-  fi
+  echo "${FFMPEG_KIT_VERSION}"
 }
 
 get_external_library_version() {
@@ -601,20 +597,15 @@ get_default_build_directory() {
 }
 
 get_build_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
   case ${ARCH} in
   x86-64)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-$(get_min_sdk_version)"
     ;;
   x86-64-mac-catalyst)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-x86_64-mac-catalyst-$(get_min_sdk_version)"
     ;;
   *)
-    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-${ARCH}-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "apple-${FFMPEG_KIT_BUILD_TYPE}-${ARCH}-$(get_min_sdk_version)"
     ;;
   esac
 }
@@ -624,55 +615,41 @@ get_build_directory() {
 #
 get_framework_directory() {
   local FRAMEWORK_TYPE="$1"
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
 
   case $FRAMEWORK_TYPE in
   "${ARCH_VAR_IOS}")
-    echo "bundle-apple-framework-ios-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-ios-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_IPHONEOS}")
-    echo "bundle-apple-framework-iphoneos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-iphoneos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_IPHONESIMULATOR}")
-    echo "bundle-apple-framework-iphonesimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-iphonesimulator-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_MAC_CATALYST}")
-    echo "bundle-apple-framework-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-mac-catalyst-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_TVOS}")
-    echo "bundle-apple-framework-tvos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-tvos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_APPLETVOS}")
-    echo "bundle-apple-framework-appletvos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-appletvos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    echo "bundle-apple-framework-appletvsimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-appletvsimulator-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_MACOS}")
-    echo "bundle-apple-framework-macos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-framework-macos-$(get_min_sdk_version)"
     ;;
   esac
 }
 
 get_xcframework_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "bundle-apple-xcframework-${FFMPEG_KIT_BUILD_TYPE}-$(get_min_sdk_version)${LTS_POSTFIX}"
+  echo "bundle-apple-xcframework-${FFMPEG_KIT_BUILD_TYPE}-$(get_min_sdk_version)"
 }
 
 get_umbrella_xcframework_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "bundle-apple-xcframework-$(get_min_sdk_version)${LTS_POSTFIX}"
+  echo "bundle-apple-xcframework-$(get_min_sdk_version)"
 }
 
 #
@@ -680,35 +657,31 @@ get_umbrella_xcframework_directory() {
 #
 get_universal_library_directory() {
   local ARCHITECTURE_VARIANT="$1"
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
 
   case ${ARCHITECTURE_VARIANT} in
   "${ARCH_VAR_IOS}")
-    echo "bundle-apple-universal-ios-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-ios-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_IPHONEOS}")
-    echo "bundle-apple-universal-iphoneos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-iphoneos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_IPHONESIMULATOR}")
-    echo "bundle-apple-universal-iphonesimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-iphonesimulator-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_MAC_CATALYST}")
-    echo "bundle-apple-universal-mac-catalyst-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-mac-catalyst-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_TVOS}")
-    echo "bundle-apple-universal-tvos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-tvos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_APPLETVOS}")
-    echo "bundle-apple-universal-appletvos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-appletvos-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    echo "bundle-apple-universal-appletvsimulator-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-appletvsimulator-$(get_min_sdk_version)"
     ;;
   "${ARCH_VAR_MACOS}")
-    echo "bundle-apple-universal-macos-$(get_min_sdk_version)${LTS_POSTFIX}"
+    echo "bundle-apple-universal-macos-$(get_min_sdk_version)"
     ;;
   esac
 }
@@ -718,35 +691,31 @@ get_universal_library_directory() {
 #
 get_apple_architecture_variant() {
   local ARCHITECTURE_VARIANT="$1"
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
 
   case ${ARCHITECTURE_VARIANT} in
   "${ARCH_VAR_IOS}")
-    echo "ios${LTS_POSTFIX}"
+    echo "ios"
     ;;
   "${ARCH_VAR_IPHONEOS}")
-    echo "iphoneos${LTS_POSTFIX}"
+    echo "iphoneos"
     ;;
   "${ARCH_VAR_IPHONESIMULATOR}")
-    echo "iphonesimulator${LTS_POSTFIX}"
+    echo "iphonesimulator"
     ;;
   "${ARCH_VAR_MAC_CATALYST}")
-    echo "mac-catalyst${LTS_POSTFIX}"
+    echo "mac-catalyst"
     ;;
   "${ARCH_VAR_TVOS}")
-    echo "tvos${LTS_POSTFIX}"
+    echo "tvos"
     ;;
   "${ARCH_VAR_APPLETVOS}")
-    echo "appletvos${LTS_POSTFIX}"
+    echo "appletvos"
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
-    echo "appletvsimulator${LTS_POSTFIX}"
+    echo "appletvsimulator"
     ;;
   "${ARCH_VAR_MACOS}")
-    echo "macos${LTS_POSTFIX}"
+    echo "macos"
     ;;
   esac
 }
@@ -901,8 +870,8 @@ build_info_plist() {
   local FILE_PATH="$1"
   local FRAMEWORK_NAME="$2"
   local FRAMEWORK_ID="$3"
-  local FRAMEWORK_SHORT_VERSION="${4/LTS/1000}"
-  local FRAMEWORK_VERSION="${5/LTS/1000}"
+  local FRAMEWORK_SHORT_VERSION="$4"
+  local FRAMEWORK_VERSION="$5"
   local ARCHITECTURE_VARIANT="$6"
 
   case ${FFMPEG_KIT_BUILD_TYPE} in
@@ -1100,6 +1069,10 @@ get_min_sdk_version() {
     esac
     ;;
   esac
+}
+
+get_min_sdk_version_flag() {
+  echo "-DFFMPEG_KIT_MIN_SDK=\\\"$(get_min_sdk_version)\\\""
 }
 
 get_sdk_path() {

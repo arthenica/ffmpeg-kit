@@ -56,8 +56,8 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-lts-on-linux:
-    name: android lts on linux
+  build-api-16-on-linux:
+    name: android api 16 on linux
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -80,7 +80,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --lts --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --api-level=16 --enable-android-media-codec --enable-android-zlib
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -116,8 +116,8 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-lts-on-macos:
-    name: android lts on macos
+  build-api-16-on-macos:
+    name: android api 16 on macos
     runs-on: macos-12
     strategy:
       matrix:
@@ -138,7 +138,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh -d --lts --enable-android-media-codec --enable-android-zlib
+        run: ./android.sh -d --api-level=16 --enable-android-media-codec --enable-android-zlib
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log

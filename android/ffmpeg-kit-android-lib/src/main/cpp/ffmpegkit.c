@@ -902,8 +902,13 @@ Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativeVersion(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_arthenica_ffmpegkit_FFmpegKitConfig_getNativePackageName(
     JNIEnv *env, jclass object) {
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define FFMPEG_KIT_PACKAGE_STR TOSTRING(FFMPEG_KIT_PACKAGE)
+
 #ifdef FFMPEG_KIT_PACKAGE
-    return (*env)->NewStringUTF(env, FFMPEG_KIT_PACKAGE);
+    return (*env)->NewStringUTF(env, FFMPEG_KIT_PACKAGE_STR);
 #else
     return (*env)->NewStringUTF(env, "");
 #endif

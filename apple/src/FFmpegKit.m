@@ -31,9 +31,19 @@
 
     [FFmpegKitConfig class];
 
-    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@.\n", [Packages getPackageName],
-          [ArchDetect getArch], [FFmpegKitConfig getVersion],
-          [FFmpegKitConfig getBuildDate]);
+    #if TARGET_OS_MACCATALYST
+        NSString* osType = @"maccatalyst";
+    #elif TARGET_OS_TV
+        NSString* osType = @"tvos";
+    #elif TARGET_OS_IOS
+        NSString* osType = @"ios";
+    #elif TARGET_OS_MAC
+        NSString* osType = @"macos";
+    #endif
+
+    NSLog(@"Loaded ffmpeg-kit-%@-%@-%@-%@%@-%@.\n", [Packages getPackageName],
+          [ArchDetect getArch], [FFmpegKitConfig getVersion], osType,
+          [ArchDetect getMinSdk], [FFmpegKitConfig getBuildDate]);
 }
 
 + (FFmpegSession *)executeWithArguments:(NSArray *)arguments {

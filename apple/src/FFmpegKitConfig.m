@@ -1033,11 +1033,7 @@ int executeFFprobe(long sessionId, NSArray *arguments) {
 }
 
 + (NSString *)getVersion {
-    if ([FFmpegKitConfig isLTSBuild] == 1) {
-        return [NSString stringWithFormat:@"%@-lts", FFmpegKitVersion];
-    } else {
-        return FFmpegKitVersion;
-    }
+    return FFmpegKitVersion;
 }
 
 + (int)isLTSBuild {

@@ -10,40 +10,37 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     MY_ARMV7_NEON := ${ARMV7_NEON}
 endif
 
-ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-    ifeq ($(MY_ARMV7_NEON), true)
-        MY_BUILD_DIR := android-$(TARGET_ARCH)-neon-$(API)$(LTS_POSTFIX)
-    else
-        MY_BUILD_DIR := android-$(TARGET_ARCH)-$(API)$(LTS_POSTFIX)
-    endif
-else
-    MY_BUILD_DIR := android-$(TARGET_ARCH)-$(API)$(LTS_POSTFIX)
-endif
-
-FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/include
-
+# DEFINE ARCH FLAGS
 MY_ARM_MODE := arm
 MY_ARM_NEON := false
-LOCAL_PATH := $(MY_LOCAL_PATH)/../ffmpeg-kit-android-lib/src/main/cpp
-
-# DEFINE ARCH FLAGS
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     MY_ARCH_FLAGS := ARM_V7A
     MY_ARM_NEON := true
+    ifeq ($(MY_ARMV7_NEON), true)
+        MY_BUILD_DIR := $(ARMV7_NEON_BUILD_PATH)
+    else
+        MY_BUILD_DIR := $(ARMV7_BUILD_PATH)
+    endif
 endif
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
     MY_ARCH_FLAGS := ARM64_V8A
     MY_ARM_NEON := true
+    MY_BUILD_DIR := $(ARM64_BUILD_PATH)
 endif
 ifeq ($(TARGET_ARCH_ABI), x86)
     MY_ARCH_FLAGS := X86
     MY_ARM_NEON := true
+    MY_BUILD_DIR := $(X86_BUILD_PATH)
 endif
 ifeq ($(TARGET_ARCH_ABI), x86_64)
     MY_ARCH_FLAGS := X86_64
     MY_ARM_NEON := true
+    MY_BUILD_DIR := $(X86_64_BUILD_PATH)
 endif
+FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/include
+LOCAL_PATH := $(MY_LOCAL_PATH)/../ffmpeg-kit-android-lib/src/main/cpp
 
+# 16 kb page size support for arm64-v8a and x86_64
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
     MY_LDFLAGS := -Wl,-z,max-page-size=16384
 else ifeq ($(TARGET_ARCH_ABI),x86_64)

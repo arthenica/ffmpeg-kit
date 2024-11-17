@@ -22,6 +22,10 @@ get_ffmpeg_kit_version() {
   echo "${FFMPEG_KIT_VERSION}"
 }
 
+get_min_api_level_flag() {
+  echo "-DFFMPEG_KIT_MIN_SDK=${API}"
+}
+
 display_help() {
   local COMMAND=$(echo "$0" | sed -e 's/\.\///g')
 
@@ -33,7 +37,7 @@ under the prebuilt folder.\n"
   echo -e "Usage: ./$COMMAND [OPTION]... [VAR=VALUE]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices\n      --jobs=N\t\t\tnumber of jobs to run [auto]\n      --api-level=api\t\toverride Android api level [24]\n      --toolchain=path\t\toverride the default (llvm) toolchain path\n      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (saf) [no]"
+  display_help_options "      --jobs=N\t\t\tnumber of jobs to run [auto]\n      --api-level=api\t\toverride Android api level [24]\n      --toolchain=path\t\toverride the default (llvm) toolchain path\n      --no-ffmpeg-kit-protocols\tdisable custom ffmpeg-kit protocols (saf) [no]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -58,18 +62,7 @@ enable_main_build() {
   export API=24
 }
 
-enable_lts_build() {
-  export FFMPEG_KIT_LTS_BUILD="1"
-
-  # LTS RELEASES USE API LEVEL 16 / Android 4.1 (JELLY BEAN)
-  export API=16
-}
-
 build_application_mk() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
-  fi
-
   if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_ZIMG]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SRT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_CHROMAPRINT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_LIBILBC]} -eq 1 ]] || [[ -n ${CUSTOM_LIBRARY_USES_CPP} ]]; then
     local APP_STL="c++_shared"
   else
@@ -80,6 +73,8 @@ build_application_mk() {
   if [[ -z ${NO_FFMPEG_KIT_PROTOCOLS} ]]; then
     local USES_FFMPEG_KIT_PROTOCOLS="-DUSES_FFMPEG_KIT_PROTOCOLS"
   fi
+
+  local MIN_API=$(get_min_api_level_flag)
 
   rm -f "${BASEDIR}/android/jni/Application.mk"
 
@@ -94,7 +89,7 @@ APP_ALLOW_MISSING_DEPS := true
 
 APP_PLATFORM := android-${API}
 
-APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable ${USES_FFMPEG_KIT_PROTOCOLS} ${FFMPEG_KIT_DEBUG} ${EXTRA_CFLAGS}
+APP_CFLAGS := -O3 -DANDROID ${MIN_API} ${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable ${USES_FFMPEG_KIT_PROTOCOLS} ${FFMPEG_KIT_DEBUG} ${EXTRA_CFLAGS}
 
 APP_LDFLAGS := -Wl,--hash-style=both ${EXTRA_LDFLAGS}
 EOF
@@ -228,14 +223,10 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
-  fi
-
   if [[ $(compare_versions "$DETECTED_NDK_VERSION" "23") -ge 0 ]]; then
-    echo "-fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD_FLAG}-D__ANDROID__ -D__ANDROID_MIN_SDK_VERSION__=${API}"
+    echo "-fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID -D__ANDROID__ -D__ANDROID_MIN_SDK_VERSION__=${API} $(get_min_api_level_flag)"
   else
-    echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID ${LTS_BUILD_FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+    echo "-fno-integrated-as -fstrict-aliasing -DANDROID_NDK -fPIC -DANDROID -D__ANDROID__ -D__ANDROID_API__=${API} $(get_min_api_level_flag)"
   fi
 }
 
@@ -373,7 +364,7 @@ get_cflags() {
 }
 
 get_cxxflags() {
-  local COMMON_INCLUDES=$(get_common_includes)
+  local COMMON_FLAGS="$(get_min_api_level_flag) $(get_common_includes)"
 
   if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
     local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
@@ -389,26 +380,26 @@ get_cxxflags() {
 
   case $1 in
   gnutls)
-    echo "${COMMON_INCLUDES} -std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_FLAGS} -std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   ffmpeg)
     if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
-      echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections ${EXTRA_CXXFLAGS}"
+      echo "${COMMON_FLAGS} -std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections ${EXTRA_CXXFLAGS}"
     else
-      echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG} ${EXTRA_CXXFLAGS}"
+      echo "${COMMON_FLAGS} -std=c++11 -fno-exceptions -fno-rtti ${FFMPEG_KIT_DEBUG} ${EXTRA_CXXFLAGS}"
     fi
     ;;
   opencore-amr)
-    echo "${COMMON_INCLUDES} ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   x265)
-    echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_FLAGS} -std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   rubberband | srt | tesseract | zimg)
-    echo "${COMMON_INCLUDES} -std=c++11 ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_FLAGS} -std=c++11 ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   *)
-    echo "${COMMON_INCLUDES} -std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
+    echo "${COMMON_FLAGS} -std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS} ${EXTRA_CXXFLAGS}"
     ;;
   esac
 }
@@ -995,21 +986,11 @@ get_android_cmake_ndk_abi() {
 }
 
 get_build_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "android-$(get_target_cpu)-${API}${LTS_POSTFIX}"
+  echo "android-$(get_target_cpu)-${API}"
 }
 
 get_aar_directory() {
-  local LTS_POSTFIX=""
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    LTS_POSTFIX="-lts"
-  fi
-
-  echo "bundle-android-aar-${API}${LTS_POSTFIX}"
+  echo "bundle-android-aar-${API}"
 }
 
 android_ndk_cmake() {

@@ -170,4 +170,12 @@
     return arch;
 }
 
++ (NSString *)getMinSdk {
+#ifdef FFMPEG_KIT_MIN_SDK
+    return [NSString stringWithUTF8String:FFMPEG_KIT_MIN_SDK];
+#else
+    return @"";
+#endif
+}
+
 @end

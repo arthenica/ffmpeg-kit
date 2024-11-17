@@ -73,8 +73,8 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-lts-on-macos-monterey:
-    name: macos lts on monterey
+  build-min-sdk-1012-on-macos-monterey:
+    name: macos min sdk 10.12 on monterey
     runs-on: macos-12
     strategy:
       matrix:
@@ -89,7 +89,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: ./macos.sh --lts --enable-macos-audiotoolbox --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
+        run: ./macos.sh --target=10.12 --enable-macos-audiotoolbox --enable-macos-bzip2 --enable-macos-coreimage --enable-macos-libiconv --enable-macos-opencl --enable-macos-opengl --enable-macos-videotoolbox --enable-macos-zlib
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log

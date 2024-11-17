@@ -76,6 +76,14 @@ public class NativeLoader {
         }
     }
 
+    static String loadMinSdk() {
+        if (isTestModeDisabled()) {
+            return AbiDetect.getNativeMinSdk();
+        } else {
+            return String.format(Locale.getDefault(), "%d", Build.VERSION.SDK_INT);
+        }
+    }
+
     static String loadPackageName() {
         if (isTestModeDisabled()) {
             return Packages.getPackageName();
@@ -85,22 +93,12 @@ public class NativeLoader {
     }
 
     static String loadVersion() {
-        final String version = "6.0";
+        final String version = "6.1.2";
 
         if (isTestModeDisabled()) {
             return FFmpegKitConfig.getVersion();
-        } else if (loadIsLTSBuild()) {
-            return String.format("%s-lts", version);
         } else {
             return version;
-        }
-    }
-
-    static boolean loadIsLTSBuild() {
-        if (isTestModeDisabled()) {
-            return AbiDetect.isNativeLTSBuild();
-        } else {
-            return true;
         }
     }
 

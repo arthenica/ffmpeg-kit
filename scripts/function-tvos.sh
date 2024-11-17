@@ -20,7 +20,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   echo -e "Usage: ./$COMMAND [OPTION]...\n"
   echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
-  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "  -l, --lts			build lts packages to support sdk 10.0+ devices\n      --jobs=N\t\t\tnumber of jobs to run [auto]" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
+  display_help_options "  -x, --xcframework\t\tbuild xcframework bundles instead of framework bundles" "      --jobs=N\t\t\tnumber of jobs to run [auto]" "      --target=tvos sdk version\toverride minimum deployment target [11.0]"
   display_help_licensing
 
   echo -e "Architectures:"
@@ -33,9 +33,7 @@ set explicitly. When compilation ends, libraries are created under the prebuilt 
   echo -e "  --full\t\t\tenables all non-GPL external libraries"
   echo -e "  --enable-tvos-audiotoolbox\tbuild with built-in Apple AudioToolbox support [no]"
   echo -e "  --enable-tvos-bzip2\t\tbuild with built-in bzip2 support [no]"
-  if [[ -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support [no]"
-  fi
+  echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support [no]"
   echo -e "  --enable-tvos-zlib\t\tbuild with built-in zlib [no]"
   echo -e "  --enable-tvos-libiconv\tbuild with built-in libiconv [no]"
 
@@ -57,27 +55,11 @@ enable_main_build() {
   fi
 }
 
-enable_lts_build() {
-  export FFMPEG_KIT_LTS_BUILD="1"
-
-  if [[ $(compare_versions "$DETECTED_TVOS_SDK_VERSION" "10.0") -le 0 ]]; then
-    export TVOS_MIN_VERSION=$DETECTED_TVOS_SDK_VERSION
-  else
-
-    # XCODE 8.0 HAS TVOS SDK 10.0
-    export TVOS_MIN_VERSION=10.0
-  fi
-}
-
 get_common_includes() {
   echo "-I${SDK_PATH}/usr/include"
 }
 
 get_common_cflags() {
-  if [[ -n ${FFMPEG_KIT_LTS_BUILD} ]]; then
-    local LTS_BUILD_FLAG="-DFFMPEG_KIT_LTS "
-  fi
-
   local BUILD_DATE="-DFFMPEG_KIT_BUILD_DATE=$(date +%Y%m%d 2>>"${BASEDIR}"/build.log)"
   if [ -z $NO_BITCODE ]; then
     local BITCODE_FLAGS="-fembed-bitcode"
@@ -85,10 +67,10 @@ get_common_cflags() {
 
   case ${ARCH} in
   arm64)
-    echo "-fstrict-aliasing ${BITCODE_FLAGS} -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing ${BITCODE_FLAGS} -DTVOS $(get_min_sdk_version_flag) ${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   x86-64 | arm64-simulator)
-    echo "-fstrict-aliasing -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -DTVOS $(get_min_sdk_version_flag) ${BUILD_DATE} -Wno-incompatible-function-pointer-types -isysroot ${SDK_PATH}"
     ;;
   esac
 }
@@ -250,7 +232,7 @@ get_asmflags() {
 }
 
 get_cxxflags() {
-  local COMMON_CFLAGS="$(get_common_cflags "$1") $(get_common_includes "$1") $(get_arch_specific_cflags) $(get_min_version_cflags "$1")"
+  local COMMON_CFLAGS="$(get_common_cflags "$1") $(get_common_includes "$1") $(get_arch_specific_cflags) $(get_min_version_cflags "$1") $(get_min_sdk_version_flag)"
   if [[ -z ${FFMPEG_KIT_DEBUG} ]]; then
     local OPTIMIZATION_FLAGS="-Oz"
   else

@@ -5,7 +5,6 @@ android {
         namespace 'com.arthenica.ffmpegkit'
     }
     compileSdk 34
-    ndkVersion "25.2.9519653"
 
     defaultConfig {
         minSdk 24

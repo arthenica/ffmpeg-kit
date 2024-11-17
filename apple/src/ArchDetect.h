@@ -41,6 +41,13 @@
  */
 + (NSString *)getArch;
 
+/**
+ * Returns the minimum skd version required to run this native library
+ *
+ * @return the minimum skd version required to run this native library
+ */
++ (NSString *)getMinSdk;
+
 @end
 
 #endif // FFMPEG_KIT_ARCH_DETECT_H

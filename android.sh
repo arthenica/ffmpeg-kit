@@ -17,7 +17,7 @@ source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 disabled_libraries=()
 
-# SET DEFAULTS SETTINGS
+# SET DEFAULT SETTINGS
 enable_default_android_architectures
 enable_default_android_libraries
 enable_main_build
@@ -33,18 +33,6 @@ DISPLAY_HELP=""
 BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_VERSION=$(git describe --tags --always 2>>"${BASEDIR}"/build.log)
-
-# PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
-rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
-cp "${BASEDIR}"/tools/android/build.gradle "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
-for argument in "$@"; do
-  if [[ "$argument" == "-l" ]] || [[ "$argument" == "--lts" ]]; then
-    enable_lts_build
-    BUILD_TYPE_ID+="LTS "
-    rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
-    cp "${BASEDIR}"/tools/android/build.lts.gradle "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
-  fi
-done
 
 # PROCESS BUILD OPTIONS
 while [ ! $# -eq 0 ]; do
@@ -82,7 +70,6 @@ while [ ! $# -eq 0 ]; do
   -s | --speed)
     optimize_for_speed
     ;;
-  -l | --lts) ;;
   -f | --force)
     export BUILD_FORCE="1"
     ;;
@@ -209,7 +196,7 @@ if [[ -n ${DISPLAY_HELP} ]]; then
 fi
 
 # SET API LEVEL IN build.gradle
-${SED_INLINE} "s/minSdkVersion .*/minSdkVersion ${API}/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
+${SED_INLINE} "s/minSdk .*/minSdk ${API}/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
 ${SED_INLINE} "s/versionCode ..0/versionCode ${API}0/g" "${BASEDIR}"/android/ffmpeg-kit-android-lib/build.gradle 1>>"${BASEDIR}"/build.log 2>&1
 
 echo -e "\nBuilding ffmpeg-kit ${BUILD_TYPE_ID}library for Android\n"
@@ -305,11 +292,15 @@ fi
 if [[ ${ENABLED_ARCHITECTURES[ARCH_X86_64]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
 fi
-if [[ ! -z ${FFMPEG_KIT_LTS_BUILD} ]]; then
-  mkdir -p "${BASEDIR}"/android/build 1>>"${BASEDIR}"/build.log 2>&1
-  append_file "${BASEDIR}"/android/jni/build.mk "LTS_POSTFIX := -lts"
+append_file "${BASEDIR}"/android/jni/build.mk "ARMV7_BUILD_PATH := android-arm-${API}"
+append_file "${BASEDIR}"/android/jni/build.mk "ARMV7_NEON_BUILD_PATH := android-arm-neon-${API}"
+append_file "${BASEDIR}"/android/jni/build.mk "X86_BUILD_PATH := android-x86-${API}"
+if [[ $(compare_versions "$API" "21") -lt 0 ]]; then
+  append_file "${BASEDIR}"/android/jni/build.mk "ARM64_BUILD_PATH := android-arm64-21"
+  append_file "${BASEDIR}"/android/jni/build.mk "X86_64_BUILD_PATH := android-x86_64-21"
 else
-  append_file "${BASEDIR}"/android/jni/build.mk "LTS_POSTFIX := "
+  append_file "${BASEDIR}"/android/jni/build.mk "ARM64_BUILD_PATH := android-arm64-${API}"
+  append_file "${BASEDIR}"/android/jni/build.mk "X86_64_BUILD_PATH := android-x86_64-${API}"
 fi
 
 # BUILD FFMPEG-KIT

@@ -101,4 +101,11 @@ public class AbiDetect {
      */
     native static String getNativeBuildConf();
 
+    /**
+     * <p>Returns the minimum Android API level required to run this library.
+     *
+     * @return minimum Android API level required to run this library
+     */
+    public native static String getNativeMinSdk();
+
 }

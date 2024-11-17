@@ -1,4 +1,4 @@
-LOCAL_PATH := $(call my-dir)/../../../../prebuilt/android-$(TARGET_ARCH)-neon-$(API)$(MY_LTS_POSTFIX)/ffmpeg/lib
+LOCAL_PATH := $(call my-dir)/../../../../prebuilt/$(MY_BUILD_DIR)/ffmpeg/lib
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := true

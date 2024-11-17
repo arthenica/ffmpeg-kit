@@ -18,7 +18,7 @@ source "${BASEDIR}"/scripts/variable.sh
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 disabled_libraries=()
 
-# SET DEFAULTS SETTINGS
+# SET DEFAULT SETTINGS
 enable_default_macos_architectures
 
 # SELECT XCODE VERSION USED FOR BUILDING
@@ -48,14 +48,6 @@ fi
 
 # MAIN BUILDS ENABLED BY DEFAULT
 enable_main_build
-
-# PROCESS LTS BUILD OPTION FIRST AND SET BUILD TYPE: MAIN OR LTS
-for argument in "$@"; do
-  if [[ "$argument" == "-l" ]] || [[ "$argument" == "--lts" ]]; then
-    enable_lts_build
-    BUILD_TYPE_ID+="LTS "
-  fi
-done
 
 # PROCESS BUILD OPTIONS
 while [ ! $# -eq 0 ]; do
@@ -89,7 +81,6 @@ while [ ! $# -eq 0 ]; do
   -s | --speed)
     optimize_for_speed
     ;;
-  -l | --lts) ;;
   -x | --xcframework)
     FFMPEG_KIT_XCF_BUILD="1"
     ;;

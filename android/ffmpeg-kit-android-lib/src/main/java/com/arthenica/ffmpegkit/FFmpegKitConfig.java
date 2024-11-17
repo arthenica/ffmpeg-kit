@@ -179,7 +179,7 @@ public class FFmpegKitConfig {
         globalLogRedirectionStrategy = LogRedirectionStrategy.PRINT_LOGS_WHEN_NO_CALLBACKS_DEFINED;
         safUrlsReusable = new AtomicBoolean(false);
 
-        android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadBuildDate()));
+        android.util.Log.i(FFmpegKitConfig.TAG, String.format("Loaded ffmpeg-kit-%s-%s-%s-api%s-%s.", NativeLoader.loadPackageName(), NativeLoader.loadAbi(), NativeLoader.loadVersion(), NativeLoader.loadMinSdk(), NativeLoader.loadBuildDate()));
     }
 
     /**
@@ -574,18 +574,17 @@ public class FFmpegKitConfig {
      * @return FFmpegKit version
      */
     public static String getVersion() {
-        if (isLTSBuild()) {
-            return String.format("%s-lts", getNativeVersion());
-        } else {
-            return getNativeVersion();
-        }
+        return getNativeVersion();
     }
 
     /**
      * <p>Returns whether FFmpegKit release is a Long Term Release or not.
      *
      * @return true/yes or false/no
+     * @deprecated as of version 6.1.2, use the {@link AbiDetect#getNativeMinSdk()} method to
+     * determine the features supported by this version
      */
+    @Deprecated(since = "6.1.2", forRemoval = true)
     public static boolean isLTSBuild() {
         return AbiDetect.isNativeLTSBuild();
     }

@@ -76,4 +76,13 @@ Java_com_arthenica_ffmpegkit_AbiDetect_isNativeLTSBuild(JNIEnv *, jclass);
 JNIEXPORT jstring JNICALL
 Java_com_arthenica_ffmpegkit_AbiDetect_getNativeBuildConf(JNIEnv *, jclass);
 
+/*
+ * Class:     com_arthenica_ffmpegkit_AbiDetect
+ * Method:    getNativeMinSdk
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_com_arthenica_ffmpegkit_AbiDetect_getNativeMinSdk(
+JNIEnv *env, jclass object);
+
 #endif /* FFMPEG_KIT_ABIDETECT_H */

@@ -147,7 +147,7 @@ typedef NS_ENUM(NSUInteger, Signal) {
  *
  * @return true/yes or false/no
  */
-+ (int)isLTSBuild;
++ (int)isLTSBuild __attribute__((deprecated("Deprecated as of version 6.1.2. Use AbiDetect.getMinSdk() method to determine the features supported by this version.")));
 
 /**
  * Returns FFmpegKit library build date.
