@@ -376,6 +376,14 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (NSArray*)getSessions;
 
 /**
+ * <p>Clears the session specified with <code>sessionId</code> from the session history.
+ * <p>Note that callbacks cannot be triggered for deleted sessions.
+ *
+ * @param sessionId session identifier
+ */
++ (void)clearSession:(long)sessionId;
+
+/**
  * <p>Clears all, including ongoing, sessions in the session history.
  * <p>Note that callbacks cannot be triggered for deleted sessions.
  */
