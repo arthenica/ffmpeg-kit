@@ -496,6 +496,18 @@ class FFmpegKitConfig {
     }
   }
 
+  /// Deletes a session from the session history.
+  /// Note that callbacks cannot be triggered for deleted sessions.
+  static Future<void> clearSession(int sessionId) async {
+    try {
+      await init();
+      return _platform.clearSession(sessionId);
+    } on PlatformException catch (e, stack) {
+      print("Plugin clearSession error: ${e.message}");
+      return Future.error("clearSession failed.", stack);
+    }
+  }
+
   /// Clears all, including ongoing, sessions in the session history.
   /// Note that callbacks cannot be triggered for deleted sessions.
   static Future<void> clearSessions() async {

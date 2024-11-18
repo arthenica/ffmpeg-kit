@@ -272,6 +272,10 @@ abstract class FFmpegKitPlatform extends PlatformInterface {
         'ffmpegKitConfigGetSessions() has not been implemented!');
   }
 
+  Future<void> clearSession(int sessionId) async {
+    throw UnimplementedError('clearSession() has not been implemented!');
+  }
+
   Future<void> clearSessions() async {
     throw UnimplementedError('clearSessions() has not been implemented!');
   }
