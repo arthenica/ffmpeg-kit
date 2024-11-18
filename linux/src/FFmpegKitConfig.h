@@ -372,6 +372,14 @@ class FFmpegKitConfig {
     static std::shared_ptr<ffmpegkit::Session> getSession(const long sessionId);
 
     /**
+     * Deletes the session specified with <code>sessionId</code> from the session
+     * history.
+     *
+     * @param sessionId session identifier
+     */
+    static void deleteSession(const long sessionId);
+
+    /**
      * Returns the last session created from the session history.
      *
      * @return the last session created or nullptr if session history is empty

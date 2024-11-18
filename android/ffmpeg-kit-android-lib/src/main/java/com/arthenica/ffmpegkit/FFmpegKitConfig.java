@@ -117,7 +117,7 @@ public class FFmpegKitConfig {
     /* Session history variables */
     private static int sessionHistorySize;
     private static final Map<Long, Session> sessionHistoryMap;
-    private static final List<Session> sessionHistoryList;
+    private static final ArrayList<Session> sessionHistoryList;
     private static final Object sessionHistoryLock;
 
     private static int asyncConcurrencyLimit;
@@ -165,7 +165,7 @@ public class FFmpegKitConfig {
                 return (this.size() > sessionHistorySize);
             }
         };
-        sessionHistoryList = new LinkedList<>();
+        sessionHistoryList = new ArrayList<>();
         sessionHistoryLock = new Object();
 
         globalLogCallback = null;
@@ -1177,6 +1177,20 @@ public class FFmpegKitConfig {
     public static Session getSession(final long sessionId) {
         synchronized (sessionHistoryLock) {
             return sessionHistoryMap.get(sessionId);
+        }
+    }
+
+    /**
+     * Deletes the session specified with <code>sessionId</code> from the session history.
+     *
+     * @param sessionId session identifier
+     */
+    public static void deleteSession(final long sessionId) {
+        synchronized (sessionHistoryLock) {
+            Session removedSession = sessionHistoryMap.remove(sessionId);
+            if (removedSession != null) {
+                sessionHistoryList.remove(removedSession);
+            }
         }
     }
 

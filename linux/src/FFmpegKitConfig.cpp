@@ -1371,6 +1371,18 @@ ffmpegkit::FFmpegKitConfig::getSession(const long sessionId) {
     }
 }
 
+void ffmpegkit::FFmpegKitConfig::deleteSession(const long sessionId) {
+    std::unique_lock<std::recursive_mutex> lock(sessionMutex, std::defer_lock);
+    lock.lock();
+
+    sessionHistoryMap.erase(sessionId);
+    auto it = std::remove_if(sessionHistoryList.begin(), sessionHistoryList.end(),
+                             [sessionId](std::shared_ptr<ffmpegkit::Session> session) {
+                                 return session->getSessionId() == sessionId;
+                             });
+    sessionHistoryList.erase(it, sessionHistoryList.end());
+}
+
 std::shared_ptr<ffmpegkit::Session>
 ffmpegkit::FFmpegKitConfig::getLastSession() {
     std::unique_lock<std::recursive_mutex> lock(sessionMutex, std::defer_lock);

@@ -1353,6 +1353,18 @@ int executeFFprobe(long sessionId, NSArray *arguments) {
     return session;
 }
 
++ (void)deleteSession:(long)sessionId {
+    [sessionHistoryLock lock];
+
+    id<Session> session = [sessionHistoryMap objectForKey:[NSNumber numberWithLong:sessionId]];
+    if (session != nil) {
+        [sessionHistoryMap removeObjectForKey:[NSNumber numberWithLong:sessionId]];
+        [sessionHistoryList removeObject:session];
+    }
+
+    [sessionHistoryLock unlock];
+}
+
 + (id<Session>)getLastSession {
     [sessionHistoryLock lock];
 

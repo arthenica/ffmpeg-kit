@@ -408,6 +408,14 @@ typedef NS_ENUM(NSUInteger, Signal) {
 + (id<Session>)getSession:(long)sessionId;
 
 /**
+ * Deletes the session specified with <code>sessionId</code> from the session
+ * history.
+ *
+ * @param sessionId session identifier
+ */
++ (void)deleteSession:(long)sessionId;
+
+/**
  * Returns the last session created from the session history.
  *
  * @return the last session created or nil if session history is empty
