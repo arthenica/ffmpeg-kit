@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux', 'r24-linux', 'r25c-linux', 'r26d-linux' ]
+        ndk-version: [ 'r22b-linux-x86_64', 'r25c-linux', 'r26d-linux', 'r27c-linux' ]
     defaults:
       run:
         shell: bash
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux' ]
+        ndk-version: [ 'r22b-linux-x86_64' ]
     defaults:
       run:
         shell: bash
@@ -89,10 +89,10 @@ jobs:
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
   build-main-on-macos:
     name: android main on macos
-    runs-on: macos-12
+    runs-on: macos-14
     strategy:
       matrix:
-        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin', 'r24-darwin', 'r25c-darwin', 'r26d-darwin' ]
+        ndk-version: [ 'r22b-darwin-x86_64', 'r25c-darwin', 'r26d-darwin' , 'r27c-darwin' ]
     defaults:
       run:
         shell: bash
@@ -118,10 +118,10 @@ jobs:
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
   build-api-16-on-macos:
     name: android api 16 on macos
-    runs-on: macos-12
+    runs-on: macos-13
     strategy:
       matrix:
-        ndk-version: [ 'r22b-darwin-x86_64', 'r23b-darwin' ]
+        ndk-version: [ 'r22b-darwin-x86_64' ]
     defaults:
       run:
         shell: bash
@@ -150,7 +150,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64' ]
+        ndk-version: [ 'r27c-linux' ]
     defaults:
       run:
         shell: bash

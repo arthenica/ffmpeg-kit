@@ -32,7 +32,7 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        xcode: [ '15.4', '16.0' ]
+        xcode: [ '15.3', '15.4' ]
     defaults:
       run:
         shell: bash
@@ -73,12 +73,12 @@ jobs:
       - name: print ffbuild logs
         if: ${{ failure() }}
         run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-min-sdk-100-on-macos-monterey:
-    name: tvos min sdk 10.0 on monterey
-    runs-on: macos-12
+  build-min-sdk-100-on-macos-ventura:
+    name: tvos min sdk 10.0 on ventura
+    runs-on: macos-13
     strategy:
       matrix:
-        xcode: [ '13.4.1', '14.2' ]
+        xcode: [ '15.2' ]
     defaults:
       run:
         shell: bash
