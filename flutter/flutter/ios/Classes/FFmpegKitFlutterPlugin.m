@@ -395,6 +395,12 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
     [self getSessions:result];
   } else if ([@"clearSessions" isEqualToString:call.method]) {
     [self clearSessions:result];
+  } else if ([@"clearSession" isEqualToString:call.method]) {
+    if (sessionId != nil) {
+      [self clearSession:sessionId result:result];
+    } else {
+      result([FlutterError errorWithCode:@"INVALID_SESSION" message:@"Invalid session id." details:nil]);
+    }
   } else if ([@"getSessionsByState" isEqualToString:call.method]) {
     NSNumber* stateIndex = call.arguments[@"state"];
     if (stateIndex != nil) {
@@ -907,6 +913,11 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
 
 - (void)getSessions:(FlutterResult)result {
   result([FFmpegKitFlutterPlugin toSessionArray:[FFmpegKitConfig getSessions]]);
+}
+
+- (void)clearSession:(NSNumber*)sessionId result:(FlutterResult)result {
+  [FFmpegKitConfig clearSession:[sessionId longValue]];
+  result(nil);
 }
 
 - (void)clearSessions:(FlutterResult)result {
