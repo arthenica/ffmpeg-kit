@@ -8,9 +8,6 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_libogg} -e
   autoreconf_library "${LIB_NAME}" 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 fi
 
-# FIX INCLUDE PATHS
-${SED_INLINE} 's/sys\/types/stdint/g' ${BASEDIR}/src/libogg/include/ogg/os_types.h
-
 ./configure \
   --prefix="${LIB_INSTALL_PREFIX}" \
   --with-pic \
