@@ -7,7 +7,7 @@ export FFMPEG_KIT_TMPDIR="${BASEDIR}/.tmp"
 ENABLED_ARCHITECTURES=(0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 # ARRAY OF ENABLED ARCHITECTURE VARIANTS
-ENABLED_ARCHITECTURE_VARIANTS=(0 0 0 0 0 0 0 0)
+ENABLED_ARCHITECTURE_VARIANTS=(0 0 0 0 0 0 0 0 0 0)
 
 # ARRAY OF ENABLED LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -30,14 +30,14 @@ ARCH_ARM_V7A_NEON=1         # android
 ARCH_ARMV7=2                # ios
 ARCH_ARMV7S=3               # ios
 ARCH_ARM64_V8A=4            # android
-ARCH_ARM64=5                # ios, tvos, macos
+ARCH_ARM64=5                # ios, tvos, xros, macos
 ARCH_ARM64E=6               # ios
 ARCH_I386=7                 # ios
 ARCH_X86=8                  # android
 ARCH_X86_64=9               # android, ios, linux, macos, tvos
 ARCH_X86_64_MAC_CATALYST=10 # ios
 ARCH_ARM64_MAC_CATALYST=11  # ios
-ARCH_ARM64_SIMULATOR=12     # ios
+ARCH_ARM64_SIMULATOR=12     # ios, xros
 
 # ARCH VARIANT INDEXES
 ARCH_VAR_IOS=1              # ios
@@ -48,6 +48,8 @@ ARCH_VAR_TVOS=5             # tvos
 ARCH_VAR_APPLETVOS=6        # tvos
 ARCH_VAR_APPLETVSIMULATOR=7 # tvos
 ARCH_VAR_MACOS=8            # macos
+ARCH_VAR_XROS=9             # xros
+ARCH_VAR_XRSIMULATOR=10     # xros
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
