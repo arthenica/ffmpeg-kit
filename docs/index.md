@@ -1,5 +1,15 @@
 # FFmpegKit
 
+## Notice
+FFmpegKit has been officially retired. There will be no further `ffmpeg-kit` releases. All previously released `ffmpeg-kit` binaries will be removed according to the following schedule. Thank you for your support and interest in this project.
+
+Thank you for your support and contributions over the course of this project.
+
+| FFmpegKit Version |  Available Until   |
+|:-----------------:|:------------------:|
+|   Less than 6.0   | February 1st, 2025 |
+|        6.0        |  April 1st, 2025   |
+
 <img src="https://github.com/arthenica/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
 
 `FFmpegKit` is a collection of tools to use `FFmpeg` in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
