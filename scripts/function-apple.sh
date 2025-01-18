@@ -117,6 +117,27 @@ disable_tvos_architecture_not_supported_on_detected_sdk_version() {
 #
 # 1. architecture index
 #
+disable_xros_architecture_not_supported_on_detected_sdk_version() {
+  local ARCH_NAME=$(get_arch_name $1)
+  
+  # No need to disable for any architecture at the moment, left as placeholder for the future
+  case ${ARCH_NAME} in
+  *)
+    local SUPPORTED=1
+    ;;
+  esac
+  
+  if [[ ${SUPPORTED} -ne 1 ]]; then
+    if [[ -z ${BUILD_FORCE} ]]; then
+      echo -e "INFO: Disabled ${ARCH_NAME} architecture which is not supported on visionOS SDK $DETECTED_XROS_SDK_VERSION\n" 1>>"${BASEDIR}"/build.log 2>&1
+      disable_arch "${ARCH_NAME}"
+    fi
+  fi
+}
+
+#
+# 1. architecture index
+#
 disable_macos_architecture_not_supported_on_detected_sdk_version() {
   local ARCH_NAME=$(get_arch_name $1)
 
@@ -160,6 +181,8 @@ build_apple_architecture_variant_strings() {
   export ALL_TVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_TVOS}")"
   export APPLETVOS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVOS}")"
   export APPLETV_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_APPLETVSIMULATOR}")"
+  export XROS_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_XROS}")"
+  export XR_SIMULATOR_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_XRSIMULATOR}")"
   export MACOSX_ARCHITECTURES="$(get_apple_architectures_for_variant "${ARCH_VAR_MACOS}")"
 }
 
@@ -647,6 +670,12 @@ get_framework_directory() {
   "${ARCH_VAR_TVOS}")
     echo "bundle-apple-framework-tvos${LTS_POSTFIX}"
     ;;
+  "${ARCH_VAR_XROS}")
+    echo "bundle-apple-framework-xros${LTS_POSTFIX}"
+    ;;
+  "${ARCH_VAR_XRSIMULATOR}")
+    echo "bundle-apple-framework-xrsimulator${LTS_POSTFIX}"
+    ;;
   "${ARCH_VAR_APPLETVOS}")
     echo "bundle-apple-framework-appletvos${LTS_POSTFIX}"
     ;;
@@ -708,6 +737,12 @@ get_universal_library_directory() {
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
     echo "bundle-apple-universal-appletvsimulator${LTS_POSTFIX}"
+    ;;
+  "${ARCH_VAR_XROS}")
+    echo "bundle-apple-universal-xros${LTS_POSTFIX}"
+    ;;
+  "${ARCH_VAR_XRSIMULATOR}")
+    echo "bundle-apple-universal-xrsimulator${LTS_POSTFIX}"
     ;;
   "${ARCH_VAR_MACOS}")
     echo "bundle-apple-universal-macos${LTS_POSTFIX}"
@@ -794,6 +829,16 @@ get_apple_architectures_for_variant() {
     ;;
   "${ARCH_VAR_APPLETVSIMULATOR}")
     for index in ${ARCH_X86_64} ${ARCH_ARM64_SIMULATOR}; do
+      ARCHITECTURES+=" $(get_full_arch_name "${index}") "
+    done
+    ;;
+  "${ARCH_VAR_XROS}")
+    for index in ${ARCH_ARM64} ${ARCH_ARM64_SIMULATOR}; do
+      ARCHITECTURES+=" $(get_full_arch_name "${index}") "
+    done
+    ;;
+  "${ARCH_VAR_XRSIMULATOR}")
+    for index in ${ARCH_ARM64_SIMULATOR}; do
       ARCHITECTURES+=" $(get_full_arch_name "${index}") "
     done
     ;;
@@ -977,6 +1022,9 @@ get_default_sdk_name() {
   tvos)
     echo "appletvos"
     ;;
+  xros)
+    echo "xros"
+    ;;    
   macos)
     echo "macosx"
     ;;
@@ -995,6 +1043,9 @@ get_sdk_name() {
       ;;
     tvos)
       echo "appletvos"
+      ;;
+    xros)
+      echo "xros"
       ;;
     macos)
       echo "macosx"
@@ -1024,6 +1075,9 @@ get_sdk_name() {
       ;;
     tvos)
       echo "appletvsimulator"
+      ;;
+    xros)
+      echo "xrsimulator"
       ;;
     esac
     ;;
@@ -1095,6 +1149,9 @@ get_min_sdk_version() {
       ;;
     tvos)
       echo "${TVOS_MIN_VERSION}"
+      ;;
+    xros)
+      echo "${XROS_MIN_VERSION}"
       ;;
     macos)
       echo "${MACOS_MIN_VERSION}"
