@@ -71,7 +71,7 @@ extern int const AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit;
   dispatch_queue_t asyncDispatchQueue;
 }
 
-RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
+RCT_EXPORT_MODULE()
 
 - (instancetype)init {
     self = [super init];
@@ -86,14 +86,8 @@ RCT_EXPORT_MODULE(FFmpegKitReactNativeModule);
     return self;
 }
 
-- (NSArray<NSString*>*)supportedEvents {
-    NSMutableArray *array = [NSMutableArray array];
-
-    [array addObject:EVENT_LOG_CALLBACK_EVENT];
-    [array addObject:EVENT_STATISTICS_CALLBACK_EVENT];
-    [array addObject:EVENT_COMPLETE_CALLBACK_EVENT];
-
-    return array;
+- (NSArray<NSString *> *)supportedEvents {
+    return @[@"FFmpegKitLogCallbackEvent", @"FFmpegKitStatisticsCallbackEvent", @"FFmpegKitCompleteCallbackEvent"];
 }
 
 - (void)registerGlobalCallbacks {
@@ -387,15 +381,15 @@ RCT_EXPORT_METHOD(closeFFmpegPipe:(NSString*)ffmpegPipePath resolver:(RCTPromise
 }
 
 RCT_EXPORT_METHOD(getFFmpegVersion:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitConfig getFFmpegVersion]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(isLTSBuild:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([NSNumber numberWithInt:[FFmpegKitConfig isLTSBuild]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getBuildDate:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitConfig getBuildDate]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(setEnvironmentVariable:(NSString*)variableName with:(NSString*)variableValue resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -514,21 +508,19 @@ RCT_EXPORT_METHOD(asyncMediaInformationSessionExecute:(int)sessionId withTimeout
 }
 
 RCT_EXPORT_METHOD(getLogLevel:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([NSNumber numberWithInt:[FFmpegKitConfig getLogLevel]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(setLogLevel:(int)level resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig setLogLevel:level];
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getSessionHistorySize:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([NSNumber numberWithInt:[FFmpegKitConfig getSessionHistorySize]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(setSessionHistorySize:(int)sessionHistorySize resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig setSessionHistorySize:sessionHistorySize];
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getSession:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -541,160 +533,95 @@ RCT_EXPORT_METHOD(getSession:(int)sessionId resolver:(RCTPromiseResolveBlock)res
 }
 
 RCT_EXPORT_METHOD(getLastSession:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionDictionary:[FFmpegKitConfig getLastSession]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getLastCompletedSession:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionDictionary:[FFmpegKitConfig getLastCompletedSession]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFmpegKitConfig getSessions]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(clearSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig clearSessions];
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getSessionsByState:(int)sessionState resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFmpegKitConfig getSessionsByState:sessionState]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getLogRedirectionStrategy:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule logRedirectionStrategyToNumber:[FFmpegKitConfig getLogRedirectionStrategy]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(setLogRedirectionStrategy:(int)logRedirectionStrategy resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig setLogRedirectionStrategy:logRedirectionStrategy];
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(messagesInTransmit:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([NSNumber numberWithInt:[FFmpegKitConfig messagesInTransmit:sessionId]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getPlatform:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve(PLATFORM_NAME);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(writeToPipe:(NSString*)inputPath onPipe:(NSString*)namedPipePath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    dispatch_async(asyncDispatchQueue, ^{
-
-        NSLog(@"Starting copy %@ to pipe %@ operation.\n", inputPath, namedPipePath);
-
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath: inputPath];
-        if (fileHandle == nil) {
-            NSLog(@"Failed to open file %@.\n", inputPath);
-            reject(@"Copy failed", [NSString stringWithFormat:@"Failed to open file %@.", inputPath], nil);
-            return;
-        }
-
-        NSFileHandle *pipeHandle = [NSFileHandle fileHandleForWritingAtPath: namedPipePath];
-        if (pipeHandle == nil) {
-            NSLog(@"Failed to open pipe %@.\n", namedPipePath);
-            reject(@"Copy failed", [NSString stringWithFormat:@"Failed to open pipe %@.", namedPipePath], nil);
-            [fileHandle closeFile];
-            return;
-        }
-
-        int BUFFER_SIZE = 4096;
-        unsigned long readBytes = 0;
-        unsigned long totalBytes = 0;
-        double startTime = CACurrentMediaTime();
-
-        @try {
-            [fileHandle seekToFileOffset: 0];
-
-            do {
-                NSData *data = [fileHandle readDataOfLength:BUFFER_SIZE];
-                readBytes = [data length];
-                if (readBytes > 0) {
-                    totalBytes += readBytes;
-                    [pipeHandle writeData:data];
-                }
-            } while (readBytes > 0);
-
-            double endTime = CACurrentMediaTime();
-
-            NSLog(@"Copying %@ to pipe %@ operation completed successfully. %lu bytes copied in %f seconds.\n", inputPath, namedPipePath, totalBytes, (endTime - startTime)/1000);
-
-            resolve(0);
-
-        } @catch (NSException *e) {
-            NSLog(@"Copy failed %@.\n", [e reason]);
-            reject(@"Copy failed", [NSString stringWithFormat:@"Copy %@ to %@ failed with error %@.", inputPath, namedPipePath, [e reason]], nil);
-        } @finally {
-            [fileHandle closeFile];
-            [pipeHandle closeFile];
-        }
-    });
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(selectDocument:(BOOL)writable title:(NSString*)title type:(NSString*)type array:(NSArray*)extraTypes resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  reject(@"Not Supported", @"Not supported on iOS platform.", nil);
+  reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getSafParameter:(NSString*)uriString mode:(NSString*)openMode resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  reject(@"Not Supported", @"Not supported on iOS platform.", nil);
+  reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 // FFmpegKit
 
 RCT_EXPORT_METHOD(cancel:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKit cancel];
-
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(cancelSession:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKit cancel:sessionId];
-
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getFFmpegSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFmpegKit listSessions]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 // FFprobeKit
 
 RCT_EXPORT_METHOD(getFFprobeSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listFFprobeSessions]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getMediaInformationSessions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFprobeKit listMediaInformationSessions]]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 // MediaInformationSession
 
 RCT_EXPORT_METHOD(getMediaInformation:(int)sessionId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    AbstractSession* session = (AbstractSession*)[FFmpegKitConfig getSession:sessionId];
-    if (session == nil) {
-        reject(@"SESSION_NOT_FOUND", @"Session not found.", nil);
-    } else {
-        if ([session isMediaInformation]) {
-            MediaInformationSession *mediaInformationSession = (MediaInformationSession*)session;
-            resolve([FFmpegKitReactNativeModule toMediaInformationDictionary:[mediaInformationSession getMediaInformation]]);
-        } else {
-            reject(@"NOT_MEDIA_INFORMATION_SESSION", @"A session is found but it does not have the correct type.", nil);
-        }
-    }
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 // Packages
 
 RCT_EXPORT_METHOD(getPackageName:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([Packages getPackageName]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([Packages getExternalLibraries]);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 RCT_EXPORT_METHOD(uninit:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve(nil);
+    reject(@"not_supported", @"iOS platform is not supported in this version", nil);
 }
 
 - (void)enableLogs {

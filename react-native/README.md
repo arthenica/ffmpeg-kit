@@ -1,16 +1,13 @@
-# FFmpegKit for React Native
+# FFmpeg Kit for React Native (Android Only Fork)
 
 ### 1. Features
 - Includes both `FFmpeg` and `FFprobe`
 - Supports
-  - Both `Android` and `iOS`
+  - Android only in this fork
   - FFmpeg `v6.0`
   - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
   - `Android API Level 24` or later
     - `API Level 16` on LTS releases
-  - `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `i386`, `x86_64`, `x86_64-mac-catalyst` and `arm64-mac-catalyst` architectures on iOS
-  - `iOS SDK 12.1` or later
-    - `iOS SDK 10` on LTS releases
   - Can process Storage Access Framework (SAF) Uris on Android
   - 25 external libraries
 
@@ -21,10 +18,12 @@
     `vid.stab`, `x264`, `x265`, `xvidcore`
 
   - `zlib` and `MediaCodec` Android system libraries
-  - `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` system frameworks on iOS
 
 - Includes Typescript definitions
 - Licensed under `LGPL 3.0` by default, some packages licensed by `GPL v3.0` effectively
+
+### Important Note
+This is a fork of the original FFmpeg Kit for React Native that removes iOS support to reduce package size. If you need iOS support, please use the original package.
 
 ### 2. Installation
 
@@ -47,24 +46,21 @@ packages and external libraries included in each one of them.
 
 ##### 2.1.1 Package Names
 
-The following table shows all package names and their respective API levels, iOS deployment targets defined in
-`ffmpeg-kit-react-native`.
+The following table shows all package names and their respective API levels defined in `ffmpeg-kit-react-native`.
 
 <table>
 <thead>
 <tr>
 <th align="center">Package</th>
-<th align="center" colspan="3">Main Release</th>
-<th align="center" colspan="3">LTS Release</th>
+<th align="center" colspan="2">Main Release</th>
+<th align="center" colspan="2">LTS Release</th>
 </tr>
 <tr>
 <th align="center"></th>
 <th align="center">Name</th>
 <th align="center">Android<br>API Level</th>
-<th align="center">iOS Minimum<br>Deployment Target</th>
 <th align="center">Name</th>
 <th align="center">Android<br>API Level</th>
-<th align="center">iOS Minimum<br>Deployment Target</th>
 </tr>
 </thead>
 <tbody>
@@ -72,73 +68,57 @@ The following table shows all package names and their respective API levels, iOS
 <td align="center">min</td>
 <td align="center">min</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">min-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">min-gpl</td>
 <td align="center">min-gpl</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">min-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">https</td>
 <td align="center">(*) https</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">https-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">https-gpl</td>
 <td align="center">https-gpl</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">https-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">audio</td>
 <td align="center">audio</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">audio-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">video</td>
 <td align="center">video</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">video-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">full</td>
 <td align="center">full</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">full-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 <tr>
 <td align="center">full-gpl</td>
 <td align="center">full-gpl</td>
 <td align="center">24</td>
-<td align="center">12.1</td>
 <td align="center">full-gpl-lts</td>
 <td align="center">16</td>
-<td align="center">10</td>
 </tr>
 </tbody>
 </table>

@@ -1,6 +1,11 @@
-import {NativeEventEmitter, NativeModules} from 'react-native';
+import {NativeEventEmitter, NativeModules, Platform} from 'react-native';
 
 const {FFmpegKitReactNativeModule} = NativeModules;
+
+// Check if the platform is iOS and warn the user
+if (Platform.OS === 'ios') {
+  console.warn('FFmpeg Kit: iOS platform is not supported in this version. All iOS-specific calls will fail.');
+}
 
 const ffmpegSessionCompleteCallbackMap = new Map()
 const ffprobeSessionCompleteCallbackMap = new Map()

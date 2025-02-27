@@ -17,10 +17,11 @@
  *  along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import <Foundation/Foundation.h>
-#import <ffmpegkit/FFmpegKitConfig.h>
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
-@interface FFmpegKitReactNativeModule : RCTEventEmitter<RCTBridgeModule>
+@interface FFmpegKitReactNativeModule : RCTEventEmitter <RCTBridgeModule>
+
+// This is a stub implementation that indicates iOS is not supported
+
 @end
