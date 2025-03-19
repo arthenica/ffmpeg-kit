@@ -125,5 +125,7 @@ repositories {
 
 dependencies {
   api 'com.facebook.react:react-native:+'
-  implementation 'com.arthenica:ffmpeg-kit-' + safePackageName(safeExtGet('ffmpegKitPackage', 'https')) + ':' + safePackageVersion(safeExtGet('ffmpegKitPackage', 'https'))
+  // https://mvnrepository.com/artifact/com.arthenica/smart-exception-java
+  implementation group: 'com.arthenica', name: 'smart-exception-java', version: '0.2.1'
+  api project(':ffmpeg-kit-binaries')
 }

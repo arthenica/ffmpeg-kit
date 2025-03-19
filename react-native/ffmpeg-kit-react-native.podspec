@@ -128,7 +128,7 @@ Pod::Spec.new do |s|
   s.subspec 'full-gpl-lts' do |ss|
       ss.source_files      = '**/FFmpegKitReactNativeModule.m',
                              '**/FFmpegKitReactNativeModule.h'
-      ss.dependency 'ffmpeg-kit-ios-full-gpl', "6.0.LTS"
+      ss.resource = 'https://github.com/pranjal-easy-peasy/ffmpeg-kit/releases/download/v6.0/ffmpeg-kit-full-gpl-6.0.LTS-ios-framework.zip'
       ss.ios.deployment_target = '10'
   end
 
