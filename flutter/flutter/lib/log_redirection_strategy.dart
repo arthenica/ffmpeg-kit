@@ -22,5 +22,5 @@ enum LogRedirectionStrategy {
   printLogsWhenNoCallbacksDefined,
   printLogsWhenGlobalCallbackNotDefined,
   printLogsWhenSessionCallbackNotDefined,
-  neverPrintLogs
+  neverPrintLogs,
 }

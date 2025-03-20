@@ -26,16 +26,16 @@ import 'src/ffmpeg_kit_factory.dart';
 /// An FFprobe session.
 class FFprobeSession extends AbstractSession {
   /// Creates a new FFprobe session with [argumentsArray].
-  static Future<FFprobeSession> create(List<String> argumentsArray,
-      [FFprobeSessionCompleteCallback? completeCallback = null,
-      LogCallback? logCallback = null,
-      LogRedirectionStrategy? logRedirectionStrategy = null]) async {
-    final session = await AbstractSession.createFFprobeSession(
-        argumentsArray, logRedirectionStrategy);
+  static Future<FFprobeSession> create(
+    List<String> argumentsArray, [
+    FFprobeSessionCompleteCallback? completeCallback = null,
+    LogCallback? logCallback = null,
+    LogRedirectionStrategy? logRedirectionStrategy = null,
+  ]) async {
+    final session = await AbstractSession.createFFprobeSession(argumentsArray, logRedirectionStrategy);
     final sessionId = session.getSessionId();
 
-    FFmpegKitFactory.setFFprobeSessionCompleteCallback(
-        sessionId, completeCallback);
+    FFmpegKitFactory.setFFprobeSessionCompleteCallback(sessionId, completeCallback);
     FFmpegKitFactory.setLogCallback(sessionId, logCallback);
 
     return session;

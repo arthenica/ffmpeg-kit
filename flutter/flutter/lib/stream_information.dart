@@ -53,62 +53,49 @@ class StreamInformation {
   String? getCodec() => this.getStringProperty(StreamInformation.keyCodec);
 
   /// Returns stream codec in long format.
-  String? getCodecLong() =>
-      this.getStringProperty(StreamInformation.keyCodecLong);
+  String? getCodecLong() => this.getStringProperty(StreamInformation.keyCodecLong);
 
   /// Returns stream format.
   String? getFormat() => this.getStringProperty(StreamInformation.keyFormat);
 
   /// Returns width.
-  int? getWidth() =>
-      this.getNumberProperty(StreamInformation.keyWidth)?.toInt();
+  int? getWidth() => this.getNumberProperty(StreamInformation.keyWidth)?.toInt();
 
   /// Returns height.
-  int? getHeight() =>
-      this.getNumberProperty(StreamInformation.keyHeight)?.toInt();
+  int? getHeight() => this.getNumberProperty(StreamInformation.keyHeight)?.toInt();
 
   /// Returns bitrate.
   String? getBitrate() => this.getStringProperty(StreamInformation.keyBitRate);
 
   /// Returns sample rate.
-  String? getSampleRate() =>
-      this.getStringProperty(StreamInformation.keySampleRate);
+  String? getSampleRate() => this.getStringProperty(StreamInformation.keySampleRate);
 
   /// Returns sample format.
-  String? getSampleFormat() =>
-      this.getStringProperty(StreamInformation.keySampleFormat);
+  String? getSampleFormat() => this.getStringProperty(StreamInformation.keySampleFormat);
 
   /// Returns channel layout.
-  String? getChannelLayout() =>
-      this.getStringProperty(StreamInformation.keyChannelLayout);
+  String? getChannelLayout() => this.getStringProperty(StreamInformation.keyChannelLayout);
 
   /// Returns sample aspect ratio.
-  String? getSampleAspectRatio() =>
-      this.getStringProperty(StreamInformation.keySampleAspectRatio);
+  String? getSampleAspectRatio() => this.getStringProperty(StreamInformation.keySampleAspectRatio);
 
   /// Returns display aspect ratio.
-  String? getDisplayAspectRatio() =>
-      this.getStringProperty(StreamInformation.keyDisplayAspectRatio);
+  String? getDisplayAspectRatio() => this.getStringProperty(StreamInformation.keyDisplayAspectRatio);
 
   /// Returns average frame rate.
-  String? getAverageFrameRate() =>
-      this.getStringProperty(StreamInformation.keyAverageFrameRate);
+  String? getAverageFrameRate() => this.getStringProperty(StreamInformation.keyAverageFrameRate);
 
   /// Returns real frame rate.
-  String? getRealFrameRate() =>
-      this.getStringProperty(StreamInformation.keyRealFrameRate);
+  String? getRealFrameRate() => this.getStringProperty(StreamInformation.keyRealFrameRate);
 
   /// Returns time base.
-  String? getTimeBase() =>
-      this.getStringProperty(StreamInformation.keyTimeBase);
+  String? getTimeBase() => this.getStringProperty(StreamInformation.keyTimeBase);
 
   /// Returns codec time base.
-  String? getCodecTimeBase() =>
-      this.getStringProperty(StreamInformation.keyCodecTimeBase);
+  String? getCodecTimeBase() => this.getStringProperty(StreamInformation.keyCodecTimeBase);
 
   /// Returns all tags.
-  Map<dynamic, dynamic>? getTags() =>
-      this.getProperty(StreamInformation.keyTags);
+  Map<dynamic, dynamic>? getTags() => this.getProperty(StreamInformation.keyTags);
 
   /// Returns the stream property associated with the key.
   String? getStringProperty(String key) => this._allProperties?[key];

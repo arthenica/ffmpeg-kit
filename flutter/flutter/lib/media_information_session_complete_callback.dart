@@ -26,5 +26,4 @@ import 'media_information_session.dart';
 /// see the execution result.
 /// If "getState" returns SessionState.failed then "getFailStackTrace" should
 /// be used to get the failure reason.
-typedef MediaInformationSessionCompleteCallback = void Function(
-    MediaInformationSession session);
+typedef MediaInformationSessionCompleteCallback = void Function(MediaInformationSession session);

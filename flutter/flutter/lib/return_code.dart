@@ -25,18 +25,15 @@ class ReturnCode {
 
   ReturnCode(this._value);
 
-  static bool isSuccess(ReturnCode? returnCode) =>
-      returnCode?.getValue() == ReturnCode.success;
+  static bool isSuccess(ReturnCode? returnCode) => returnCode?.getValue() == ReturnCode.success;
 
-  static bool isCancel(ReturnCode? returnCode) =>
-      returnCode?.getValue() == ReturnCode.cancel;
+  static bool isCancel(ReturnCode? returnCode) => returnCode?.getValue() == ReturnCode.cancel;
 
   int getValue() => this._value;
 
   bool isValueSuccess() => this._value == ReturnCode.success;
 
-  bool isValueError() =>
-      (this._value != ReturnCode.success) && (this._value != ReturnCode.cancel);
+  bool isValueError() => (this._value != ReturnCode.success) && (this._value != ReturnCode.cancel);
 
   bool isValueCancel() => this._value == ReturnCode.cancel;
 
