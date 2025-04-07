@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux', 'r24-linux', 'r25b-linux' ]
-        branches: [ 'main', 'development' ]
+        ndk-version: [ 'r25b-linux' ]
+        branches: [ 'development' ]
     defaults:
       run:
         shell: bash
@@ -38,46 +38,18 @@ jobs:
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
         run: ./android.sh --full --enable-gpl --disable-lib-srt --disable-arm-v7a
-      - name: print build logs
-        if: ${{ always() }}
-        run: cat build.log
-      - name: print ffbuild logs
-        if: ${{ failure() }}
-        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -50 ./src/ffmpeg/ffbuild/config.log'
-  build-android-lts-on-linux:
-    name: android lts on linux
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        ndk-version: [ 'r22b-linux-x86_64', 'r23b-linux' ]
-        branches: [ 'main', 'development' ]
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v4
+      - name: List all
+        run: ls -laR
+      - name: Upload Release Asset (.integrity)
+        id: upload-release-asset-integrity
+        uses: ncipollo/release-action@v1
         with:
-          ref: ${{ matrix.branches }}
-      - name: set up adopt jdk 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-      - name: prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install autoconf automake libtool pkg-config curl git doxygen nasm cmake gcc gperf texinfo yasm bison autogen wget autopoint meson ninja-build ragel groff gtk-doc-tools libtasn1-bin
-      - name: prerequisites 2
-        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1"
-      - name: upgrade meson
-        run: pip install meson --upgrade
-      - name: set up android ndk
-        run: |
-          curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
-          unzip -q -o ndk.zip -d .ndk
-          echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
-      - name: run the build script
-        run: ./android.sh -l --full --enable-gpl --disable-lib-srt
+          allowUpdates: true
+          artifacts: "prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-release.aar"
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
