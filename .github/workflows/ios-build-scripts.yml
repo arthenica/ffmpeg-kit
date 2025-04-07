@@ -1,6 +1,7 @@
 name: ios build scripts
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - development
@@ -44,6 +45,7 @@ jobs:
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
         run: ./ios.sh --xcframework --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib
+      - run: ls -laR
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -67,6 +69,7 @@ jobs:
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
         run: ./ios.sh --xcframework --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib
+      - run: ls -laR
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
@@ -90,6 +93,7 @@ jobs:
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
         run: ./ios.sh --lts --enable-ios-audiotoolbox --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-zlib
+      - run: ls -laR
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
