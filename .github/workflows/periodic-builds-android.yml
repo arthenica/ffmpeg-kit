@@ -1,8 +1,7 @@
 name: android nightly builds
 
 on:
-  schedule:
-    - cron:  '0 3 * * 0'
+  workflow_dispatch:
 
 jobs:
   build-android-main-on-linux:
