@@ -38,17 +38,16 @@ jobs:
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
         run: ./android.sh --full --enable-gpl --disable-lib-srt --disable-arm-v7a
-      - name: List all
-        run: ls -laR
       - name: Upload Release Asset (.integrity)
         id: upload-release-asset-integrity
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-release.aar"
+          artifacts: "prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           draft: true
+          tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: print build logs
         if: ${{ always() }}
