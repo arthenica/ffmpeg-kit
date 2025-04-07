@@ -23,7 +23,7 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: IOS_MIN_VERSION="13.0" PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt --disable-lib-gnutls
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt --disable-lib-gnutls --target="13.0"
       - run: ls -laR
       - name: print build logs
         if: ${{ always() }}
