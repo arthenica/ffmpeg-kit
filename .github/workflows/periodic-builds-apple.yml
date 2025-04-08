@@ -26,13 +26,13 @@ jobs:
         run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt --disable-lib-gnutls
       - name: package zip
         working-directory: ./prebuilt/bundle-apple-xcframework-ios/
-        run: zip -r ffmpegkit.xcframework.zip ffmpegkit.xcframework
+        run: zip -r ffmpegkit.xcframework.zip *
       - name: Upload Release Asset (.integrity)
         id: upload-release-asset-integrity
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "prebuilt/bundle-apple-xcframework-ios/ffmpegkit.xcframework.zip"
+          artifacts: "prebuilt/bundle-apple-xcframework-ios/ffmpegkit-bundled.xcframework.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           draft: true
