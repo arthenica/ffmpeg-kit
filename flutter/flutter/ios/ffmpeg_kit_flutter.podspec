@@ -16,7 +16,6 @@ Pod::Spec.new do |s|
     'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
   }
-  s.dependency 'ffmpeg_kit_vendor', '6.0'
   s.source           = {
     :http => 'https://github.com/FreezeIt/ffmpeg-kit/releases/download/v6.0/ffmpeg-kit-full-gpl-6.0-ios-xcframework.zip'
   }
