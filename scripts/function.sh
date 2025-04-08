@@ -2326,11 +2326,7 @@ library_is_installed() {
 }
 
 prepare_inline_sed() {
-  if [ "$(uname)" == "Darwin" ]; then
-    export SED_INLINE="sed -i .tmp"
-  else
-    export SED_INLINE="sed -i"
-  fi
+  export SED_INLINE="/opt/homebrew/opt/gnu-sed/libexec/gnubin/sed -i"
 }
 
 to_capital_case() {

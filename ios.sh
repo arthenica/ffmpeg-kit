@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "当前使用的sed路径: $(which sed)"
+sed --version | head -1
+
 # CHECK IF XCODE IS INSTALLED
 if [ ! -x "$(command -v xcrun)" ]; then
   echo -e "\n(*) xcrun command not found. Please check your Xcode installation\n"
