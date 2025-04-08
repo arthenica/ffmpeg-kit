@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-ios-main-on-macos-sonoma:
-    name: ios main on sonoma
-    runs-on: macos-14
+  build-ios-main-on-macos:
+    name: ios main
+    runs-on: macos-13
     strategy:
       matrix:
-        xcode: [ '16.0' ]
+        xcode: [ '15.2' ]
         branches: [ 'development' ]
     defaults:
       run:
@@ -23,8 +23,19 @@ jobs:
       - name: set up xcode
         run: echo "export DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" > ~/.xcode.for.ffmpeg.kit.sh
       - name: run the build script
-        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt --disable-lib-gnutls --target="13.0"
-      - run: ls -laR
+        run: PATH="/usr/local/opt/bison/bin:$PATH" XML_CATALOG_FILES="/usr/local/etc/xml/catalog" ./ios.sh -x --full --enable-gpl --disable-lib-srt --disable-lib-gnutls
+      - run: zip -r ffmpegkit.xcframework.zip ./prebuilt/bundle-apple-xcframework-ios/ffmpegkit.xcframework
+      - name: Upload Release Asset (.integrity)
+        id: upload-release-asset-integrity
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "ffmpegkit.xcframework.zip"
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          draft: true
+          tag: nightly
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
