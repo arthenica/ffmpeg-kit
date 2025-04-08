@@ -18,24 +18,5 @@ Pod::Spec.new do |s|
     'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
   }
-
-  s.default_subspec     = 'full-gpl'
-
-  s.subspec 'full-gpl' do |ss|
-    ss.source_files         = 'Classes/**/*'
-    ss.public_header_files  = 'Classes/**/*.h'
-    ss.source = {
-      :http => 'https://github.com/FreezeIt/ffmpeg-kit/releases/download/v6.0/ffmpeg-kit-full-gpl-6.0-ios-xcframework.zip'
-    }
-    ss.vendored_frameworks = [
-      'ffmpegkit.framework',
-      'libavcodec.framework',
-      'libavdevice.framework',
-      'libavfilter.framework',
-      'libavformat.framework',
-      'libavutil.framework',
-      'libswresample.framework',
-      'libswscale.framework'
-    ]
-  end
+  s.dependency 'ffmpeg_kit_vendor', '6.0'
 end
