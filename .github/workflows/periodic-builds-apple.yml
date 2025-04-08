@@ -2,6 +2,9 @@ name: apple nightly builds
 
 on:
   workflow_dispatch:
+  push:
+    tags: 
+      - '*'
 
 jobs:
   build-ios-main-on-macos:
@@ -30,13 +33,13 @@ jobs:
       - name: Upload Release Asset (.integrity)
         id: upload-release-asset-integrity
         uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           allowUpdates: true
           artifacts: "prebuilt/bundle-apple-xcframework-ios/ffmpegkit-bundled.xcframework.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           draft: true
-          tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: print build logs
         if: ${{ always() }}
