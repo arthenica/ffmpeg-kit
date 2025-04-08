@@ -12,9 +12,9 @@ if [ ! -x "$(command -v xcodebuild)" ]; then
 fi
 
 # LOAD INITIAL SETTINGS  
-export BASEDIR="$(pwd)"
-export FFMPEG_KIT_BUILD_TYPE="ios"
-source "${BASEDIR}"/scripts/variable.sh
+export BASEDIR="$(pwd)"  
+export FFMPEG_KIT_BUILD_TYPE="ios"  
+source "${BASEDIR}"/scripts/variable.sh  
 source "${BASEDIR}"/scripts/function-${FFMPEG_KIT_BUILD_TYPE}.sh
 disabled_libraries=()
 
