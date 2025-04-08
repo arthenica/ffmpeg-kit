@@ -11,7 +11,7 @@ if [ ! -x "$(command -v xcodebuild)" ]; then
   exit 1
 fi
 
-# LOAD INITIAL SETTINGS
+# LOAD INITIAL SETTINGS  
 export BASEDIR="$(pwd)"
 export FFMPEG_KIT_BUILD_TYPE="ios"
 source "${BASEDIR}"/scripts/variable.sh
