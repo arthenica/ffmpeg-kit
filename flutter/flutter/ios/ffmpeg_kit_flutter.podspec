@@ -11,12 +11,23 @@ Pod::Spec.new do |s|
   s.requires_arc        = true
   s.static_framework    = true
 
-  s.source              = { :path => '.' }
-
   s.dependency          'Flutter'
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
   }
   s.dependency 'ffmpeg_kit_vendor', '6.0'
+  s.source           = {
+    :http => 'https://github.com/FreezeIt/ffmpeg-kit/releases/download/v6.0/ffmpeg-kit-full-gpl-6.0-ios-xcframework.zip'
+  }
+  s.vendored_frameworks = [
+    'ffmpegkit.framework',
+    'libavcodec.framework',
+    'libavdevice.framework',
+    'libavfilter.framework',
+    'libavformat.framework',
+    'libavutil.framework',
+    'libswresample.framework',
+    'libswscale.framework'
+  ]
 end
