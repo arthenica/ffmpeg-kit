@@ -14,6 +14,14 @@ All previously released `ffmpeg-kit` binaries will be removed according to the f
 
 Thank you for your support and interest in this project.
 
+If you're looking for a replacement, please check out the community-maintained forks available through the package managers below.
+
+|                          Platform                           |
+|:-------------------------------------------------------:|
+| [Android](https://central.sonatype.com/search?q=ffmpeg+kit) |
+| [Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
+| [React Native](https://www.npmjs.com/search?q=ffmpeg%20kit) |
+
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
 `FFmpegKit` is a collection of tools to use `FFmpeg`<sup>1</sup> in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
