@@ -1,20 +1,15 @@
 # FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v6.0-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
 
-## Notice
-FFmpegKit has been officially retired. There will be no further `ffmpeg-kit` releases.
+## Update (July 2026)
+Development of `FFmpegKit` continues with `FFmpegKitNext`, maintained by its original author.
 
-See [Saying Goodbye to FFmpegKit @ medium](https://medium.com/@tanersener/saying-goodbye-to-ffmpegkit-33ae939767e1) to learn why we made this decision.
+[FFmpegKitNext](https://github.com/arthenica/ffmpeg-kit-next) is the actively maintained continuation of `FFmpegKit`. It is distributed as source only and continues to receive updates for newer FFmpeg releases, platform support, and build infrastructure improvements.
 
-All previously released `ffmpeg-kit` binaries will be removed according to the following schedule.
+`FFmpegKit` has been officially retired. Historical releases and documentation remain available in this repository.
 
-| FFmpegKit Version |  Available Until   |
-|:-----------------:|:------------------:|
-|   Less than 6.0   | February 1st, 2025 |
-|        6.0        |  April 1st, 2025   |
+If you're looking for the actively maintained continuation of FFmpegKit, please see `FFmpegKitNext`.
 
-Thank you for your support and interest in this project.
-
-If you're looking for a replacement, please check out the community-maintained forks available through the package managers below.
+Community-maintained forks are also available through the package managers below.
 
 |                          Platform                           |
 |:-------------------------------------------------------:|
