@@ -1,14 +1,21 @@
 # FFmpegKit
 
-## Notice
-FFmpegKit has been officially retired. There will be no further `ffmpeg-kit` releases. All previously released `ffmpeg-kit` binaries will be removed according to the following schedule. Thank you for your support and interest in this project.
+## Update (July 2026)
+Development of `FFmpegKit` continues with `FFmpegKitNext`, maintained by its original author.
 
-Thank you for your support and contributions over the course of this project.
+[FFmpegKitNext](https://github.com/arthenica/ffmpeg-kit-next) is the actively maintained continuation of `FFmpegKit`. It is distributed as source only and continues to receive updates for newer FFmpeg releases, platform support, and build infrastructure improvements.
 
-| FFmpegKit Version |  Available Until   |
-|:-----------------:|:------------------:|
-|   Less than 6.0   | February 1st, 2025 |
-|        6.0        |  April 1st, 2025   |
+`FFmpegKit` has been officially retired. Historical releases and documentation remain available in this repository.
+
+If you're looking for the actively maintained continuation of FFmpegKit, please see `FFmpegKitNext`.
+
+Community-maintained forks are also available through the package managers below.
+
+|                          Platform                           |
+|:-------------------------------------------------------:|
+| [Android](https://central.sonatype.com/search?q=ffmpeg+kit) |
+| [Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
+| [React Native](https://www.npmjs.com/search?q=ffmpeg%20kit) |
 
 <img src="https://github.com/arthenica/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
 
