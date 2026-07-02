@@ -10,11 +10,10 @@ Development of `FFmpegKit` continues with `FFmpegKitNext`, maintained by its ori
 If you're looking for the actively maintained continuation of FFmpegKit, please see `FFmpegKitNext`.
 
 Community-maintained forks are also available through the package managers below.
-|                          Platform                           |
-|:-------------------------------------------------------:|
-| [Android](https://central.sonatype.com/search?q=ffmpeg+kit) |
-| [Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
-| [React Native](https://www.npmjs.com/search?q=ffmpeg%20kit) |
+
+[Android](https://central.sonatype.com/search?q=ffmpeg+kit) |
+[Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
+[React Native](https://www.npmjs.com/search?q=ffmpeg%20kit)
 
 <img src="https://github.com/arthenica/ffmpeg-kit/raw/main/docs/assets/ffmpeg-kit-icon-v9.png" width="180">
 
